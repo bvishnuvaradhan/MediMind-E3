@@ -18,11 +18,13 @@ class UrgencyLevel(str, Enum):
     EMERGENCY = "EMERGENCY"
     MEDICAL_EVALUATION_RECOMMENDED = "MEDICAL_EVALUATION_RECOMMENDED"
     SELF_CARE = "SELF_CARE"
+    REVIEW_REQUIRED = "REVIEW_REQUIRED"
 
 class RiskLevel(str, Enum):
     HIGH = "HIGH"
     MEDIUM = "MEDIUM"
     LOW = "LOW"
+    UNKNOWN = "UNKNOWN"
 
 class GeneralHealthRequest(BaseModel):
     family_member_id: str = Field(..., description="ID of the family member (patient)")
