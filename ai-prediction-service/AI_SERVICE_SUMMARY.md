@@ -46,11 +46,23 @@ Role checks allow:
 ## Safety model
 The NLP engine is designed as a clinical decision-support tool, not a diagnostic engine. It includes:
 
-- emergency red-flag detection
+ emergency red-flag detection for cardiac, respiratory, neurological, trauma, airway, bleeding, diabetic, poisoning, and burn events
+ self-harm and psychiatric emergency detection
+ pediatric and neonatal emergency detection
+ Hindi/Hinglish and Telugu-English symptom phrase support
+ negation, historical, third-person, conditional, and hypothetical context handling
+ ambiguous, garbage, and non-specific input handling
 - moderate-risk triage rules
 - self-care / low-risk classification
 - mandatory medical disclaimer in every result
 - conservative assessment behavior for urgent symptoms
+ model version `1.1.0`
+
+## Robustness and test data
+The automated suite covers NLP edge cases, authentication, database lifecycle behavior,
+pagination, prediction-ID uniqueness, and API regression checks. Local Excel evaluation files
+and larger medical datasets are stored under `test-dataset/` and are intentionally ignored by
+Git. Dataset tests use those files when available and skip cleanly when they are not present.
 
 ## Validation status
 The current project has been verified with pytest in the active environment.

@@ -1,10 +1,13 @@
 import pytest
 import pandas as pd
+from pathlib import Path
 from app.models.general_health.general_health_nlp import GeneralHealthNLPEngine
 from app.schemas.prediction_schemas import UrgencyLevel, RiskLevel
 
 def test_evaluate_advanced_excel_dataset():
-    dataset_path = "tests/medimind_advanced_nlp_triage_test_dataset.xlsx"
+    dataset_path = Path(__file__).parent.parent / "test-dataset" / "medimind_advanced_nlp_triage_test_dataset.xlsx"
+    if not dataset_path.exists():
+        pytest.skip("Local test dataset is not available")
     df = pd.read_excel(dataset_path)
 
     passed_cases = 0
