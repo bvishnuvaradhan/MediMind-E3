@@ -31,6 +31,28 @@ class GeneralHealthRequest(BaseModel):
     text: str = Field(..., min_length=3, description="Free-text description of patient symptoms")
     appointment_id: Optional[str] = Field(None, description="Optional associated appointment ID")
 
+class HeartDiseaseRequest(BaseModel):
+    family_member_id: str = Field(..., min_length=1, description="ID of the family member (patient)")
+    AGE: float = Field(..., ge=1, le=120)
+    GENDER: float = Field(..., ge=1, le=2)
+    HEIGHT: float = Field(..., gt=0, le=300)
+    WEIGHT: float = Field(..., gt=0, le=500)
+    AP_HIGH: float = Field(..., gt=0, le=300)
+    AP_LOW: float = Field(..., gt=0, le=250)
+    CHOLESTEROL: float = Field(..., ge=1, le=3)
+    GLUCOSE: float = Field(..., ge=1, le=3)
+    SMOKE: float = Field(..., ge=0, le=1)
+    ALCOHOL: float = Field(..., ge=0, le=1)
+    PHYSICAL_ACTIVITY: float = Field(..., ge=0, le=1)
+    appointment_id: Optional[str] = Field(None, description="Optional associated appointment ID")
+
+class HeartDiseaseResponse(BaseModel):
+    family_member_id: str
+    appointment_id: Optional[str] = None
+    prediction_type: str
+    input_type: str
+    result: Dict[str, Any]
+
 class GeneralHealthResultPayload(BaseModel):
     possibleConcerns: List[str] = Field(..., description="Non-definitive possible health concerns identified")
     urgency: UrgencyLevel = Field(..., description="Safety-first urgency classification")

@@ -23,6 +23,7 @@ can change the observed class distribution, so the training report records raw,
 deduplicated, and removed-duplicate class balances. IQR outliers are reported
 but not silently clipped.
 
-The model has no inference API yet. It must not be integrated into clinical
-workflows until input validation, external validation, calibration review,
-fairness review, and clinician governance are completed.
+The current standalone inference route is `POST /api/ai/heart-disease` and
+requires the service authentication header. It must not be integrated into
+clinical workflows until input validation, external validation, calibration
+review, fairness review, and clinician governance are completed.

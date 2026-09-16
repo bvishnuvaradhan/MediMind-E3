@@ -24,6 +24,8 @@ The service currently includes:
   - `models/general_health/` — NLP triage engine
   - `models/heart_disease/` — cardiovascular dataset inspection and preprocessing
     - `heart_disease_training.py` — EDA, stratified splitting, baseline models, MLP training, and evaluation artifacts
+    - `heart_disease_service.py` — lazy Random Forest inference with thresholded risk estimates
+    - `INFERENCE_USAGE.md` — standalone script and Swagger usage
   - `services/` — business service layer
   - `api/v1/` — API routes
 - `tests/` — test suite organized by model, plus shared auth and persistence tests
@@ -35,6 +37,7 @@ The service currently includes:
 
 ## API routes
 - `POST /api/ai/general-health` — analyze symptom text and produce an AI-assessed response
+- `POST /api/ai/heart-disease` — validate 11 patient features and return a cardiovascular risk estimate
 - `GET /api/ai/member/{member_id}` — fetch prediction history for a member
 - `GET /api/ai/member/{member_id}?skip=0&limit=50` — fetch bounded, newest-first history pages
 - `GET /api/ai/{prediction_id}` — fetch a single prediction by ID
@@ -92,7 +95,7 @@ saved in the same ignored folder.
 The current project has been verified with pytest in the active environment.
 
 Most recent validation result:
-- 115 passed
+- 122 passed
 - 0 failed
 - 2 existing dependency deprecation warnings
 
@@ -127,6 +130,15 @@ from `0.32` in the 55-64 age band to `0.91` in the 30-44 band, and from `0.08`
 for cholesterol category 3 to `0.69` for category 1. These results are a
 validation finding, not evidence of clinical fairness; external validation and
 clinical governance are required before deployment.
+
+## Heart Disease inference status
+The standalone inference service loads `random_forest.joblib` lazily, validates
+the 11-feature request schema, preserves the trained feature order, applies
+threshold `0.4`, and returns a probability, `HIGH`/`LOW` risk category, model
+version `0.2.0`, and a non-diagnostic disclaimer. The local script is
+`scripts/predict_heart_disease.py`; the independent API can be tested through
+Swagger at `http://localhost:5007/docs`. Inference is not yet persisted to
+prediction history or integrated with the frontend.
 
 ## Current branch
 - Branch: `feature/ai-prediction-service`
