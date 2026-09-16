@@ -21,13 +21,20 @@ The service currently includes:
   - `core/` — configuration and database logic
   - `middleware/` — authentication and authorization
   - `schemas/` — Pydantic request/response models
+    - `prediction_schemas.py` — shared contracts plus Heart Disease inference request/response models
   - `models/general_health/` — NLP triage engine
   - `models/heart_disease/` — cardiovascular dataset inspection and preprocessing
     - `heart_disease_training.py` — EDA, stratified splitting, baseline models, MLP training, and evaluation artifacts
     - `heart_disease_service.py` — lazy Random Forest inference with thresholded risk estimates
+    - `HEART_DISEASE_MODEL_CARD.md` — model limitations and validation scope
     - `INFERENCE_USAGE.md` — standalone script and Swagger usage
   - `services/` — business service layer
+    - `heart_disease_service.py` — standalone Heart Disease prediction service
   - `api/v1/` — API routes
+    - `general_health.py` — General Health NLP routes
+    - `heart_disease.py` — standalone Heart Disease risk route
+- `scripts/` — local standalone utilities
+  - `predict_heart_disease.py` — sample local Heart Disease prediction
 - `tests/` — test suite organized by model, plus shared auth and persistence tests
   - `tests/general_health/` — General Health API, NLP robustness, and dataset tests
   - `tests/heart_disease/` — Heart Disease preprocessing and training tests
@@ -149,7 +156,6 @@ prediction history or integrated with the frontend.
 The repo roadmap includes additional prediction modules beyond general health, such as:
 
 - fracture detection
-- diabetes risk prediction
 - diabetes risk prediction
 
 These are not yet implemented in the current workspace state.
