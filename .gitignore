@@ -12,6 +12,8 @@ ENV/
 # Local data / test datasets
 ai-prediction-service/test-dataset/
 **/test-dataset/
+ai-prediction-service/artifacts/
+**/artifacts/
 
 # Environment Variables
 .env

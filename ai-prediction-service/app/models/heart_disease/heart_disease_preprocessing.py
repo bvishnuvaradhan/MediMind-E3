@@ -29,10 +29,7 @@ DATASET_COLUMNS = CARDIOVASCULAR_FEATURES + [TARGET_COLUMN]
 
 def load_cardiovascular_dataset(path: str | Path) -> pd.DataFrame:
     """Load the semicolon-delimited cardiovascular dataset."""
-    dataset = pd.read_csv(
-        path,
-        sep=";",
-    )
+    dataset = pd.read_csv(path)
     if list(dataset.columns) != DATASET_COLUMNS:
         raise ValueError(f"Unexpected cardiovascular dataset columns: {list(dataset.columns)}")
     return dataset
@@ -60,6 +57,7 @@ def prepare_cardiovascular_dataset(path: str | Path) -> tuple[pd.DataFrame, pd.S
     """Clean numeric rows and return the binary cardiovascular target."""
     dataset = load_cardiovascular_dataset(path).apply(pd.to_numeric, errors="coerce")
     dataset = dataset.dropna(subset=DATASET_COLUMNS).copy()
+    dataset = dataset.drop_duplicates().reset_index(drop=True)
     features = dataset[CARDIOVASCULAR_FEATURES]
     target = dataset[TARGET_COLUMN].astype("int64")
     return features, target

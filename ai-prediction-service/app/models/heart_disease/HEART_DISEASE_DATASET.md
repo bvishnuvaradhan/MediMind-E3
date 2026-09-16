@@ -15,12 +15,18 @@
 
 ## Inspection results
 
-- Delimiter: semicolon (`;`)
+- Delimiter: comma (standard CSV)
 - Missing values: none in the inspected file
 - Target distribution: 0 = 34,742; 1 = 34,041
-- Current preparation: coerce values to numeric, drop rows missing any feature or target, and preserve the binary target
-- Train/validation/test split: not selected yet
-- Model: not selected or trained yet
+- Exact duplicate rows: 3,820; they are removed before splitting to reduce leakage
+- Current preparation: coerce values to numeric, remove invalid targets and exact duplicates, preserve the binary target
+- Outliers: retained for now and reported with the IQR rule; no silent clipping is applied
+- Scaling: `StandardScaler` is used in Logistic Regression and MLP pipelines; Random Forest uses raw numeric features
+- Train/validation/test split: stratified 70% / 15% / 15% with random seed 42, producing 45,474 / 9,744 / 9,745 rows after deduplication
+- Models: Logistic Regression, Random Forest, and a small regularized MLP baseline
+- Metrics: recall, specificity, precision, F1, ROC-AUC, PR-AUC, Brier score, and confusion matrix
+- Baseline result: Random Forest selected by validation ROC-AUC (0.7944); test ROC-AUC was 0.7961
+- Local artifacts: saved under `artifacts/heart_disease/` and ignored by Git
 
 ## Source and limitations
 

@@ -23,6 +23,7 @@ The service currently includes:
   - `schemas/` — Pydantic request/response models
   - `models/general_health/` — NLP triage engine
   - `models/heart_disease/` — cardiovascular dataset inspection and preprocessing
+    - `heart_disease_training.py` — EDA, stratified splitting, baseline models, MLP training, and evaluation artifacts
   - `services/` — business service layer
   - `api/v1/` — API routes
 - `tests/` — test suite covering NLP, auth, MongoDB persistence, and regression checks
@@ -77,7 +78,7 @@ Git. Dataset tests use those files when available and skip cleanly when they are
 The current project has been verified with pytest in the active environment.
 
 Most recent validation result:
-- 114 passed
+- 115 passed
 - 0 failed
 - 2 existing dependency deprecation warnings
 
@@ -86,13 +87,17 @@ emergency, negation, multilingual, and authorization flows. MongoDB was
 available during validation; the in-memory fallback remains covered by the
 database tests.
 
-## Next module preparation
-The Heart Disease module has started with dataset inspection and preprocessing
-only. The available cardiovascular dataset contains 68,783 rows, 11 numeric
-features, no missing values, and a binary target with 34,742 negative and
-34,041 positive records. Training, model saving, inference routes, and frontend
-integration are intentionally not started. Dataset details are documented in
-`app/models/heart_disease/HEART_DISEASE_DATASET.md`.
+## Heart Disease module status
+The Heart Disease module now has a reproducible local training pipeline for the
+comma-separated cardiovascular dataset. It removes 3,820 exact duplicates,
+creates a stratified 70/15/15 split, reports EDA/IQR outliers and
+feature-target summaries, scales Logistic Regression and MLP inputs, and
+compares Logistic Regression, Random Forest, and a regularized MLP. Random
+Forest was selected by validation ROC-AUC (0.7944) and achieved 0.7961 test
+ROC-AUC; the MLP achieved 0.7956 test ROC-AUC. Metrics include recall,
+specificity, precision, F1, ROC-AUC, PR-AUC, Brier score, and confusion matrix.
+Artifacts are saved locally under `artifacts/heart_disease/` and ignored by
+Git. No inference route or frontend integration has been added yet.
 
 ## Current branch
 - Branch: `feature/ai-prediction-service`
@@ -103,6 +108,6 @@ The repo roadmap includes additional prediction modules beyond general health, s
 
 - fracture detection
 - diabetes risk prediction
-- heart disease risk prediction
+- heart disease risk prediction API integration
 
 These are not yet implemented in the current workspace state.
