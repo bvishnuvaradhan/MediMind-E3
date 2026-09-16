@@ -89,3 +89,14 @@ def test_api_route_rejects_missing_feature():
     del payload["AP_LOW"]
     response = client.post("/api/ai/heart-disease", json=payload, headers=AUTH_HEADERS)
     assert response.status_code == 422
+
+
+def test_api_route_requires_authentication():
+    response = TestClient(app).post("/api/ai/heart-disease", json=VALID)
+    assert response.status_code == 401
+
+
+def test_openapi_exposes_heart_disease_route():
+    openapi = TestClient(app).get("/openapi.json")
+    assert openapi.status_code == 200
+    assert "/api/ai/heart-disease" in openapi.json()["paths"]

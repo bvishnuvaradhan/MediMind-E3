@@ -95,7 +95,7 @@ saved in the same ignored folder.
 The current project has been verified with pytest in the active environment.
 
 Most recent validation result:
-- 122 passed
+- 124 passed
 - 0 failed
 - 2 existing dependency deprecation warnings
 
@@ -114,7 +114,8 @@ Forest was selected by validation ROC-AUC (0.7944) and achieved 0.7961 test
 ROC-AUC; the MLP achieved 0.7956 test ROC-AUC. Metrics include recall,
 specificity, precision, F1, ROC-AUC, PR-AUC, Brier score, and confusion matrix.
 Artifacts are saved locally under `artifacts/heart_disease/` and ignored by
-Git. No inference route or frontend integration has been added yet.
+Git. A standalone inference service and independent API route are available;
+prediction-history persistence and frontend integration have not been added.
 
 Validation methodology now records raw versus deduplicated class balance,
 confirms that threshold `0.4` was selected from validation data only, reports
@@ -149,6 +150,6 @@ The repo roadmap includes additional prediction modules beyond general health, s
 
 - fracture detection
 - diabetes risk prediction
-- heart disease risk prediction API integration
+- diabetes risk prediction
 
 These are not yet implemented in the current workspace state.
