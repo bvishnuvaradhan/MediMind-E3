@@ -9,6 +9,10 @@ venv/
 ENV/
 .pytest_cache/
 
+# Local data / test datasets
+ai-prediction-service/test-dataset/
+**/test-dataset/
+
 # Environment Variables
 .env
 .env.local
