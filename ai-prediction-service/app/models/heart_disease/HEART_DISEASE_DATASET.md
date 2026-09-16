@@ -26,6 +26,9 @@
 - Models: Logistic Regression, Random Forest, and a small regularized MLP baseline
 - Metrics: recall, specificity, precision, F1, ROC-AUC, PR-AUC, Brier score, and confusion matrix
 - Baseline result: Random Forest selected by validation ROC-AUC (0.7944); test ROC-AUC was 0.7961
+- Threshold policy: tune on validation data for maximum recall while maintaining at least 0.60 specificity; never tune on the test set
+- Calibration and error analysis: saved in `training_report.json`, including reliability bins, expected calibration error, false positives, and false negatives
+- Limitations: this is a population-risk estimate, not a diagnosis; feature codes and dataset provenance require confirmation before clinical use
 - Local artifacts: saved under `artifacts/heart_disease/` and ignored by Git
 
 ## Source and limitations
