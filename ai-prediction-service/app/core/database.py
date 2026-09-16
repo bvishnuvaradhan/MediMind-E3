@@ -37,9 +37,7 @@ class Database:
             # Verify server availability
             await cls.client.server_info()
             cls.db = cls.client[settings.DB_NAME]
-            logger.info(
-                f"Connected to MongoDB at {settings.MONGO_URI} (DB: {settings.DB_NAME})"
-            )
+            logger.info("Connected to MongoDB database '%s'", settings.DB_NAME)
             # Ensure indexes exist — idempotent, safe to call every startup
             await cls.create_indexes()
         except Exception as e:

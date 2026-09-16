@@ -22,13 +22,16 @@ The service currently includes:
   - `middleware/` — authentication and authorization
   - `schemas/` — Pydantic request/response models
   - `models/general_health/` — NLP triage engine
+  - `models/heart_disease/` — cardiovascular dataset inspection and preprocessing
   - `services/` — business service layer
   - `api/v1/` — API routes
 - `tests/` — test suite covering NLP, auth, MongoDB persistence, and regression checks
+- `test-dataset/` — local-only evaluation datasets; ignored by Git
 
 ## API routes
 - `POST /api/ai/general-health` — analyze symptom text and produce an AI-assessed response
 - `GET /api/ai/member/{member_id}` — fetch prediction history for a member
+- `GET /api/ai/member/{member_id}?skip=0&limit=50` — fetch bounded, newest-first history pages
 - `GET /api/ai/{prediction_id}` — fetch a single prediction by ID
 - `GET /health` — service health check
 
@@ -58,6 +61,12 @@ The NLP engine is designed as a clinical decision-support tool, not a diagnostic
 - conservative assessment behavior for urgent symptoms
  model version `1.1.0`
 
+Supported General Health input is free-text symptom description in English,
+Hindi/Hinglish, or Telugu-English phrasing covered by the rule set. The module
+does not diagnose disease, interpret images, replace a clinician, or provide
+reliable risk assessment for unsupported languages, clinical records without
+context, or non-symptom medical questions.
+
 ## Robustness and test data
 The automated suite covers NLP edge cases, authentication, database lifecycle behavior,
 pagination, prediction-ID uniqueness, and API regression checks. Local Excel evaluation files
@@ -68,8 +77,22 @@ Git. Dataset tests use those files when available and skip cleanly when they are
 The current project has been verified with pytest in the active environment.
 
 Most recent validation result:
-- 111 passed
+- 114 passed
 - 0 failed
+- 2 existing dependency deprecation warnings
+
+The live service was also checked at `http://localhost:5007/docs` for health,
+emergency, negation, multilingual, and authorization flows. MongoDB was
+available during validation; the in-memory fallback remains covered by the
+database tests.
+
+## Next module preparation
+The Heart Disease module has started with dataset inspection and preprocessing
+only. The available cardiovascular dataset contains 68,783 rows, 11 numeric
+features, no missing values, and a binary target with 34,742 negative and
+34,041 positive records. Training, model saving, inference routes, and frontend
+integration are intentionally not started. Dataset details are documented in
+`app/models/heart_disease/HEART_DISEASE_DATASET.md`.
 
 ## Current branch
 - Branch: `feature/ai-prediction-service`

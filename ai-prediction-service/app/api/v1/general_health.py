@@ -1,10 +1,13 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+import logging
+
+from fastapi import APIRouter, HTTPException, status, Depends, Query
 from typing import List, Dict, Any
 from app.schemas.prediction_schemas import GeneralHealthRequest, CommonPredictionResponse
 from app.services.general_health_service import GeneralHealthService
 from app.middleware.auth import get_current_user_or_service, authorize_family_member_access
 
 router = APIRouter(prefix="/api/ai", tags=["AI Prediction"])
+logger = logging.getLogger("ai_service.api.general_health")
 
 @router.post(
     "/general-health",
@@ -25,10 +28,11 @@ async def analyze_general_health(
     try:
         prediction = await GeneralHealthService.analyze_general_health(request)
         return prediction
-    except Exception as e:
+    except Exception:
+        logger.exception("General Health analysis failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occurred during General Health AI analysis: {str(e)}"
+            detail="An error occurred during General Health AI analysis."
         )
 
 @router.get(
@@ -38,6 +42,8 @@ async def analyze_general_health(
 )
 async def get_member_prediction_history(
     member_id: str,
+    skip: int = Query(0, ge=0, description="Number of history records to skip"),
+    limit: int = Query(50, ge=1, le=100, description="Maximum records to return"),
     current_user: Dict[str, Any] = Depends(get_current_user_or_service)
 ):
     """
@@ -45,7 +51,7 @@ async def get_member_prediction_history(
     Enforces authorization check for family member.
     """
     authorize_family_member_access(current_user, member_id)
-    history = await GeneralHealthService.get_history_by_member(member_id)
+    history = await GeneralHealthService.get_history_by_member(member_id, skip=skip, limit=limit)
     return history
 
 @router.get(

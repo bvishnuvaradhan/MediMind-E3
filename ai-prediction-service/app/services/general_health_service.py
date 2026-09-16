@@ -47,8 +47,17 @@ class GeneralHealthService:
         return prediction_record
 
     @classmethod
-    async def get_history_by_member(cls, family_member_id: str) -> List[Dict[str, Any]]:
-        return await Database.get_predictions_by_member(family_member_id)
+    async def get_history_by_member(
+        cls,
+        family_member_id: str,
+        skip: int = 0,
+        limit: int = 50,
+    ) -> List[Dict[str, Any]]:
+        return await Database.get_predictions_by_member(
+            family_member_id,
+            skip=skip,
+            limit=limit,
+        )
 
     @classmethod
     async def get_prediction_by_id(cls, prediction_id: str) -> Optional[Dict[str, Any]]:

@@ -74,3 +74,20 @@ def test_api_prediction_history_endpoints():
     assert single_res.status_code == 200
     single_data = single_res.json()
     assert single_data["prediction_id"] == pred_id
+
+def test_api_prediction_history_pagination():
+    member_id = "mem_api_page_001"
+    for index in range(3):
+        response = client.post(
+            "/api/ai/general-health",
+            json={"family_member_id": member_id, "text": f"Mild headache {index}"},
+            headers=AUTH_HEADERS,
+        )
+        assert response.status_code == 200
+
+    page = client.get(
+        f"/api/ai/member/{member_id}?skip=1&limit=1",
+        headers=AUTH_HEADERS,
+    )
+    assert page.status_code == 200
+    assert len(page.json()) == 1
