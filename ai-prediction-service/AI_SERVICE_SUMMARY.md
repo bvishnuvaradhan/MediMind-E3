@@ -26,7 +26,11 @@ The service currently includes:
     - `heart_disease_training.py` — EDA, stratified splitting, baseline models, MLP training, and evaluation artifacts
   - `services/` — business service layer
   - `api/v1/` — API routes
-- `tests/` — test suite covering NLP, auth, MongoDB persistence, and regression checks
+- `tests/` — test suite organized by model, plus shared auth and persistence tests
+  - `tests/general_health/` — General Health API, NLP robustness, and dataset tests
+  - `tests/heart_disease/` — Heart Disease preprocessing and training tests
+  - `tests/test_auth.py` — shared authentication and authorization tests
+  - `tests/test_mongodb_integration.py` — shared persistence, pagination, and uniqueness tests
 - `test-dataset/` — local-only evaluation datasets; ignored by Git
 
 ## API routes
@@ -73,6 +77,16 @@ The automated suite covers NLP edge cases, authentication, database lifecycle be
 pagination, prediction-ID uniqueness, and API regression checks. Local Excel evaluation files
 and larger medical datasets are stored under `test-dataset/` and are intentionally ignored by
 Git. Dataset tests use those files when available and skip cleanly when they are not present.
+
+## Where to see results
+Run training from `ai-prediction-service/` with:
+
+`py -c "from app.models.heart_disease.heart_disease_training import train_and_evaluate; train_and_evaluate('test-dataset/Heart Disease/cardiovascular_diseases_dv3.csv', 'artifacts/heart_disease')"`
+
+Live progress, model timings, MLP iterations, early stopping, and Random Forest
+diagnostics appear in the terminal. Final metrics and training diagnostics are
+saved in `artifacts/heart_disease/training_report.json`; trained model files are
+saved in the same ignored folder.
 
 ## Validation status
 The current project has been verified with pytest in the active environment.

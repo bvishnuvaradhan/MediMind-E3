@@ -1,10 +1,12 @@
 """Reproducible training and evaluation pipeline for cardiovascular risk models."""
 
 import json
+import time
 from pathlib import Path
 from typing import Any, Dict
 
 import joblib
+import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -31,7 +33,7 @@ from app.models.heart_disease.heart_disease_preprocessing import (
 
 RANDOM_STATE = 42
 MODEL_NAME = "heart_disease_risk"
-MODEL_VERSION = "0.1.0"
+MODEL_VERSION = "0.2.0"
 
 
 def prepare_training_data(path: str | Path) -> tuple[pd.DataFrame, pd.Series, Dict[str, int]]:
@@ -105,12 +107,18 @@ def exploratory_profile(features: pd.DataFrame, target: pd.Series) -> Dict[str, 
     return {"distributions": distribution, "feature_target_relationships": relationships}
 
 
-def _classification_metrics(target: pd.Series, probabilities: Any) -> Dict[str, Any]:
-    predictions = (probabilities >= 0.5).astype(int)
+def _classification_metrics(
+    target: pd.Series,
+    probabilities: Any,
+    threshold: float = 0.5,
+) -> Dict[str, Any]:
+    probabilities = np.asarray(probabilities)
+    predictions = (probabilities >= threshold).astype(int)
     true_negative, false_positive, false_negative, true_positive = confusion_matrix(
         target, predictions, labels=[0, 1]
     ).ravel()
     return {
+        "threshold": threshold,
         "recall": float(recall_score(target, predictions, zero_division=0)),
         "specificity": float(true_negative / (true_negative + false_positive)),
         "precision": float(precision_score(target, predictions, zero_division=0)),
@@ -119,6 +127,57 @@ def _classification_metrics(target: pd.Series, probabilities: Any) -> Dict[str, 
         "pr_auc": float(average_precision_score(target, probabilities)),
         "brier_score": float(brier_score_loss(target, probabilities)),
         "confusion_matrix": [[int(true_negative), int(false_positive)], [int(false_negative), int(true_positive)]],
+    }
+
+
+def tune_threshold(
+    target: pd.Series,
+    probabilities: Any,
+    minimum_specificity: float = 0.60,
+) -> Dict[str, Any]:
+    """Select a validation threshold maximizing recall under a specificity floor."""
+    candidates = []
+    for threshold in [index / 100 for index in range(5, 100, 5)]:
+        metrics = _classification_metrics(target, probabilities, threshold)
+        if metrics["specificity"] >= minimum_specificity:
+            candidates.append(metrics)
+    if not candidates:
+        return _classification_metrics(target, probabilities, 0.5)
+    return max(candidates, key=lambda metrics: (metrics["recall"], metrics["f1"]))
+
+
+def calibration_summary(target: pd.Series, probabilities: Any, bins: int = 10) -> Dict[str, Any]:
+    """Return reliability-bin statistics and expected calibration error."""
+    probabilities = np.asarray(probabilities)
+    frame = pd.DataFrame({"target": target.to_numpy(), "probability": probabilities})
+    frame["bin"] = pd.cut(frame["probability"], bins=bins, labels=False, include_lowest=True)
+    grouped = frame.groupby("bin", observed=True)
+    rows = []
+    weighted_error = 0.0
+    for bin_id, group in grouped:
+        mean_probability = float(group["probability"].mean())
+        observed_rate = float(group["target"].mean())
+        weight = len(group) / len(frame)
+        weighted_error += weight * abs(mean_probability - observed_rate)
+        rows.append({
+            "bin": int(bin_id),
+            "count": int(len(group)),
+            "mean_probability": mean_probability,
+            "observed_rate": observed_rate,
+        })
+    return {"expected_calibration_error": float(weighted_error), "bins": rows}
+
+
+def error_analysis(target: pd.Series, probabilities: Any, threshold: float) -> Dict[str, Any]:
+    """Summarize false positives and false negatives for clinical review."""
+    predictions = (probabilities >= threshold).astype(int)
+    false_positive = int(((target.to_numpy() == 0) & (predictions == 1)).sum())
+    false_negative = int(((target.to_numpy() == 1) & (predictions == 0)).sum())
+    return {
+        "threshold": threshold,
+        "false_positive_count": false_positive,
+        "false_negative_count": false_negative,
+        "error_count": false_positive + false_negative,
     }
 
 
@@ -159,12 +218,39 @@ def train_and_evaluate(
     }
 
     evaluations: Dict[str, Any] = {}
+    training_diagnostics: Dict[str, Any] = {}
     for name, model in models.items():
+        print(f"[heart-disease] training {name} on {len(partitions['x_train'])} rows...", flush=True)
+        started_at = time.perf_counter()
         model.fit(partitions["x_train"], partitions["y_train"])
+        duration_seconds = time.perf_counter() - started_at
+        diagnostics: Dict[str, Any] = {
+            "status": "completed",
+            "duration_seconds": round(duration_seconds, 3),
+        }
+        if name == "mlp":
+            mlp_model = model.named_steps["model"]
+            diagnostics.update({
+                "iterations_completed": int(mlp_model.n_iter_),
+                "maximum_iterations": int(mlp_model.max_iter),
+                "stopped_early": bool(mlp_model.n_iter_ < mlp_model.max_iter),
+                "early_stopping_enabled": bool(mlp_model.early_stopping),
+                "final_loss": float(mlp_model.loss_),
+            })
+        elif name == "random_forest":
+            diagnostics["estimators_trained"] = int(model.n_estimators)
+            diagnostics["maximum_depth"] = model.max_depth
+        training_diagnostics[name] = diagnostics
+        print(
+            f"[heart-disease] completed {name} in {duration_seconds:.2f}s "
+            f"({diagnostics})",
+            flush=True,
+        )
         validation_probabilities = model.predict_proba(partitions["x_validation"])[:, 1]
         test_probabilities = model.predict_proba(partitions["x_test"])[:, 1]
+        validation_metrics = _classification_metrics(partitions["y_validation"], validation_probabilities)
         evaluations[name] = {
-            "validation": _classification_metrics(partitions["y_validation"], validation_probabilities),
+            "validation": validation_metrics,
             "test": _classification_metrics(partitions["y_test"], test_probabilities),
         }
         joblib.dump(model, artifact_path / f"{name}.joblib")
@@ -173,6 +259,21 @@ def train_and_evaluate(
         evaluations,
         key=lambda name: evaluations[name]["validation"]["roc_auc"],
     )
+    best_model = models[best_model_name]
+    best_validation_probabilities = best_model.predict_proba(partitions["x_validation"])[:, 1]
+    tuned_validation_metrics = tune_threshold(
+        partitions["y_validation"],
+        best_validation_probabilities,
+        minimum_specificity=0.60,
+    )
+    best_test_probabilities = best_model.predict_proba(partitions["x_test"])[:, 1]
+    tuned_threshold = tuned_validation_metrics["threshold"]
+    evaluations[best_model_name]["tuned_validation"] = tuned_validation_metrics
+    evaluations[best_model_name]["tuned_test"] = _classification_metrics(
+        partitions["y_test"], best_test_probabilities, tuned_threshold
+    )
+    calibration = calibration_summary(partitions["y_test"], best_test_probabilities)
+    errors = error_analysis(partitions["y_test"], best_test_probabilities, tuned_threshold)
     joblib.dump(models[best_model_name], artifact_path / "best_model.joblib")
     report = {
         "model_name": MODEL_NAME,
@@ -191,7 +292,11 @@ def train_and_evaluate(
         "preparation": preparation,
         "eda": exploratory_profile(features, target),
         "models": evaluations,
+        "training_diagnostics": training_diagnostics,
         "selected_model": best_model_name,
+        "selected_threshold": tuned_threshold,
+        "calibration": calibration,
+        "error_analysis": errors,
     }
     (artifact_path / "training_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     return report

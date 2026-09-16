@@ -8,14 +8,16 @@ from app.models.heart_disease.heart_disease_preprocessing import (
     prepare_cardiovascular_dataset,
 )
 from app.models.heart_disease.heart_disease_training import (
+    calibration_summary,
     exploratory_profile,
+    tune_threshold,
     prepare_training_data,
     split_dataset,
 )
 
 
 DATASET_PATH = (
-    Path(__file__).parent.parent
+    Path(__file__).parent.parent.parent
     / "test-dataset"
     / "Heart Disease"
     / "cardiovascular_diseases_dv3.csv"
@@ -59,3 +61,15 @@ def test_training_preparation_removes_duplicates_and_splits_stratified():
     assert sum(len(partitions[key]) for key in ("x_train", "x_validation", "x_test")) == len(features)
     assert set(profile["distributions"]) == set(CARDIOVASCULAR_FEATURES)
     assert set(profile["feature_target_relationships"]) == set(CARDIOVASCULAR_FEATURES)
+
+
+def test_threshold_and_calibration_reports_are_deterministic():
+    target = __import__("pandas").Series([0, 0, 1, 1])
+    probabilities = [0.10, 0.40, 0.55, 0.90]
+
+    threshold_metrics = tune_threshold(target, probabilities, minimum_specificity=0.50)
+    calibration = calibration_summary(target, probabilities, bins=2)
+
+    assert 0.05 <= threshold_metrics["threshold"] <= 0.95
+    assert threshold_metrics["specificity"] >= 0.50
+    assert 0.0 <= calibration["expected_calibration_error"] <= 1.0
