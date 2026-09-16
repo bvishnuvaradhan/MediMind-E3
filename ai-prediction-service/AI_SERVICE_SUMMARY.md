@@ -159,3 +159,7 @@ The repo roadmap includes additional prediction modules beyond general health, s
 - diabetes risk prediction
 
 These are not yet implemented in the current workspace state.
+
+The standalone route has been validated for successful predictions, schema
+errors, missing authentication, OpenAPI exposure, and missing-model failure
+handling, so it is ready for future integration work.

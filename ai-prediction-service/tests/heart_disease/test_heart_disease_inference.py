@@ -100,3 +100,20 @@ def test_openapi_exposes_heart_disease_route():
     openapi = TestClient(app).get("/openapi.json")
     assert openapi.status_code == 200
     assert "/api/ai/heart-disease" in openapi.json()["paths"]
+
+    def test_api_route_returns_service_unavailable_when_model_is_missing(monkeypatch):
+        def missing_model(cls, model_path=None):
+            raise FileNotFoundError("missing model artifact")
+
+        monkeypatch.setattr(
+            HeartDiseaseInferenceService,
+            "load_model",
+            classmethod(missing_model),
+        )
+        response = TestClient(app).post(
+            "/api/ai/heart-disease",
+            json=VALID,
+            headers=AUTH_HEADERS,
+        )
+        assert response.status_code == 503
+        assert response.json()["detail"] == "Heart Disease model is unavailable."
