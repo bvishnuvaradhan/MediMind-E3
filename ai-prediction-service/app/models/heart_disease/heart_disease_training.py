@@ -42,11 +42,30 @@ def prepare_training_data(path: str | Path) -> tuple[pd.DataFrame, pd.Series, Di
     rows_before = len(dataset)
     dataset = dataset.dropna(subset=CARDIOVASCULAR_FEATURES + [TARGET_COLUMN])
     dataset = dataset[dataset[TARGET_COLUMN].isin([0, 1])]
+    rows_before_deduplication = len(dataset)
+    duplicate_rows = dataset[dataset.duplicated(keep="first")]
+    duplicate_groups = dataset[dataset.duplicated(keep=False)].drop_duplicates()
     dataset = dataset.drop_duplicates().reset_index(drop=True)
     stats = {
         "rows_before": rows_before,
+        "rows_before_deduplication": rows_before_deduplication,
         "rows_after": len(dataset),
-        "duplicates_removed": rows_before - len(dataset),
+        "duplicates_removed": len(duplicate_rows),
+        "duplicate_groups": len(duplicate_groups),
+        "raw_class_balance": {
+            str(label): int(count)
+            for label, count in pd.Series(
+                dataset[TARGET_COLUMN].tolist() + duplicate_rows[TARGET_COLUMN].tolist()
+            ).value_counts().sort_index().items()
+        },
+        "deduplicated_class_balance": {
+            str(label): int(count)
+            for label, count in dataset[TARGET_COLUMN].value_counts().sort_index().items()
+        },
+        "removed_duplicate_class_balance": {
+            str(label): int(count)
+            for label, count in duplicate_rows[TARGET_COLUMN].value_counts().sort_index().items()
+        },
     }
     return dataset[CARDIOVASCULAR_FEATURES], dataset[TARGET_COLUMN].astype("int64"), stats
 
@@ -149,7 +168,7 @@ def tune_threshold(
 def calibration_summary(target: pd.Series, probabilities: Any, bins: int = 10) -> Dict[str, Any]:
     """Return reliability-bin statistics and expected calibration error."""
     probabilities = np.asarray(probabilities)
-    frame = pd.DataFrame({"target": target.to_numpy(), "probability": probabilities})
+    frame = pd.DataFrame({"target": np.asarray(target), "probability": probabilities})
     frame["bin"] = pd.cut(frame["probability"], bins=bins, labels=False, include_lowest=True)
     grouped = frame.groupby("bin", observed=True)
     rows = []
@@ -178,7 +197,49 @@ def error_analysis(target: pd.Series, probabilities: Any, threshold: float) -> D
         "false_positive_count": false_positive,
         "false_negative_count": false_negative,
         "error_count": false_positive + false_negative,
+        "false_positive_rate": float(false_positive / (target == 0).sum()),
+        "false_negative_rate": float(false_negative / (target == 1).sum()),
     }
+
+
+def subgroup_metrics(
+    features: pd.DataFrame,
+    target: pd.Series,
+    probabilities: Any,
+    threshold: float,
+) -> Dict[str, Any]:
+    """Evaluate selected model behavior across fixed demographic/clinical groups."""
+    probabilities = np.asarray(probabilities)
+    groups = {
+        "GENDER": {str(value): features["GENDER"] == value for value in sorted(features["GENDER"].unique())},
+        "AGE_BAND": {
+            "30-44": (features["AGE"] >= 30) & (features["AGE"] <= 44),
+            "45-54": (features["AGE"] >= 45) & (features["AGE"] <= 54),
+            "55-64": (features["AGE"] >= 55) & (features["AGE"] <= 64),
+            "65+": features["AGE"] >= 65,
+        },
+        "CHOLESTEROL": {str(value): features["CHOLESTEROL"] == value for value in sorted(features["CHOLESTEROL"].unique())},
+        "GLUCOSE": {str(value): features["GLUCOSE"] == value for value in sorted(features["GLUCOSE"].unique())},
+    }
+    report = {}
+    for dimension, dimension_groups in groups.items():
+        report[dimension] = {}
+        for group_name, mask in dimension_groups.items():
+            mask_values = mask.to_numpy()
+            group_target = target.to_numpy()[mask_values]
+            group_probabilities = probabilities[mask_values]
+            if len(group_target) == 0:
+                continue
+            metrics = _classification_metrics(group_target, group_probabilities, threshold)
+            if len(np.unique(group_target)) < 2:
+                metrics["roc_auc"] = None
+            metrics.update({
+                "count": int(len(group_target)),
+                "prevalence": float(group_target.mean()),
+                "expected_calibration_error": calibration_summary(group_target, group_probabilities)["expected_calibration_error"],
+            })
+            report[dimension][group_name] = metrics
+    return report
 
 
 def train_and_evaluate(
@@ -274,6 +335,12 @@ def train_and_evaluate(
     )
     calibration = calibration_summary(partitions["y_test"], best_test_probabilities)
     errors = error_analysis(partitions["y_test"], best_test_probabilities, tuned_threshold)
+    subgroups = subgroup_metrics(
+        partitions["x_test"],
+        partitions["y_test"],
+        best_test_probabilities,
+        tuned_threshold,
+    )
     joblib.dump(models[best_model_name], artifact_path / "best_model.joblib")
     report = {
         "model_name": MODEL_NAME,
@@ -297,6 +364,20 @@ def train_and_evaluate(
         "selected_threshold": tuned_threshold,
         "calibration": calibration,
         "error_analysis": errors,
+        "subgroups": subgroups,
+        "threshold_provenance": {
+            "source_partition": "validation",
+            "selection_metric": "recall",
+            "tie_breaker": "f1",
+            "minimum_specificity": 0.60,
+            "candidate_thresholds": "0.05 to 0.95 in 0.05 steps",
+            "test_partition_usage": "evaluation only; never used to select the threshold",
+        },
+        "model_card": {
+            "output_interpretation": "Estimated cardiovascular risk probability and risk category.",
+            "not_a_diagnosis": "This model does not diagnose heart disease.",
+            "clinical_use": "Results require qualified clinician review and must not replace clinical judgment.",
+        },
     }
     (artifact_path / "training_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     return report

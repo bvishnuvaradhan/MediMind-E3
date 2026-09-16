@@ -13,6 +13,7 @@ from app.models.heart_disease.heart_disease_training import (
     tune_threshold,
     prepare_training_data,
     split_dataset,
+    subgroup_metrics,
 )
 
 
@@ -61,6 +62,20 @@ def test_training_preparation_removes_duplicates_and_splits_stratified():
     assert sum(len(partitions[key]) for key in ("x_train", "x_validation", "x_test")) == len(features)
     assert set(profile["distributions"]) == set(CARDIOVASCULAR_FEATURES)
     assert set(profile["feature_target_relationships"]) == set(CARDIOVASCULAR_FEATURES)
+
+
+def test_subgroup_metrics_and_duplicate_balance_are_reportable():
+    if not DATASET_PATH.exists():
+        pytest.skip("Local heart-disease dataset is not available")
+
+    features, target, stats = prepare_training_data(DATASET_PATH)
+    probabilities = target.to_numpy() * 0.7 + 0.15
+    report = subgroup_metrics(features, target, probabilities, 0.4)
+
+    assert stats["duplicate_groups"] > 0
+    assert set(report) == {"GENDER", "AGE_BAND", "CHOLESTEROL", "GLUCOSE"}
+    assert report["AGE_BAND"]["45-54"]["count"] > 0
+    assert 0.0 <= report["GENDER"]["1"]["expected_calibration_error"] <= 1.0
 
 
 def test_threshold_and_calibration_reports_are_deterministic():

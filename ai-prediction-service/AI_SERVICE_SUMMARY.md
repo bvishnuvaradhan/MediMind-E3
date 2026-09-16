@@ -113,6 +113,21 @@ specificity, precision, F1, ROC-AUC, PR-AUC, Brier score, and confusion matrix.
 Artifacts are saved locally under `artifacts/heart_disease/` and ignored by
 Git. No inference route or frontend integration has been added yet.
 
+Validation methodology now records raw versus deduplicated class balance,
+confirms that threshold `0.4` was selected from validation data only, reports
+performance and calibration across gender, age bands, cholesterol, and glucose
+subgroups, and summarizes false-positive/false-negative rates. Duplicate removal
+changed the class balance from raw `34,742/34,041` to deduplicated `31,910/33,053`,
+so this sensitivity evidence must be considered during review. The model card
+states that outputs are cardiovascular risk estimates and are not diagnoses.
+
+The subgroup report shows materially different operating behavior across age,
+cholesterol, and glucose groups. For example, tuned test specificity ranges
+from `0.32` in the 55-64 age band to `0.91` in the 30-44 band, and from `0.08`
+for cholesterol category 3 to `0.69` for category 1. These results are a
+validation finding, not evidence of clinical fairness; external validation and
+clinical governance are required before deployment.
+
 ## Current branch
 - Branch: `feature/ai-prediction-service`
 - Scope: AI prediction service module, especially general health triage
