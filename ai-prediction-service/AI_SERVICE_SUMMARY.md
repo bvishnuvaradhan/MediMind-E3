@@ -58,8 +58,17 @@ The service supports two valid access patterns:
 
 Role checks allow:
 - Internal system calls
-- DOCTOR / ADMIN / DEPARTMENT_HEAD / HOSPITAL_ADMIN / CHAIRMAN access
-- FAMILY users only for their own linked family members
+- FAMILY users only for exact linked member IDs in their trusted scope
+
+`JWT_SECRET` and `INTERNAL_SERVICE_KEY` are required environment settings. The
+service does not provide development fallback credentials; local development
+must supply explicit values through `.env`.
+
+Until the platform provides an authoritative member-access source, direct JWT
+access to private predictions is limited to FAMILY tokens carrying exact
+`family_member_ids` scope entries. Doctors and organizational roles must use
+an authorized internal service path rather than receiving role-based access to
+private prediction records.
 
 ## Safety model
 The NLP engine is designed as a clinical decision-support tool, not a diagnostic engine. It includes:
@@ -145,9 +154,11 @@ The standalone inference service loads `random_forest.joblib` lazily, validates
 the 11-feature request schema, preserves the trained feature order, applies
 threshold `0.4`, and returns a probability, `HIGH`/`LOW` risk category, model
 version `0.2.0`, and a non-diagnostic disclaimer. The local script is
-`scripts/predict_heart_disease.py`; the independent API can be tested through
-Swagger at `http://localhost:5007/docs`. Inference is not yet persisted to
-prediction history or integrated with the frontend.
+`scripts/predict_heart_disease.py`; the API persists successful inference
+results to prediction history and can be tested through Swagger at
+`http://localhost:5007/docs`. The common `risk_score` and `confidence` fields
+use the available risk probability; `confidence` is not independently
+calibrated. Frontend integration has not been added.
 
 ## Current branch
 - Branch: `feature/ai-prediction-service`

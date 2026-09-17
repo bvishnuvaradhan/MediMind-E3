@@ -4,7 +4,7 @@ from typing import Any, Dict
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.middleware.auth import authorize_family_member_access, get_current_user_or_service
-from app.schemas.prediction_schemas import HeartDiseaseRequest, HeartDiseaseResponse
+from app.schemas.prediction_schemas import CommonPredictionResponse, HeartDiseaseRequest
 from app.services.heart_disease_service import HeartDiseaseInferenceService
 
 
@@ -12,21 +12,14 @@ router = APIRouter(prefix="/api/ai", tags=["AI Prediction"])
 logger = logging.getLogger("ai_service.api.heart_disease")
 
 
-@router.post("/heart-disease", response_model=HeartDiseaseResponse, status_code=status.HTTP_200_OK)
+@router.post("/heart-disease", response_model=CommonPredictionResponse, status_code=status.HTTP_200_OK)
 async def predict_heart_disease(
     request: HeartDiseaseRequest,
     current_user: Dict[str, Any] = Depends(get_current_user_or_service),
 ):
     authorize_family_member_access(current_user, request.family_member_id)
     try:
-        result = HeartDiseaseInferenceService.predict(request)
-        return {
-            "family_member_id": request.family_member_id,
-            "appointment_id": request.appointment_id,
-            "prediction_type": "HEART_DISEASE_RISK",
-            "input_type": "HEALTH_PARAMETERS",
-            "result": result,
-        }
+        return await HeartDiseaseInferenceService.predict_and_persist(request)
     except FileNotFoundError:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Heart Disease model is unavailable.")
     except ValueError as exc:
