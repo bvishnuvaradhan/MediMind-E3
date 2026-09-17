@@ -39,9 +39,13 @@ New members receive mock record and prediction counts of zero.
 Each family member can be opened on a separate profile page containing:
 
 - Member name and relation
+- Date of birth, age, gender, and blood group
+- Phone, email, address, and emergency contact
+- Medical conditions, allergies, and previous treatments
 - Health overview mock score
 - Medical record count
 - AI prediction count
+- Appointment, consultation, prescription, and shared doctor counts
 - Recent records
 - Link to the Medical records page
 - Back to Family members navigation
@@ -55,7 +59,8 @@ The Medical records page includes mock records with:
 - Source
 - Availability status
 - Record category filters
-- Click feedback for opening a record
+- Functional category filters for All, Reports, Tests, X-Rays, Prescriptions, Consultations, and AI Reports
+- Medical record details popup with patient, source, date, and description
 
 The Upload record page includes controls for:
 
@@ -78,6 +83,8 @@ The General health risk model represents an overall estimate based on symptoms, 
 
 All prediction modules currently use mock presentation behavior and do not connect to a production AI model.
 
+General Health Risk opens a free-text assessment page for symptoms, lifestyle, and family history. It shows a mock Routine or High priority result, factors considered, and a recommendation using AI Decision Support wording.
+
 ## Doctors
 
 The Doctors page includes mock doctor profiles with:
@@ -90,6 +97,22 @@ The Doctors page includes mock doctor profiles with:
 - View profile action
 
 Book appointment opens the AI-assisted appointment intake flow. View profile opens a separate doctor profile page.
+
+The initial departments shown by the prototype are Orthopedics, Cardiology, and Diabetology.
+
+## Doctor Access
+
+The Doctor Access page provides patient-specific authorization using one permission:
+
+- Select a family member
+- Select a doctor
+- Grant Share Everything access
+- View active access cards
+- Revoke access with confirmation
+
+Access is scoped to the selected patient. Granting Dr. Rahul access to Mother's records does not grant access to Father's or Son's records.
+
+Doctor Access is independent from appointments. Booking an appointment never grants record access, shares records, or changes Doctor Access. Revoking access removes the doctor's record access but does not cancel existing appointments.
 
 ## AI-Assisted Appointment Intake
 
@@ -117,8 +140,15 @@ The booking page supports:
 - AI-generated reason summary
 - Appointment confirmation
 - Back and Cancel actions
+- Cancel appointment with confirmation
+- Reschedule appointment entry point
+- Appointment status feedback
 
 Booked slots are tracked by doctor and date. A booked slot is disabled and cannot be booked again. Confirmed appointments are displayed on the Appointments page.
+
+Appointments and Doctor Access are separate workflows. Confirming an appointment changes only appointment state; it does not grant access to medical records, tests, X-rays, AI predictions, consultations, prescriptions, or other patient history.
+
+Cancelled appointments remain in the local appointment list with a Cancelled status. Cancelling or rescheduling does not modify Doctor Access.
 
 ## Appointments
 
@@ -181,8 +211,9 @@ The notification bell and notification popover were removed from the application
 The following features are not included in the current frontend navigation:
 
 - MediMind Knowledge
-- Doctor access
 - Notification bell and notification popover
+
+Doctor Access is included in the current navigation.
 
 ## Frontend Limitations
 
