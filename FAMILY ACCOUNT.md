@@ -1456,3 +1456,66 @@ The complete Family Account experience is:
 
 > **One Family Account can contain multiple patient profiles, with all family members able to access the family's medical information while the creator retains account-management privileges.**
 > :::
+
+---
+
+# 25. Current Frontend Prototype Scope
+
+The current React frontend prototype implements the following family-account workflows with mock data:
+
+## Family member management
+
+The Family Members page supports:
+
+* Add member
+* Custom relation when `Other` is selected
+* View a member on a separate profile page
+* Delete a member with confirmation
+* Prevent deleting the final remaining member
+* Switch the active family profile
+
+## Appointment booking and AI intake
+
+Booking an appointment first opens an AI-assisted intake page. The user can:
+
+* Enter symptoms or the reason for a visit
+* Upload a PDF or image report
+* Receive a mock routine or high-priority assessment
+* Carry the AI summary into Appointment details
+* Choose a patient, doctor, date, time slot, appointment type, and consultation mode
+
+High-priority symptoms recommend the earliest available slot. Slot availability is tracked per doctor and date, and an already-booked slot cannot be booked again.
+
+## Feature details and downloads
+
+The prototype provides popup details for:
+
+* Appointments
+* Consultation notes
+* Prescription instructions
+
+Prescription details can be downloaded as a text file for presentation purposes.
+
+## AI prediction modules
+
+The AI Predictions page currently presents mock modules for:
+
+* Fracture detection
+* Diabetes risk
+* Heart disease risk
+* General health risk using symptoms, lifestyle, family history, and recent records
+
+These modules are presentation workflows only and do not connect to a production model.
+
+## Support and account preferences
+
+The prototype includes dedicated pages for:
+
+* Help center with FAQ and support actions
+* Settings with appearance, notification preferences, and privacy actions
+
+The notification bell and notification popover were removed from the application header. MediMind Knowledge and Doctor access are also not present in the current prototype navigation.
+
+## Prototype limitations
+
+The current frontend uses local React state and mock data. It does not yet persist members, appointments, uploaded files, prescriptions, or AI results to a backend database. Refreshing the browser resets the prototype state.
