@@ -4,13 +4,23 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Settings:
-    PROJECT_NAME: str = "MediMind AI Prediction Service"
-    VERSION: str = "1.0.0"
-    PORT: int = int(os.getenv("PORT", 5007))
-    MONGO_URI: str = os.getenv("MONGO_URI", "mongodb://localhost:27017")
-    DB_NAME: str = os.getenv("DB_NAME", "medimind_ai")
-    JWT_SECRET: str = os.getenv("JWT_SECRET", "medimind_super_secret_jwt_key_2026")
-    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
-    INTERNAL_SERVICE_KEY: str = os.getenv("INTERNAL_SERVICE_KEY", "medimind_internal_microservice_secret_key")
+    def __init__(self) -> None:
+        self.PROJECT_NAME = "MediMind AI Prediction Service"
+        self.VERSION = "1.0.0"
+        self.PORT = int(os.getenv("PORT", 5007))
+        self.MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+        self.DB_NAME = os.getenv("DB_NAME", "medimind_ai")
+        self.JWT_SECRET = self._required_secret("JWT_SECRET")
+        self.JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+        self.INTERNAL_SERVICE_KEY = self._required_secret("INTERNAL_SERVICE_KEY")
+
+    @staticmethod
+    def _required_secret(name: str) -> str:
+        value = os.getenv(name, "").strip()
+        if not value:
+            raise RuntimeError(
+                f"{name} must be configured through the environment or .env file."
+            )
+        return value
 
 settings = Settings()

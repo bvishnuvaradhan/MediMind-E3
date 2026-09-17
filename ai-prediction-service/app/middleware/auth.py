@@ -1,4 +1,5 @@
 import jwt
+from hmac import compare_digest
 from fastapi import Request, HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Dict, Any, Optional
@@ -35,7 +36,7 @@ async def get_current_user_or_service(
     2. User JWT token via 'Authorization: Bearer <token>' header
     """
     internal_key = request.headers.get("X-Internal-Service-Key")
-    if internal_key and internal_key == settings.INTERNAL_SERVICE_KEY:
+    if internal_key and compare_digest(internal_key, settings.INTERNAL_SERVICE_KEY):
         return {
             "type": "INTERNAL_SERVICE",
             "role": "SYSTEM",
@@ -49,6 +50,12 @@ async def get_current_user_or_service(
         )
 
     payload = decode_jwt_token(credentials.credentials)
+    # Normalize the documented camelCase identity claims for downstream
+    # consumers without treating identity data as member-access authority.
+    if "user_id" not in payload and payload.get("userId"):
+        payload["user_id"] = payload["userId"]
+    if "reference_id" not in payload and payload.get("referenceId"):
+        payload["reference_id"] = payload["referenceId"]
     payload["type"] = "USER"
     return payload
 
@@ -56,26 +63,17 @@ def authorize_family_member_access(user: Dict[str, Any], family_member_id: str):
     """
     Enforces authorization:
     - Internal system calls are granted access.
-    - DOCTOR / ADMIN / DEPARTMENT_HEAD roles are granted access when authorized.
-    - FAMILY role can access only their own family member IDs.
+    - FAMILY users can access only exact member IDs in their trusted scope.
+    - Direct JWT access for privileged roles is denied until an authoritative,
+      member-specific authorization source is integrated.
     """
     if user.get("type") == "INTERNAL_SERVICE":
         return True
 
     role = user.get("role", "").upper()
-    if role in ["DOCTOR", "ADMIN", "DEPARTMENT_HEAD", "HOSPITAL_ADMIN", "CHAIRMAN"]:
-        return True
-
     if role == "FAMILY":
-        # Check if user owns the family member or matches ID
         user_member_ids = user.get("family_member_ids", [])
-        user_id = user.get("sub") or user.get("user_id") or user.get("id")
-
-        if family_member_id == user_id or family_member_id in user_member_ids:
-            return True
-
-        # Fallback check if user ID matches pattern
-        if user_id and str(user_id) in family_member_id:
+        if isinstance(user_member_ids, (list, tuple, set)) and family_member_id in user_member_ids:
             return True
 
         raise HTTPException(
@@ -85,5 +83,5 @@ def authorize_family_member_access(user: Dict[str, Any], family_member_id: str):
 
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
-        detail="Unauthorized user role for AI prediction service."
+        detail="Direct access to family-member predictions is not authorized for this role."
     )

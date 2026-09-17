@@ -122,7 +122,8 @@ ROC-AUC; the MLP achieved 0.7956 test ROC-AUC. Metrics include recall,
 specificity, precision, F1, ROC-AUC, PR-AUC, Brier score, and confusion matrix.
 Artifacts are saved locally under `artifacts/heart_disease/` and ignored by
 Git. A standalone inference service and independent API route are available;
-prediction-history persistence and frontend integration have not been added.
+successful API predictions are persisted through the shared prediction-history
+architecture. Frontend integration has not been added.
 
 Validation methodology now records raw versus deduplicated class balance,
 confirms that threshold `0.4` was selected from validation data only, reports

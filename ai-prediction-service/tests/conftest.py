@@ -17,6 +17,8 @@ import jwt
 from fastapi.testclient import TestClient
 
 os.environ["DB_NAME"] = f"medimind_ai_test_{uuid.uuid4().hex[:8]}"
+os.environ["JWT_SECRET"] = "test-only-jwt-secret-not-for-deployment"
+os.environ["INTERNAL_SERVICE_KEY"] = "test-only-internal-service-key-not-for-deployment"
 
 from app.main import app
 from app.core.config import settings
