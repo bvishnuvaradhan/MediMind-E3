@@ -18,6 +18,15 @@ from app.models.general_health.general_health_nlp import GeneralHealthNLPEngine
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Fixture
+# ─────────────────────────────────────────────────────────────────────────────
+
+@pytest.fixture
+def anyio_backend():
+    return 'asyncio'
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -50,7 +59,7 @@ def _make_record(prediction_id: str, member_id: str, text: str, created_at: str)
 # Tests
 # ─────────────────────────────────────────────────────────────────────────────
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_mongodb_prediction_lifecycle():
     """Basic lifecycle: save → query by member → query by id."""
     await Database.connect_db()
@@ -84,7 +93,7 @@ async def test_mongodb_prediction_lifecycle():
     await Database.close_db()
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_integrity_guard_raises_on_missing_fields():
     """save_prediction must reject records missing required fields."""
     await Database.connect_db()
@@ -101,7 +110,7 @@ async def test_integrity_guard_raises_on_missing_fields():
     await Database.close_db()
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_pagination_and_sort_order():
     """
     Inserts 5 records for a single member with staggered timestamps,
@@ -147,7 +156,7 @@ async def test_pagination_and_sort_order():
     await Database.close_db()
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_no_duplicate_prediction_id():
     """
     Saving two records with the same prediction_id should raise on MongoDB

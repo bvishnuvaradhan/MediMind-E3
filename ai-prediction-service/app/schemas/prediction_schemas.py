@@ -46,6 +46,18 @@ class HeartDiseaseRequest(BaseModel):
     PHYSICAL_ACTIVITY: float = Field(..., ge=0, le=1)
     appointment_id: Optional[str] = Field(None, description="Optional associated appointment ID")
 
+class DiabetesRequest(BaseModel):
+    family_member_id: str = Field(..., min_length=1, description="ID of the family member (patient)")
+    Pregnancies: int = Field(..., ge=0, le=25, description="Number of times pregnant")
+    Glucose: float = Field(..., ge=0.0, le=500.0, description="Plasma glucose concentration")
+    BloodPressure: float = Field(..., ge=0.0, le=250.0, description="Diastolic blood pressure (mm Hg)")
+    SkinThickness: float = Field(..., ge=0.0, le=100.0, description="Triceps skin fold thickness (mm)")
+    Insulin: float = Field(..., ge=0.0, le=1000.0, description="2-Hour serum insulin (mu U/ml)")
+    BMI: float = Field(..., ge=0.0, le=100.0, description="Body mass index")
+    DiabetesPedigreeFunction: float = Field(..., ge=0.0, le=3.5, description="Diabetes pedigree function")
+    Age: int = Field(..., ge=1, le=120, description="Age in years")
+    appointment_id: Optional[str] = Field(None, description="Optional associated appointment ID")
+
 class HeartDiseaseResponse(BaseModel):
     family_member_id: str
     appointment_id: Optional[str] = None
