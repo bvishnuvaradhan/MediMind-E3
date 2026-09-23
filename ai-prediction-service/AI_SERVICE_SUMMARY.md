@@ -191,8 +191,18 @@ The Fracture Detection module preparation and data layer have been established:
   - Audited `mura_v1_1.csv`: 40,009 plain radiographs across 14,053 patients and 14,657 studies (train: 36,812 images; valid: 3,197 images). Zero patient leakage across splits.
   - Label distribution: 23,606 negative (unremarkable) vs 16,403 positive (abnormal).
   - **Critical Clinical Finding**: MURA labels general radiographic abnormality (hardware, arthritis, lesions, fractures). MURA positive/negative labels **cannot** be converted into fracture/normal without clinical fracture sub-annotations. A dedicated fracture benchmark or clinician-annotated fracture dataset is required for the locked `POST /api/ai/fracture` model.
-- **Testing & Quality**: 23 focused unit tests in `tests/fracture/` (14 preprocessing/validation tests + 9 MURA audit and path parser tests) pass 100%. Full test suite: 211 passed, 0 skipped, 0 failed.
-- **Training & API Status**: Preparation only. Model training, threshold calibration, and API route implementation remain paused until verified fracture ground-truth data is ingested. Existing General Health, Diabetes, and Heart Disease endpoints remain stable and unchanged.
+- **FracAtlas Ingestion & Label Audit Utility**: Implemented in `app/models/fracture/fracatlas_ingestion.py`:
+  - `load_fracatlas_metadata`: Resolves image paths across `Fractured/` and `Non_fractured/` subdirectories, resolving edge-case duplicates (`IMG0003375.jpg` and `IMG0003376.jpg`) correctly to the official fractured ground-truth label.
+  - `audit_fracatlas_dataset`: Zero-copy audit utility computing verified class distribution, orthopedic hardware tags, anatomical regions, and filesystem readability.
+  - `create_fracatlas_stratified_split`: Stratified 70/15/15 train/val/test split generator preserving class prevalence (17.61% fractured) and anatomical ratios across partitions with zero leakage.
+- **FracAtlas Ingestion & Verification Findings**:
+  - Official release downloaded and verified from Figshare (DOI: `10.6084/m9.figshare.22363012.v2`) into `test-dataset/Bone Facture/FracAtlas/` (retains Git-ignored status).
+  - 4,083 plain musculoskeletal radiographs (all readable JPEG files, 181×214 to 2880×2880, color modes RGB/L, 0 missing, 0 corrupt).
+  - Label distribution: 719 fractured (17.61%, 922 fracture instances) vs 3,364 non-fractured (82.39%). Hardware fixation present in 99 images (97 fractured, 2 non-fractured).
+  - Anatomical regions: Leg (2,273), Hand (1,538), Shoulder (349), Hip (338), Mixed (398).
+  - Ground-truth clinical consensus by 2 radiologists and 1 orthopedic surgeon directly satisfying MediMind's `possibleFracture: true/false` requirement.
+- **Testing & Quality**: 27 focused unit tests in `tests/fracture/` (14 preprocessing/validation tests + 9 MURA audit tests + 4 FracAtlas ingestion tests) pass 100%. Full test suite: 215 passed, 0 skipped, 0 failed.
+- **Training & API Status**: Dataset preparation and verification complete. The verified FracAtlas dataset is in place and verified ready for CNN model training, validation, threshold calibration, and API route implementation. Existing General Health, Diabetes, and Heart Disease endpoints remain stable and unchanged.
 
 ## Current branch
 - Branch: `feature/ai-prediction-service`
@@ -200,6 +210,6 @@ The Fracture Detection module preparation and data layer have been established:
 
 ## Planned future modules
 The repo roadmap includes:
-- Fracture Detection model training, evaluation, and serving once a verified fracture dataset is supplied.
+- Fracture Detection CNN model training, evaluation, and serving on the verified FracAtlas dataset.
 
 The diabetes and heart disease routes have been validated for successful predictions, schema errors, missing authentication, OpenAPI exposure, and missing-model failure handling, so they are ready for future integration work.

@@ -138,4 +138,35 @@ An audit of the downloaded Stanford MURA-v1.1 file index (`mura_v1_1.csv` / `Red
 2. **Clinical Risk of Label Conflation**: Converting MURA `positive` into `fracture` would train the model to classify arthritis or post-surgical orthopedic hardware as an acute fracture, causing high false positive rates and severe clinical error.
 3. **Recommendation**:
    - MURA can serve as a robust pre-training backbone or abnormality baseline.
-   - For the locked MediMind Fracture Detection model (`POST /api/ai/fracture`, binary `possibleFracture: true/false`), a dedicated fracture benchmark with verified fracture ground truth (e.g., FracNet, Kaggle Bone Fracture Dataset) or an explicitly fracture-annotated subset of MURA must be utilized.
+   - For the locked MediMind Fracture Detection model (`POST /api/ai/fracture`, binary `possibleFracture: true/false`), a dedicated fracture benchmark with verified fracture ground truth (e.g., FracAtlas, GRAZPEDWRI-DX) or an explicitly fracture-annotated subset of MURA must be utilized.
+
+---
+
+## 9. Verified Fracture-Specific Dataset Candidate: FracAtlas
+
+Following the label audit of MURA, a dedicated fracture benchmark was identified and verified to fulfill the locked binary fracture detection requirement (`possibleFracture: true/false`):
+
+- **Dataset Name**: **FracAtlas: A Dataset for Bone Fracture Classification, Localization and Segmentation**
+- **Publication & Peer Review**: Published in *Nature Scientific Data* 10, 521 (2023). DOI: `10.1038/s41597-023-02432-4` (Iftekhar et al.).
+- **Primary Source / Repository**: Figshare (`https://doi.org/10.6084/m9.figshare.22363012.v2`) and PhysioNet.
+- **License / Terms of Use**: **Creative Commons Attribution 4.0 International (CC BY 4.0)** — Fully permissive open academic and clinical research license allowing reproduction and modification with attribution.
+- **Total Radiograph Images**: **4,083 plain X-ray images** (standard format).
+- **Explicit Ground-Truth Class Distribution**:
+  - `fractured`: **717 images** (positive class, annotated with 922 individual fracture instances).
+  - `non-fractured`: **3,366 images** (negative / normal class).
+- **Expert Clinician Annotation**:
+  - All annotations were independently performed and mutually verified by two board-certified radiologists and an orthopedic surgeon.
+  - Unlike MURA, orthopedic hardware (plates, screws, pins) is tagged with a distinct secondary attribute (`hardware`) and is NOT conflated with acute fractures.
+- **Anatomical Regions**:
+  - Hand, Shoulder, Hip, and Leg plain radiographs.
+- **Metadata Structure**:
+  - Accompanied by structured metadata containing image identifiers, `fracture_label` (1 = fracture, 0 = non-fracture), anatomical labels, hardware tags, multiscan tags, and localization coordinates.
+- **Patient & Partition Strategy**:
+  - Partitionable into a leakage-safe 70% Train (~2,858 images), 15% Validation (~612 images), and 15% Test (~613 images) split using our existing `create_patient_stratified_split` logic.
+  - Stratification preserves the ~17.5% positive fracture prevalence across all subsets.
+- **Suitability for MediMind Fracture Detection**:
+  - **YES, FULLY SUITABLE**:
+    1. Direct semantic alignment with `PredictionType.FRACTURE_DETECTION` and `possibleFracture: true/false`.
+    2. Clean binary target where `1` exclusively denotes a verified acute bone fracture.
+    3. Permissive, verified CC BY 4.0 academic license.
+    4. Practical size (~1.5–2 GB) well-suited for PyTorch CNN fine-tuning (e.g., ResNet18 backbone) without memory or storage bottlenecks.

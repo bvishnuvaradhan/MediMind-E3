@@ -1,7 +1,7 @@
 """
 Fracture Detection Model Package.
 Provides dataset specification, image validation, preprocessing, model pipelines,
-and MURA dataset audit utilities.
+MURA dataset audit utilities, and FracAtlas ingestion tooling.
 """
 
 from .fracture_preprocessing import (
@@ -21,6 +21,12 @@ from .mura_audit import (
     MURA_BODY_PARTS,
     MURA_SPLITS,
 )
+from .fracatlas_ingestion import (
+    load_fracatlas_metadata,
+    audit_fracatlas_dataset,
+    create_fracatlas_stratified_split,
+    FRACATLAS_ANATOMICAL_PARTS,
+)
 
 __all__ = [
     "validate_image_bytes",
@@ -36,4 +42,8 @@ __all__ = [
     "save_audit_report",
     "MURA_BODY_PARTS",
     "MURA_SPLITS",
+    "load_fracatlas_metadata",
+    "audit_fracatlas_dataset",
+    "create_fracatlas_stratified_split",
+    "FRACATLAS_ANATOMICAL_PARTS",
 ]
