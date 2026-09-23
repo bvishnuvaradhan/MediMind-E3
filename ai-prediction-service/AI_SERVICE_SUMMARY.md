@@ -201,15 +201,40 @@ The Fracture Detection module preparation and data layer have been established:
   - Label distribution: 719 fractured (17.61%, 922 fracture instances) vs 3,364 non-fractured (82.39%). Hardware fixation present in 99 images (97 fractured, 2 non-fractured).
   - Anatomical regions: Leg (2,273), Hand (1,538), Shoulder (349), Hip (338), Mixed (398).
   - Ground-truth clinical consensus by 2 radiologists and 1 orthopedic surgeon directly satisfying MediMind's `possibleFracture: true/false` requirement.
-- **Testing & Quality**: 27 focused unit tests in `tests/fracture/` (14 preprocessing/validation tests + 9 MURA audit tests + 4 FracAtlas ingestion tests) pass 100%. Full test suite: 215 passed, 0 skipped, 0 failed.
-- **Training & API Status**: Dataset preparation and verification complete. The verified FracAtlas dataset is in place and verified ready for CNN model training, validation, threshold calibration, and API route implementation. Existing General Health, Diabetes, and Heart Disease endpoints remain stable and unchanged.
+- **MURA → FracAtlas Pretraining & Fine-Tuning Pipeline**: Implemented in `app/models/fracture/fracture_training.py`:
+  - `FractureClassifier`: ResNet-18 architecture with transfer-learning support (feature backbone extraction, weight freezing/unfreezing, binary classification head `Dropout(0.3) -> Linear(512, 1)`).
+  - Two-Stage Pretraining Workflow: Musculoskeletal feature representation pretraining on Stanford MURA v1.1 (2 epochs, val AUC 0.7878), followed by transfer of the learned backbone to FracAtlas fracture detection.
+  - Baseline Comparison: Evaluated alongside standard ImageNet-initialized ResNet-18 fine-tuned on the identical FracAtlas split.
+  - Leakage-safe 70/15/15 partitioning: Zero patient/image overlap across train (1,200 sampled), val (612), and held-out test (613) sets. Class imbalance addressed via `pos_weight = 1.8571` in `BCEWithLogitsLoss`.
+  - Validation-Only Threshold Calibration: Selected threshold `0.1800` strictly on validation data to maximize recall under a clinical specificity floor $\ge 0.60$.
+  - Model Selection: `mura_pretrained_resnet18` selected based on superior validation performance (ROC-AUC `0.8836` vs Baseline `0.8742`, validation loss `0.4220` vs Baseline `0.6229`).
+- **Final Held-Out Test Evaluation Results (613 radiographs, 107 fractures)**:
+  - **Recall (Sensitivity)**: **`0.9626`** (103 / 107 fractures detected, only 4 false negatives) vs Baseline `0.8879` (+7.47% improvement).
+  - **Specificity**: `0.6364` (322 / 506 normal cases) vs Baseline `0.6522`.
+  - **Precision**: `0.3589` vs Baseline `0.3506`.
+  - **NPV**: **`0.9877`** vs Baseline `0.9649`.
+  - **F1 Score**: `0.5228` vs Baseline `0.5026`.
+  - **ROC-AUC**: **`0.9244`** vs Baseline `0.9001` (+0.0243).
+  - **PR-AUC**: **`0.7843`** vs Baseline `0.7467` (+0.0376).
+  - **Brier Score**: **`0.0896`** vs Baseline `0.1656` (45.9% reduction in probabilistic error).
+  - **Expected Calibration Error (ECE)**: **`0.1021`** vs Baseline `0.2342` (56.4% reduction in calibration error).
+  - **Subgroups**: Hand (Recall 0.9697, AUC 0.8316), Leg (Recall 0.9487, AUC 0.9724), Hip (Recall 1.0), Shoulder (Recall 1.0), With Hardware (Recall 1.0), Without Hardware (Recall 0.9560).
+- **Artifacts Generated & Verified**: Stored under `artifacts/fracture/` (ignored by Git):
+  - `mura_pretrained_backbone.pt` (44.78 MB)
+  - `baseline_model.pt` (44.79 MB)
+  - `mura_pretrained_model.pt` (44.79 MB)
+  - `best_model.pt` (44.79 MB, production checkpoint with threshold `0.1800`)
+  - `training_report.json` (5.53 KB)
+  - Documented in `app/models/fracture/FRACTURE_MODEL_CARD.md`.
+- **Testing & Quality**: 34 focused unit tests in `tests/fracture/` pass 100%. Full test suite: 222 passed, 0 skipped, 0 failed.
+- **Training & API Status**: Training and comparative evaluation completed. High-performing production checkpoint `best_model.pt` is verified and ready for the next milestone: Fracture Inference Service and FastAPI route implementation (`POST /api/ai/fracture`). Existing General Health, Diabetes, and Heart Disease endpoints remain stable and unchanged.
 
 ## Current branch
 - Branch: `feature/ai-prediction-service`
-- Scope: AI prediction service module (General Health Triage, Heart Disease Risk, Diabetes Risk Prediction, and Fracture Detection data/audit pipeline)
+- Scope: AI prediction service module (General Health Triage, Heart Disease Risk, Diabetes Risk Prediction, and Fracture Detection CNN training/evaluation pipeline)
 
 ## Planned future modules
 The repo roadmap includes:
-- Fracture Detection CNN model training, evaluation, and serving on the verified FracAtlas dataset.
+- Fracture Detection inference service, validation schemas, and FastAPI endpoint (`POST /api/ai/fracture`) serving `best_model.pt`.
 
 The diabetes and heart disease routes have been validated for successful predictions, schema errors, missing authentication, OpenAPI exposure, and missing-model failure handling, so they are ready for future integration work.

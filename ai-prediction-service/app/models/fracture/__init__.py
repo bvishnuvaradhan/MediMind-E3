@@ -27,6 +27,13 @@ from .fracatlas_ingestion import (
     create_fracatlas_stratified_split,
     FRACATLAS_ANATOMICAL_PARTS,
 )
+from .fracture_training import (
+    FractureClassifier,
+    calibrate_threshold,
+    evaluate_model_performance,
+    calculate_ece,
+    run_fracture_experiment,
+)
 
 __all__ = [
     "validate_image_bytes",
@@ -46,4 +53,9 @@ __all__ = [
     "audit_fracatlas_dataset",
     "create_fracatlas_stratified_split",
     "FRACATLAS_ANATOMICAL_PARTS",
+    "FractureClassifier",
+    "calibrate_threshold",
+    "evaluate_model_performance",
+    "calculate_ece",
+    "run_fracture_experiment",
 ]
