@@ -106,7 +106,10 @@ context, or non-symptom medical questions.
 The automated suite covers NLP edge cases, authentication, database lifecycle behavior,
 pagination, prediction-ID uniqueness, and API regression checks. Local evaluation files
 and medical datasets are stored under `test-dataset/` and are intentionally ignored by
-Git. Dataset tests use those files when available and skip cleanly when they are not present.
+Git. The General Health benchmark Excel datasets (`medimind_general_health_test_dataset.xlsx`
+and `medimind_advanced_nlp_triage_test_dataset.xlsx`), the Diabetes dataset (`diabetes.csv`),
+and the Heart Disease dataset (`cardiovascular_diseases_dv3.csv`) are present locally.
+All preprocessing, inference, and end-to-end integration tests execute and pass 100%.
 
 ## Where to see results
 Run Heart Disease training from `ai-prediction-service/` with:
@@ -126,37 +129,37 @@ same ignored folders.
 The current project has been verified with pytest in the active environment.
 
 Most recent validation result:
-- 177 passed
-- 9 skipped (Heart Disease local dataset tests skip cleanly when local CSV is absent)
+- 186 passed
+- 0 skipped
 - 0 failed
 - 3 warnings (including 2 expected single-class ROC-AUC subgroup warnings for edge age bands)
 
 The live service health, authorization, persistence, and inference endpoints have been validated.
 
 ## Heart Disease module status
-The Heart Disease module has a reproducible local training pipeline for the
-comma-separated cardiovascular dataset. It removes 3,820 exact duplicates,
-creates a stratified 70/15/15 split, reports EDA/IQR outliers and
-feature-target summaries, scales Logistic Regression and MLP inputs, and
-compares Logistic Regression, Random Forest, and a regularized MLP. Random
-Forest was selected by validation ROC-AUC (0.7944) and achieved 0.7961 test
-ROC-AUC; the MLP achieved 0.7956 test ROC-AUC. Metrics include recall,
-specificity, precision, F1, ROC-AUC, PR-AUC, Brier score, and confusion matrix.
-Artifacts are saved locally under `artifacts/heart_disease/` and ignored by
-Git. A standalone inference service and independent API route are available;
-successful API predictions are persisted through the shared prediction-history
-architecture. Frontend integration has not been added.
+The Heart Disease Risk Prediction module is fully trained, validated, and served via FastAPI:
+- **Dataset**: Cardiovascular disease tabular dataset (`test-dataset/Heart Disease/cardiovascular_diseases_dv3.csv`, `68,783` raw records, 11 predictive features + 1 binary target `CARDIO_DISEASE` with 34,742 negative / 34,041 positive).
+- **Deduplication & Partitions**: Removed 3,820 exact duplicates, retaining 64,963 clean records (31,910 negative / 33,053 positive). Stratified 70/15/15 split: Train (`45,474`), Validation (`9,744`), Test (`9,745`).
+- **Models Evaluated**: Logistic Regression (StandardScaler, max_iter=1000), Random Forest (200 trees, max_depth=12, min_samples_leaf=3), and regularized MLP (StandardScaler, hidden layers (32, 16), early stopping).
+- **Model Selection**: **Random Forest** selected by validation ROC-AUC (`0.7944` vs LR `0.7882` and MLP `0.7919`).
+- **Threshold Tuning**: Threshold `0.40` was selected from validation data under a minimum specificity floor of 0.60 to maximize recall. On the validation set: recall `0.7939`, specificity `0.6396`, precision `0.6953`, F1 `0.7413`.
+- **Held-out Test Performance (9,745 rows)**:
+  - **ROC-AUC**: `0.7961`
+  - **PR-AUC**: `0.7835`
+  - **Recall**: `0.8001` (3,967 of 4,958 positive cases detected)
+  - **Specificity**: `0.6340` (3,035 of 4,787 negative cases correctly classified)
+  - **Precision**: `0.6937`
+  - **F1 Score**: `0.7431`
+  - **Brier Score**: `0.1829`
+  - **Expected Calibration Error (ECE)**: `0.0080` (excellent probability calibration)
+  - **Error Analysis**: 1,752 false positives (FPR 36.60%), 991 false negatives (FNR 19.99%)
+- **Subgroup Analysis**: Validated across GENDER (1, 2), AGE_BAND (30-44, 45-54, 55-64, 65+), CHOLESTEROL levels (1, 2, 3), and GLUCOSE levels (1, 2, 3).
+- **Artifacts**: Stored under `artifacts/heart_disease/` (`best_model.joblib`, `random_forest.joblib`, `logistic_regression.joblib`, `mlp.joblib`, `training_report.json`), ignored by Git.
 
 ## Heart Disease inference status
-The standalone inference service loads `random_forest.joblib` lazily, validates
-the 11-feature request schema, preserves the trained feature order, applies
-threshold `0.4`, and returns a probability, `HIGH`/`LOW` risk category, model
-version `0.2.0`, and a non-diagnostic disclaimer. The local script is
-`scripts/predict_heart_disease.py`; the API persists successful inference
-results to prediction history and can be tested through Swagger at
-`http://localhost:5007/docs`. The common `risk_score` and `confidence` fields
-use the available risk probability; `confidence` is not independently
-calibrated. Frontend integration has not been added.
+The standalone inference service loads `random_forest.joblib` lazily, validates the 11-feature request schema, preserves the trained feature order, applies threshold `0.40`, and returns a probability, `HIGH`/`LOW` risk category, model version `0.2.0`, and a mandatory non-diagnostic disclaimer. The API persists successful inference results to MongoDB prediction history (`POST /api/ai/heart-disease`) with strict JWT family scoping and internal service key authentication. The common `risk_score` and `confidence` fields expose the estimated risk probability.
+
+- **Limitations**: Non-diagnostic clinical decision support tool. Observational dataset cannot establish causality. Self-reported behavioural features (smoking, alcohol, physical activity) are subjective. Requires professional medical evaluation.
 
 ## Diabetes Risk Prediction module status
 The Diabetes Risk Prediction module is fully trained, validated, and served via FastAPI:
@@ -167,7 +170,7 @@ The Diabetes Risk Prediction module is fully trained, validated, and served via 
 - **Subgroup & Calibration Analysis**: Evaluated across age bands (21-30, 31-45, 46-60, 61+) and BMI categories (underweight/normal, overweight, obese). Expected Calibration Error (ECE) is **0.1037**. Error analysis identified 24 false positives and 8 false negatives on the test set.
 - **Inference & API Route**: `DiabetesInferenceService` loads `best_model.joblib` lazily, enforces the 8-feature order, applies threshold `0.25`, outputs model version `0.1.0`, includes a mandatory non-diagnostic disclaimer, and persists predictions to MongoDB. `POST /api/ai/diabetes` validates inputs via `DiabetesRequest`, enforces JWT / internal key auth and family authorization, and returns `CommonPredictionResponse`. Returns HTTP 503 if model artifact is absent and HTTP 422 for invalid inputs.
 - **Artifact Storage**: Trained model files (`best_model.joblib`, `logistic_regression.joblib`, `random_forest.joblib`, `mlp.joblib`) and `training_report.json` are saved under `artifacts/diabetes/` (ignored by Git).
-- **Validation**: 32/32 focused diabetes tests in `tests/diabetes/` pass 100%. Full suite: 177 passed, 9 skipped (Heart Disease local CSV tests), 0 failed.
+- **Validation**: 32/32 focused diabetes tests in `tests/diabetes/` pass 100%. Full suite: 186 passed, 0 skipped, 0 failed.
 
 ## Current branch
 - Branch: `feature/ai-prediction-service`
