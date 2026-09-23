@@ -107,3 +107,35 @@ Before training, the dataset provenance must be verified and documented:
 3. **Artifact Sensitivity**: Plaster splints, surgical fixation hardware (screws, plates), external jewelry, motion blur, and underexposure/overexposure can degrade model confidence.
 4. **Anatomical Specificity**: Performance may vary across skeletal sites (e.g., appendicular skeleton vs. axial skeleton). Evaluation must report anatomical subgroup metrics when metadata is available.
 5. **False Negative Minimization**: Because missed fractures can lead to malunion or permanent disability, threshold calibration should prioritize high sensitivity/recall (e.g., $\ge 0.85$) while preserving specificity.
+
+---
+
+## 8. MURA-v1.1 Dataset Audit & Label Feasibility Assessment
+
+An audit of the downloaded Stanford MURA-v1.1 file index (`mura_v1_1.csv` / `Redivis-files-2026-09-23.csv`) was conducted using `app/models/fracture/mura_audit.py`:
+
+- **Dataset Source**: Stanford ML Group MURA v1.1 via Redivis.
+- **Total Records in Index**: 40,013 entries (4 reference CSVs + 40,009 plain musculoskeletal radiographs).
+- **Split Breakdown**:
+  - `train`: 36,812 images across 12,934 unique patients and 13,457 studies.
+  - `valid`: 3,197 images across 1,118 unique patients and 1,200 studies.
+  - **Patient Leakage**: Audited across splits. Overlap between train and valid patients is **0** (clean study/patient isolation).
+- **Anatomical Distribution (Image Counts)**:
+  - `XR_WRIST`: 10,415
+  - `XR_SHOULDER`: 8,942
+  - `XR_HAND`: 6,003
+  - `XR_FINGER`: 5,567
+  - `XR_ELBOW`: 5,396
+  - `XR_FOREARM`: 2,126
+  - `XR_HUMERUS`: 1,560
+- **Official MURA Abnormality Labels**:
+  - `negative` (unremarkable/normal study): 23,606 images (8,941 studies: 8,280 train / 661 valid).
+  - `positive` (abnormal radiograph): 16,403 images (5,715 studies: 5,177 train / 538 valid).
+
+### Critical Finding: Can MURA Satisfy the Locked Fracture Detection Model?
+**NO, not without additional fracture annotations.**
+1. **Label Semantic Mismatch**: MURA classifies **general radiographic abnormality**, NOT specific bone fractures. In the official MURA study, a radiograph is labeled `positive` if any abnormality is detected by radiologists, including hardware (plates, screws, pins), degenerative joint disease, arthritis, bone tumors/lesions, and congenital deformities, in addition to acute fractures.
+2. **Clinical Risk of Label Conflation**: Converting MURA `positive` into `fracture` would train the model to classify arthritis or post-surgical orthopedic hardware as an acute fracture, causing high false positive rates and severe clinical error.
+3. **Recommendation**:
+   - MURA can serve as a robust pre-training backbone or abnormality baseline.
+   - For the locked MediMind Fracture Detection model (`POST /api/ai/fracture`, binary `possibleFracture: true/false`), a dedicated fracture benchmark with verified fracture ground truth (e.g., FracNet, Kaggle Bone Fracture Dataset) or an explicitly fracture-annotated subset of MURA must be utilized.

@@ -129,7 +129,7 @@ same ignored folders.
 The current project has been verified with pytest in the active environment.
 
 Most recent validation result:
-- 202 passed
+- 211 passed
 - 0 skipped
 - 0 failed
 - 3 warnings (including 2 expected single-class ROC-AUC subgroup warnings for edge age bands)
@@ -182,16 +182,24 @@ The Fracture Detection module preparation and data layer have been established:
   - `preprocess_image_bytes`: Channel standardization (grayscale/palette/RGBA to 3-channel RGB), resizing to 224×224, scaling to float32 `[0.0, 1.0]`, and ImageNet channel normalization.
   - Transformation pipelines: Separate deterministic `get_inference_transforms()` vs training-only augmentation `get_training_transforms()` (horizontal flips, mild rotation, slight color/contrast jitter).
   - Dataset & Split Helpers: `FractureImageDataset` PyTorch dataset loader and `create_patient_stratified_split` enforcing 0 patient overlap across train (70%), validation (15%), and test (15%) partitions.
-- **Testing & Quality**: 14 unit tests in `tests/fracture/test_fracture_preprocessing.py` validate format checks, corruption rejection, empty payload rejection, channel conversions, normalization, transform determinism, and patient split leakage guards using synthetic in-memory images (no dummy datasets committed). Full test suite: 202 passed, 0 skipped, 0 failed.
-- **Dataset Blocker**: **BLOCKED ON DATASET INTAKE**. The actual labeled X-ray benchmark dataset is not present in the repository, Git history, or local environment. Training, model checkpointing, and model artifact creation are held until the real dataset is provided under `test-dataset/Fracture/`. No synthetic datasets or fabricated metrics were generated.
-- **API & Inference Service**: Held until model training is executed with real data, keeping existing General Health, Diabetes, and Heart Disease endpoints stable and unaffected.
+- **MURA Ingestion & Label Audit Utility**: Implemented in `app/models/fracture/mura_audit.py`:
+  - `parse_mura_path`: Standardized path parser extracting split (`train`/`valid`), body part (7 upper-extremity anatomical regions), namespaced patient ID, study ID, and abnormality label.
+  - `audit_mura_metadata_csv`: In-memory metadata auditor computing distribution across 40,013 file index records.
+  - `audit_mura_extracted_directory`: Zero-copy filesystem scanner validating image integrity, patient isolation, and detecting corrupted/truncated files.
+  - `save_audit_report`: Generates structured machine-readable JSON reports.
+- **MURA Audit Findings & Label Semantics**:
+  - Audited `mura_v1_1.csv`: 40,009 plain radiographs across 14,053 patients and 14,657 studies (train: 36,812 images; valid: 3,197 images). Zero patient leakage across splits.
+  - Label distribution: 23,606 negative (unremarkable) vs 16,403 positive (abnormal).
+  - **Critical Clinical Finding**: MURA labels general radiographic abnormality (hardware, arthritis, lesions, fractures). MURA positive/negative labels **cannot** be converted into fracture/normal without clinical fracture sub-annotations. A dedicated fracture benchmark or clinician-annotated fracture dataset is required for the locked `POST /api/ai/fracture` model.
+- **Testing & Quality**: 23 focused unit tests in `tests/fracture/` (14 preprocessing/validation tests + 9 MURA audit and path parser tests) pass 100%. Full test suite: 211 passed, 0 skipped, 0 failed.
+- **Training & API Status**: Preparation only. Model training, threshold calibration, and API route implementation remain paused until verified fracture ground-truth data is ingested. Existing General Health, Diabetes, and Heart Disease endpoints remain stable and unchanged.
 
 ## Current branch
 - Branch: `feature/ai-prediction-service`
-- Scope: AI prediction service module (General Health Triage, Heart Disease Risk, Diabetes Risk Prediction, and Fracture Detection preparation)
+- Scope: AI prediction service module (General Health Triage, Heart Disease Risk, Diabetes Risk Prediction, and Fracture Detection data/audit pipeline)
 
 ## Planned future modules
 The repo roadmap includes:
-- Fracture Detection model training, evaluation, and serving once the real X-ray dataset is supplied.
+- Fracture Detection model training, evaluation, and serving once a verified fracture dataset is supplied.
 
 The diabetes and heart disease routes have been validated for successful predictions, schema errors, missing authentication, OpenAPI exposure, and missing-model failure handling, so they are ready for future integration work.

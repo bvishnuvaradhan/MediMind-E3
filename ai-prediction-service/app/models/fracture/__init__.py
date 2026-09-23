@@ -1,6 +1,7 @@
 """
 Fracture Detection Model Package.
-Provides dataset specification, image validation, preprocessing, and model pipelines.
+Provides dataset specification, image validation, preprocessing, model pipelines,
+and MURA dataset audit utilities.
 """
 
 from .fracture_preprocessing import (
@@ -12,6 +13,14 @@ from .fracture_preprocessing import (
     SUPPORTED_IMAGE_FORMATS,
     DEFAULT_IMAGE_SIZE,
 )
+from .mura_audit import (
+    parse_mura_path,
+    audit_mura_metadata_csv,
+    audit_mura_extracted_directory,
+    save_audit_report,
+    MURA_BODY_PARTS,
+    MURA_SPLITS,
+)
 
 __all__ = [
     "validate_image_bytes",
@@ -21,4 +30,10 @@ __all__ = [
     "FractureImageDataset",
     "SUPPORTED_IMAGE_FORMATS",
     "DEFAULT_IMAGE_SIZE",
+    "parse_mura_path",
+    "audit_mura_metadata_csv",
+    "audit_mura_extracted_directory",
+    "save_audit_report",
+    "MURA_BODY_PARTS",
+    "MURA_SPLITS",
 ]
