@@ -12,11 +12,26 @@ router = APIRouter(prefix="/api/ai", tags=["AI Prediction"])
 logger = logging.getLogger("ai_service.api.heart_disease")
 
 
-@router.post("/heart-disease", response_model=CommonPredictionResponse, status_code=status.HTTP_200_OK)
+@router.post(
+    "/heart-disease",
+    response_model=CommonPredictionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Heart Disease Risk Assessment (Structured Health Parameters)",
+)
 async def predict_heart_disease(
     request: HeartDiseaseRequest,
     current_user: Dict[str, Any] = Depends(get_current_user_or_service),
 ):
+    """
+    Estimates 10-year heart disease risk from structured cardiovascular clinical features.
+
+    Enforces authentication (JWT Bearer or X-Internal-Service-Key) and family-member
+    authorization. Returns a CommonPredictionResponse and persists the result
+    to the shared prediction history.
+
+    Returns HTTP 503 when the trained model artifact is unavailable.
+    Returns HTTP 422 for invalid or out-of-range input values.
+    """
     authorize_family_member_access(current_user, request.family_member_id)
     try:
         return await HeartDiseaseInferenceService.predict_and_persist(request)
