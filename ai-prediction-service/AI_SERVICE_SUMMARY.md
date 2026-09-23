@@ -129,7 +129,7 @@ same ignored folders.
 The current project has been verified with pytest in the active environment.
 
 Most recent validation result:
-- 188 passed
+- 202 passed
 - 0 skipped
 - 0 failed
 - 3 warnings (including 2 expected single-class ROC-AUC subgroup warnings for edge age bands)
@@ -172,13 +172,26 @@ The Diabetes Risk Prediction module is fully trained, validated, and served via 
 - **Artifact Storage**: Trained model files (`best_model.joblib`, `logistic_regression.joblib`, `random_forest.joblib`, `mlp.joblib`) and `training_report.json` are saved under `artifacts/diabetes/` (ignored by Git).
 - **Validation**: 32/32 focused diabetes tests in `tests/diabetes/` pass 100%. Full suite: 188 passed, 0 skipped, 0 failed.
 
+## Fracture Detection module preparation status
+The Fracture Detection module preparation and data layer have been established:
+- **Scope & Model Type**: PyTorch Convolutional Neural Network (CNN) for musculoskeletal plain radiograph (X-ray) classification (`FRACTURE_DETECTION`, input type `IMAGE`).
+- **Dependencies**: `torch==2.14.0+cpu`, `torchvision==0.29.0+cpu`, `pillow==11.3.0` installed in the active environment and documented in `requirements.txt`.
+- **Dataset Specification**: Detailed in `app/models/fracture/FRACTURE_DATASET.md`. Documents required directory structures (folder-based or indexed `metadata.csv`), binary class contract (`fracture`: 1 vs `normal`: 0), source/license provenance fields, anatomical coverage, and strict patient-level splitting to avoid cross-split data leakage.
+- **Preprocessing & Validation Pipeline**: Implemented in `app/models/fracture/fracture_preprocessing.py`:
+  - `validate_image_bytes`: File size verification (up to 25MB), DICOM preamble detection, byte corruption trapping via `verify()`, dimension bounds (min 32×32, max 10,000×10,000), format checks.
+  - `preprocess_image_bytes`: Channel standardization (grayscale/palette/RGBA to 3-channel RGB), resizing to 224×224, scaling to float32 `[0.0, 1.0]`, and ImageNet channel normalization.
+  - Transformation pipelines: Separate deterministic `get_inference_transforms()` vs training-only augmentation `get_training_transforms()` (horizontal flips, mild rotation, slight color/contrast jitter).
+  - Dataset & Split Helpers: `FractureImageDataset` PyTorch dataset loader and `create_patient_stratified_split` enforcing 0 patient overlap across train (70%), validation (15%), and test (15%) partitions.
+- **Testing & Quality**: 14 unit tests in `tests/fracture/test_fracture_preprocessing.py` validate format checks, corruption rejection, empty payload rejection, channel conversions, normalization, transform determinism, and patient split leakage guards using synthetic in-memory images (no dummy datasets committed). Full test suite: 202 passed, 0 skipped, 0 failed.
+- **Dataset Blocker**: **BLOCKED ON DATASET INTAKE**. The actual labeled X-ray benchmark dataset is not present in the repository, Git history, or local environment. Training, model checkpointing, and model artifact creation are held until the real dataset is provided under `test-dataset/Fracture/`. No synthetic datasets or fabricated metrics were generated.
+- **API & Inference Service**: Held until model training is executed with real data, keeping existing General Health, Diabetes, and Heart Disease endpoints stable and unaffected.
+
 ## Current branch
 - Branch: `feature/ai-prediction-service`
-- Scope: AI prediction service module (General Health Triage, Heart Disease Risk, Diabetes Risk Prediction)
+- Scope: AI prediction service module (General Health Triage, Heart Disease Risk, Diabetes Risk Prediction, and Fracture Detection preparation)
 
 ## Planned future modules
-The repo roadmap includes additional prediction modules beyond general health, heart disease, and diabetes risk:
-
-- fracture detection (PyTorch CNN for X-ray images)
+The repo roadmap includes:
+- Fracture Detection model training, evaluation, and serving once the real X-ray dataset is supplied.
 
 The diabetes and heart disease routes have been validated for successful predictions, schema errors, missing authentication, OpenAPI exposure, and missing-model failure handling, so they are ready for future integration work.

@@ -1,0 +1,109 @@
+# Fracture Detection Dataset Specification
+
+## 1. Module Overview & Purpose
+
+The Fracture Detection module is an AI-assisted medical imaging tool within the MediMind AI Prediction Service. Its purpose is to analyze musculoskeletal plain radiographs (X-rays) to detect patterns suggestive of acute bone fractures using a PyTorch Convolutional Neural Network (CNN).
+
+- **Prediction Type**: `FRACTURE_DETECTION`
+- **Input Modality**: `IMAGE` (Musculoskeletal Plain Radiography / X-ray)
+- **Model Name**: `fracture_cnn`
+- **Model Version**: `0.1.0` (baseline pre-release)
+- **Target Task**: Binary classification (`fracture` vs `normal`)
+- **Current Status**: **BLOCKED ON DATASET INTAKE** — Preparation and preprocessing code is ready; training is held until the real labeled X-ray benchmark dataset is supplied.
+
+---
+
+## 2. Expected Dataset Structure & File Destination
+
+The dataset must be placed under the Git-ignored directory:
+`ai-prediction-service/test-dataset/Fracture/`
+
+Supported on-disk structures:
+
+### Option A: Standard Folder Structure (Recommended)
+```
+ai-prediction-service/test-dataset/Fracture/
+├── train/
+│   ├── fracture/          # Positive class images
+│   └── normal/            # Negative class images
+├── val/
+│   ├── fracture/
+│   └── normal/
+└── test/
+    ├── fracture/
+    └── normal/
+```
+
+### Option B: Unified Image Pool with Metadata Index
+```
+ai-prediction-service/test-dataset/Fracture/
+├── images/
+│   ├── IMG_000001.png
+│   ├── IMG_000002.png
+│   └── ...
+└── metadata.csv
+```
+
+When using `metadata.csv`, the following columns are required:
+- `patient_id` (string/int): Unique identifier of the patient (critical for leakage prevention).
+- `study_id` (string/int): Identifier of the radiographic study / exam.
+- `image_path` (string): Relative path to the image file under `images/`.
+- `label` (int or string): `1` or `"fracture"` for positive, `0` or `"normal"` for negative.
+- `body_part` (optional string): Anatomical region (e.g., `wrist`, `hand`, `elbow`, `shoulder`, `ankle`, `hip`).
+- `split` (optional string): `"train"`, `"val"`, or `"test"`.
+
+---
+
+## 3. Source, Citation & License Fields
+
+Before training, the dataset provenance must be verified and documented:
+- **Dataset Name**: Verified fracture dataset (e.g., FracNet, Kaggle Bone Fracture Dataset, or an explicitly fracture-annotated radiograph cohort).
+- **Source / Repository**: Official URL / DOI of the dataset provider.
+- **License / Terms of Use**: Confirmed open clinical research license (e.g., CC BY 4.0, PhysioNet Credentialed Health Data License).
+- **Patient Privacy / HIPAA Compliance**: Verification that all images are fully anonymized and free of protected health information (PHI) in pixel data and headers.
+
+---
+
+## 4. Class Labels & Target Contract
+
+| Class Name | Target Value | Description |
+|:---|:---:|:---|
+| `normal` | `0` | Negative: No radiographic evidence of acute bone fracture. |
+| `fracture` | `1` | Positive: Radiographic evidence of acute cortical disruption, fissure, or displaced bone fracture. |
+
+> [!IMPORTANT]
+> **Ground Truth Label Integrity**: General musculoskeletal abnormality datasets (such as MURA) classify broad radiographic abnormalities (which include orthopedic hardware, degenerative joint disease, arthritis, and structural lesions) rather than acute fractures. MURA's binary abnormality labels (`positive` / `negative`) must **never** be assumed or conflated to mean `fracture` / `normal`. Any ingested dataset must have verified, explicit labels confirming acute bone fracture status.
+
+---
+
+## 5. Splitting Strategy & Leakage Prevention
+
+- **Patient-Level Partitioning**: All radiographic views or repeated studies for a given patient must belong exclusively to a single partition (`train`, `val`, or `test`). Splitting randomly across individual images when multiple views exist for the same patient causes severe data leakage and artificially inflated metrics.
+- **Split Proportions**:
+  - **Train**: 70% of patient studies
+  - **Validation**: 15% of patient studies (used for checkpoint selection and threshold tuning)
+  - **Test**: 15% of patient studies (held out strictly for final evaluation; never used during training or threshold tuning)
+- **Stratification**: The split must maintain identical class proportions (`fracture` vs `normal`) across train, validation, and test subsets.
+- **Augmentation Isolation**: Data augmentation (e.g., random flips, rotations) must only execute during training batches; validation and test sets must undergo deterministic evaluation transforms only.
+
+---
+
+## 6. Image Format & Quality Standards
+
+- **Supported Formats**: PNG, JPEG, and uncompressed DICOM (`.dcm`).
+- **Standardized Resolution**: Preprocessing standardizes all inputs to 224×224 pixels.
+- **Channels**: Standardized to 3-channel RGB (grayscale radiographs replicated across 3 channels) to allow compatibility with pre-trained vision backbones (e.g., ResNet18).
+- **Pixel Range**: Scaled to float32 `[0.0, 1.0]`, normalized using ImageNet channel statistics:
+  - Mean: `[0.485, 0.456, 0.406]`
+  - Standard Deviation: `[0.229, 0.224, 0.225]`
+- **Corruption Traps**: Images with corrupt bytes, zero-length files, non-radiographic content, or dimensions below 32×32 must be rejected with HTTP 422 before reaching the CNN.
+
+---
+
+## 7. Known Clinical & Technical Limitations
+
+1. **Non-Diagnostic Nature**: The model is an assistive triage tool. It does not replace a board-certified radiologist's evaluation.
+2. **Subtle & Stress Fractures**: Hairline fractures, non-displaced scaphoid fractures, or stress reactions may not present obvious cortical disruption on plain X-rays and may be missed.
+3. **Artifact Sensitivity**: Plaster splints, surgical fixation hardware (screws, plates), external jewelry, motion blur, and underexposure/overexposure can degrade model confidence.
+4. **Anatomical Specificity**: Performance may vary across skeletal sites (e.g., appendicular skeleton vs. axial skeleton). Evaluation must report anatomical subgroup metrics when metadata is available.
+5. **False Negative Minimization**: Because missed fractures can lead to malunion or permanent disability, threshold calibration should prioritize high sensitivity/recall (e.g., $\ge 0.85$) while preserving specificity.
