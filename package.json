@@ -1,0 +1,17 @@
+{
+  "name": "medimind-root",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "auth-service",
+    "api-gateway"
+  ],
+  "scripts": {
+    "test:auth": "npm --prefix auth-service test",
+    "test:gateway": "npm --prefix api-gateway test",
+    "test": "npm run test:auth && npm run test:gateway",
+    "start:auth": "npm --prefix auth-service start",
+    "start:gateway": "npm --prefix api-gateway start"
+  }
+}
