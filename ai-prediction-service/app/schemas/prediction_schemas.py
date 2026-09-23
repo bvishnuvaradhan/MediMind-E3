@@ -27,7 +27,7 @@ class RiskLevel(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 class GeneralHealthRequest(BaseModel):
-    family_member_id: str = Field(..., description="ID of the family member (patient)")
+    family_member_id: str = Field(..., min_length=1, description="ID of the family member (patient)")
     text: str = Field(..., min_length=3, description="Free-text description of patient symptoms")
     appointment_id: Optional[str] = Field(None, description="Optional associated appointment ID")
 

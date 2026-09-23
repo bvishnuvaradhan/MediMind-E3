@@ -129,7 +129,7 @@ same ignored folders.
 The current project has been verified with pytest in the active environment.
 
 Most recent validation result:
-- 186 passed
+- 188 passed
 - 0 skipped
 - 0 failed
 - 3 warnings (including 2 expected single-class ROC-AUC subgroup warnings for edge age bands)
@@ -170,7 +170,7 @@ The Diabetes Risk Prediction module is fully trained, validated, and served via 
 - **Subgroup & Calibration Analysis**: Evaluated across age bands (21-30, 31-45, 46-60, 61+) and BMI categories (underweight/normal, overweight, obese). Expected Calibration Error (ECE) is **0.1037**. Error analysis identified 24 false positives and 8 false negatives on the test set.
 - **Inference & API Route**: `DiabetesInferenceService` loads `best_model.joblib` lazily, enforces the 8-feature order, applies threshold `0.25`, outputs model version `0.1.0`, includes a mandatory non-diagnostic disclaimer, and persists predictions to MongoDB. `POST /api/ai/diabetes` validates inputs via `DiabetesRequest`, enforces JWT / internal key auth and family authorization, and returns `CommonPredictionResponse`. Returns HTTP 503 if model artifact is absent and HTTP 422 for invalid inputs.
 - **Artifact Storage**: Trained model files (`best_model.joblib`, `logistic_regression.joblib`, `random_forest.joblib`, `mlp.joblib`) and `training_report.json` are saved under `artifacts/diabetes/` (ignored by Git).
-- **Validation**: 32/32 focused diabetes tests in `tests/diabetes/` pass 100%. Full suite: 186 passed, 0 skipped, 0 failed.
+- **Validation**: 32/32 focused diabetes tests in `tests/diabetes/` pass 100%. Full suite: 188 passed, 0 skipped, 0 failed.
 
 ## Current branch
 - Branch: `feature/ai-prediction-service`

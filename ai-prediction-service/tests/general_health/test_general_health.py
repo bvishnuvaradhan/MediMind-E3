@@ -91,3 +91,23 @@ def test_api_prediction_history_pagination():
     )
     assert page.status_code == 200
     assert len(page.json()) == 1
+
+
+def test_health_check_endpoint():
+    response = client.get("/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "healthy"
+    assert data["service"] == settings.PROJECT_NAME
+    assert data["version"] == settings.VERSION
+    assert "database_connected" in data
+
+
+def test_general_health_rejects_empty_family_member_id():
+    response = client.post(
+        "/api/ai/general-health",
+        json={"family_member_id": "", "text": "Mild headache today"},
+        headers=AUTH_HEADERS,
+    )
+    assert response.status_code == 422
+
