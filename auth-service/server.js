@@ -12,8 +12,9 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim().length === 0) {
   process.exit(1);
 }
 
-if (!process.env.MONGO_URI || process.env.MONGO_URI.trim().length === 0) {
-  console.error("FATAL: MONGO_URI environment variable is required and must not be empty.");
+if ((!process.env.MONGODB_URI || process.env.MONGODB_URI.trim().length === 0) &&
+    (!process.env.MONGO_URI || process.env.MONGO_URI.trim().length === 0)) {
+  console.error("FATAL: MONGODB_URI (or MONGO_URI) environment variable is required and must not be empty.");
   process.exit(1);
 }
 

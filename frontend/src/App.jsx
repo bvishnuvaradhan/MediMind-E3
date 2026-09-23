@@ -1,5 +1,8 @@
-﻿import { useState } from 'react'
-import { Activity, ArrowUpRight, CalendarDays, ChevronDown, ChevronRight, CircleHelp, Download, FileText, HeartPulse, LayoutDashboard, LockKeyhole, Menu, MoreHorizontal, Moon, Plus, Search, Settings, ShieldCheck, Sparkles, Stethoscope, Sun, Trash2, Upload, UsersRound, X } from 'lucide-react'
+import { useState } from 'react'
+import { Activity, ArrowUpRight, CalendarDays, ChevronDown, ChevronRight, CircleHelp, Download, FileText, HeartPulse, LayoutDashboard, LockKeyhole, LogOut, Menu, MoreHorizontal, Moon, Plus, Search, Settings, ShieldCheck, Sparkles, Stethoscope, Sun, Trash2, Upload, UsersRound, X } from 'lucide-react'
+import { useAuth } from './context/AuthContext'
+import { LoginPage, SignupPage } from './components/auth/AuthPages'
+import './components/auth/Auth.css'
 import './App.css'
 
 const members = [
@@ -42,6 +45,8 @@ const presentationData = {
 }
 
 function App() {
+  const { user, isAuthenticated, loading, logout } = useAuth()
+  const [authMode, setAuthMode] = useState('login')
   const [page, setPage] = useState('Dashboard')
   const [selectedDoctor, setSelectedDoctor] = useState(null)
   const [memberIndex, setMemberIndex] = useState(0)
@@ -185,6 +190,23 @@ function App() {
     navigate('Appointment AI assessment')
   }
 
+  if (loading) {
+    return (
+      <div className="auth-loading-screen">
+        <div className="auth-spinner" />
+        <p>Restoring your session...</p>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return authMode === 'login' ? (
+      <LoginPage onSwitchToSignup={() => setAuthMode('signup')} />
+    ) : (
+      <SignupPage onSwitchToLogin={() => setAuthMode('login')} />
+    )
+  }
+
   return <div className={`app-shell ${dark ? 'dark-theme' : ''}`}>
     <style>{`.upload-form{width:min(100%,720px);margin:0 auto}.upload-form .primary-button{width:100%;justify-content:center}.feature-panel:has(.upload-form){padding:32px 40px}.drop-zone{min-height:150px}.feature-panel:has(.upload-form) label{width:100%}.feature-view{display:flex;flex-direction:column;gap:20px}.feature-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.feature-heading>div{flex:1}.feature-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:var(--soft);color:var(--teal)}.compact-button{margin-left:auto;white-space:nowrap}.add-member-form{margin-top:14px;padding:20px;border:1px solid var(--line);border-radius:18px;background:var(--card);box-shadow:0 10px 24px rgba(25,39,52,.04)}.form-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.form-header h3{margin:0;font-size:1.1rem}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.add-member-form label{display:flex;flex-direction:column;gap:8px;color:#5d646d;font-size:12px;font-weight:600}.add-member-form input,.add-member-form select{border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:11px 12px;font:inherit;color:var(--ink)}.form-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:18px}.secondary-button{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--ink);font-weight:600}.close-form{display:grid;place-items:center;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--ink)}.delete-member-button{display:grid;place-items:center;width:32px;height:32px;margin-left:0;border:1px solid #efcaca;border-radius:9px;background:transparent;color:#c45b5b}.delete-member-button:hover{background:#fff0f0;color:#a93f3f;transform:translateY(-1px)}.feature-card{flex-wrap:nowrap}.feature-card .text-button{margin-left:auto;align-self:center}.feature-card .delete-member-button{align-self:center}.feature-actions{display:flex;align-items:center;gap:16px;margin-left:auto;white-space:nowrap}.recent-records-panel .section-heading h2{font-size:18px}.recent-records-panel .section-heading p{font-size:12px}.recent-records-panel .record-copy strong{font-size:13px}.recent-records-panel .record-copy span,.recent-records-panel .status-text{font-size:11px}@media(max-width:720px){.feature-heading{flex-direction:column}.compact-button{width:100%}.form-grid{grid-template-columns:1fr}.upload-form{width:100%}.feature-panel:has(.upload-form){padding:20px 16px}.feature-card{flex-wrap:wrap}.feature-card .text-button{margin-left:auto}.feature-actions{width:100%;justify-content:flex-end;flex-wrap:wrap}}`}</style>
     <style>{`@keyframes medimind-enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}@keyframes medimind-card{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}.page-transition{animation:medimind-enter .32s cubic-bezier(.22,1,.36,1)}.page-transition .member-card,.page-transition .dashboard-grid>*,.page-transition .lower-grid>*,.page-transition .feature-card,.page-transition .ai-module,.page-transition .feature-records .record-row{animation:medimind-card .36s cubic-bezier(.22,1,.36,1) both}.page-transition .member-card:nth-child(2),.page-transition .feature-card:nth-child(2),.page-transition .ai-module:nth-child(2),.page-transition .feature-records .record-row:nth-child(2){animation-delay:.05s}.page-transition .member-card:nth-child(3),.page-transition .feature-card:nth-child(3),.page-transition .ai-module:nth-child(3),.page-transition .feature-records .record-row:nth-child(3){animation-delay:.1s}.primary-button,.text-button,.plain-button,.upload-button,.icon-button,.nav-item,.member-card,.ai-module,.record-row,.filter{transition:transform .2s ease,background-color .2s ease,border-color .2s ease,box-shadow .2s ease,color .2s ease}.primary-button:hover,.upload-button:hover{transform:translateY(-2px);box-shadow:0 8px 18px #156f7030}.primary-button:active,.upload-button:active,.text-button:active,.plain-button:active,.icon-button:active{transform:scale(.97)}.member-card:hover,.feature-card:hover,.ai-module:hover{transform:translateY(-3px);box-shadow:0 10px 22px #20352b12}.nav-item:hover{transform:translateX(3px)}.record-row:hover{background:#f3f8f6;padding-left:8px;padding-right:8px}.dark-theme .record-row:hover{background:#2a3942}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}`}</style>
@@ -204,9 +226,9 @@ function App() {
       </div>
 
       <button className="account-switcher" onClick={() => setProfileOpen(!profileOpen)}>
-        <div className="avatar avatar-coral">RK</div>
+        <div className="avatar avatar-coral">{user?.email ? user.email.slice(0, 2).toUpperCase() : 'RK'}</div>
         <div className="account-copy">
-          <strong>Rohan Kapoor</strong>
+          <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '120px' }}>{user?.email ? user.email.split('@')[0] : 'Rohan Kapoor'}</strong>
           <span>Family account</span>
         </div>
         <ChevronDown size={16} />
@@ -232,6 +254,11 @@ function App() {
         <button className={`nav-item ${page === 'Settings' ? 'active' : ''}`} onClick={() => navigate('Settings')}>
           <Settings size={18} />
           <span>Settings</span>
+        </button>
+
+        <button className="nav-item" style={{ color: '#b45b5b' }} onClick={() => logout()} title="Sign out of MediMind">
+          <LogOut size={18} />
+          <span>Sign out</span>
         </button>
 
         <div className="privacy-note">
@@ -261,8 +288,8 @@ function App() {
             {dark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
-          <button className="profile-button" onClick={() => setProfileOpen(!profileOpen)}>
-            <div className="avatar avatar-coral small">RK</div>
+          <button className="profile-button" onClick={() => setProfileOpen(!profileOpen)} title="View profile options">
+            <div className="avatar avatar-coral small">{user?.email ? user.email.slice(0, 2).toUpperCase() : 'RK'}</div>
             <ChevronDown size={16} />
           </button>
         </div>
@@ -292,6 +319,22 @@ function App() {
             {memberIndex === index && <span className="check">✓</span>}
           </button>
         ))}
+        <div className="popover-auth-section" style={{ borderTop: '1px solid var(--line)', marginTop: '12px', paddingTop: '12px' }}>
+          <div style={{ fontSize: '11px', color: 'var(--muted)', marginBottom: '8px', wordBreak: 'break-all' }}>
+            Signed in as <strong>{user?.email}</strong>
+          </div>
+          <button
+            className="secondary-button"
+            style={{ width: '100%', justifyContent: 'center', fontSize: '12px', padding: '8px 12px', color: '#b45b5b', display: 'flex', alignItems: 'center', gap: '6px' }}
+            onClick={() => {
+              setProfileOpen(false)
+              logout()
+            }}
+          >
+            <LogOut size={14} />
+            <span>Sign out</span>
+          </button>
+        </div>
       </div>
     )}
 
