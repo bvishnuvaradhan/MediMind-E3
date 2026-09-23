@@ -6,6 +6,7 @@ from app.core.database import Database
 from app.api.v1.general_health import router as general_health_router
 from app.api.v1.heart_disease import router as heart_disease_router
 from app.api.v1.diabetes import router as diabetes_router
+from app.api.v1.fracture import router as fracture_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,6 +36,7 @@ app.add_middleware(
 app.include_router(general_health_router)
 app.include_router(heart_disease_router)
 app.include_router(diabetes_router)
+app.include_router(fracture_router)
 
 @app.get("/health", tags=["Health Check"])
 async def health_check():

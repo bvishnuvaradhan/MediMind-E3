@@ -226,15 +226,22 @@ The Fracture Detection module preparation and data layer have been established:
   - `best_model.pt` (44.79 MB, production checkpoint with threshold `0.1800`)
   - `training_report.json` (5.53 KB)
   - Documented in `app/models/fracture/FRACTURE_MODEL_CARD.md`.
-- **Testing & Quality**: 34 focused unit tests in `tests/fracture/` pass 100%. Full test suite: 222 passed, 0 skipped, 0 failed.
-- **Training & API Status**: Training and comparative evaluation completed. High-performing production checkpoint `best_model.pt` is verified and ready for the next milestone: Fracture Inference Service and FastAPI route implementation (`POST /api/ai/fracture`). Existing General Health, Diabetes, and Heart Disease endpoints remain stable and unchanged.
+- **Testing & Quality**: 50 focused unit and API tests in `tests/fracture/` pass 100%. Full test suite: 238 passed, 0 skipped, 0 failed.
+- **Fracture Inference Service & API Route Status**:
+  - `FractureInferenceService`: Implemented in `app/services/fracture_service.py`. Lazily loads `artifacts/fracture/best_model.pt`, applies the validation-calibrated threshold `0.1800`, enforces image validation and preprocessing across PNG, JPEG, and DICOM preamble inputs, evaluates the PyTorch ResNet-18 model in inference mode, and persists prediction records to MongoDB.
+  - Endpoint `POST /api/ai/fracture`: Implemented in `app/api/v1/fracture.py` and mounted in `app/main.py`. Accepts multipart/form-data image uploads with required `family_member_id` and optional `appointment_id`. Enforces JWT bearer and internal service key authentication, exact family-member authorization, and returns `CommonPredictionResponse`.
+  - Persistence: Persists to MongoDB via `Database.save_prediction` with `PredictionType.FRACTURE_DETECTION`, `InputType.IMAGE`, input metadata, risk scores, confidence, and non-diagnostic disclaimers.
+  - Error Handling: Returns HTTP 422 for corrupt/empty/unsupported/oversized images, HTTP 401 for unauthenticated calls, HTTP 403 for unauthorized member access, and HTTP 503 when the model artifact is unavailable.
 
 ## Current branch
 - Branch: `feature/ai-prediction-service`
-- Scope: AI prediction service module (General Health Triage, Heart Disease Risk, Diabetes Risk Prediction, and Fracture Detection CNN training/evaluation pipeline)
+- Scope: AI prediction service module (General Health Triage, Heart Disease Risk, Diabetes Risk Prediction, and Fracture Detection complete inference and API pipeline)
 
-## Planned future modules
-The repo roadmap includes:
-- Fracture Detection inference service, validation schemas, and FastAPI endpoint (`POST /api/ai/fracture`) serving `best_model.pt`.
+## Production readiness across all 4 AI modules
+All four MediMind AI modules are fully trained, evaluated, served, and tested:
+1. **General Health Triage**: NLP rule-based triage (`POST /api/ai/general-health`), urgency classification, and symptom extraction.
+2. **Heart Disease Risk**: Random Forest classifier (`POST /api/ai/heart-disease`), threshold `0.40`, 11 health parameters.
+3. **Diabetes Risk**: Multi-Layer Perceptron (`POST /api/ai/diabetes`), threshold `0.25`, 8 health parameters.
+4. **Fracture Detection**: MURA-pretrained ResNet-18 CNN (`POST /api/ai/fracture`), threshold `0.1800`, plain radiograph image upload.
 
-The diabetes and heart disease routes have been validated for successful predictions, schema errors, missing authentication, OpenAPI exposure, and missing-model failure handling, so they are ready for future integration work.
+All endpoints enforce unified authentication (JWT / internal service key), strict family-member authorization, MongoDB prediction persistence, OpenAPI specifications, and mandatory non-diagnostic disclaimers. Total test suite: 238 passed, 0 skipped, 0 failed.

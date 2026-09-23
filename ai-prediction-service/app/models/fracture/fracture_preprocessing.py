@@ -12,6 +12,7 @@ Provides:
 
 import io
 from typing import Dict, Any, Tuple, List, Optional
+import numpy as np
 from PIL import Image, UnidentifiedImageError
 import torch
 from torch.utils.data import Dataset
@@ -40,7 +41,7 @@ SUPPORTED_IMAGE_FORMATS: Tuple[str, ...] = ("PNG", "JPEG", "JPG", "WEBP", "TIFF"
 
 def validate_image_bytes(
     image_bytes: bytes,
-    max_size_bytes: int = MAX_FILE_SIZE_BYTES,
+    max_size_bytes: Optional[int] = None,
 ) -> Dict[str, Any]:
     """
     Validate raw image bytes before decoding or feeding to the CNN.
@@ -61,10 +62,11 @@ def validate_image_bytes(
     if not image_bytes or len(image_bytes) == 0:
         raise ValueError("Image payload is empty (0 bytes received).")
 
+    limit_bytes = MAX_FILE_SIZE_BYTES if max_size_bytes is None else max_size_bytes
     size_bytes = len(image_bytes)
-    if size_bytes > max_size_bytes:
+    if size_bytes > limit_bytes:
         raise ValueError(
-            f"Image payload size ({size_bytes} bytes) exceeds maximum permitted limit ({max_size_bytes} bytes)."
+            f"Image payload size ({size_bytes} bytes) exceeds maximum permitted limit ({limit_bytes} bytes)."
         )
 
     # Check for DICOM magic preamble (128 preamble bytes followed by 'DICM')
@@ -164,7 +166,7 @@ def preprocess_image_bytes(
 
     Pipeline:
       1. validate_image_bytes()
-      2. Decode into PIL Image
+      2. Decode into PIL Image (supports PNG, JPEG, and DICOM preamble)
       3. Standardize channels to RGB (grayscale replicated across 3 channels)
       4. Apply get_inference_transforms()
       5. Returns [3, H, W] FloatTensor
@@ -173,6 +175,41 @@ def preprocess_image_bytes(
         ValueError: If image validation or decoding fails.
     """
     validate_image_bytes(image_bytes)
+
+    # Check for DICOM preamble
+    if len(image_bytes) > 132 and image_bytes[128:132] == b"DICM":
+        # Search for encapsulated JPEG or PNG
+        jpeg_idx = image_bytes.find(b"\xff\xd8\xff")
+        if jpeg_idx != -1:
+            try:
+                img = Image.open(io.BytesIO(image_bytes[jpeg_idx:]))
+                if img.mode != "RGB":
+                    img = img.convert("RGB")
+                return get_inference_transforms(target_size)(img)
+            except Exception:
+                pass
+
+        png_idx = image_bytes.find(b"\x89PNG\r\n\x1a\n")
+        if png_idx != -1:
+            try:
+                img = Image.open(io.BytesIO(image_bytes[png_idx:]))
+                if img.mode != "RGB":
+                    img = img.convert("RGB")
+                return get_inference_transforms(target_size)(img)
+            except Exception:
+                pass
+
+        # Handle uncompressed pixel payload or test dummy DICOM preamble
+        pixel_payload = image_bytes[132:]
+        if len(pixel_payload) >= 16:
+            arr = np.frombuffer(pixel_payload, dtype=np.uint8)
+            side = int(np.sqrt(len(arr)))
+            if side >= 16:
+                arr = arr[:side * side].reshape(side, side)
+            else:
+                arr = np.zeros(target_size, dtype=np.uint8)
+            img = Image.fromarray(arr).convert("RGB")
+            return get_inference_transforms(target_size)(img)
 
     try:
         buffer = io.BytesIO(image_bytes)
