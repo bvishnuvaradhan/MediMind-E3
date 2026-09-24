@@ -377,10 +377,18 @@ export function DepartmentHeadLayout({ dark, setDark }) {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '6px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
             <button
               className="dh-btn dh-btn-outline dh-btn-sm"
-              style={{ flex: 1, fontSize: '11.5px' }}
+              style={{ fontSize: '11px', padding: '4px 6px' }}
+              onClick={() => switchRole('DOCTOR')}
+              title="Switch to Doctor"
+            >
+              Doctor
+            </button>
+            <button
+              className="dh-btn dh-btn-outline dh-btn-sm"
+              style={{ fontSize: '11px', padding: '4px 6px' }}
               onClick={() => switchRole('HOSPITAL_ADMIN')}
               title="Switch to Hospital Admin"
             >
@@ -388,7 +396,7 @@ export function DepartmentHeadLayout({ dark, setDark }) {
             </button>
             <button
               className="dh-btn dh-btn-outline dh-btn-sm"
-              style={{ flex: 1, fontSize: '11.5px' }}
+              style={{ fontSize: '11px', padding: '4px 6px' }}
               onClick={() => switchRole('CHAIRMAN')}
               title="Switch to Chairman"
             >
@@ -396,12 +404,11 @@ export function DepartmentHeadLayout({ dark, setDark }) {
             </button>
             <button
               className="dh-btn dh-btn-ghost dh-btn-sm"
+              style={{ fontSize: '11px', padding: '4px 6px', color: 'var(--dh-coral)' }}
               onClick={logout}
               title="Sign Out"
             >
-              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
+              Sign Out
             </button>
           </div>
         </div>

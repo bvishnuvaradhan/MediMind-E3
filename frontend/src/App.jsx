@@ -5,6 +5,7 @@ import { LoginPage, SignupPage } from './components/auth/AuthPages'
 import { ChairmanLayout } from './components/chairman/ChairmanLayout'
 import { HospitalAdminLayout } from './components/hospital-admin/HospitalAdminLayout'
 import { DepartmentHeadLayout } from './components/department-head/DepartmentHeadLayout'
+import { DoctorLayout } from './components/doctor/DoctorLayout'
 import { FamilyLayout } from './components/family/FamilyLayout'
 
 function MainRouter() {
@@ -39,6 +40,10 @@ function MainRouter() {
 
   if (role === 'DEPARTMENT_HEAD') {
     return <DepartmentHeadLayout dark={dark} setDark={setDark} />
+  }
+
+  if (role === 'DOCTOR') {
+    return <DoctorLayout dark={dark} setDark={setDark} />
   }
 
   return <FamilyLayout dark={dark} setDark={setDark} />

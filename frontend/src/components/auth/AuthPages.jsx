@@ -13,15 +13,16 @@ import {
   Building2,
   UsersRound,
   Stethoscope,
+  Activity,
 } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
 import './Auth.css';
 
 export function LoginPage({ onSwitchToSignup }) {
   const { login, error, clearError } = useAuth();
-  const [selectedRole, setSelectedRole] = useState('DEPARTMENT_HEAD'); // Default to Department Head for active testing
-  const [email, setEmail] = useState('priya.sharma@medimindhospital.com');
-  const [password, setPassword] = useState('depthead123');
+  const [selectedRole, setSelectedRole] = useState('DOCTOR'); // Default to Doctor for active testing
+  const [email, setEmail] = useState('rahul.mehta@medimindhospital.com');
+  const [password, setPassword] = useState('doctor123');
   const [validationError, setValidationError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -29,7 +30,10 @@ export function LoginPage({ onSwitchToSignup }) {
     setSelectedRole(role);
     clearError();
     setValidationError('');
-    if (role === 'DEPARTMENT_HEAD') {
+    if (role === 'DOCTOR') {
+      setEmail('rahul.mehta@medimindhospital.com');
+      setPassword('doctor123');
+    } else if (role === 'DEPARTMENT_HEAD') {
       setEmail('priya.sharma@medimindhospital.com');
       setPassword('depthead123');
     } else if (role === 'HOSPITAL_ADMIN') {
@@ -83,7 +87,9 @@ export function LoginPage({ onSwitchToSignup }) {
             </span>
           </div>
           <p className="eyebrow" style={{ marginTop: '12px', textAlign: 'center' }}>
-            {selectedRole === 'DEPARTMENT_HEAD'
+            {selectedRole === 'DOCTOR'
+              ? 'Doctor Clinical Workspace Portal'
+              : selectedRole === 'DEPARTMENT_HEAD'
               ? 'Department Head Clinical Portal'
               : selectedRole === 'HOSPITAL_ADMIN'
               ? 'Hospital Administration Portal'
@@ -93,7 +99,9 @@ export function LoginPage({ onSwitchToSignup }) {
           </p>
           <h2>Welcome back</h2>
           <p className="auth-subheading">
-            {selectedRole === 'DEPARTMENT_HEAD'
+            {selectedRole === 'DOCTOR'
+              ? 'Sign in to access authorized patient health records, conduct consultations, issue prescriptions, and review AI decision support.'
+              : selectedRole === 'DEPARTMENT_HEAD'
               ? 'Sign in to manage department doctors, OPD duty rosters, capacity workloads, and aggregate AI diagnostics.'
               : selectedRole === 'HOSPITAL_ADMIN'
               ? 'Sign in to manage hospital departments, clinical staff, operational schedules, and aggregate AI screening.'
@@ -104,13 +112,21 @@ export function LoginPage({ onSwitchToSignup }) {
         </div>
 
         {/* Role switcher tabs */}
-        <div className="auth-role-tabs" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+        <div className="auth-role-tabs" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
+          <button
+            type="button"
+            className={`auth-role-tab ${selectedRole === 'DOCTOR' ? 'active' : ''}`}
+            onClick={() => handleRoleTabChange('DOCTOR')}
+          >
+            <Activity size={14} />
+            <span>Doctor</span>
+          </button>
           <button
             type="button"
             className={`auth-role-tab ${selectedRole === 'DEPARTMENT_HEAD' ? 'active' : ''}`}
             onClick={() => handleRoleTabChange('DEPARTMENT_HEAD')}
           >
-            <Stethoscope size={15} />
+            <Stethoscope size={14} />
             <span>Dept Head</span>
           </button>
           <button
@@ -118,7 +134,7 @@ export function LoginPage({ onSwitchToSignup }) {
             className={`auth-role-tab ${selectedRole === 'HOSPITAL_ADMIN' ? 'active' : ''}`}
             onClick={() => handleRoleTabChange('HOSPITAL_ADMIN')}
           >
-            <Building2 size={15} />
+            <Building2 size={14} />
             <span>Hosp Admin</span>
           </button>
           <button
@@ -126,7 +142,7 @@ export function LoginPage({ onSwitchToSignup }) {
             className={`auth-role-tab chairman ${selectedRole === 'CHAIRMAN' ? 'active' : ''}`}
             onClick={() => handleRoleTabChange('CHAIRMAN')}
           >
-            <Crown size={15} />
+            <Crown size={14} />
             <span>Chairman</span>
           </button>
           <button
@@ -134,7 +150,7 @@ export function LoginPage({ onSwitchToSignup }) {
             className={`auth-role-tab ${selectedRole === 'FAMILY' ? 'active' : ''}`}
             onClick={() => handleRoleTabChange('FAMILY')}
           >
-            <UsersRound size={15} />
+            <UsersRound size={14} />
             <span>Family</span>
           </button>
         </div>
@@ -154,7 +170,9 @@ export function LoginPage({ onSwitchToSignup }) {
               <input
                 type="email"
                 placeholder={
-                  selectedRole === 'DEPARTMENT_HEAD'
+                  selectedRole === 'DOCTOR'
+                    ? 'rahul.mehta@medimindhospital.com'
+                    : selectedRole === 'DEPARTMENT_HEAD'
                     ? 'priya.sharma@medimindhospital.com'
                     : selectedRole === 'HOSPITAL_ADMIN'
                     ? 'admin@medimindhospital.com'
@@ -196,6 +214,13 @@ export function LoginPage({ onSwitchToSignup }) {
               <button
                 type="button"
                 className="quick-fill-btn"
+                onClick={() => handleRoleTabChange('DOCTOR')}
+              >
+                Doctor (Rahul Mehta)
+              </button>
+              <button
+                type="button"
+                className="quick-fill-btn"
                 onClick={() => handleRoleTabChange('DEPARTMENT_HEAD')}
               >
                 Dept Head
@@ -233,7 +258,9 @@ export function LoginPage({ onSwitchToSignup }) {
             {submitting
               ? 'Signing in...'
               : `Sign in as ${
-                  selectedRole === 'DEPARTMENT_HEAD'
+                  selectedRole === 'DOCTOR'
+                    ? 'Doctor (Clinician)'
+                    : selectedRole === 'DEPARTMENT_HEAD'
                     ? 'Department Head'
                     : selectedRole === 'HOSPITAL_ADMIN'
                     ? 'Hospital Admin'
@@ -262,7 +289,9 @@ export function LoginPage({ onSwitchToSignup }) {
             </>
           ) : (
             <span style={{ fontSize: '11px', color: '#64748b' }}>
-              {selectedRole === 'DEPARTMENT_HEAD'
+              {selectedRole === 'DOCTOR'
+                ? 'Authorized Clinical Practitioner Access · Patient Consent Protected'
+                : selectedRole === 'DEPARTMENT_HEAD'
                 ? 'Clinical Department Head Access · Scoped Authority'
                 : selectedRole === 'HOSPITAL_ADMIN'
                 ? 'Hospital Administrative Access · NABH/JCI Verified'

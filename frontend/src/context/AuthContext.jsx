@@ -1,6 +1,6 @@
 // MediMind Platform - Authentication Context
 // Manages authentication state, user identity, and strict role isolation.
-// Roles supported: FAMILY, CHAIRMAN, HOSPITAL_ADMIN, DEPARTMENT_HEAD.
+// Roles supported: FAMILY, CHAIRMAN, HOSPITAL_ADMIN, DEPARTMENT_HEAD, DOCTOR.
 
 import { useState } from 'react';
 import { AuthContext } from './authContextCore';
@@ -43,6 +43,20 @@ const DEFAULT_DEPARTMENT_HEAD = {
   avatarTone: 'coral',
 };
 
+const DEFAULT_DOCTOR = {
+  id: 'usr_doc_001',
+  name: 'Dr. Rahul Mehta',
+  email: 'rahul.mehta@medimindhospital.com',
+  role: 'DOCTOR',
+  title: 'Senior Consultant Orthopedic Surgeon',
+  departmentId: 'dept_ortho',
+  departmentName: 'Orthopedics',
+  hospitalId: 'hosp_001',
+  hospitalName: 'MediMind Central Hospital',
+  avatarInitials: 'RM',
+  avatarTone: 'coral',
+};
+
 const DEFAULT_FAMILY = {
   id: 'usr_fam_001',
   name: 'Rohan Kapoor',
@@ -77,15 +91,26 @@ export function AuthProvider({ children }) {
     setError(null);
     const cleanEmail = (email || '').trim().toLowerCase();
 
-    // Check credentials or roleHint for Chairman
-    if (roleHint === 'CHAIRMAN' || cleanEmail.includes('chairman') || cleanEmail.includes('owner') || cleanEmail === 'admin@medimind.com') {
-      const chairmanUser = {
-        ...DEFAULT_CHAIRMAN,
-        email: cleanEmail || DEFAULT_CHAIRMAN.email,
+    // Check credentials or roleHint for Doctor
+    if (roleHint === 'DOCTOR' || cleanEmail.includes('rahul') || cleanEmail.includes('doctor') || cleanEmail.includes('doc_')) {
+      const docUser = {
+        ...DEFAULT_DOCTOR,
+        email: cleanEmail || DEFAULT_DOCTOR.email,
       };
-      setUser(chairmanUser);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(chairmanUser));
-      return { success: true, user: chairmanUser };
+      setUser(docUser);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(docUser));
+      return { success: true, user: docUser };
+    }
+
+    // Check credentials or roleHint for Department Head
+    if (roleHint === 'DEPARTMENT_HEAD' || cleanEmail.includes('priya') || cleanEmail.includes('depthead') || cleanEmail.includes('ortho')) {
+      const dhUser = {
+        ...DEFAULT_DEPARTMENT_HEAD,
+        email: cleanEmail || DEFAULT_DEPARTMENT_HEAD.email,
+      };
+      setUser(dhUser);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dhUser));
+      return { success: true, user: dhUser };
     }
 
     // Check credentials or roleHint for Hospital Admin
@@ -99,15 +124,15 @@ export function AuthProvider({ children }) {
       return { success: true, user: hospitalAdminUser };
     }
 
-    // Check credentials or roleHint for Department Head
-    if (roleHint === 'DEPARTMENT_HEAD' || cleanEmail.includes('priya') || cleanEmail.includes('depthead') || cleanEmail.includes('ortho')) {
-      const dhUser = {
-        ...DEFAULT_DEPARTMENT_HEAD,
-        email: cleanEmail || DEFAULT_DEPARTMENT_HEAD.email,
+    // Check credentials or roleHint for Chairman
+    if (roleHint === 'CHAIRMAN' || cleanEmail.includes('chairman') || cleanEmail.includes('owner') || cleanEmail === 'admin@medimind.com') {
+      const chairmanUser = {
+        ...DEFAULT_CHAIRMAN,
+        email: cleanEmail || DEFAULT_CHAIRMAN.email,
       };
-      setUser(dhUser);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(dhUser));
-      return { success: true, user: dhUser };
+      setUser(chairmanUser);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(chairmanUser));
+      return { success: true, user: chairmanUser };
     }
 
     // Default to Family account login
@@ -148,15 +173,18 @@ export function AuthProvider({ children }) {
   };
 
   const switchRole = (targetRole) => {
-    if (targetRole === 'CHAIRMAN') {
-      setUser(DEFAULT_CHAIRMAN);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_CHAIRMAN));
-    } else if (targetRole === 'HOSPITAL_ADMIN') {
-      setUser(DEFAULT_HOSPITAL_ADMIN);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_HOSPITAL_ADMIN));
+    if (targetRole === 'DOCTOR') {
+      setUser(DEFAULT_DOCTOR);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DOCTOR));
     } else if (targetRole === 'DEPARTMENT_HEAD') {
       setUser(DEFAULT_DEPARTMENT_HEAD);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DEPARTMENT_HEAD));
+    } else if (targetRole === 'HOSPITAL_ADMIN') {
+      setUser(DEFAULT_HOSPITAL_ADMIN);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_HOSPITAL_ADMIN));
+    } else if (targetRole === 'CHAIRMAN') {
+      setUser(DEFAULT_CHAIRMAN);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_CHAIRMAN));
     } else {
       setUser(DEFAULT_FAMILY);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_FAMILY));
@@ -169,9 +197,10 @@ export function AuthProvider({ children }) {
         user,
         isAuthenticated: !!user,
         role: user?.role || null,
-        isChairman: user?.role === 'CHAIRMAN',
-        isHospitalAdmin: user?.role === 'HOSPITAL_ADMIN',
+        isDoctor: user?.role === 'DOCTOR',
         isDepartmentHead: user?.role === 'DEPARTMENT_HEAD',
+        isHospitalAdmin: user?.role === 'HOSPITAL_ADMIN',
+        isChairman: user?.role === 'CHAIRMAN',
         isFamily: user?.role === 'FAMILY',
         loading,
         error,
