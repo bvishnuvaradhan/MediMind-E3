@@ -32,6 +32,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
+import './Chairman.css';
 
 // Import all Chairman Views
 import { PlatformDashboard } from './views/PlatformDashboard';
