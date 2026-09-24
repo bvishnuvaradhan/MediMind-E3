@@ -313,6 +313,17 @@ export function ChairmanLayout({ dark, setDark }) {
                   <button
                     className="user-menu-item"
                     onClick={() => {
+                      switchRole('DEPARTMENT_HEAD');
+                      announce('Switched to Department Head Portal.');
+                    }}
+                  >
+                    <Stethoscope size={15} />
+                    <span>Switch to Dept Head</span>
+                  </button>
+
+                  <button
+                    className="user-menu-item"
+                    onClick={() => {
                       switchRole('FAMILY');
                       announce('Switched to Family Account experience.');
                     }}

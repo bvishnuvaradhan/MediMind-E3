@@ -1,6 +1,6 @@
 // MediMind Platform - Authentication Context
 // Manages authentication state, user identity, and strict role isolation.
-// Roles supported: FAMILY, CHAIRMAN, HOSPITAL_ADMIN.
+// Roles supported: FAMILY, CHAIRMAN, HOSPITAL_ADMIN, DEPARTMENT_HEAD.
 
 import { useState } from 'react';
 import { AuthContext } from './authContextCore';
@@ -27,6 +27,20 @@ const DEFAULT_HOSPITAL_ADMIN = {
   hospitalName: 'MediMind Central Hospital',
   avatarInitials: 'RS',
   avatarTone: 'sapphire',
+};
+
+const DEFAULT_DEPARTMENT_HEAD = {
+  id: 'usr_dh_001',
+  name: 'Dr. Priya Sharma',
+  email: 'priya.sharma@medimindhospital.com',
+  role: 'DEPARTMENT_HEAD',
+  title: 'Head of Orthopedics',
+  departmentId: 'dept_ortho',
+  departmentName: 'Orthopedics',
+  hospitalId: 'hosp_001',
+  hospitalName: 'MediMind Central Hospital',
+  avatarInitials: 'PS',
+  avatarTone: 'coral',
 };
 
 const DEFAULT_FAMILY = {
@@ -85,6 +99,17 @@ export function AuthProvider({ children }) {
       return { success: true, user: hospitalAdminUser };
     }
 
+    // Check credentials or roleHint for Department Head
+    if (roleHint === 'DEPARTMENT_HEAD' || cleanEmail.includes('priya') || cleanEmail.includes('depthead') || cleanEmail.includes('ortho')) {
+      const dhUser = {
+        ...DEFAULT_DEPARTMENT_HEAD,
+        email: cleanEmail || DEFAULT_DEPARTMENT_HEAD.email,
+      };
+      setUser(dhUser);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dhUser));
+      return { success: true, user: dhUser };
+    }
+
     // Default to Family account login
     const familyUser = {
       ...DEFAULT_FAMILY,
@@ -129,6 +154,9 @@ export function AuthProvider({ children }) {
     } else if (targetRole === 'HOSPITAL_ADMIN') {
       setUser(DEFAULT_HOSPITAL_ADMIN);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_HOSPITAL_ADMIN));
+    } else if (targetRole === 'DEPARTMENT_HEAD') {
+      setUser(DEFAULT_DEPARTMENT_HEAD);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DEPARTMENT_HEAD));
     } else {
       setUser(DEFAULT_FAMILY);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_FAMILY));
@@ -143,6 +171,7 @@ export function AuthProvider({ children }) {
         role: user?.role || null,
         isChairman: user?.role === 'CHAIRMAN',
         isHospitalAdmin: user?.role === 'HOSPITAL_ADMIN',
+        isDepartmentHead: user?.role === 'DEPARTMENT_HEAD',
         isFamily: user?.role === 'FAMILY',
         loading,
         error,

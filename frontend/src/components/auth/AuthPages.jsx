@@ -9,19 +9,19 @@ import {
   AlertCircle,
   ArrowRight,
   ShieldCheck,
-  User,
   Crown,
   Building2,
   UsersRound,
+  Stethoscope,
 } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
 import './Auth.css';
 
 export function LoginPage({ onSwitchToSignup }) {
   const { login, error, clearError } = useAuth();
-  const [selectedRole, setSelectedRole] = useState('HOSPITAL_ADMIN'); // Default to Hospital Admin for active testing
-  const [email, setEmail] = useState('admin@medimindhospital.com');
-  const [password, setPassword] = useState('hospital123');
+  const [selectedRole, setSelectedRole] = useState('DEPARTMENT_HEAD'); // Default to Department Head for active testing
+  const [email, setEmail] = useState('priya.sharma@medimindhospital.com');
+  const [password, setPassword] = useState('depthead123');
   const [validationError, setValidationError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -29,12 +29,15 @@ export function LoginPage({ onSwitchToSignup }) {
     setSelectedRole(role);
     clearError();
     setValidationError('');
-    if (role === 'CHAIRMAN') {
-      setEmail('chairman@medimind.com');
-      setPassword('chairman123');
+    if (role === 'DEPARTMENT_HEAD') {
+      setEmail('priya.sharma@medimindhospital.com');
+      setPassword('depthead123');
     } else if (role === 'HOSPITAL_ADMIN') {
       setEmail('admin@medimindhospital.com');
       setPassword('hospital123');
+    } else if (role === 'CHAIRMAN') {
+      setEmail('chairman@medimind.com');
+      setPassword('chairman123');
     } else {
       setEmail('rohan.kapoor@example.com');
       setPassword('family123');
@@ -80,31 +83,43 @@ export function LoginPage({ onSwitchToSignup }) {
             </span>
           </div>
           <p className="eyebrow" style={{ marginTop: '12px', textAlign: 'center' }}>
-            {selectedRole === 'CHAIRMAN'
-              ? 'Platform Administration Portal'
+            {selectedRole === 'DEPARTMENT_HEAD'
+              ? 'Department Head Clinical Portal'
               : selectedRole === 'HOSPITAL_ADMIN'
               ? 'Hospital Administration Portal'
+              : selectedRole === 'CHAIRMAN'
+              ? 'Platform Administration Portal'
               : 'Family Healthcare Portal'}
           </p>
           <h2>Welcome back</h2>
           <p className="auth-subheading">
-            {selectedRole === 'CHAIRMAN'
-              ? 'Sign in to access platform governance, hospital network oversight, and AI service metrics.'
+            {selectedRole === 'DEPARTMENT_HEAD'
+              ? 'Sign in to manage department doctors, OPD duty rosters, capacity workloads, and aggregate AI diagnostics.'
               : selectedRole === 'HOSPITAL_ADMIN'
               ? 'Sign in to manage hospital departments, clinical staff, operational schedules, and aggregate AI screening.'
+              : selectedRole === 'CHAIRMAN'
+              ? 'Sign in to access platform governance, hospital network oversight, and AI service metrics.'
               : 'Sign in to access your family unified health records, appointments, and AI screening.'}
           </p>
         </div>
 
         {/* Role switcher tabs */}
-        <div className="auth-role-tabs" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+        <div className="auth-role-tabs" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+          <button
+            type="button"
+            className={`auth-role-tab ${selectedRole === 'DEPARTMENT_HEAD' ? 'active' : ''}`}
+            onClick={() => handleRoleTabChange('DEPARTMENT_HEAD')}
+          >
+            <Stethoscope size={15} />
+            <span>Dept Head</span>
+          </button>
           <button
             type="button"
             className={`auth-role-tab ${selectedRole === 'HOSPITAL_ADMIN' ? 'active' : ''}`}
             onClick={() => handleRoleTabChange('HOSPITAL_ADMIN')}
           >
             <Building2 size={15} />
-            <span>Hospital Admin</span>
+            <span>Hosp Admin</span>
           </button>
           <button
             type="button"
@@ -139,10 +154,12 @@ export function LoginPage({ onSwitchToSignup }) {
               <input
                 type="email"
                 placeholder={
-                  selectedRole === 'CHAIRMAN'
-                    ? 'chairman@medimind.com'
+                  selectedRole === 'DEPARTMENT_HEAD'
+                    ? 'priya.sharma@medimindhospital.com'
                     : selectedRole === 'HOSPITAL_ADMIN'
                     ? 'admin@medimindhospital.com'
+                    : selectedRole === 'CHAIRMAN'
+                    ? 'chairman@medimind.com'
                     : 'rohan.kapoor@example.com'
                 }
                 value={email}
@@ -179,6 +196,13 @@ export function LoginPage({ onSwitchToSignup }) {
               <button
                 type="button"
                 className="quick-fill-btn"
+                onClick={() => handleRoleTabChange('DEPARTMENT_HEAD')}
+              >
+                Dept Head
+              </button>
+              <button
+                type="button"
+                className="quick-fill-btn"
                 onClick={() => handleRoleTabChange('HOSPITAL_ADMIN')}
               >
                 Hospital Admin
@@ -209,10 +233,12 @@ export function LoginPage({ onSwitchToSignup }) {
             {submitting
               ? 'Signing in...'
               : `Sign in as ${
-                  selectedRole === 'CHAIRMAN'
-                    ? 'Chairman'
+                  selectedRole === 'DEPARTMENT_HEAD'
+                    ? 'Department Head'
                     : selectedRole === 'HOSPITAL_ADMIN'
                     ? 'Hospital Admin'
+                    : selectedRole === 'CHAIRMAN'
+                    ? 'Chairman'
                     : 'Family'
                 }`}
             {!submitting && <ArrowRight size={16} />}
@@ -236,7 +262,9 @@ export function LoginPage({ onSwitchToSignup }) {
             </>
           ) : (
             <span style={{ fontSize: '11px', color: '#64748b' }}>
-              {selectedRole === 'HOSPITAL_ADMIN'
+              {selectedRole === 'DEPARTMENT_HEAD'
+                ? 'Clinical Department Head Access · Scoped Authority'
+                : selectedRole === 'HOSPITAL_ADMIN'
                 ? 'Hospital Administrative Access · NABH/JCI Verified'
                 : 'Root Platform Owner Access · Multi-Factor Authentication enabled'}
             </span>
@@ -313,12 +341,10 @@ export function SignupPage({ onSwitchToLogin }) {
               Medi<span>Mind</span>
             </span>
           </div>
-          <p className="eyebrow" style={{ marginTop: '12px', textAlign: 'center' }}>
-            Family Health Workspace
-          </p>
-          <h2>Create Family Account</h2>
+          <p className="eyebrow" style={{ marginTop: '12px', textAlign: 'center' }}>Family Registration</p>
+          <h2>Create account</h2>
           <p className="auth-subheading">
-            Register as the family account creator to manage your entire household's health records, doctor appointments, and AI screenings.
+            Set up your family health portal to manage members, share unified health records, and access AI diagnostic screening.
           </p>
         </div>
 
@@ -331,12 +357,11 @@ export function SignupPage({ onSwitchToLogin }) {
 
         <form onSubmit={handleSubmit} className="auth-form" noValidate>
           <label>
-            <span>Your Full Name</span>
+            <span>Full Name</span>
             <div className="auth-input-wrapper">
-              <User size={16} className="auth-icon" />
               <input
                 type="text"
-                placeholder="e.g. Rohan Kapoor"
+                placeholder="Rohan Kapoor"
                 value={name}
                 onChange={(e) => {
                   setName(e.target.value);
@@ -366,12 +391,12 @@ export function SignupPage({ onSwitchToLogin }) {
           </label>
 
           <label>
-            <span>Create Password</span>
+            <span>Password (min 6 characters)</span>
             <div className="auth-input-wrapper">
               <LockKeyhole size={16} className="auth-icon" />
               <input
                 type="password"
-                placeholder="At least 6 characters"
+                placeholder="Create secure password"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -388,7 +413,7 @@ export function SignupPage({ onSwitchToLogin }) {
               <LockKeyhole size={16} className="auth-icon" />
               <input
                 type="password"
-                placeholder="Repeat password"
+                placeholder="Re-enter password"
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
@@ -411,7 +436,7 @@ export function SignupPage({ onSwitchToLogin }) {
         </form>
 
         <div className="auth-footer">
-          <span>Already have a family account?</span>
+          <span>Already have an account?</span>
           <button
             type="button"
             className="text-button"
@@ -420,13 +445,13 @@ export function SignupPage({ onSwitchToLogin }) {
               onSwitchToLogin();
             }}
           >
-            Sign in
+            Sign In
           </button>
         </div>
 
         <div className="auth-security-note">
           <ShieldCheck size={14} />
-          <span>One login covers all family profiles with unified medical record access.</span>
+          <span>AES-256 encrypted storage · HIPAA/ABDM compliant family data isolation.</span>
         </div>
       </div>
     </div>
