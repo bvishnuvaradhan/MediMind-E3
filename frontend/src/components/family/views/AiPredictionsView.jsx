@@ -1,14 +1,16 @@
 import { useState } from 'react';
-import { Sparkles, Activity, HeartPulse, ShieldCheck, ArrowUpRight, History } from 'lucide-react';
+import { Sparkles, Activity, HeartPulse, ShieldCheck, ArrowUpRight, History, FileText, Stethoscope } from 'lucide-react';
 import { PredictionInputModal } from '../components/PredictionInputModal';
 
 export function AiPredictionsView({
   member,
+  records = [],
   predictionHistory = [],
   navigate,
   announce,
   onOpenPredictionDetail,
   onAddPrediction,
+  onAddRecord,
 }) {
   const [selectedModel, setSelectedModel] = useState(null);
 
@@ -23,6 +25,17 @@ export function AiPredictionsView({
       riskLevel: 'Low Risk',
       result: 'Stable Cardiovascular Telemetry (Score 86/100)',
       status: 'Reviewed',
+      relatedDoctor: {
+        name: 'Dr. Ananya Rao',
+        role: 'Lead Cardiologist',
+        department: 'Cardiology',
+        hospital: 'Fortis Healthcare, Bannerghatta',
+      },
+      attachedDoc: {
+        title: 'Lipid Profile & Cardiac Biomarkers',
+        type: 'Lab Report',
+        source: 'Medical Records',
+      },
       factors: [
         'Resting Blood Pressure: 122/78 mmHg',
         'Total Cholesterol: 182 mg/dL',
@@ -40,6 +53,17 @@ export function AiPredictionsView({
       riskLevel: 'Moderate Risk',
       result: 'Prediabetes Risk Zone (24%)',
       status: 'Action Required',
+      relatedDoctor: {
+        name: 'Dr. Kavya Shah',
+        role: 'Senior Diabetologist & Endocrinologist',
+        department: 'Diabetology',
+        hospital: 'Manipal Hospital, Whitefield',
+      },
+      attachedDoc: {
+        title: 'Comprehensive Metabolic Panel & HbA1c',
+        type: 'Lab Report',
+        source: 'Medical Records',
+      },
       factors: [
         'Fasting Glucose: 112 mg/dL',
         'HbA1c: 5.9%',
@@ -57,6 +81,17 @@ export function AiPredictionsView({
       riskLevel: 'Low Risk',
       result: 'No Acute Fracture Identified (96% conf)',
       status: 'Completed',
+      relatedDoctor: {
+        name: 'Dr. Rahul Mehta',
+        role: 'Chief of Orthopedics',
+        department: 'Orthopedics',
+        hospital: 'Apollo Hospitals, Greams Road',
+      },
+      attachedDoc: {
+        title: 'Left Wrist AP & Lateral Radiograph',
+        type: 'Imaging / X-Ray',
+        source: 'Medical Records',
+      },
       factors: [
         'Anatomical Site: Left Wrist',
         'Cortical Margins: Intact',
@@ -79,7 +114,7 @@ export function AiPredictionsView({
     if (onOpenPredictionDetail) {
       onOpenPredictionDetail(predictionPayload);
     } else {
-      navigate('General health risk');
+      navigate('Personal prediction detail');
     }
     announce(`${predictionPayload.title} assessment completed.`);
   };
@@ -190,7 +225,24 @@ export function AiPredictionsView({
                   <p style={{ margin: '3px 0 0', fontSize: '12.5px', color: 'var(--family-muted)' }}>
                     Patient: <strong>{item.memberName}</strong> · {item.type || 'Clinical Decision Support'} · Evaluated: {item.date}
                   </p>
-                  <span className="feature-meta" style={{ marginTop: '2px', display: 'block', fontSize: '12px' }}>
+                  
+                  {/* Linked Doctor & Attached Doc Telemetry */}
+                  <div style={{ display: 'flex', gap: '14px', marginTop: '6px', fontSize: '12px', flexWrap: 'wrap' }}>
+                    {item.relatedDoctor && (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--family-ink)' }}>
+                        <Stethoscope size={13} style={{ color: 'var(--family-primary)' }} />
+                        {item.relatedDoctor.name} ({item.relatedDoctor.department})
+                      </span>
+                    )}
+                    {item.attachedDoc && (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--family-muted)' }}>
+                        <FileText size={13} style={{ color: '#6366f1' }} />
+                        {typeof item.attachedDoc === 'object' ? item.attachedDoc.title : item.attachedDoc}
+                      </span>
+                    )}
+                  </div>
+
+                  <span className="feature-meta" style={{ marginTop: '4px', display: 'block', fontSize: '12px' }}>
                     Result: {item.result}
                   </span>
                 </div>
@@ -201,7 +253,7 @@ export function AiPredictionsView({
                     if (onOpenPredictionDetail) {
                       onOpenPredictionDetail(item);
                     } else {
-                      navigate('General health risk');
+                      navigate('Personal prediction detail');
                     }
                   }}
                 >
@@ -223,7 +275,9 @@ export function AiPredictionsView({
         onClose={() => setSelectedModel(null)}
         modelType={selectedModel}
         member={member}
+        records={records}
         onSubmitPrediction={handleRunPrediction}
+        onAddRecord={onAddRecord}
         announce={announce}
       />
     </section>

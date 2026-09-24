@@ -410,11 +410,13 @@ export function FamilyLayout({ dark, setDark }) {
       return (
         <AiPredictionsView
           member={member}
+          records={records}
           predictionHistory={predictionHistory}
           navigate={navigate}
           announce={announce}
           onOpenPredictionDetail={handleOpenPredictionDetail}
           onAddPrediction={(newPred) => setPredictionHistory((prev) => [newPred, ...prev])}
+          onAddRecord={handleAddRecord}
         />
       );
     }
@@ -423,8 +425,15 @@ export function FamilyLayout({ dark, setDark }) {
         <PersonalPredictionDetailView
           prediction={selectedPrediction}
           member={member}
+          records={records}
           navigate={navigate}
           announce={announce}
+          openFeatureModal={openFeatureModal}
+          onBookDoctor={(doc) => {
+            setSelectedDoctor(doc);
+            setReturnTo('Personal prediction detail');
+            navigate('Book appointment');
+          }}
         />
       );
     }
@@ -489,10 +498,12 @@ export function FamilyLayout({ dark, setDark }) {
           selectedDoctor={selectedDoctor}
           familyMembers={familyMembers}
           member={member}
+          records={records}
           returnTo={returnTo}
           navigate={navigate}
           announce={announce}
           setAppointmentAssessment={setAppointmentAssessment}
+          onAddRecord={handleAddRecord}
         />
       );
     }
@@ -566,17 +577,6 @@ export function FamilyLayout({ dark, setDark }) {
           <span>Medi<span>Mind</span></span>
         </div>
 
-        <button className="account-switcher" onClick={() => navigate('Member profile')}>
-          <div className={`avatar avatar-${member.tone}`}>
-            {member.initials}
-          </div>
-          <div className="account-copy">
-            <strong>{member.name}</strong>
-            <span>{member.relation} · Family</span>
-          </div>
-          <ChevronDown size={16} />
-        </button>
-
         <div className="nav-label">Family Workspace</div>
         {navItems.map(([item, Icon]) => (
           <button
@@ -586,7 +586,6 @@ export function FamilyLayout({ dark, setDark }) {
           >
             <Icon size={18} />
             <span>{item}</span>
-            {item === 'AI predictions' && <div className="nav-dot" />}
           </button>
         ))}
 

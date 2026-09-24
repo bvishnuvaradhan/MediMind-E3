@@ -1,17 +1,22 @@
 import { useState } from 'react';
-import { X, Sparkles, Activity, HeartPulse, ShieldCheck, Upload } from 'lucide-react';
+import { X, Sparkles, Activity, HeartPulse, ShieldCheck, Upload, Paperclip, FileText } from 'lucide-react';
 
 export function PredictionInputModal({
   isOpen,
   onClose,
   modelType,
   member,
+  records = [],
+  onAddRecord,
   onSubmitPrediction,
 }) {
+  const [docSource, setDocSource] = useState('upload'); // 'upload' | 'existing'
+  const [uploadedFileName, setUploadedFileName] = useState('');
+  const [selectedExistingRecordId, setSelectedExistingRecordId] = useState('');
+
   const [fractureData, setFractureData] = useState({
     anatomicalSite: 'Right Knee',
     injuryDate: '2026-09-14',
-    fileName: '',
     painLevel: '7',
   });
 
@@ -39,34 +44,47 @@ export function PredictionInputModal({
 
   if (!isOpen) return null;
 
+  // Filter records available for this member
+  const memberRecords = records.filter(
+    (r) => !r.patient || r.patient.toLowerCase() === member?.name?.toLowerCase()
+  );
+
   const modelConfigs = {
     fracture: {
       title: 'Fracture Detection AI (ResNet-50 CNN)',
+      department: 'Orthopedics',
+      relatedDoctor: 'Dr. Rahul Mehta',
       icon: Activity,
       color: 'coral',
       description: 'Evaluates musculoskeletal X-ray radiographs with Grad-CAM heatmap localization to identify cortical disruptions, hairline fissures, or osteopathic fractures.',
-      requiredText: 'Required: X-Ray image radiograph, anatomical region, and injury timeframe.',
+      requiredText: 'Prerequisites: X-Ray image radiograph, anatomical region, and injury timeframe.',
     },
     diabetes: {
       title: 'Diabetes 3-Year Risk Forecaster (XGBoost)',
+      department: 'Diabetology',
+      relatedDoctor: 'Dr. Kavya Shah',
       icon: Activity,
       color: 'lilac',
       description: 'Predicts 3-year type-2 diabetes onset probability utilizing metabolic biomarkers, glycemic parameters, and patient demographic indicators.',
-      requiredText: 'Required: Fasting glucose (mg/dL), HbA1c (%), BMI, and blood pressure.',
+      requiredText: 'Prerequisites: Fasting glucose (mg/dL), HbA1c (%), BMI, and blood pressure.',
     },
     heart: {
       title: 'Cardiovascular Risk Engine (Framingham AI)',
+      department: 'Cardiology',
+      relatedDoctor: 'Dr. Ananya Rao',
       icon: HeartPulse,
       color: 'mint',
       description: 'Computes 5-year atherosclerotic cardiovascular disease (ASCVD) risk profile based on lipid levels, hemodynamics, and lifestyle factors.',
-      requiredText: 'Required: Total cholesterol (mg/dL), systolic blood pressure, resting heart rate, and smoking history.',
+      requiredText: 'Prerequisites: Total cholesterol (mg/dL), systolic blood pressure, resting heart rate, and smoking history.',
     },
     general: {
       title: 'General Health Risk Synthesizer',
+      department: 'General Medicine',
+      relatedDoctor: 'Dr. Kumar Iyer',
       icon: ShieldCheck,
       color: 'yellow',
       description: 'Synthesizes unified family health history, reported clinical symptoms, lifestyle indices, and recent records into a holistic decision-support risk estimate.',
-      requiredText: 'Required: Current symptoms, lifestyle parameters, and family medical history.',
+      requiredText: 'Prerequisites: Current symptoms, lifestyle parameters, and family medical history.',
     },
   };
 
@@ -75,7 +93,55 @@ export function PredictionInputModal({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    let payload = { modelType, memberName: member?.name || 'Father', date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) };
+    const patientName = member?.name || 'Father';
+    const formattedDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    let attachedDoc = null;
+
+    if (docSource === 'upload' && uploadedFileName) {
+      // Save new record to unified Medical Records (Requirement 6 & 10)
+      const newRec = {
+        type: modelType === 'fracture' ? 'X-Ray radiograph' : `${currentConfig.title} Intake`,
+        category: modelType === 'fracture' ? 'X-Rays' : 'Reports',
+        patient: patientName,
+        date: formattedDate,
+        source: 'Uploaded by Family',
+        description: `Uploaded document: ${uploadedFileName} for ${currentConfig.title}`,
+        icon: FileText,
+        color: 'blue',
+        status: 'Available',
+      };
+      if (onAddRecord) {
+        onAddRecord(newRec);
+      }
+      attachedDoc = {
+        name: uploadedFileName,
+        type: newRec.type,
+        date: formattedDate,
+        source: 'Uploaded by Family',
+        record: newRec,
+      };
+    } else if (docSource === 'existing' && selectedExistingRecordId) {
+      const found = memberRecords.find((r) => r.type === selectedExistingRecordId || `${r.type}-${r.date}` === selectedExistingRecordId);
+      if (found) {
+        attachedDoc = {
+          name: `${found.type} (${found.date})`,
+          type: found.type,
+          date: found.date,
+          source: 'Existing Medical Record',
+          record: found,
+        };
+      }
+    }
+
+    let payload = {
+      modelType,
+      memberName: patientName,
+      date: formattedDate,
+      relatedDoctor: currentConfig.relatedDoctor,
+      department: currentConfig.department,
+      documentUsed: attachedDoc,
+    };
 
     if (modelType === 'fracture') {
       payload = {
@@ -85,8 +151,13 @@ export function PredictionInputModal({
         result: 'No Acute Fracture Identified',
         riskLevel: 'Low Risk',
         details: fractureData,
-        factors: ['Cortical margin integrity: Intact', 'Joint space preservation: Normal', 'Soft tissue swelling: Minimal'],
-        recommendation: 'Conservative supportive care, rest, and routine follow-up if discomfort persists beyond 7 days.',
+        factors: [
+          'Cortical margin integrity: Intact',
+          'Joint space preservation: Normal',
+          'Soft tissue swelling: Minimal',
+          `Anatomical Region: ${fractureData.anatomicalSite}`,
+        ],
+        recommendation: 'Conservative supportive care, rest, and routine follow-up with orthopedic specialist if discomfort persists beyond 7 days.',
       };
     } else if (modelType === 'diabetes') {
       payload = {
@@ -96,8 +167,13 @@ export function PredictionInputModal({
         result: 'Prediabetes Risk Zone',
         riskLevel: 'Moderate Risk',
         details: diabetesData,
-        factors: [`Fasting Blood Glucose: ${diabetesData.glucose} mg/dL`, `HbA1c: ${diabetesData.hba1c}%`, `Body Mass Index: ${diabetesData.bmi}`],
-        recommendation: 'Dietary carbohydrate titration, regular glycemic monitoring, and repeat HbA1c in 3 months.',
+        factors: [
+          `Fasting Blood Glucose: ${diabetesData.glucose} mg/dL`,
+          `HbA1c Level: ${diabetesData.hba1c}%`,
+          `Body Mass Index (BMI): ${diabetesData.bmi}`,
+          `Systolic Hemodynamics: ${diabetesData.bpSystolic} mmHg`,
+        ],
+        recommendation: 'Dietary carbohydrate titration, regular glycemic monitoring, and clinical review with diabetology care team in 3 months.',
       };
     } else if (modelType === 'heart') {
       payload = {
@@ -107,8 +183,13 @@ export function PredictionInputModal({
         result: 'Stable Cardiovascular Status (Score 86/100)',
         riskLevel: 'Low Risk',
         details: heartData,
-        factors: [`Total Serum Cholesterol: ${heartData.cholesterol} mg/dL`, `Systolic BP: ${heartData.bpSystolic} mmHg`, `Resting Pulse: ${heartData.restingHr} bpm`],
-        recommendation: 'Maintain current aerobic activity schedule and routine annual cardiovascular screening.',
+        factors: [
+          `Total Serum Cholesterol: ${heartData.cholesterol} mg/dL`,
+          `Systolic BP: ${heartData.bpSystolic} mmHg`,
+          `Resting Pulse: ${heartData.restingHr} bpm`,
+          `Smoking Status: ${heartData.smoker}`,
+        ],
+        recommendation: 'Cardiovascular parameters remain optimal. Continue current aerobic activity schedule and routine annual cardiovascular screening.',
       };
     } else {
       payload = {
@@ -118,8 +199,12 @@ export function PredictionInputModal({
         result: 'Low Priority / Routine Monitoring',
         riskLevel: 'Low Risk',
         details: generalData,
-        factors: ['Reported symptoms: Mild', 'Lifestyle habits: Positive aerobic baseline', 'Family history: Mild hypertension risk factor'],
-        recommendation: 'Continue regular preventive health checkups and blood pressure logging.',
+        factors: [
+          'Reported symptoms: Mild',
+          'Lifestyle habits: Positive aerobic baseline',
+          'Family history: Mild hypertension risk factor',
+        ],
+        recommendation: 'Continue regular preventive health checkups, blood pressure logging, and routine primary care consults.',
       };
     }
 
@@ -135,7 +220,7 @@ export function PredictionInputModal({
         aria-modal="true"
         aria-labelledby="prediction-modal-title"
         onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: '560px' }}
+        style={{ maxWidth: '580px' }}
       >
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -158,12 +243,95 @@ export function PredictionInputModal({
           <p style={{ fontSize: '13px', color: 'var(--family-ink)', lineHeight: '1.4', margin: '0 0 6px 0' }}>
             {currentConfig.description}
           </p>
-          <span style={{ fontSize: '12px', color: 'var(--family-primary)', fontWeight: '600' }}>
-            Patient: {member?.name || 'Father'} · {currentConfig.requiredText}
-          </span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--family-primary)', fontWeight: '600' }}>
+            <span>Patient: {member?.name || 'Father'}</span>
+            <span>Related Specialist: {currentConfig.relatedDoctor} ({currentConfig.department})</span>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit}>
+          {/* Dual Document Option: Upload New or Use Existing (Requirement 6) */}
+          <div style={{ margin: '0 0 14px 0', padding: '14px', backgroundColor: 'var(--family-card)', borderRadius: '10px', border: '1px solid var(--family-border)' }}>
+            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--family-ink)', display: 'block', marginBottom: '8px' }}>
+              Document Prerequisite:
+            </span>
+
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+              <button
+                type="button"
+                onClick={() => setDocSource('upload')}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  backgroundColor: docSource === 'upload' ? 'var(--family-primary)' : 'var(--family-soft)',
+                  color: docSource === 'upload' ? '#ffffff' : 'var(--family-ink)',
+                  border: '1px solid var(--family-border)',
+                }}
+              >
+                <Upload size={13} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
+                Option 1: Upload New Document
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setDocSource('existing')}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  backgroundColor: docSource === 'existing' ? 'var(--family-primary)' : 'var(--family-soft)',
+                  color: docSource === 'existing' ? '#ffffff' : 'var(--family-ink)',
+                  border: '1px solid var(--family-border)',
+                }}
+              >
+                <Paperclip size={13} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
+                Option 2: Use Existing Medical Record ({memberRecords.length})
+              </button>
+            </div>
+
+            {docSource === 'upload' && (
+              <label className="drop-zone" style={{ margin: 0, padding: '14px' }}>
+                <Upload size={20} style={{ color: 'var(--family-primary)' }} />
+                <strong>{uploadedFileName || (modelType === 'fracture' ? 'Upload DICOM / PNG / JPEG Radiograph' : 'Upload Lab Report / PDF / Image')}</strong>
+                <span>Document will automatically appear in {member?.name || 'Father'}'s Medical Records</span>
+                <input
+                  type="file"
+                  accept="image/*,.pdf,.dcm"
+                  onChange={(e) => setUploadedFileName(e.target.files?.[0]?.name || 'radiograph_scan.png')}
+                />
+              </label>
+            )}
+
+            {docSource === 'existing' && (
+              <div>
+                {memberRecords.length === 0 ? (
+                  <span style={{ fontSize: '12px', color: 'var(--family-muted)' }}>
+                    No existing records found for {member?.name}. Please upload a new document.
+                  </span>
+                ) : (
+                  <select
+                    className="feature-input"
+                    value={selectedExistingRecordId}
+                    onChange={(e) => setSelectedExistingRecordId(e.target.value)}
+                  >
+                    <option value="">-- Select an existing medical record --</option>
+                    {memberRecords.map((r, idx) => (
+                      <option key={`${r.type}-${idx}`} value={`${r.type}-${r.date}`}>
+                        {r.type} · {r.date} ({r.source})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Model-Specific Inputs */}
           {modelType === 'fracture' && (
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <label style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -191,17 +359,6 @@ export function PredictionInputModal({
                   className="feature-input"
                   value={fractureData.injuryDate}
                   onChange={(e) => setFractureData({ ...fractureData, injuryDate: e.target.value })}
-                />
-              </label>
-
-              <label className="drop-zone" style={{ gridColumn: 'span 2', padding: '16px' }}>
-                <Upload size={24} style={{ color: 'var(--family-primary)' }} />
-                <strong>{fractureData.fileName || 'Upload DICOM / JPEG / PNG Radiograph'}</strong>
-                <span>X-ray scans are analyzed securely on-device</span>
-                <input
-                  type="file"
-                  accept="image/*,.dcm"
-                  onChange={(e) => setFractureData({ ...fractureData, fileName: e.target.files?.[0]?.name || 'knee_radiograph_ap_lat.png' })}
                 />
               </label>
             </div>
@@ -342,7 +499,7 @@ export function PredictionInputModal({
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '14px 0 0', color: 'var(--family-muted)', fontSize: '11.5px' }}>
             <ShieldCheck size={16} style={{ color: 'var(--family-primary)', flexShrink: 0 }} />
-            <span>AI results are for decision-support and do not replace formal physician diagnosis.</span>
+            <span>AI telemetry supports clinical decisions and does not replace formal physician diagnosis.</span>
           </div>
 
           <div className="modal-actions" style={{ marginTop: '18px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>

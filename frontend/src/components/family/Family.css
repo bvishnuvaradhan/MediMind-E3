@@ -1232,6 +1232,112 @@
   margin-top: 24px;
 }
 
+/* Polished Doctor Profile Styling */
+.doctor-profile-header-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  background-color: var(--family-card);
+  border: 1px solid var(--family-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  margin-bottom: 24px;
+}
+
+.doctor-profile-avatar-lg {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  font-size: 22px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.doctor-section-card {
+  background-color: var(--family-card);
+  border: 1px solid var(--family-border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-xs);
+  margin-bottom: 20px;
+}
+
+.doctor-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--family-ink);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--family-border);
+}
+
+.doctor-section-title svg {
+  color: var(--family-primary);
+}
+
+.doctor-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.info-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  background-color: var(--family-soft);
+  border: 1px solid var(--family-border);
+  border-radius: var(--radius-md);
+}
+
+.info-tile-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--family-muted);
+}
+
+.info-tile-value {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--family-ink);
+  line-height: 1.4;
+}
+
+.info-tile-sub {
+  font-size: 12px;
+  color: var(--family-subtle);
+}
+
+/* Symptom Intake & Booking Modern Cards */
+.booking-section-card {
+  background-color: var(--family-card);
+  border: 1px solid var(--family-border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-xs);
+}
+
+.booking-context-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background-color: var(--family-soft);
+  border: 1px solid var(--family-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+}
+
 /* Responsive Media Queries */
 @media (max-width: 1080px) {
   .sidebar {
