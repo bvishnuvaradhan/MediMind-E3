@@ -8,7 +8,10 @@ import {
 import { initialRecords } from '../../../data/familyMockData';
 import { RecordRow } from '../components/RecordRow';
 
-export function MemberProfileView({ member, navigate, announce }) {
+export function MemberProfileView({ member, records = initialRecords, navigate, announce }) {
+  const memberRecords = records.filter(
+    (r) => !r.patient || r.patient.toLowerCase() === member.name.toLowerCase()
+  );
   return (
     <section className="feature-view">
       <div className="feature-heading">
@@ -88,8 +91,8 @@ export function MemberProfileView({ member, navigate, announce }) {
           </button>
         </div>
         <div className="record-list">
-          {initialRecords.map((record) => (
-            <RecordRow record={record} announce={announce} key={record.type} />
+          {(memberRecords.length > 0 ? memberRecords : records).slice(0, 3).map((record, idx) => (
+            <RecordRow record={record} announce={announce} key={`${record.type}-${idx}`} />
           ))}
         </div>
       </div>

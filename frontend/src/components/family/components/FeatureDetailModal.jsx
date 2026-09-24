@@ -1,7 +1,8 @@
 import { X, FileText, CalendarDays, Download } from 'lucide-react';
 
-export function FeatureDetailModal({ detail, onClose, announce }) {
-  const { item, feature } = detail;
+export function FeatureDetailModal({ item: propItem, feature: propFeature, detail, onClose, announce }) {
+  const item = propItem || detail?.item || {};
+  const feature = propFeature || detail?.feature || 'Details';
   const titles = {
     'Medical record': 'Medical record details',
     Appointments: 'Appointment details',

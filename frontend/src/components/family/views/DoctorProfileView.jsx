@@ -1,15 +1,18 @@
 import { ArrowUpRight, Stethoscope, CalendarDays } from 'lucide-react';
 
-export function DoctorProfileView({ doctor, navigate, announce }) {
-  if (!doctor) {
-    navigate('Doctors');
-    return null;
-  }
+export function DoctorProfileView({ doctor: propDoctor, selectedDoctor, navigate, announce }) {
+  const doctor = propDoctor || selectedDoctor || {
+    title: 'Dr. Rahul Mehta',
+    detail: 'Orthopedics · MediMind Hospital',
+    meta: 'Available today · 10:30 AM',
+    tone: 'coral',
+    initials: 'RM',
+  };
 
   return (
     <section className="feature-view">
       <div className="feature-heading">
-        <span className={`avatar avatar-${doctor.tone}`}>{doctor.initials}</span>
+        <span className={`avatar avatar-${doctor.tone || 'coral'}`}>{doctor.initials || 'DR'}</span>
         <div>
           <p className="eyebrow">Doctor profile</p>
           <h1>{doctor.title}</h1>
@@ -30,13 +33,13 @@ export function DoctorProfileView({ doctor, navigate, announce }) {
           </div>
           <div>
             <p className="card-kicker">SPECIALIST OVERVIEW</p>
-            <h3>{doctor.detail.split(' · ')[0]}</h3>
+            <h3>{doctor.detail ? doctor.detail.split(' · ')[0] : 'Orthopedics'}</h3>
             <p className="insight-copy">
               Trusted care for your family account with appointment availability this week.
             </p>
             <button
               className="primary-button"
-              onClick={() => navigate('Appointment AI assessment')}
+              onClick={() => navigate('Appointment assessment')}
             >
               <CalendarDays size={16} /> Book appointment
             </button>

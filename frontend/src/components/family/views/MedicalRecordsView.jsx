@@ -3,7 +3,7 @@ import { FileText } from 'lucide-react';
 import { initialRecords } from '../../../data/familyMockData';
 import { RecordRow } from '../components/RecordRow';
 
-export function MedicalRecordsView({ announce, openFeatureModal }) {
+export function MedicalRecordsView({ records = initialRecords, announce, openFeatureModal }) {
   const [recordFilter, setRecordFilter] = useState('All');
   const filters = ['All', 'Reports', 'Tests', 'X-Rays', 'Prescriptions', 'Consultations', 'AI Reports'];
 
@@ -34,7 +34,7 @@ export function MedicalRecordsView({ announce, openFeatureModal }) {
         </div>
 
         <div className="feature-records">
-          {initialRecords
+          {records
             .filter((record) => recordFilter === 'All' || record.category === recordFilter)
             .map((record) => (
               <RecordRow

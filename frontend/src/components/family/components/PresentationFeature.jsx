@@ -29,13 +29,19 @@ export function PresentationFeature({
           </div>
           {page === 'Doctors' ? (
             <div className="feature-actions">
-              <button className="text-button" onClick={() => navigate('Appointment AI assessment')}>
+              <button
+                className="text-button"
+                onClick={() => {
+                  if (setSelectedDoctor) setSelectedDoctor(item);
+                  navigate('Appointment assessment');
+                }}
+              >
                 Book appointment <CalendarDays size={14} />
               </button>
               <button
                 className="text-button"
                 onClick={() => {
-                  setSelectedDoctor(item);
+                  if (setSelectedDoctor) setSelectedDoctor(item);
                   navigate('Doctor profile');
                 }}
               >

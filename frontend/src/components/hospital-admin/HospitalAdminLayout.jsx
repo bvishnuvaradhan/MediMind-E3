@@ -485,23 +485,47 @@ export function HospitalAdminLayout({ dark, setDark }) {
 
         {/* Sidebar Footer & Quick Role Switches */}
         <div className="ha-sidebar-footer">
-          <button
-            className="ha-nav-item"
-            style={{ color: '#4338ca', backgroundColor: '#eef2ff', borderRadius: '8px' }}
-            onClick={() => switchRole('CHAIRMAN')}
-          >
-            <Crown size={17} />
-            <span>Switch to Chairman</span>
-          </button>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+            <button
+              className="ha-nav-item"
+              style={{ padding: '6px 8px', fontSize: '11px', color: '#0f766e', backgroundColor: '#f0fdfa', borderRadius: '6px' }}
+              onClick={() => switchRole('DOCTOR')}
+              title="Switch to Doctor"
+            >
+              <Stethoscope size={14} />
+              <span>Doctor</span>
+            </button>
 
-          <button
-            className="ha-nav-item"
-            style={{ color: '#0f766e', backgroundColor: '#f0fdfa', borderRadius: '8px', marginTop: '4px' }}
-            onClick={() => switchRole('FAMILY')}
-          >
-            <UsersRound size={17} />
-            <span>Switch to Family Demo</span>
-          </button>
+            <button
+              className="ha-nav-item"
+              style={{ padding: '6px 8px', fontSize: '11px', color: '#7c3aed', backgroundColor: '#f5f3ff', borderRadius: '6px' }}
+              onClick={() => switchRole('DEPARTMENT_HEAD')}
+              title="Switch to Department Head"
+            >
+              <UserCheck size={14} />
+              <span>Dept Head</span>
+            </button>
+
+            <button
+              className="ha-nav-item"
+              style={{ padding: '6px 8px', fontSize: '11px', color: '#4338ca', backgroundColor: '#eef2ff', borderRadius: '6px' }}
+              onClick={() => switchRole('CHAIRMAN')}
+              title="Switch to Chairman"
+            >
+              <Crown size={14} />
+              <span>Chairman</span>
+            </button>
+
+            <button
+              className="ha-nav-item"
+              style={{ padding: '6px 8px', fontSize: '11px', color: '#2563eb', backgroundColor: '#eff6ff', borderRadius: '6px' }}
+              onClick={() => switchRole('FAMILY')}
+              title="Switch to Family Portal"
+            >
+              <UsersRound size={14} />
+              <span>Family</span>
+            </button>
+          </div>
 
           <button
             className="ha-nav-item"

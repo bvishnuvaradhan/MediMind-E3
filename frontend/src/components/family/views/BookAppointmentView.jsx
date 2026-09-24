@@ -2,18 +2,25 @@ import { useState } from 'react';
 import { CalendarDays, ArrowUpRight, Sparkles, LockKeyhole, ShieldCheck } from 'lucide-react';
 
 export function BookAppointmentView({
-  member,
-  assessment,
-  bookedSlots,
+  member: propMember,
+  familyMembers = [],
+  selectedDoctor,
+  assessment: propAssessment,
+  appointmentAssessment,
+  bookedSlots = {},
   onBookAppointment,
+  handleBookAppointment,
   navigate,
   announce,
 }) {
+  const member = propMember || familyMembers[0] || { name: 'Father' };
+  const assessment = propAssessment || appointmentAssessment;
+  const submitBooking = onBookAppointment || handleBookAppointment || (() => true);
   const slotOptions = ['10:30 AM', '11:15 AM', '2:00 PM', '4:30 PM'];
 
   const [booking, setBooking] = useState({
     patient: member.name,
-    doctor: assessment?.doctor ?? 'Dr. Rahul Mehta',
+    doctor: assessment?.doctor ?? selectedDoctor?.title ?? 'Dr. Rahul Mehta',
     date: assessment?.urgency === 'high' ? '2026-09-17' : '2026-09-18',
     slot: assessment?.urgency === 'high' ? '10:30 AM' : '11:15 AM',
     reason: assessment?.reason ?? '',
@@ -51,7 +58,7 @@ export function BookAppointmentView({
       return;
     }
 
-    if (!onBookAppointment(booking)) return;
+    if (!submitBooking(booking)) return;
 
     announce(
       `Appointment booked with ${booking.doctor} for ${booking.patient} on ${booking.date} at ${booking.slot}.`

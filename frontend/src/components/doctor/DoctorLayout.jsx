@@ -504,6 +504,14 @@ export function DoctorLayout({ dark, setDark }) {
             <button
               className="doctor-btn doctor-btn-outline doctor-btn-sm"
               style={{ fontSize: '11px', padding: '4px 6px' }}
+              onClick={() => switchRole('CHAIRMAN')}
+              title="Switch to Chairman"
+            >
+              Chairman
+            </button>
+            <button
+              className="doctor-btn doctor-btn-outline doctor-btn-sm"
+              style={{ fontSize: '11px', padding: '4px 6px' }}
               onClick={() => switchRole('FAMILY')}
               title="Switch to Family Portal"
             >
@@ -511,7 +519,7 @@ export function DoctorLayout({ dark, setDark }) {
             </button>
             <button
               className="doctor-btn doctor-btn-ghost doctor-btn-sm"
-              style={{ fontSize: '11px', padding: '4px 6px', color: 'var(--doctor-coral)' }}
+              style={{ gridColumn: 'span 2', fontSize: '11px', padding: '4px 6px', color: 'var(--doctor-coral)' }}
               onClick={logout}
               title="Sign Out"
             >

@@ -2,12 +2,17 @@ import { useState } from 'react';
 import { Sparkles, ShieldCheck, Upload, ArrowUpRight } from 'lucide-react';
 
 export function AppointmentAssessmentView({
-  member,
-  doctor,
-  setAssessment,
+  member: propMember,
+  doctor: propDoctor,
+  selectedDoctor,
+  setAssessment: propSetAssessment,
+  setAppointmentAssessment,
   navigate,
   announce,
 }) {
+  const member = propMember || { name: 'Father' };
+  const doctor = propDoctor || selectedDoctor;
+  const setAssessment = propSetAssessment || setAppointmentAssessment || (() => {});
   const [symptoms, setSymptoms] = useState('');
   const [fileName, setFileName] = useState('');
 

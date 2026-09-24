@@ -14,6 +14,7 @@ import { RecordRow } from '../components/RecordRow';
 
 export function DashboardView({
   member,
+  records = initialRecords,
   memberIndex,
   setMemberIndex,
   navigate,
@@ -124,8 +125,8 @@ export function DashboardView({
             </button>
           </div>
           <div className="record-list">
-            {initialRecords.map((record) => (
-              <RecordRow record={record} key={record.type} announce={announce} />
+            {records.slice(0, 3).map((record, idx) => (
+              <RecordRow record={record} key={`${record.type}-${idx}`} announce={announce} />
             ))}
           </div>
           <button className="upload-button" onClick={() => navigate('Upload record')}>

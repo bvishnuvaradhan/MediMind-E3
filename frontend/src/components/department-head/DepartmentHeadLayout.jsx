@@ -403,8 +403,16 @@ export function DepartmentHeadLayout({ dark, setDark }) {
               Chairman
             </button>
             <button
+              className="dh-btn dh-btn-outline dh-btn-sm"
+              style={{ fontSize: '11px', padding: '4px 6px' }}
+              onClick={() => switchRole('FAMILY')}
+              title="Switch to Family Portal"
+            >
+              Family
+            </button>
+            <button
               className="dh-btn dh-btn-ghost dh-btn-sm"
-              style={{ fontSize: '11px', padding: '4px 6px', color: 'var(--dh-coral)' }}
+              style={{ gridColumn: 'span 2', fontSize: '11px', padding: '4px 6px', color: 'var(--dh-coral)' }}
               onClick={logout}
               title="Sign Out"
             >

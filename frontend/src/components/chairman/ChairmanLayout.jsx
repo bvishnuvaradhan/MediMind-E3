@@ -317,8 +317,19 @@ export function ChairmanLayout({ dark, setDark }) {
                       announce('Switched to Department Head Portal.');
                     }}
                   >
-                    <Stethoscope size={15} />
+                    <Activity size={15} />
                     <span>Switch to Dept Head</span>
+                  </button>
+
+                  <button
+                    className="user-menu-item"
+                    onClick={() => {
+                      switchRole('DOCTOR');
+                      announce('Switched to Doctor Portal.');
+                    }}
+                  >
+                    <Stethoscope size={15} />
+                    <span>Switch to Doctor</span>
                   </button>
 
                   <button

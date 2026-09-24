@@ -26,6 +26,7 @@ import {
 import { useAuth } from '../../context/useAuth'
 import {
   initialFamilyMembers,
+  initialRecords,
   initialBookedSlots,
   initialDoctorAccess,
 } from '../../data/familyMockData'
@@ -72,6 +73,7 @@ export function FamilyLayout({ dark, setDark }) {
   const [detailModal, setDetailModal] = useState(null)
   const [appointmentAssessment, setAppointmentAssessment] = useState(null)
   const [familyMembers, setFamilyMembers] = useState(initialFamilyMembers)
+  const [records, setRecords] = useState(initialRecords)
   const [bookedSlots, setBookedSlots] = useState(initialBookedSlots)
   const [bookedAppointments, setBookedAppointments] = useState([])
   const [appointmentStatuses, setAppointmentStatuses] = useState({})
@@ -91,6 +93,55 @@ export function FamilyLayout({ dark, setDark }) {
   const navigate = (nextPage) => {
     setPage(nextPage)
     setProfileOpen(false)
+  }
+
+  const handleAddRecord = (newRecord) => {
+    setRecords((prev) => [newRecord, ...prev])
+    if (newRecord.patient) {
+      setFamilyMembers((prev) =>
+        prev.map((m) =>
+          m.name.toLowerCase() === newRecord.patient.toLowerCase()
+            ? { ...m, records: (m.records || 0) + 1 }
+            : m
+        )
+      )
+    }
+  }
+
+  const handleGrantAccess = (grant) => {
+    const exists = doctorAccess.some(
+      (entry) => entry.member === grant.member && entry.doctor === grant.doctor
+    )
+    if (exists) {
+      announce(`${grant.doctor} already has access to ${grant.member}'s records.`)
+      return
+    }
+    const newEntry = {
+      ...grant,
+      granted: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+    }
+    setDoctorAccess((current) => [...current, newEntry])
+    announce(`Access granted to ${grant.doctor} for ${grant.member}.`)
+  }
+
+  const handleRevokeAccess = (entry) => {
+    if (!window.confirm(`Revoke record access for ${entry.doctor} to ${entry.member}'s records?`)) return
+    setDoctorAccess((current) =>
+      current.filter((item) => !(item.member === entry.member && item.doctor === entry.doctor))
+    )
+    announce(`Access revoked for ${entry.doctor} to ${entry.member}'s records.`)
+  }
+
+  const handleCancelAppointment = (item) => {
+    const key = `${item.title}|${item.detail}`
+    if (!window.confirm(`Cancel the appointment for ${item.title}?`)) return
+    setAppointmentStatuses((curr) => ({ ...curr, [key]: 'Cancelled' }))
+    announce(`Appointment cancelled for ${item.title}.`)
+  }
+
+  const handleRescheduleAppointment = (item) => {
+    navigate('Appointment assessment')
+    announce(`Rescheduling appointment for ${item.title}`)
   }
 
   const handleBookAppointment = (booking) => {
@@ -187,6 +238,7 @@ export function FamilyLayout({ dark, setDark }) {
         <DashboardView
           member={member}
           familyMembers={familyMembers}
+          records={records}
           memberIndex={memberIndex}
           setMemberIndex={setMemberIndex}
           navigate={navigate}
@@ -199,6 +251,7 @@ export function FamilyLayout({ dark, setDark }) {
       return (
         <MemberProfileView
           member={member}
+          records={records}
           navigate={navigate}
           announce={announce}
           openFeatureModal={openFeatureModal}
@@ -218,13 +271,16 @@ export function FamilyLayout({ dark, setDark }) {
           handleAddMember={handleAddMember}
           handleDeleteMember={handleDeleteMember}
           navigate={navigate}
+          announce={announce}
         />
       )
     }
     if (page === 'Medical records') {
       return (
         <MedicalRecordsView
+          records={records}
           navigate={navigate}
+          announce={announce}
           openFeatureModal={openFeatureModal}
         />
       )
@@ -232,9 +288,11 @@ export function FamilyLayout({ dark, setDark }) {
     if (page === 'Upload record') {
       return (
         <UploadRecordView
+          member={member}
           familyMembers={familyMembers}
           navigate={navigate}
           announce={announce}
+          onAddRecord={handleAddRecord}
         />
       )
     }
@@ -251,6 +309,7 @@ export function FamilyLayout({ dark, setDark }) {
         <DoctorsView
           setSelectedDoctor={setSelectedDoctor}
           navigate={navigate}
+          announce={announce}
           openFeatureModal={openFeatureModal}
         />
       )
@@ -261,6 +320,8 @@ export function FamilyLayout({ dark, setDark }) {
           bookedAppointments={bookedAppointments}
           appointmentStatuses={appointmentStatuses}
           setAppointmentStatuses={setAppointmentStatuses}
+          onCancelAppointment={handleCancelAppointment}
+          onRescheduleAppointment={handleRescheduleAppointment}
           navigate={navigate}
           announce={announce}
           openFeatureModal={openFeatureModal}
@@ -271,6 +332,7 @@ export function FamilyLayout({ dark, setDark }) {
       return (
         <ConsultationsView
           openFeatureModal={openFeatureModal}
+          announce={announce}
         />
       )
     }
@@ -278,6 +340,7 @@ export function FamilyLayout({ dark, setDark }) {
       return (
         <PrescriptionsView
           openFeatureModal={openFeatureModal}
+          announce={announce}
         />
       )
     }
@@ -287,11 +350,13 @@ export function FamilyLayout({ dark, setDark }) {
           doctorAccess={doctorAccess}
           setDoctorAccess={setDoctorAccess}
           familyMembers={familyMembers}
+          onGrant={handleGrantAccess}
+          onRevoke={handleRevokeAccess}
           announce={announce}
         />
       )
     }
-    if (page === 'Appointment assessment') {
+    if (page === 'Appointment assessment' || page === 'Appointment AI assessment') {
       return (
         <AppointmentAssessmentView
           selectedDoctor={selectedDoctor}
@@ -330,6 +395,7 @@ export function FamilyLayout({ dark, setDark }) {
         <DoctorProfileView
           selectedDoctor={selectedDoctor}
           navigate={navigate}
+          announce={announce}
           openFeatureModal={openFeatureModal}
         />
       )
@@ -405,24 +471,48 @@ export function FamilyLayout({ dark, setDark }) {
             <span>Help center</span>
           </button>
 
-          {/* Quick role switch for development/testing */}
-          <button
-            className="nav-item"
-            style={{ marginTop: '8px', color: '#2563eb', background: '#eff6ff', borderRadius: '8px' }}
-            onClick={() => switchRole('HOSPITAL_ADMIN')}
-          >
-            <Building2 size={18} />
-            <span>Switch to Hospital Admin</span>
-          </button>
+          {/* Quick role switches for development/testing */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', marginTop: '8px' }}>
+            <button
+              className="nav-item"
+              style={{ padding: '6px 8px', fontSize: '11px', color: '#0f766e', background: '#f0fdfa', borderRadius: '6px' }}
+              onClick={() => switchRole('DOCTOR')}
+              title="Switch to Doctor"
+            >
+              <Stethoscope size={14} />
+              <span>Doctor</span>
+            </button>
 
-          <button
-            className="nav-item"
-            style={{ marginTop: '4px', color: '#6366f1', background: '#eef2ff', borderRadius: '8px' }}
-            onClick={() => switchRole('CHAIRMAN')}
-          >
-            <Crown size={18} />
-            <span>Switch to Chairman</span>
-          </button>
+            <button
+              className="nav-item"
+              style={{ padding: '6px 8px', fontSize: '11px', color: '#7c3aed', background: '#f5f3ff', borderRadius: '6px' }}
+              onClick={() => switchRole('DEPARTMENT_HEAD')}
+              title="Switch to Department Head"
+            >
+              <Activity size={14} />
+              <span>Dept Head</span>
+            </button>
+
+            <button
+              className="nav-item"
+              style={{ padding: '6px 8px', fontSize: '11px', color: '#2563eb', background: '#eff6ff', borderRadius: '6px' }}
+              onClick={() => switchRole('HOSPITAL_ADMIN')}
+              title="Switch to Hospital Admin"
+            >
+              <Building2 size={14} />
+              <span>Admin</span>
+            </button>
+
+            <button
+              className="nav-item"
+              style={{ padding: '6px 8px', fontSize: '11px', color: '#4338ca', background: '#eef2ff', borderRadius: '6px' }}
+              onClick={() => switchRole('CHAIRMAN')}
+              title="Switch to Chairman"
+            >
+              <Crown size={14} />
+              <span>Chairman</span>
+            </button>
+          </div>
 
           <button
             className="nav-item"

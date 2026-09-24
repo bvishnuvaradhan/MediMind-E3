@@ -1,15 +1,62 @@
 import { useState } from 'react';
 import { LockKeyhole, ShieldCheck, Trash2 } from 'lucide-react';
 
-export function DoctorAccessView({ members, accessEntries, onGrant, onRevoke }) {
+export function DoctorAccessView({
+  members: propMembers,
+  familyMembers,
+  accessEntries: propAccessEntries,
+  doctorAccess,
+  setDoctorAccess,
+  onGrant: propOnGrant,
+  onRevoke: propOnRevoke,
+  announce = () => {},
+}) {
+  const members = familyMembers || propMembers || [{ name: 'Father' }];
+  const accessEntries = doctorAccess || propAccessEntries || [];
   const doctors = [
     { name: 'Dr. Rahul Mehta', department: 'Orthopedics' },
     { name: 'Dr. Ananya Rao', department: 'Cardiology' },
     { name: 'Dr. Kavya Shah', department: 'Diabetology' },
   ];
-  const [selectedMember, setSelectedMember] = useState(members[0]?.name ?? '');
+  const [selectedMember, setSelectedMember] = useState(members[0]?.name ?? 'Father');
   const [selectedDoctor, setSelectedDoctor] = useState(doctors[0].name);
   const doctor = doctors.find((item) => item.name === selectedDoctor) ?? doctors[0];
+
+  const handleGrant = (grant) => {
+    if (propOnGrant) {
+      propOnGrant(grant);
+      return;
+    }
+    if (setDoctorAccess) {
+      const exists = accessEntries.some(
+        (e) => e.member === grant.member && e.doctor === grant.doctor
+      );
+      if (exists) {
+        announce(`${grant.doctor} already has access to ${grant.member}'s records.`);
+        return;
+      }
+      const newEntry = {
+        ...grant,
+        granted: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+      };
+      setDoctorAccess((prev) => [...prev, newEntry]);
+      announce(`Access granted to ${grant.doctor} for ${grant.member}.`);
+    }
+  };
+
+  const handleRevoke = (entry) => {
+    if (propOnRevoke) {
+      propOnRevoke(entry);
+      return;
+    }
+    if (setDoctorAccess) {
+      if (!window.confirm(`Revoke record access for ${entry.doctor} to ${entry.member}'s records?`)) return;
+      setDoctorAccess((prev) =>
+        prev.filter((e) => !(e.member === entry.member && e.doctor === entry.doctor))
+      );
+      announce(`Access revoked for ${entry.doctor} to ${entry.member}'s records.`);
+    }
+  };
 
   return (
     <section className="feature-view">
@@ -61,7 +108,7 @@ export function DoctorAccessView({ members, accessEntries, onGrant, onRevoke }) 
           <button
             className="primary-button"
             onClick={() =>
-              onGrant({
+              handleGrant({
                 member: selectedMember,
                 doctor: doctor.name,
                 department: doctor.department,
@@ -99,7 +146,7 @@ export function DoctorAccessView({ members, accessEntries, onGrant, onRevoke }) 
                 </div>
                 <button
                   className="delete-member-button"
-                  onClick={() => onRevoke(entry)}
+                  onClick={() => handleRevoke(entry)}
                   aria-label={`Revoke ${entry.doctor} access`}
                 >
                   <Trash2 size={16} />
