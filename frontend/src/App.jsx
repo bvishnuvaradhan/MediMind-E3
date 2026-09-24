@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext'
 import { useAuth } from './context/useAuth'
 import { LoginPage, SignupPage } from './components/auth/AuthPages'
 import { ChairmanLayout } from './components/chairman/ChairmanLayout'
+import { HospitalAdminLayout } from './components/hospital-admin/HospitalAdminLayout'
 import { FamilyLayout } from './components/family/FamilyLayout'
 
 function MainRouter() {
@@ -29,6 +30,10 @@ function MainRouter() {
 
   if (role === 'CHAIRMAN') {
     return <ChairmanLayout dark={dark} setDark={setDark} />
+  }
+
+  if (role === 'HOSPITAL_ADMIN') {
+    return <HospitalAdminLayout dark={dark} setDark={setDark} />
   }
 
   return <FamilyLayout dark={dark} setDark={setDark} />

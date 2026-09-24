@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {
   Activity,
+  Building2,
   CalendarDays,
   ChevronDown,
   ChevronRight,
@@ -407,7 +408,16 @@ export function FamilyLayout({ dark, setDark }) {
           {/* Quick role switch for development/testing */}
           <button
             className="nav-item"
-            style={{ marginTop: '8px', color: '#6366f1', background: '#eef2ff', borderRadius: '8px' }}
+            style={{ marginTop: '8px', color: '#2563eb', background: '#eff6ff', borderRadius: '8px' }}
+            onClick={() => switchRole('HOSPITAL_ADMIN')}
+          >
+            <Building2 size={18} />
+            <span>Switch to Hospital Admin</span>
+          </button>
+
+          <button
+            className="nav-item"
+            style={{ marginTop: '4px', color: '#6366f1', background: '#eef2ff', borderRadius: '8px' }}
             onClick={() => switchRole('CHAIRMAN')}
           >
             <Crown size={18} />

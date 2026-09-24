@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   User,
   Crown,
+  Building2,
   UsersRound,
 } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
@@ -18,9 +19,9 @@ import './Auth.css';
 
 export function LoginPage({ onSwitchToSignup }) {
   const { login, error, clearError } = useAuth();
-  const [selectedRole, setSelectedRole] = useState('CHAIRMAN'); // Default to Chairman so reviewer directly tests Chairman portal
-  const [email, setEmail] = useState('chairman@medimind.com');
-  const [password, setPassword] = useState('chairman123');
+  const [selectedRole, setSelectedRole] = useState('HOSPITAL_ADMIN'); // Default to Hospital Admin for active testing
+  const [email, setEmail] = useState('admin@medimindhospital.com');
+  const [password, setPassword] = useState('hospital123');
   const [validationError, setValidationError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -31,6 +32,9 @@ export function LoginPage({ onSwitchToSignup }) {
     if (role === 'CHAIRMAN') {
       setEmail('chairman@medimind.com');
       setPassword('chairman123');
+    } else if (role === 'HOSPITAL_ADMIN') {
+      setEmail('admin@medimindhospital.com');
+      setPassword('hospital123');
     } else {
       setEmail('rohan.kapoor@example.com');
       setPassword('family123');
@@ -76,25 +80,39 @@ export function LoginPage({ onSwitchToSignup }) {
             </span>
           </div>
           <p className="eyebrow" style={{ marginTop: '12px', textAlign: 'center' }}>
-            {selectedRole === 'CHAIRMAN' ? 'Platform Administration Portal' : 'Family Healthcare Portal'}
+            {selectedRole === 'CHAIRMAN'
+              ? 'Platform Administration Portal'
+              : selectedRole === 'HOSPITAL_ADMIN'
+              ? 'Hospital Administration Portal'
+              : 'Family Healthcare Portal'}
           </p>
           <h2>Welcome back</h2>
           <p className="auth-subheading">
             {selectedRole === 'CHAIRMAN'
               ? 'Sign in to access platform governance, hospital network oversight, and AI service metrics.'
+              : selectedRole === 'HOSPITAL_ADMIN'
+              ? 'Sign in to manage hospital departments, clinical staff, operational schedules, and aggregate AI screening.'
               : 'Sign in to access your family unified health records, appointments, and AI screening.'}
           </p>
         </div>
 
         {/* Role switcher tabs */}
-        <div className="auth-role-tabs">
+        <div className="auth-role-tabs" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+          <button
+            type="button"
+            className={`auth-role-tab ${selectedRole === 'HOSPITAL_ADMIN' ? 'active' : ''}`}
+            onClick={() => handleRoleTabChange('HOSPITAL_ADMIN')}
+          >
+            <Building2 size={15} />
+            <span>Hospital Admin</span>
+          </button>
           <button
             type="button"
             className={`auth-role-tab chairman ${selectedRole === 'CHAIRMAN' ? 'active' : ''}`}
             onClick={() => handleRoleTabChange('CHAIRMAN')}
           >
             <Crown size={15} />
-            <span>Chairman / Owner</span>
+            <span>Chairman</span>
           </button>
           <button
             type="button"
@@ -102,7 +120,7 @@ export function LoginPage({ onSwitchToSignup }) {
             onClick={() => handleRoleTabChange('FAMILY')}
           >
             <UsersRound size={15} />
-            <span>Family Account</span>
+            <span>Family</span>
           </button>
         </div>
 
@@ -120,7 +138,13 @@ export function LoginPage({ onSwitchToSignup }) {
               <Mail size={16} className="auth-icon" />
               <input
                 type="email"
-                placeholder={selectedRole === 'CHAIRMAN' ? 'chairman@medimind.com' : 'rohan.kapoor@example.com'}
+                placeholder={
+                  selectedRole === 'CHAIRMAN'
+                    ? 'chairman@medimind.com'
+                    : selectedRole === 'HOSPITAL_ADMIN'
+                    ? 'admin@medimindhospital.com'
+                    : 'rohan.kapoor@example.com'
+                }
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -150,14 +174,30 @@ export function LoginPage({ onSwitchToSignup }) {
           </label>
 
           <div className="auth-quick-pills">
-            <span>Demo credentials loaded:</span>
-            <button
-              type="button"
-              className="quick-fill-btn"
-              onClick={() => handleRoleTabChange(selectedRole === 'CHAIRMAN' ? 'FAMILY' : 'CHAIRMAN')}
-            >
-              Switch to {selectedRole === 'CHAIRMAN' ? 'Family Demo' : 'Chairman Demo'}
-            </button>
+            <span>Quick demo accounts:</span>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+              <button
+                type="button"
+                className="quick-fill-btn"
+                onClick={() => handleRoleTabChange('HOSPITAL_ADMIN')}
+              >
+                Hospital Admin
+              </button>
+              <button
+                type="button"
+                className="quick-fill-btn"
+                onClick={() => handleRoleTabChange('CHAIRMAN')}
+              >
+                Chairman
+              </button>
+              <button
+                type="button"
+                className="quick-fill-btn"
+                onClick={() => handleRoleTabChange('FAMILY')}
+              >
+                Family
+              </button>
+            </div>
           </div>
 
           <button
@@ -166,7 +206,15 @@ export function LoginPage({ onSwitchToSignup }) {
             disabled={submitting}
             style={{ width: '100%', justifyContent: 'center', marginTop: '6px', height: '44px' }}
           >
-            {submitting ? 'Signing in...' : `Sign in as ${selectedRole === 'CHAIRMAN' ? 'Chairman' : 'Family'}`}
+            {submitting
+              ? 'Signing in...'
+              : `Sign in as ${
+                  selectedRole === 'CHAIRMAN'
+                    ? 'Chairman'
+                    : selectedRole === 'HOSPITAL_ADMIN'
+                    ? 'Hospital Admin'
+                    : 'Family'
+                }`}
             {!submitting && <ArrowRight size={16} />}
           </button>
         </form>
@@ -188,7 +236,9 @@ export function LoginPage({ onSwitchToSignup }) {
             </>
           ) : (
             <span style={{ fontSize: '11px', color: '#64748b' }}>
-              Root administrative access. Multi-Factor Authentication enabled.
+              {selectedRole === 'HOSPITAL_ADMIN'
+                ? 'Hospital Administrative Access · NABH/JCI Verified'
+                : 'Root Platform Owner Access · Multi-Factor Authentication enabled'}
             </span>
           )}
         </div>
@@ -228,7 +278,7 @@ export function SignupPage({ onSwitchToLogin }) {
       return;
     }
     if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
-      setValidationError('Please enter a valid email address format.');
+      setValidationError('Please enter a valid email address.');
       return;
     }
     if (!password) {
@@ -236,11 +286,11 @@ export function SignupPage({ onSwitchToLogin }) {
       return;
     }
     if (password.length < 6) {
-      setValidationError('Password must be at least 6 characters long.');
+      setValidationError('Password must be at least 6 characters.');
       return;
     }
     if (password !== confirmPassword) {
-      setValidationError('Passwords do not match. Please verify.');
+      setValidationError('Passwords do not match.');
       return;
     }
 
@@ -264,11 +314,11 @@ export function SignupPage({ onSwitchToLogin }) {
             </span>
           </div>
           <p className="eyebrow" style={{ marginTop: '12px', textAlign: 'center' }}>
-            Patient Registration
+            Family Health Workspace
           </p>
           <h2>Create Family Account</h2>
           <p className="auth-subheading">
-            Register your family account to manage member profiles, medical records, and AI screening.
+            Register as the family account creator to manage your entire household's health records, doctor appointments, and AI screenings.
           </p>
         </div>
 
@@ -281,7 +331,7 @@ export function SignupPage({ onSwitchToLogin }) {
 
         <form onSubmit={handleSubmit} className="auth-form" noValidate>
           <label>
-            <span>Full Name (Account Creator)</span>
+            <span>Your Full Name</span>
             <div className="auth-input-wrapper">
               <User size={16} className="auth-icon" />
               <input
@@ -304,7 +354,7 @@ export function SignupPage({ onSwitchToLogin }) {
               <Mail size={16} className="auth-icon" />
               <input
                 type="email"
-                placeholder="your.family@example.com"
+                placeholder="rohan.kapoor@example.com"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -316,7 +366,7 @@ export function SignupPage({ onSwitchToLogin }) {
           </label>
 
           <label>
-            <span>Create Password (min. 6 characters)</span>
+            <span>Create Password</span>
             <div className="auth-input-wrapper">
               <LockKeyhole size={16} className="auth-icon" />
               <input
@@ -355,13 +405,13 @@ export function SignupPage({ onSwitchToLogin }) {
             disabled={submitting}
             style={{ width: '100%', justifyContent: 'center', marginTop: '6px', height: '44px' }}
           >
-            {submitting ? 'Creating Account...' : 'Register Family Account'}
+            {submitting ? 'Creating account...' : 'Create Family Account'}
             {!submitting && <ArrowRight size={16} />}
           </button>
         </form>
 
         <div className="auth-footer">
-          <span>Already registered?</span>
+          <span>Already have a family account?</span>
           <button
             type="button"
             className="text-button"
@@ -370,14 +420,13 @@ export function SignupPage({ onSwitchToLogin }) {
               onSwitchToLogin();
             }}
           >
-            Sign in here
+            Sign in
           </button>
         </div>
 
-        <div className="auth-role-notice">
-          <small>
-            Clinical staff (Doctors, Department Heads, Hospital Admins, Chairman) are provisioned through internal administration.
-          </small>
+        <div className="auth-security-note">
+          <ShieldCheck size={14} />
+          <span>One login covers all family profiles with unified medical record access.</span>
         </div>
       </div>
     </div>

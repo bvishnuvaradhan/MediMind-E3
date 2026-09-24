@@ -302,6 +302,17 @@ export function ChairmanLayout({ dark, setDark }) {
                   <button
                     className="user-menu-item"
                     onClick={() => {
+                      switchRole('HOSPITAL_ADMIN');
+                      announce('Switched to Hospital Admin Portal.');
+                    }}
+                  >
+                    <Building2 size={15} />
+                    <span>Switch to Hospital Admin</span>
+                  </button>
+
+                  <button
+                    className="user-menu-item"
+                    onClick={() => {
                       switchRole('FAMILY');
                       announce('Switched to Family Account experience.');
                     }}

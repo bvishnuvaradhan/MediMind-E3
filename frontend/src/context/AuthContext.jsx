@@ -1,6 +1,6 @@
 // MediMind Platform - Authentication Context
 // Manages authentication state, user identity, and strict role isolation.
-// Roles supported: FAMILY (end-user family accounts), CHAIRMAN (root platform owner).
+// Roles supported: FAMILY, CHAIRMAN, HOSPITAL_ADMIN.
 
 import { useState } from 'react';
 import { AuthContext } from './authContextCore';
@@ -15,6 +15,18 @@ const DEFAULT_CHAIRMAN = {
   title: 'Chairman & Platform Owner',
   avatarInitials: 'SM',
   avatarTone: 'indigo',
+};
+
+const DEFAULT_HOSPITAL_ADMIN = {
+  id: 'usr_hadmin_001',
+  name: 'Dr. Rajesh Sharma',
+  email: 'admin@medimindhospital.com',
+  role: 'HOSPITAL_ADMIN',
+  title: 'Hospital Administrator',
+  hospitalId: 'hosp_001',
+  hospitalName: 'MediMind Central Hospital',
+  avatarInitials: 'RS',
+  avatarTone: 'sapphire',
 };
 
 const DEFAULT_FAMILY = {
@@ -51,7 +63,7 @@ export function AuthProvider({ children }) {
     setError(null);
     const cleanEmail = (email || '').trim().toLowerCase();
 
-    // Check credentials or roleHint
+    // Check credentials or roleHint for Chairman
     if (roleHint === 'CHAIRMAN' || cleanEmail.includes('chairman') || cleanEmail.includes('owner') || cleanEmail === 'admin@medimind.com') {
       const chairmanUser = {
         ...DEFAULT_CHAIRMAN,
@@ -60,6 +72,17 @@ export function AuthProvider({ children }) {
       setUser(chairmanUser);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(chairmanUser));
       return { success: true, user: chairmanUser };
+    }
+
+    // Check credentials or roleHint for Hospital Admin
+    if (roleHint === 'HOSPITAL_ADMIN' || cleanEmail.includes('hospital') || cleanEmail === 'admin@medimindhospital.com' || cleanEmail.includes('hadmin')) {
+      const hospitalAdminUser = {
+        ...DEFAULT_HOSPITAL_ADMIN,
+        email: cleanEmail || DEFAULT_HOSPITAL_ADMIN.email,
+      };
+      setUser(hospitalAdminUser);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(hospitalAdminUser));
+      return { success: true, user: hospitalAdminUser };
     }
 
     // Default to Family account login
@@ -103,6 +126,9 @@ export function AuthProvider({ children }) {
     if (targetRole === 'CHAIRMAN') {
       setUser(DEFAULT_CHAIRMAN);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_CHAIRMAN));
+    } else if (targetRole === 'HOSPITAL_ADMIN') {
+      setUser(DEFAULT_HOSPITAL_ADMIN);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_HOSPITAL_ADMIN));
     } else {
       setUser(DEFAULT_FAMILY);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_FAMILY));
@@ -116,6 +142,7 @@ export function AuthProvider({ children }) {
         isAuthenticated: !!user,
         role: user?.role || null,
         isChairman: user?.role === 'CHAIRMAN',
+        isHospitalAdmin: user?.role === 'HOSPITAL_ADMIN',
         isFamily: user?.role === 'FAMILY',
         loading,
         error,
@@ -130,4 +157,3 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
-
