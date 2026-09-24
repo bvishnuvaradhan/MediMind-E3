@@ -532,7 +532,11 @@ export function FamilyLayout({ dark, setDark }) {
 
       <div className="main-content">
         <header className="topbar">
-          <button className="icon-button mobile-menu" onClick={() => announce('Navigation menu')}>
+          <button
+            className="icon-button mobile-menu"
+            onClick={() => announce('Navigation menu')}
+            aria-label="Toggle navigation menu"
+          >
             <Menu size={20} />
           </button>
           <div className="breadcrumbs">
@@ -544,18 +548,24 @@ export function FamilyLayout({ dark, setDark }) {
           <div className="top-actions">
             <div className="search-box">
               <Search size={15} />
-              <input placeholder="Search records, doctors..." />
+              <input
+                placeholder="Search records, doctors..."
+                aria-label="Search family health workspace"
+              />
             </div>
             <button
               className="icon-button theme-button"
               onClick={() => setDark(!dark)}
               title={dark ? 'Light mode' : 'Dark mode'}
+              aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'}
             >
               {dark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
             <button
               className="profile-button"
               onClick={() => setProfileOpen(!profileOpen)}
+              aria-label="Switch active family profile"
+              aria-expanded={profileOpen}
             >
               <div className={`avatar small avatar-${member.tone}`}>
                 {member.initials}

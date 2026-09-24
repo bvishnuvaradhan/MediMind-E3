@@ -547,7 +547,11 @@ export function HospitalAdminLayout({ dark, setDark }) {
       <div className="ha-main-content">
         <header className="ha-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button className="ha-icon-btn mobile-menu" onClick={() => announce('Navigation menu')}>
+            <button
+              className="ha-icon-btn mobile-menu"
+              onClick={() => announce('Navigation menu')}
+              aria-label="Toggle navigation menu"
+            >
               <Menu size={18} />
             </button>
             <div className="ha-breadcrumbs">
@@ -562,6 +566,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
               className="ha-icon-btn"
               onClick={() => setDark(!dark)}
               title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {dark ? <Sun size={17} /> : <Moon size={17} />}
             </button>
