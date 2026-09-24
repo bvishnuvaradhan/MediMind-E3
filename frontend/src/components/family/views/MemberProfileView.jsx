@@ -92,7 +92,12 @@ export function MemberProfileView({ member, records = initialRecords, navigate, 
         </div>
         <div className="record-list">
           {(memberRecords.length > 0 ? memberRecords : records).slice(0, 3).map((record, idx) => (
-            <RecordRow record={record} announce={announce} key={`${record.type}-${idx}`} />
+            <RecordRow
+              record={record}
+              announce={announce}
+              onOpen={(rec) => openFeatureModal ? openFeatureModal(rec, 'Medical record') : announce(`Viewing ${rec.type}`)}
+              key={`${record.type}-${idx}`}
+            />
           ))}
         </div>
       </div>

@@ -5,10 +5,11 @@ export function AppointmentsView({
   announce,
   navigate,
   openFeatureModal,
-  bookedAppointments,
-  appointmentStatuses,
+  bookedAppointments = [],
+  appointmentStatuses = {},
   onCancelAppointment,
   onRescheduleAppointment,
+  setReturnTo,
 }) {
   return (
     <section className="feature-view">
@@ -19,12 +20,17 @@ export function AppointmentsView({
         <div>
           <p className="eyebrow">Family account</p>
           <h1>Appointments</h1>
-          <p>Book and manage care for a specific family member.</p>
+          <p>Schedule, manage, and review care consultations for your family.</p>
         </div>
 
+        {/* Book Appointment button placed clearly on the RIGHT side of the page header */}
         <button
           className="primary-button compact-button"
-          onClick={() => navigate('Appointment AI assessment')}
+          onClick={() => {
+            if (setReturnTo) setReturnTo('Appointments');
+            navigate('Appointment assessment');
+            announce('Starting appointment symptom assessment.');
+          }}
         >
           <CalendarDays size={16} /> Book appointment
         </button>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react';
 import {
   Activity,
   Building2,
@@ -14,89 +14,162 @@ import {
   LogOut,
   Menu,
   Moon,
-  Search,
   Settings,
   ShieldCheck,
   Sparkles,
   Stethoscope,
   Sun,
-  Upload,
   UsersRound,
-} from 'lucide-react'
-import { useAuth } from '../../context/useAuth'
+} from 'lucide-react';
+import { useAuth } from '../../context/useAuth';
 import {
   initialFamilyMembers,
   initialRecords,
   initialBookedSlots,
   initialDoctorAccess,
-} from '../../data/familyMockData'
-import { FeatureDetailModal } from './components/FeatureDetailModal'
-import { DashboardView } from './views/DashboardView'
-import { MemberProfileView } from './views/MemberProfileView'
-import { FamilyMembersView } from './views/FamilyMembersView'
-import { MedicalRecordsView } from './views/MedicalRecordsView'
-import { UploadRecordView } from './views/UploadRecordView'
-import { AiPredictionsView } from './views/AiPredictionsView'
-import { DoctorsView } from './views/DoctorsView'
-import { AppointmentsView } from './views/AppointmentsView'
-import { ConsultationsView } from './views/ConsultationsView'
-import { PrescriptionsView } from './views/PrescriptionsView'
-import { DoctorAccessView } from './views/DoctorAccessView'
-import { AppointmentAssessmentView } from './views/AppointmentAssessmentView'
-import { BookAppointmentView } from './views/BookAppointmentView'
-import { GeneralHealthRiskView } from './views/GeneralHealthRiskView'
-import { DoctorProfileView } from './views/DoctorProfileView'
-import { HelpCenterView } from './views/HelpCenterView'
-import { SettingsView } from './views/SettingsView'
-import './Family.css'
+} from '../../data/familyMockData';
+import { FeatureDetailModal } from './components/FeatureDetailModal';
+import { AppointmentDetailModal } from './components/AppointmentDetailModal';
+import { CancelAppointmentModal } from './components/CancelAppointmentModal';
+import { UploadRecordModal } from './components/UploadRecordModal';
+import { DashboardView } from './views/DashboardView';
+import { MemberProfileView } from './views/MemberProfileView';
+import { FamilyMembersView } from './views/FamilyMembersView';
+import { MedicalRecordsView } from './views/MedicalRecordsView';
+import { AiPredictionsView } from './views/AiPredictionsView';
+import { PersonalPredictionDetailView } from './views/PersonalPredictionDetailView';
+import { DoctorsView } from './views/DoctorsView';
+import { AppointmentsView } from './views/AppointmentsView';
+import { ConsultationsView } from './views/ConsultationsView';
+import { PrescriptionsView } from './views/PrescriptionsView';
+import { DoctorAccessView } from './views/DoctorAccessView';
+import { AppointmentAssessmentView } from './views/AppointmentAssessmentView';
+import { BookAppointmentView } from './views/BookAppointmentView';
+import { GeneralHealthRiskView } from './views/GeneralHealthRiskView';
+import { DoctorProfileView } from './views/DoctorProfileView';
+import { HelpCenterView } from './views/HelpCenterView';
+import { SettingsView } from './views/SettingsView';
+import './Family.css';
 
 const navItems = [
   ['Dashboard', LayoutDashboard],
   ['Family members', UsersRound],
   ['Medical records', FileText],
-  ['Upload record', Upload],
   ['AI predictions', Sparkles],
   ['Doctors', Stethoscope],
   ['Appointments', CalendarDays],
   ['Consultations', Activity],
   ['Prescriptions', HeartPulse],
   ['Doctor access', LockKeyhole],
-]
+];
+
+const allKnownPages = [
+  'Dashboard',
+  'Family members',
+  'Member profile',
+  'Medical records',
+  'AI predictions',
+  'Personal prediction detail',
+  'Doctors',
+  'Doctor profile',
+  'Appointments',
+  'Appointment assessment',
+  'Appointment AI assessment',
+  'Book appointment',
+  'Consultations',
+  'Prescriptions',
+  'Doctor access',
+  'General health risk',
+  'Help center',
+  'Settings',
+];
+
+const getInitialFamilyPage = () => {
+  if (typeof window === 'undefined') return 'Dashboard';
+  const hash = window.location.hash.replace('#', '');
+  if (hash) {
+    const matched = allKnownPages.find(
+      (p) => p.toLowerCase().replace(/\s+/g, '-') === hash
+    );
+    if (matched) return matched;
+  }
+  const saved = sessionStorage.getItem('medimind_family_page');
+  if (saved && allKnownPages.includes(saved)) return saved;
+  return 'Dashboard';
+};
 
 export function FamilyLayout({ dark, setDark }) {
-  const { user, logout, switchRole } = useAuth()
-  const [page, setPage] = useState('Dashboard')
-  const [selectedDoctor, setSelectedDoctor] = useState(null)
-  const [memberIndex, setMemberIndex] = useState(0)
-  const [profileOpen, setProfileOpen] = useState(false)
-  const [toast, setToast] = useState('')
-  const [detailModal, setDetailModal] = useState(null)
-  const [appointmentAssessment, setAppointmentAssessment] = useState(null)
-  const [familyMembers, setFamilyMembers] = useState(initialFamilyMembers)
-  const [records, setRecords] = useState(initialRecords)
-  const [bookedSlots, setBookedSlots] = useState(initialBookedSlots)
-  const [bookedAppointments, setBookedAppointments] = useState([])
-  const [appointmentStatuses, setAppointmentStatuses] = useState({})
-  const [doctorAccess, setDoctorAccess] = useState(initialDoctorAccess)
-  const [showAddMember, setShowAddMember] = useState(false)
-  const [newMember, setNewMember] = useState({ name: '', relation: 'Family member', customRelation: '' })
+  const { user, logout, switchRole } = useAuth();
+  const [page, setPage] = useState(getInitialFamilyPage);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [returnTo, setReturnTo] = useState('Doctors');
+  const [memberIndex, setMemberIndex] = useState(() => {
+    const savedIdx = sessionStorage.getItem('medimind_family_member_idx');
+    return savedIdx ? parseInt(savedIdx, 10) : 0;
+  });
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [toast, setToast] = useState('');
+  const [detailModal, setDetailModal] = useState(null);
+  const [appointmentDetailModal, setAppointmentDetailModal] = useState(null);
+  const [appointmentToCancel, setAppointmentToCancel] = useState(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [appointmentAssessment, setAppointmentAssessment] = useState(null);
+  const [selectedPrediction, setSelectedPrediction] = useState(null);
+  const [predictionHistory, setPredictionHistory] = useState([]);
+  const [rescheduleData, setRescheduleData] = useState(null);
 
-  const member = familyMembers[memberIndex] ?? familyMembers[0]
+  const [familyMembers, setFamilyMembers] = useState(initialFamilyMembers);
+  const [records, setRecords] = useState(initialRecords);
+  const [bookedSlots, setBookedSlots] = useState(initialBookedSlots);
+  const [bookedAppointments, setBookedAppointments] = useState([]);
+  const [appointmentStatuses, setAppointmentStatuses] = useState({});
+  const [doctorAccess, setDoctorAccess] = useState(initialDoctorAccess);
+
+  const member = familyMembers[memberIndex] ?? familyMembers[0];
+
+  // Refresh and History Navigation Synchronization
+  useEffect(() => {
+    const handlePopState = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash) {
+        const matched = allKnownPages.find(
+          (p) => p.toLowerCase().replace(/\s+/g, '-') === hash
+        );
+        if (matched) setPage(matched);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const announce = (message) => {
-    setToast(message)
-    window.setTimeout(() => setToast(''), 2600)
-  }
+    setToast(message);
+    window.setTimeout(() => setToast(''), 2600);
+  };
 
-  const openFeatureModal = (item, feature) => setDetailModal({ item, feature })
+  const navigate = (nextPage, extra = {}) => {
+    setPage(nextPage);
+    setProfileOpen(false);
 
-  const navigate = (nextPage) => {
-    setPage(nextPage)
-    setProfileOpen(false)
-  }
+    if (extra.doctor) setSelectedDoctor(extra.doctor);
+    if (extra.returnTo) setReturnTo(extra.returnTo);
+    if (extra.prediction) setSelectedPrediction(extra.prediction);
+    if (extra.rescheduleData) setRescheduleData(extra.rescheduleData);
+
+    const slug = nextPage.toLowerCase().replace(/\s+/g, '-');
+    window.history.pushState({ page: nextPage }, '', `#${slug}`);
+    sessionStorage.setItem('medimind_family_page', nextPage);
+  };
+
+  const handleSelectMemberIndex = (idx) => {
+    setMemberIndex(idx);
+    sessionStorage.setItem('medimind_family_member_idx', idx.toString());
+  };
+
+  const openFeatureModal = (item, feature) => setDetailModal({ item, feature });
 
   const handleAddRecord = (newRecord) => {
-    setRecords((prev) => [newRecord, ...prev])
+    setRecords((prev) => [newRecord, ...prev]);
     if (newRecord.patient) {
       setFamilyMembers((prev) =>
         prev.map((m) =>
@@ -104,133 +177,178 @@ export function FamilyLayout({ dark, setDark }) {
             ? { ...m, records: (m.records || 0) + 1 }
             : m
         )
-      )
+      );
     }
-  }
+  };
 
   const handleGrantAccess = (grant) => {
     const exists = doctorAccess.some(
-      (entry) => entry.member === grant.member && entry.doctor === grant.doctor
-    )
+      (entry) =>
+        entry.member.toLowerCase() === grant.member.toLowerCase() &&
+        entry.doctor.toLowerCase() === grant.doctor.toLowerCase()
+    );
     if (exists) {
-      announce(`${grant.doctor} already has access to ${grant.member}'s records.`)
-      return
+      announce(`${grant.doctor} already has access to ${grant.member}'s records.`);
+      return;
     }
     const newEntry = {
       ...grant,
       granted: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-    }
-    setDoctorAccess((current) => [...current, newEntry])
-    announce(`Access granted to ${grant.doctor} for ${grant.member}.`)
-  }
+    };
+    setDoctorAccess((current) => [...current, newEntry]);
+    announce(`Access granted to ${grant.doctor} for ${grant.member}.`);
+  };
 
   const handleRevokeAccess = (entry) => {
-    if (!window.confirm(`Revoke record access for ${entry.doctor} to ${entry.member}'s records?`)) return
     setDoctorAccess((current) =>
-      current.filter((item) => !(item.member === entry.member && item.doctor === entry.doctor))
-    )
-    announce(`Access revoked for ${entry.doctor} to ${entry.member}'s records.`)
-  }
+      current.filter(
+        (item) => !(item.member === entry.member && item.doctor === entry.doctor)
+      )
+    );
+    announce(`Access revoked for ${entry.doctor} to ${entry.member}'s records.`);
+  };
 
   const handleCancelAppointment = (item) => {
-    const key = `${item.title}|${item.detail}`
-    if (!window.confirm(`Cancel the appointment for ${item.title}?`)) return
-    setAppointmentStatuses((curr) => ({ ...curr, [key]: 'Cancelled' }))
-    announce(`Appointment cancelled for ${item.title}.`)
-  }
+    setAppointmentToCancel(item);
+  };
+
+  const handleConfirmCancelAppointment = (item) => {
+    const key = `${item.title}|${item.detail}`;
+    setAppointmentStatuses((curr) => ({ ...curr, [key]: 'Cancelled' }));
+    announce(`Appointment cancelled for ${item.title}.`);
+  };
 
   const handleRescheduleAppointment = (item) => {
-    navigate('Appointment assessment')
-    announce(`Rescheduling appointment for ${item.title}`)
-  }
+    setRescheduleData(item);
+    setReturnTo('Appointments');
+    navigate('Book appointment');
+    announce(`Rescheduling appointment for ${item.title}`);
+  };
+
+  const handleUpdateRescheduledAppointment = (oldApt, updatedBooking) => {
+    const formattedDate = new Date(`${updatedBooking.date}T00:00:00`).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+
+    const updatedObj = {
+      ...oldApt,
+      title: updatedBooking.type || oldApt.title,
+      detail: `${updatedBooking.doctor} · ${updatedBooking.patient}`,
+      meta: `${formattedDate} · ${updatedBooking.slot} · ${updatedBooking.mode}`,
+      initials: formattedDate.slice(0, 2),
+      doctor: updatedBooking.doctor,
+      patient: updatedBooking.patient,
+      date: formattedDate,
+      slot: updatedBooking.slot,
+      mode: updatedBooking.mode,
+    };
+
+    setBookedAppointments((prev) => {
+      const exists = prev.some((a) => a.title === oldApt.title && a.detail === oldApt.detail);
+      if (exists) {
+        return prev.map((a) => (a.title === oldApt.title && a.detail === oldApt.detail ? updatedObj : a));
+      }
+      return [updatedObj, ...prev];
+    });
+
+    setRescheduleData(null);
+  };
 
   const handleBookAppointment = (booking) => {
-    const bookingKey = `${booking.doctor}|${booking.date}`
-    const slotsForDay = bookedSlots[bookingKey] ?? []
+    const bookingKey = `${booking.doctor}|${booking.date}`;
+    const slotsForDay = bookedSlots[bookingKey] ?? [];
     if (slotsForDay.includes(booking.slot)) {
-      announce(`${booking.slot} is already booked with ${booking.doctor}. Please choose another slot.`)
-      return false
+      announce(`${booking.slot} is already booked with ${booking.doctor}. Please choose another slot.`);
+      return false;
     }
 
-    setBookedSlots(current => ({ ...current, [bookingKey]: [...(current[bookingKey] ?? []), booking.slot] }))
-    const formattedDate = new Date(`${booking.date}T00:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-    setBookedAppointments(current => [...current, {
+    setBookedSlots((current) => ({
+      ...current,
+      [bookingKey]: [...(current[bookingKey] ?? []), booking.slot],
+    }));
+
+    const formattedDate = new Date(`${booking.date}T00:00:00`).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+
+    const newApt = {
       title: booking.type,
       detail: `${booking.doctor} · ${booking.patient}`,
       meta: `${formattedDate} · ${booking.slot} · ${booking.mode}`,
       tone: 'mint',
       initials: formattedDate.slice(0, 2),
       action: 'View details',
-    }])
-    return true
-  }
+      doctor: booking.doctor,
+      patient: booking.patient,
+      date: formattedDate,
+      slot: booking.slot,
+      mode: booking.mode,
+      reason: booking.reason,
+    };
 
-  const handleAddMember = (event) => {
-    event.preventDefault()
+    setBookedAppointments((current) => [newApt, ...current]);
 
-    const name = newMember.name.trim()
-    if (!name) {
-      announce('Please enter a name to add a family member.')
-      return
-    }
+    // Auto-grant doctor access upon appointment booking (Part 12)
+    setDoctorAccess((current) => {
+      const exists = current.some(
+        (entry) =>
+          entry.member.toLowerCase() === booking.patient.toLowerCase() &&
+          entry.doctor.toLowerCase() === booking.doctor.toLowerCase()
+      );
+      if (exists) return current;
 
-    const relation = newMember.relation === 'Other' ? newMember.customRelation.trim() : newMember.relation
-    if (!relation) {
-      announce('Please enter a custom relation.')
-      return
-    }
+      const docDept = booking.doctor.includes('Mehta')
+        ? 'Orthopedics'
+        : booking.doctor.includes('Rao')
+        ? 'Cardiology'
+        : booking.doctor.includes('Shah')
+        ? 'Diabetology'
+        : 'General Medicine';
 
-    const initials = name.split(/\s+/).slice(0, 2).map(part => part[0]?.toUpperCase() ?? '').join('') || 'MM'
-    const tones = ['coral', 'lilac', 'mint']
+      return [
+        ...current,
+        {
+          member: booking.patient,
+          doctor: booking.doctor,
+          department: docDept,
+          granted: formattedDate,
+        },
+      ];
+    });
 
-    const nextMember = {
-      name,
-      relation,
-      initials,
-      tone: tones[(familyMembers.length) % tones.length],
-      records: 0,
-      predictions: 0,
-      appointments: 0,
-      consultations: 0,
-      prescriptions: 0,
-      sharedDoctors: 0,
-      dob: 'Not provided',
-      age: 'Not provided',
-      gender: 'Not provided',
-      bloodGroup: 'Not provided',
-      phone: 'Not provided',
-      email: 'Not provided',
-      address: 'Not provided',
-      emergencyContact: 'Not provided',
-      conditions: 'No conditions recorded',
-      allergies: 'No allergies recorded',
-      treatments: 'No previous treatments recorded',
-    }
+    return true;
+  };
 
-    const updatedMembers = [...familyMembers, nextMember]
-    setFamilyMembers(updatedMembers)
-    setMemberIndex(updatedMembers.length - 1)
-    setShowAddMember(false)
-    setNewMember({ name: '', relation: 'Family member', customRelation: '' })
-    announce(`${name} was added to your family account.`)
-  }
+  const handleAddMember = (nextMember) => {
+    const updatedMembers = [...familyMembers, nextMember];
+    setFamilyMembers(updatedMembers);
+    handleSelectMemberIndex(updatedMembers.length - 1);
+    announce(`${nextMember.name} was added to your family account.`);
+  };
 
   const handleDeleteMember = (index) => {
-    if (familyMembers.length === 1) {
-      announce('At least one family member must remain in the account.')
-      return
+    if (familyMembers.length <= 1) {
+      announce('At least one family member must remain in the account.');
+      return;
     }
 
-    const deletedMember = familyMembers[index]
-    if (!window.confirm(`Delete ${deletedMember.name} from this family account?`)) return
-
-    const updatedMembers = familyMembers.filter((_, memberIndexToRemove) => memberIndexToRemove !== index)
-    setFamilyMembers(updatedMembers)
+    const deletedMember = familyMembers[index];
+    const updatedMembers = familyMembers.filter((_, idx) => idx !== index);
+    setFamilyMembers(updatedMembers);
     if (memberIndex >= updatedMembers.length) {
-      setMemberIndex(updatedMembers.length - 1)
+      handleSelectMemberIndex(updatedMembers.length - 1);
     }
-    announce(`${deletedMember.name} was removed from your family account.`)
-  }
+    announce(`${deletedMember.name} was removed from your family account.`);
+  };
+
+  const handleOpenPredictionDetail = (predictionData) => {
+    setSelectedPrediction(predictionData);
+    navigate('Personal prediction detail');
+  };
 
   const renderCurrentView = () => {
     if (page === 'Dashboard') {
@@ -239,13 +357,17 @@ export function FamilyLayout({ dark, setDark }) {
           member={member}
           familyMembers={familyMembers}
           records={records}
+          bookedAppointments={bookedAppointments}
           memberIndex={memberIndex}
-          setMemberIndex={setMemberIndex}
+          setMemberIndex={handleSelectMemberIndex}
           navigate={navigate}
           announce={announce}
           openFeatureModal={openFeatureModal}
+          onOpenAppointmentDetail={(apt) => setAppointmentDetailModal(apt)}
+          onOpenUploadModal={() => setIsUploadModalOpen(true)}
+          onOpenPredictionDetail={handleOpenPredictionDetail}
         />
-      )
+      );
     }
     if (page === 'Member profile') {
       return (
@@ -256,63 +378,66 @@ export function FamilyLayout({ dark, setDark }) {
           announce={announce}
           openFeatureModal={openFeatureModal}
         />
-      )
+      );
     }
     if (page === 'Family members') {
       return (
         <FamilyMembersView
           familyMembers={familyMembers}
           memberIndex={memberIndex}
-          setMemberIndex={setMemberIndex}
-          showAddMember={showAddMember}
-          setShowAddMember={setShowAddMember}
-          newMember={newMember}
-          setNewMember={setNewMember}
+          setMemberIndex={handleSelectMemberIndex}
           handleAddMember={handleAddMember}
           handleDeleteMember={handleDeleteMember}
           navigate={navigate}
           announce={announce}
         />
-      )
+      );
     }
     if (page === 'Medical records') {
       return (
         <MedicalRecordsView
           records={records}
+          familyMembers={familyMembers}
+          activeMember={member}
           navigate={navigate}
           announce={announce}
           openFeatureModal={openFeatureModal}
-        />
-      )
-    }
-    if (page === 'Upload record') {
-      return (
-        <UploadRecordView
-          member={member}
-          familyMembers={familyMembers}
-          navigate={navigate}
-          announce={announce}
           onAddRecord={handleAddRecord}
         />
-      )
+      );
     }
     if (page === 'AI predictions') {
       return (
         <AiPredictionsView
+          member={member}
+          predictionHistory={predictionHistory}
+          navigate={navigate}
+          announce={announce}
+          onOpenPredictionDetail={handleOpenPredictionDetail}
+          onAddPrediction={(newPred) => setPredictionHistory((prev) => [newPred, ...prev])}
+        />
+      );
+    }
+    if (page === 'Personal prediction detail') {
+      return (
+        <PersonalPredictionDetailView
+          prediction={selectedPrediction}
+          member={member}
           navigate={navigate}
           announce={announce}
         />
-      )
+      );
     }
     if (page === 'Doctors') {
       return (
         <DoctorsView
           setSelectedDoctor={setSelectedDoctor}
+          setReturnTo={setReturnTo}
           navigate={navigate}
           announce={announce}
           openFeatureModal={openFeatureModal}
         />
-      )
+      );
     }
     if (page === 'Appointments') {
       return (
@@ -322,11 +447,12 @@ export function FamilyLayout({ dark, setDark }) {
           setAppointmentStatuses={setAppointmentStatuses}
           onCancelAppointment={handleCancelAppointment}
           onRescheduleAppointment={handleRescheduleAppointment}
+          setReturnTo={setReturnTo}
           navigate={navigate}
           announce={announce}
           openFeatureModal={openFeatureModal}
         />
-      )
+      );
     }
     if (page === 'Consultations') {
       return (
@@ -334,7 +460,7 @@ export function FamilyLayout({ dark, setDark }) {
           openFeatureModal={openFeatureModal}
           announce={announce}
         />
-      )
+      );
     }
     if (page === 'Prescriptions') {
       return (
@@ -342,7 +468,7 @@ export function FamilyLayout({ dark, setDark }) {
           openFeatureModal={openFeatureModal}
           announce={announce}
         />
-      )
+      );
     }
     if (page === 'Doctor access') {
       return (
@@ -350,11 +476,12 @@ export function FamilyLayout({ dark, setDark }) {
           doctorAccess={doctorAccess}
           setDoctorAccess={setDoctorAccess}
           familyMembers={familyMembers}
+          activeMember={member}
           onGrant={handleGrantAccess}
           onRevoke={handleRevokeAccess}
           announce={announce}
         />
-      )
+      );
     }
     if (page === 'Appointment assessment' || page === 'Appointment AI assessment') {
       return (
@@ -362,11 +489,12 @@ export function FamilyLayout({ dark, setDark }) {
           selectedDoctor={selectedDoctor}
           familyMembers={familyMembers}
           member={member}
+          returnTo={returnTo}
           navigate={navigate}
           announce={announce}
           setAppointmentAssessment={setAppointmentAssessment}
         />
-      )
+      );
     }
     if (page === 'Book appointment') {
       return (
@@ -376,36 +504,43 @@ export function FamilyLayout({ dark, setDark }) {
           member={member}
           appointmentAssessment={appointmentAssessment}
           bookedSlots={bookedSlots}
+          rescheduleData={rescheduleData}
+          returnTo={returnTo}
           navigate={navigate}
           announce={announce}
           handleBookAppointment={handleBookAppointment}
+          onUpdateRescheduledAppointment={handleUpdateRescheduledAppointment}
         />
-      )
+      );
     }
     if (page === 'General health risk') {
       return (
         <GeneralHealthRiskView
+          member={member}
           navigate={navigate}
           announce={announce}
         />
-      )
+      );
     }
     if (page === 'Doctor profile') {
       return (
         <DoctorProfileView
           selectedDoctor={selectedDoctor}
+          setSelectedDoctor={setSelectedDoctor}
+          setReturnTo={setReturnTo}
           navigate={navigate}
           announce={announce}
           openFeatureModal={openFeatureModal}
         />
-      )
+      );
     }
     if (page === 'Help center') {
       return (
         <HelpCenterView
           announce={announce}
+          userEmail={user?.email}
         />
-      )
+      );
     }
     if (page === 'Settings') {
       return (
@@ -415,11 +550,11 @@ export function FamilyLayout({ dark, setDark }) {
           announce={announce}
           logout={logout}
         />
-      )
+      );
     }
 
-    return null
-  }
+    return null;
+  };
 
   return (
     <div className={`app-shell ${dark ? 'dark-theme' : ''}`}>
@@ -471,7 +606,7 @@ export function FamilyLayout({ dark, setDark }) {
             <span>Help center</span>
           </button>
 
-          {/* Quick role switches for development/testing */}
+          {/* Quick role switches */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', marginTop: '8px' }}>
             <button
               className="nav-item"
@@ -520,7 +655,7 @@ export function FamilyLayout({ dark, setDark }) {
             onClick={logout}
           >
             <LogOut size={18} />
-            <span>Sign Out ({user?.role})</span>
+            <span>Sign Out</span>
           </button>
 
           <div className="privacy-note">
@@ -540,19 +675,12 @@ export function FamilyLayout({ dark, setDark }) {
             <Menu size={20} />
           </button>
           <div className="breadcrumbs">
-            <span>MediMind</span>
+            <span>MediMind Family</span>
             <ChevronRight size={14} />
             <strong>{page}</strong>
           </div>
 
           <div className="top-actions">
-            <div className="search-box">
-              <Search size={15} />
-              <input
-                placeholder="Search records, doctors..."
-                aria-label="Search family health workspace"
-              />
-            </div>
             <button
               className="icon-button theme-button"
               onClick={() => setDark(!dark)}
@@ -586,9 +714,9 @@ export function FamilyLayout({ dark, setDark }) {
                 key={item.name}
                 className="popover-member"
                 onClick={() => {
-                  setMemberIndex(idx)
-                  setProfileOpen(false)
-                  announce(`Switched active view to ${item.name}`)
+                  handleSelectMemberIndex(idx);
+                  setProfileOpen(false);
+                  announce(`Switched active view to ${item.name}`);
                 }}
               >
                 <div className={`avatar small avatar-${item.tone}`}>
@@ -615,11 +743,42 @@ export function FamilyLayout({ dark, setDark }) {
         />
       )}
 
+      {appointmentDetailModal && (
+        <AppointmentDetailModal
+          isOpen={!!appointmentDetailModal}
+          appointment={appointmentDetailModal}
+          onClose={() => setAppointmentDetailModal(null)}
+          onReschedule={handleRescheduleAppointment}
+          onCancel={handleCancelAppointment}
+          announce={announce}
+        />
+      )}
+
+      {appointmentToCancel && (
+        <CancelAppointmentModal
+          isOpen={!!appointmentToCancel}
+          appointment={appointmentToCancel}
+          onClose={() => setAppointmentToCancel(null)}
+          onConfirmCancel={handleConfirmCancelAppointment}
+        />
+      )}
+
+      {isUploadModalOpen && (
+        <UploadRecordModal
+          isOpen={isUploadModalOpen}
+          onClose={() => setIsUploadModalOpen(false)}
+          familyMembers={familyMembers}
+          activeMember={member}
+          onAddRecord={handleAddRecord}
+          announce={announce}
+        />
+      )}
+
       {toast && (
         <div className="toast">
           <span>{toast}</span>
         </div>
       )}
     </div>
-  )
+  );
 }

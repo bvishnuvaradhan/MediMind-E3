@@ -24,7 +24,6 @@ import {
   Menu,
   Sun,
   Moon,
-  Search,
   Bell,
   LogOut,
   ShieldCheck,
@@ -206,11 +205,6 @@ export function ChairmanLayout({ dark, setDark }) {
           </div>
 
           <div className="chairman-top-actions">
-            <div className="chairman-search">
-              <Search size={15} />
-              <input placeholder="Search platform directory..." aria-label="Global search" />
-            </div>
-
             {/* Notification Center */}
             <div style={{ position: 'relative' }}>
               <button
