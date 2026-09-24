@@ -1,5 +1,9 @@
-﻿import { useState } from 'react'
-import { Activity, ArrowUpRight, CalendarDays, ChevronDown, ChevronRight, CircleHelp, Download, FileText, HeartPulse, LayoutDashboard, LockKeyhole, Menu, MoreHorizontal, Moon, Plus, Search, Settings, ShieldCheck, Sparkles, Stethoscope, Sun, Trash2, Upload, UsersRound, X } from 'lucide-react'
+import { useState } from 'react'
+import { Activity, ArrowUpRight, CalendarDays, ChevronDown, ChevronRight, CircleHelp, Crown, Download, FileText, HeartPulse, LayoutDashboard, LockKeyhole, LogOut, Menu, MoreHorizontal, Moon, Plus, Search, Settings, ShieldCheck, Sparkles, Stethoscope, Sun, Trash2, Upload, UsersRound, X } from 'lucide-react'
+import { AuthProvider } from './context/AuthContext'
+import { useAuth } from './context/useAuth'
+import { LoginPage, SignupPage } from './components/auth/AuthPages'
+import { ChairmanLayout } from './components/chairman/ChairmanLayout'
 import './App.css'
 
 const members = [
@@ -41,11 +45,11 @@ const presentationData = {
   ],
 }
 
-function App() {
+function FamilyApp({ dark, setDark }) {
+  const { user, logout, switchRole } = useAuth()
   const [page, setPage] = useState('Dashboard')
   const [selectedDoctor, setSelectedDoctor] = useState(null)
   const [memberIndex, setMemberIndex] = useState(0)
-  const [dark, setDark] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [toast, setToast] = useState('')
   const [detailModal, setDetailModal] = useState(null)
@@ -204,9 +208,9 @@ function App() {
       </div>
 
       <button className="account-switcher" onClick={() => setProfileOpen(!profileOpen)}>
-        <div className="avatar avatar-coral">RK</div>
+        <div className="avatar avatar-coral">{user?.avatarInitials || 'RK'}</div>
         <div className="account-copy">
-          <strong>Rohan Kapoor</strong>
+          <strong>{user?.name || 'Rohan Kapoor'}</strong>
           <span>Family account</span>
         </div>
         <ChevronDown size={16} />
@@ -232,6 +236,11 @@ function App() {
         <button className={`nav-item ${page === 'Settings' ? 'active' : ''}`} onClick={() => navigate('Settings')}>
           <Settings size={18} />
           <span>Settings</span>
+        </button>
+
+        <button className="nav-item" style={{ color: '#b45b5b' }} onClick={() => logout()} title="Sign out of MediMind">
+          <LogOut size={18} />
+          <span>Sign out</span>
         </button>
 
         <div className="privacy-note">
@@ -292,6 +301,24 @@ function App() {
             {memberIndex === index && <span className="check">✓</span>}
           </button>
         ))}
+        <div style={{ borderTop: '1px solid var(--line)', marginTop: '8px', paddingTop: '8px' }}>
+          <button
+            className="popover-member"
+            style={{ color: '#2563eb' }}
+            onClick={() => { switchRole('CHAIRMAN'); setProfileOpen(false); announce('Switched to Chairman / Platform Owner.'); }}
+          >
+            <Crown size={14} />
+            <span>Switch to Chairman Demo</span>
+          </button>
+          <button
+            className="popover-member"
+            style={{ color: '#dc2626' }}
+            onClick={() => logout()}
+          >
+            <LogOut size={14} />
+            <span>Sign out</span>
+          </button>
+        </div>
       </div>
     )}
 
@@ -1093,6 +1120,7 @@ function HelpCenterPage({ announce }) {
 }
 
 function SettingsPage({ dark, setDark, announce }) {
+  const { user, logout } = useAuth()
   return <section className="feature-view">
     <div className="feature-heading">
       <span className="feature-icon"><Settings size={20} /></span>
@@ -1116,8 +1144,47 @@ function SettingsPage({ dark, setDark, announce }) {
         <div><h2>Privacy and security</h2><p>Your family profiles are protected with secure access.</p></div>
         <button className="secondary-button" onClick={() => announce('Privacy settings opened.')}><ShieldCheck size={16} /> Review privacy</button>
       </div>
+      <div className="settings-section">
+        <div><h2>Account session</h2><p>Signed in as {user?.email || 'rohan.kapoor@example.com'}.</p></div>
+        <button className="secondary-button" style={{ color: '#dc2626', borderColor: '#fca5a5' }} onClick={() => logout()}>Sign out</button>
+      </div>
     </div>
   </section>
 }
 
-export default App
+function MainRouter() {
+  const { isAuthenticated, loading, role } = useAuth()
+  const [authMode, setAuthMode] = useState('login')
+  const [dark, setDark] = useState(false)
+
+  if (loading) {
+    return (
+      <div className="auth-loading-screen">
+        <div className="auth-spinner" />
+        <p>Restoring MediMind session...</p>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return authMode === 'login' ? (
+      <LoginPage onSwitchToSignup={() => setAuthMode('signup')} />
+    ) : (
+      <SignupPage onSwitchToLogin={() => setAuthMode('login')} />
+    )
+  }
+
+  if (role === 'CHAIRMAN') {
+    return <ChairmanLayout dark={dark} setDark={setDark} />
+  }
+
+  return <FamilyApp dark={dark} setDark={setDark} />
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <MainRouter />
+    </AuthProvider>
+  )
+}
