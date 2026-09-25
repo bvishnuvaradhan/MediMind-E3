@@ -31,6 +31,18 @@ export const departmentHeadService = {
     return { ...profileState };
   },
 
+  async updateProfile(updatedData) {
+    profileState = {
+      ...profileState,
+      ...updatedData,
+      departmentId: profileState.departmentId,
+      departmentName: profileState.departmentName,
+      hospitalId: profileState.hospitalId,
+      hospitalName: profileState.hospitalName,
+    };
+    return { ...profileState };
+  },
+
   async getDepartmentInfo() {
     return { ...departmentInfoState };
   },
@@ -43,7 +55,7 @@ export const departmentHeadService = {
   // --- Doctors Management ---
   async getDoctors(filters = {}) {
     let list = [...doctorsState];
-    if (filters.status) {
+    if (filters.status && filters.status !== 'All') {
       list = list.filter((d) => d.status === filters.status);
     }
     if (filters.search) {
@@ -52,7 +64,8 @@ export const departmentHeadService = {
         (d) =>
           d.name.toLowerCase().includes(q) ||
           d.specialization.toLowerCase().includes(q) ||
-          d.email.toLowerCase().includes(q)
+          d.email.toLowerCase().includes(q) ||
+          d.room.toLowerCase().includes(q)
       );
     }
     return list;
@@ -78,7 +91,7 @@ export const departmentHeadService = {
       avatarInitials: initials,
       avatarTone: 'coral',
       workload: 0,
-      maxCapacity: 25,
+      maxCapacity: Number(doctorData.maxCapacity) || 25,
       rating: 5.0,
       consultationsCompleted: 0,
       todayAppointments: 0,
@@ -99,7 +112,14 @@ export const departmentHeadService = {
 
   async updateDoctor(doctorId, updatedData) {
     doctorsState = doctorsState.map((d) =>
-      d.id === doctorId ? { ...d, ...updatedData } : d
+      d.id === doctorId ? { ...d, ...updatedData, maxCapacity: Number(updatedData.maxCapacity) || d.maxCapacity } : d
+    );
+    return doctorsState.find((d) => d.id === doctorId);
+  },
+
+  async updateDoctorStatus(doctorId, newStatus) {
+    doctorsState = doctorsState.map((d) =>
+      d.id === doctorId ? { ...d, status: newStatus } : d
     );
     return doctorsState.find((d) => d.id === doctorId);
   },
@@ -107,7 +127,7 @@ export const departmentHeadService = {
   async toggleDoctorStatus(doctorId) {
     doctorsState = doctorsState.map((d) => {
       if (d.id === doctorId) {
-        const nextStatus = d.status === 'Active' ? 'Suspended' : 'Active';
+        const nextStatus = d.status === 'Active' ? 'On Leave' : 'Active';
         return { ...d, status: nextStatus };
       }
       return d;
@@ -115,13 +135,20 @@ export const departmentHeadService = {
     return doctorsState.find((d) => d.id === doctorId);
   },
 
+  async updateDoctorCapacity(doctorId, newCapacity) {
+    doctorsState = doctorsState.map((d) =>
+      d.id === doctorId ? { ...d, maxCapacity: Math.max(5, Math.min(50, Number(newCapacity))) } : d
+    );
+    return doctorsState.find((d) => d.id === doctorId);
+  },
+
   // --- Appointments ---
   async getAppointments(filters = {}) {
     let list = [...appointmentsState];
-    if (filters.status) {
+    if (filters.status && filters.status !== 'All') {
       list = list.filter((a) => a.status === filters.status);
     }
-    if (filters.doctorId) {
+    if (filters.doctorId && filters.doctorId !== 'All') {
       list = list.filter((a) => a.doctorId === filters.doctorId);
     }
     if (filters.date) {
@@ -131,24 +158,49 @@ export const departmentHeadService = {
       const q = filters.search.toLowerCase();
       list = list.filter(
         (a) =>
+          a.patientName.toLowerCase().includes(q) ||
           a.doctorName.toLowerCase().includes(q) ||
-          a.patientRef.toLowerCase().includes(q) ||
+          a.token.toLowerCase().includes(q) ||
           a.type.toLowerCase().includes(q)
       );
     }
     return list;
   },
 
-  // --- Schedules ---
-  async getSchedules() {
-    return [...schedulesState];
+  async updateAppointmentStatus(appointmentId, status) {
+    appointmentsState = appointmentsState.map((a) =>
+      a.id === appointmentId ? { ...a, status } : a
+    );
+    return appointmentsState.find((a) => a.id === appointmentId);
   },
 
-  async updateSchedule(day, scheduleData) {
+  // --- Schedules / Rosters ---
+  async getSchedules(filters = {}) {
+    let list = [...schedulesState];
+    if (filters.day && filters.day !== 'All') {
+      list = list.filter((s) => s.day === filters.day);
+    }
+    if (filters.doctorId && filters.doctorId !== 'All') {
+      list = list.filter((s) => s.doctorId === filters.doctorId);
+    }
+    return list;
+  },
+
+  async updateScheduleStatus(scheduleId, status) {
     schedulesState = schedulesState.map((s) =>
-      s.day === day ? { ...s, ...scheduleData } : s
+      s.id === scheduleId ? { ...s, status } : s
     );
-    return schedulesState.find((s) => s.day === day);
+    return schedulesState.find((s) => s.id === scheduleId);
+  },
+
+  async createScheduleShift(shiftData) {
+    const newShift = {
+      id: `sch_${Date.now()}`,
+      status: 'Active',
+      ...shiftData,
+    };
+    schedulesState = [newShift, ...schedulesState];
+    return newShift;
   },
 
   // --- Analytics ---
@@ -166,13 +218,26 @@ export const departmentHeadService = {
   },
 
   // --- Knowledge Articles ---
-  async getArticles() {
-    return [...articlesState];
+  async getArticles(filters = {}) {
+    let list = [...articlesState];
+    if (filters.category && filters.category !== 'All') {
+      list = list.filter((a) => a.category === filters.category);
+    }
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      list = list.filter(
+        (a) =>
+          a.title.toLowerCase().includes(q) ||
+          a.summary.toLowerCase().includes(q) ||
+          (a.tags && a.tags.some((t) => t.toLowerCase().includes(q)))
+      );
+    }
+    return list;
   },
 
   async createArticle(articleData) {
     const newArticle = {
-      id: `art_${Date.now()}`,
+      id: `art_dept_${Date.now()}`,
       author: profileState.name,
       role: `Head of ${profileState.departmentName}`,
       publishedDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),

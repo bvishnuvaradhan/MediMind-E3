@@ -22,12 +22,69 @@ import EditDoctorModal from './components/EditDoctorModal';
 import CreateArticleModal from './components/CreateArticleModal';
 import ConfirmationModal from './components/ConfirmationModal';
 
+const validDepartmentHeadTabs = [
+  'dashboard',
+  'doctors',
+  'doctor_details',
+  'schedules',
+  'appointments',
+  'workload',
+  'analytics',
+  'ai_analytics',
+  'performance',
+  'knowledge',
+  'settings',
+];
+
+const getInitialDepartmentHeadTab = () => {
+  if (typeof window === 'undefined') return 'dashboard';
+  const hash = window.location.hash.replace('#', '').trim();
+  if (hash && validDepartmentHeadTabs.includes(hash)) return hash;
+  const saved = sessionStorage.getItem('medimind_depthead_tab');
+  if (saved && validDepartmentHeadTabs.includes(saved)) return saved;
+  return 'dashboard';
+};
+
+const getInitialDepartmentHeadDoctorId = () => {
+  if (typeof window === 'undefined') return null;
+  return sessionStorage.getItem('medimind_depthead_doc_id') || null;
+};
+
 export function DepartmentHeadLayout({ dark, setDark }) {
   const { user, logout, switchRole } = useAuth();
   const [, startTransition] = useTransition();
 
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [selectedDoctorId, setSelectedDoctorId] = useState(null);
+  const [activeTab, setActiveTab] = useState(getInitialDepartmentHeadTab);
+  const [selectedDoctorId, setSelectedDoctorId] = useState(getInitialDepartmentHeadDoctorId);
+
+  // Synchronize activeTab and selectedDoctorId with sessionStorage & browser URL hash
+  useEffect(() => {
+    sessionStorage.setItem('medimind_depthead_tab', activeTab);
+    if (selectedDoctorId) {
+      sessionStorage.setItem('medimind_depthead_doc_id', selectedDoctorId);
+    } else {
+      sessionStorage.removeItem('medimind_depthead_doc_id');
+    }
+    if (window.location.hash !== `#${activeTab}`) {
+      window.history.replaceState(null, '', `#${activeTab}`);
+    }
+  }, [activeTab, selectedDoctorId]);
+
+  // Handle browser Back / Forward buttons
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '').trim();
+      if (hash && validDepartmentHeadTabs.includes(hash)) {
+        setActiveTab(hash);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('popstate', handleHashChange);
+    };
+  }, []);
 
   // Data states
   const [profile, setProfile] = useState(null);

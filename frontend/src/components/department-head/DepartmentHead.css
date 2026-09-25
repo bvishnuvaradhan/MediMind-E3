@@ -419,6 +419,72 @@
   margin-top: 2px;
 }
 
+/* Information Tiles & Key-Value Grids */
+.dh-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.dh-info-tile {
+  background-color: var(--dh-bg);
+  border: 1px solid var(--dh-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.15s ease;
+}
+
+.dh-info-tile:hover {
+  border-color: var(--dh-blue);
+}
+
+.dh-info-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--dh-text-muted);
+}
+
+.dh-info-value {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--dh-text-primary);
+  line-height: 1.3;
+}
+
+.dh-info-value.highlight {
+  color: var(--dh-blue);
+}
+
+.dh-info-value.teal {
+  color: var(--dh-teal);
+}
+
+.dh-info-value.coral {
+  color: var(--dh-coral);
+}
+
+.dh-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.dh-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dh-text-primary);
+  margin: 0;
+}
+
 /* Stat Cards */
 .dh-stat-grid {
   display: grid;
