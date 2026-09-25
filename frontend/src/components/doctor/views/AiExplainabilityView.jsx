@@ -75,7 +75,7 @@ export function AiExplainabilityView({
       </div>
 
       {/* Main Analysis Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '20px' }}>
         {/* Finding Card */}
         <div
           className="doctor-card"
