@@ -193,9 +193,9 @@ export function DashboardView({
             </div>
             <button
               className="ha-btn ha-btn-outline ha-btn-sm"
-              onClick={() => navigate('Appointments')}
+              onClick={() => navigate('Hospital Operational Analytics')}
             >
-              All Appts <ChevronRight size={13} />
+              Analytics <ChevronRight size={13} />
             </button>
           </div>
 
@@ -254,7 +254,7 @@ export function DashboardView({
           </div>
           <button
             className="ha-btn ha-btn-secondary ha-btn-sm"
-            onClick={() => navigate('Hospital Analytics')}
+            onClick={() => navigate('Hospital Operational Analytics')}
           >
             <TrendingUp size={14} /> Full Analytics
           </button>

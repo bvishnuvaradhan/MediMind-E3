@@ -474,39 +474,6 @@ export const initialAppointments = [
   },
 ];
 
-export const initialSchedules = [
-  {
-    department: 'Orthopedics',
-    departmentId: 'dept_ortho',
-    operatingHours: '09:00 – 18:00',
-    onDutyHead: 'Dr. Priya Sharma',
-    doctorsOnDuty: ['Dr. Rahul Mehta (09:00-15:00)', 'Dr. Anil Deshmukh (14:00-18:00)'],
-    emergencyCoverage: 'Dr. Kumar Iyer (On-Call Trauma Specialist)',
-    conflicts: 0,
-    roomAllocations: ['OPD 204', 'OPD 206', 'OPD 208', 'Minor OT 1'],
-  },
-  {
-    department: 'Diabetology & Endocrinology',
-    departmentId: 'dept_diab',
-    operatingHours: '09:00 – 17:00',
-    onDutyHead: 'Dr. Arun Kumar',
-    doctorsOnDuty: ['Dr. Kavya Shah (09:00-14:00)', 'Dr. Ravi Varma (12:00-17:00)'],
-    emergencyCoverage: 'Dr. Arjun Nair (Inpatient Glycemic Response)',
-    conflicts: 0,
-    roomAllocations: ['OPD 108', 'OPD 110', 'OPD 112', 'Daycare Bed 1-4'],
-  },
-  {
-    department: 'Cardiology & Vascular Sciences',
-    departmentId: 'dept_cardio',
-    operatingHours: '10:00 – 18:00',
-    onDutyHead: 'Dr. Meera Nambiar',
-    doctorsOnDuty: ['Dr. Ananya Rao (10:00-16:00)', 'Dr. Suresh Hegde (11:00-18:00)'],
-    emergencyCoverage: 'Dr. Kiran Patil (24/7 Cath Lab Primary Interventionalist)',
-    conflicts: 0,
-    roomAllocations: ['Cath Lab 301', 'Echo Suite 302', 'EP Lab 304', 'ICCU Beds'],
-  },
-];
-
 export const initialHospitalAnalytics = {
   kpis: {
     totalDepartments: 3,

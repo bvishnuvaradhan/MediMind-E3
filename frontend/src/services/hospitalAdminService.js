@@ -8,7 +8,6 @@ import {
   initialDepartmentHeads,
   initialDoctors,
   initialAppointments,
-  initialSchedules,
   initialHospitalAnalytics,
   initialReports,
   initialKnowledgeActivity,
@@ -22,7 +21,6 @@ let departmentsState = [...initialDepartments];
 let departmentHeadsState = [...initialDepartmentHeads];
 let doctorsState = [...initialDoctors];
 let appointmentsState = [...initialAppointments];
-let schedulesState = [...initialSchedules];
 let analyticsState = { ...initialHospitalAnalytics };
 let reportsState = [...initialReports];
 let knowledgeState = { ...initialKnowledgeActivity };
@@ -310,25 +308,6 @@ export const hospitalAdminService = {
       );
     }
     return list;
-  },
-
-  // --- Schedules ---
-  async getSchedules() {
-    return [...schedulesState];
-  },
-
-  async updateSchedule(departmentId, updatedSchedule) {
-    schedulesState = schedulesState.map(s =>
-      s.departmentId === departmentId ? { ...s, ...updatedSchedule } : s
-    );
-    const updated = schedulesState.find(s => s.departmentId === departmentId);
-    if (updated) {
-      this.logAuditEvent(
-        `Updated Hospital Operating Schedule & Shift Coverage for ${updated.department}`,
-        updated.department
-      );
-    }
-    return updated;
   },
 
   // --- Analytics ---

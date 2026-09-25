@@ -6,8 +6,6 @@ import {
   UserCheck,
   Stethoscope,
   Users,
-  Calendar,
-  Clock,
   TrendingUp,
   BarChart3,
   Sparkles,
@@ -32,7 +30,6 @@ import {
   initialDepartmentHeads,
   initialDoctors,
   initialAppointments,
-  initialSchedules,
   initialHospitalAnalytics,
   initialReports,
   initialKnowledgeActivity,
@@ -50,8 +47,6 @@ import { DepartmentHeadDetailsView } from './views/DepartmentHeadDetailsView';
 import { DoctorsView } from './views/DoctorsView';
 import { DoctorDetailsView } from './views/DoctorDetailsView';
 import { StaffManagementView } from './views/StaffManagementView';
-import { AppointmentsView } from './views/AppointmentsView';
-import { SchedulesView } from './views/SchedulesView';
 import { HospitalAnalyticsView } from './views/HospitalAnalyticsView';
 import { DepartmentAnalyticsView } from './views/DepartmentAnalyticsView';
 import { AiAnalyticsView } from './views/AiAnalyticsView';
@@ -74,10 +69,8 @@ const navItems = [
   ['Department Heads', 'Department Heads', UserCheck],
   ['Doctors', 'Doctors', Stethoscope],
   ['Staff Management', 'Staff Management', Users],
-  ['Appointments', 'Appointments', Calendar],
-  ['Schedules', 'Schedules', Clock],
-  ['Hospital Analytics', 'Hospital Analytics', TrendingUp],
-  ['Department Analytics', 'Department Analytics', BarChart3],
+  ['Hospital Operational Analytics', 'Hospital Operational Analytics', TrendingUp],
+  ['Department Comparative Analytics', 'Department Comparative Analytics', BarChart3],
   ['AI Analytics', 'AI Analytics', Sparkles],
   ['Reports', 'Reports', FileText],
   ['Knowledge Activity', 'Knowledge Activity', BookOpen],
@@ -93,19 +86,40 @@ const pageToHash = {
   'Doctors': 'doctors',
   'Doctor Details': 'doctor-details',
   'Staff Management': 'staff-management',
-  'Appointments': 'appointments',
-  'Schedules': 'schedules',
-  'Hospital Analytics': 'hospital-analytics',
-  'Department Analytics': 'department-analytics',
+  'Hospital Operational Analytics': 'hospital-operational-analytics',
+  'Department Comparative Analytics': 'department-comparative-analytics',
   'AI Analytics': 'ai-analytics',
   'Reports': 'reports',
   'Knowledge Activity': 'knowledge-activity',
   'Settings': 'settings',
+  // Compatibility aliases
+  'Hospital Analytics': 'hospital-operational-analytics',
+  'Department Analytics': 'department-comparative-analytics',
+  'Appointments': 'hospital-operational-analytics',
+  'Schedules': 'dashboard',
 };
 
-const hashToPage = Object.fromEntries(
-  Object.entries(pageToHash).map(([page, hash]) => [hash, page])
-);
+const hashToPage = {
+  'dashboard': 'Dashboard',
+  'hospital-profile': 'Hospital Profile',
+  'departments': 'Departments',
+  'department-heads': 'Department Heads',
+  'department-head-details': 'Department Head Details',
+  'doctors': 'Doctors',
+  'doctor-details': 'Doctor Details',
+  'staff-management': 'Staff Management',
+  'hospital-operational-analytics': 'Hospital Operational Analytics',
+  'operational-analytics': 'Hospital Operational Analytics',
+  'hospital-analytics': 'Hospital Operational Analytics',
+  'department-comparative-analytics': 'Department Comparative Analytics',
+  'department-analytics': 'Department Comparative Analytics',
+  'ai-analytics': 'AI Analytics',
+  'reports': 'Reports',
+  'knowledge-activity': 'Knowledge Activity',
+  'settings': 'Settings',
+  'appointments': 'Hospital Operational Analytics',
+  'schedules': 'Dashboard',
+};
 
 const getInitialPage = () => {
   if (typeof window === 'undefined') return 'Dashboard';
@@ -189,7 +203,6 @@ export function HospitalAdminLayout({ dark, setDark }) {
   const [departmentHeads, setDepartmentHeads] = useState(initialDepartmentHeads);
   const [doctors, setDoctors] = useState(initialDoctors);
   const [appointments] = useState(initialAppointments);
-  const [schedules] = useState(initialSchedules);
   const [analytics] = useState(initialHospitalAnalytics);
   const [reports, setReports] = useState(initialReports);
   const [knowledge] = useState(initialKnowledgeActivity);
@@ -446,22 +459,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
         />
       );
     }
-    if (currentPage === 'Appointments') {
-      return (
-        <AppointmentsView
-          appointments={appointments}
-          departments={departments}
-        />
-      );
-    }
-    if (currentPage === 'Schedules') {
-      return (
-        <SchedulesView
-          schedules={schedules}
-        />
-      );
-    }
-    if (currentPage === 'Hospital Analytics') {
+    if (currentPage === 'Hospital Operational Analytics' || currentPage === 'Hospital Analytics' || currentPage === 'Appointments') {
       return (
         <HospitalAnalyticsView
           analytics={analytics}
@@ -469,7 +467,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
         />
       );
     }
-    if (currentPage === 'Department Analytics') {
+    if (currentPage === 'Department Comparative Analytics' || currentPage === 'Department Analytics') {
       return (
         <DepartmentAnalyticsView
           analytics={analytics}
@@ -554,7 +552,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
         </div>
 
         <div className="ha-nav-section-title">Clinical & Operations</div>
-        {navItems.slice(0, 8).map(([label, pageId, Icon]) => (
+        {navItems.slice(0, 6).map(([label, pageId, Icon]) => (
           <button
             key={pageId}
             className={`ha-nav-item ${currentPage === pageId ? 'active' : ''}`}
@@ -566,7 +564,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
         ))}
 
         <div className="ha-nav-section-title">Analytics & Intelligence</div>
-        {navItems.slice(8, 11).map(([label, pageId, Icon]) => (
+        {navItems.slice(6, 9).map(([label, pageId, Icon]) => (
           <button
             key={pageId}
             className={`ha-nav-item ${currentPage === pageId ? 'active' : ''}`}
@@ -578,7 +576,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
         ))}
 
         <div className="ha-nav-section-title">Governance & Administration</div>
-        {navItems.slice(11).map(([label, pageId, Icon]) => (
+        {navItems.slice(9).map(([label, pageId, Icon]) => (
           <button
             key={pageId}
             className={`ha-nav-item ${currentPage === pageId ? 'active' : ''}`}
