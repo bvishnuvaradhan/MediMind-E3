@@ -390,6 +390,72 @@
   margin-top: 2px;
 }
 
+/* Information Tiles & Key-Value Grids */
+.doctor-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.doctor-info-tile {
+  background-color: var(--doctor-bg);
+  border: 1px solid var(--doctor-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.15s ease;
+}
+
+.doctor-info-tile:hover {
+  border-color: var(--doctor-primary);
+}
+
+.doctor-info-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--doctor-text-muted);
+}
+
+.doctor-info-value {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--doctor-text-primary);
+  line-height: 1.3;
+}
+
+.doctor-info-value.highlight {
+  color: var(--doctor-primary);
+}
+
+.doctor-info-value.teal {
+  color: var(--doctor-teal);
+}
+
+.doctor-info-value.coral {
+  color: var(--doctor-coral);
+}
+
+.doctor-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.doctor-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--doctor-text-primary);
+  margin: 0;
+}
+
 /* Stat Cards */
 .doctor-stat-grid {
   display: grid;

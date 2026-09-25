@@ -23,12 +23,69 @@ import AiExplainabilityModal from './components/AiExplainabilityModal';
 import CreateArticleModal from './components/CreateArticleModal';
 import ConfirmationModal from './components/ConfirmationModal';
 
+const validDoctorTabs = [
+  'dashboard',
+  'patients',
+  'patient_profile',
+  'appointments',
+  'consultations',
+  'prescriptions',
+  'ai_diagnostics',
+  'availability',
+  'patient_access',
+  'knowledge',
+  'settings',
+];
+
+const getInitialDoctorTab = () => {
+  if (typeof window === 'undefined') return 'dashboard';
+  const hash = window.location.hash.replace('#', '').trim();
+  if (hash && validDoctorTabs.includes(hash)) return hash;
+  const saved = sessionStorage.getItem('medimind_doctor_tab');
+  if (saved && validDoctorTabs.includes(saved)) return saved;
+  return 'dashboard';
+};
+
+const getInitialDoctorPatientId = () => {
+  if (typeof window === 'undefined') return null;
+  return sessionStorage.getItem('medimind_doctor_patient_id') || null;
+};
+
 export function DoctorLayout({ dark, setDark }) {
   const { user, logout, switchRole } = useAuth();
   const [, startTransition] = useTransition();
 
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [selectedPatientId, setSelectedPatientId] = useState(null);
+  const [activeTab, setActiveTab] = useState(getInitialDoctorTab);
+  const [selectedPatientId, setSelectedPatientId] = useState(getInitialDoctorPatientId);
+
+  // Synchronize activeTab and selectedPatientId with sessionStorage & browser URL hash
+  useEffect(() => {
+    sessionStorage.setItem('medimind_doctor_tab', activeTab);
+    if (selectedPatientId) {
+      sessionStorage.setItem('medimind_doctor_patient_id', selectedPatientId);
+    } else {
+      sessionStorage.removeItem('medimind_doctor_patient_id');
+    }
+    if (window.location.hash !== `#${activeTab}`) {
+      window.history.replaceState(null, '', `#${activeTab}`);
+    }
+  }, [activeTab, selectedPatientId]);
+
+  // Handle browser Back / Forward buttons
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '').trim();
+      if (hash && validDoctorTabs.includes(hash)) {
+        setActiveTab(hash);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('popstate', handleHashChange);
+    };
+  }, []);
 
   // Data states
   const [doctorProfile, setDoctorProfile] = useState(null);
