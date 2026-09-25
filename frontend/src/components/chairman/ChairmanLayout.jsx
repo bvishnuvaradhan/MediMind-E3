@@ -26,7 +26,6 @@ import {
   Bell,
   LogOut,
   ShieldCheck,
-  Crown,
   AlertTriangle,
 } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
@@ -191,10 +190,6 @@ export function ChairmanLayout({ dark, setDark }) {
             <span>
               Medi<b>Mind</b>
             </span>
-            <div className="chairman-badge">
-              <Crown size={11} />
-              <span>Platform Administration</span>
-            </div>
           </div>
         </div>
 
