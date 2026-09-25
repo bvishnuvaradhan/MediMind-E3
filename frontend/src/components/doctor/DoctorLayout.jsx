@@ -11,6 +11,7 @@ import AppointmentsView from './views/AppointmentsView';
 import ConsultationsView from './views/ConsultationsView';
 import PrescriptionsView from './views/PrescriptionsView';
 import AiDiagnosticView from './views/AiDiagnosticView';
+import AiExplainabilityView from './views/AiExplainabilityView';
 import AvailabilityView from './views/AvailabilityView';
 import PatientAccessView from './views/PatientAccessView';
 import KnowledgeView from './views/KnowledgeView';
@@ -31,6 +32,7 @@ const validDoctorTabs = [
   'consultations',
   'prescriptions',
   'ai_diagnostics',
+  'ai_explain',
   'availability',
   'patient_access',
   'knowledge',
@@ -51,14 +53,32 @@ const getInitialDoctorPatientId = () => {
   return sessionStorage.getItem('medimind_doctor_patient_id') || null;
 };
 
+const getInitialDoctorAiPredId = () => {
+  if (typeof window === 'undefined') return null;
+  return sessionStorage.getItem('medimind_doctor_ai_pred_id') || null;
+};
+
+const getInitialDoctorAiPatientId = () => {
+  if (typeof window === 'undefined') return null;
+  return sessionStorage.getItem('medimind_doctor_ai_patient_id') || null;
+};
+
+const getInitialDoctorAiReturnTab = () => {
+  if (typeof window === 'undefined') return 'ai_diagnostics';
+  return sessionStorage.getItem('medimind_doctor_ai_return_tab') || 'ai_diagnostics';
+};
+
 export function DoctorLayout({ dark, setDark }) {
   const { user, logout, switchRole } = useAuth();
   const [, startTransition] = useTransition();
 
   const [activeTab, setActiveTab] = useState(getInitialDoctorTab);
   const [selectedPatientId, setSelectedPatientId] = useState(getInitialDoctorPatientId);
+  const [selectedAiPredId, setSelectedAiPredId] = useState(getInitialDoctorAiPredId);
+  const [selectedAiPatientId, setSelectedAiPatientId] = useState(getInitialDoctorAiPatientId);
+  const [aiReturnTab, setAiReturnTab] = useState(getInitialDoctorAiReturnTab);
 
-  // Synchronize activeTab and selectedPatientId with sessionStorage & browser URL hash
+  // Synchronize activeTab, patientId, and AI explainability states with sessionStorage & browser URL hash
   useEffect(() => {
     sessionStorage.setItem('medimind_doctor_tab', activeTab);
     if (selectedPatientId) {
@@ -66,10 +86,23 @@ export function DoctorLayout({ dark, setDark }) {
     } else {
       sessionStorage.removeItem('medimind_doctor_patient_id');
     }
+    if (selectedAiPredId) {
+      sessionStorage.setItem('medimind_doctor_ai_pred_id', selectedAiPredId);
+    } else {
+      sessionStorage.removeItem('medimind_doctor_ai_pred_id');
+    }
+    if (selectedAiPatientId) {
+      sessionStorage.setItem('medimind_doctor_ai_patient_id', selectedAiPatientId);
+    } else {
+      sessionStorage.removeItem('medimind_doctor_ai_patient_id');
+    }
+    if (aiReturnTab) {
+      sessionStorage.setItem('medimind_doctor_ai_return_tab', aiReturnTab);
+    }
     if (window.location.hash !== `#${activeTab}`) {
       window.history.replaceState(null, '', `#${activeTab}`);
     }
-  }, [activeTab, selectedPatientId]);
+  }, [activeTab, selectedPatientId, selectedAiPredId, selectedAiPatientId, aiReturnTab]);
 
   // Handle browser Back / Forward buttons
   useEffect(() => {
@@ -169,7 +202,7 @@ export function DoctorLayout({ dark, setDark }) {
     startTransition(() => {
       setActiveTab(tab);
       setMobileMenuOpen(false);
-      if (tab !== 'patient_profile') {
+      if (tab !== 'patient_profile' && tab !== 'ai_explain') {
         setSelectedPatientId(null);
       }
     });
@@ -311,7 +344,52 @@ export function DoctorLayout({ dark, setDark }) {
     });
   };
 
+  const handleOpenFullAiAnalysis = (prediction, patientIdOrName, returnTab = 'ai_diagnostics') => {
+    const predId = prediction?.id || prediction;
+    setSelectedAiPredId(predId);
+
+    let patId = null;
+    if (patientIdOrName) {
+      const match = patients.find((p) => p.id === patientIdOrName || p.name === patientIdOrName);
+      patId = match ? match.id : patientIdOrName;
+    } else if (prediction?.patientId) {
+      patId = prediction.patientId;
+    }
+    setSelectedAiPatientId(patId);
+    setAiReturnTab(returnTab || 'ai_diagnostics');
+
+    // Close modal if open
+    setAiExplainModal({
+      isOpen: false,
+      prediction: null,
+      patientName: '',
+    });
+
+    handleNavigate('ai_explain');
+  };
+
   const currentPatient = patients.find((p) => p.id === selectedPatientId);
+
+  const allAiPredictions = patients.flatMap((p) =>
+    (p.aiPredictions || []).map((pred) => ({
+      ...pred,
+      patientName: p.name,
+      patientId: p.id,
+      patientAge: p.age,
+      patientGender: p.gender,
+    }))
+  );
+
+  const currentAiPrediction =
+    allAiPredictions.find((pred) => pred.id === selectedAiPredId) ||
+    (aiExplainModal.prediction?.id === selectedAiPredId ? aiExplainModal.prediction : null) ||
+    (allAiPredictions.length > 0 ? allAiPredictions[0] : null);
+
+  const currentAiPatient =
+    patients.find((p) => p.id === selectedAiPatientId) ||
+    patients.find((p) => p.name === selectedAiPatientId) ||
+    patients.find((p) => p.id === currentAiPrediction?.patientId) ||
+    (currentPatient ? currentPatient : null);
 
   // Tab Titles
   const tabTitles = {
@@ -322,6 +400,7 @@ export function DoctorLayout({ dark, setDark }) {
     consultations: { title: 'Consultations & Clinical Records', sub: 'Immutable medical consultations & clinical amendments' },
     prescriptions: { title: 'Electronic Prescriptions', sub: 'Medication schedules, dosages, and linked corrections' },
     ai_diagnostics: { title: 'AI Decision Support Telemetry', sub: 'Fracture Detection CNN & Grad-CAM heatmap localization' },
+    ai_explain: { title: 'AI Explainability & Deep Decision Support', sub: 'Detailed neural network telemetry, Grad-CAM heatmap localization & anatomical findings' },
     availability: { title: 'Consultation Availability', sub: 'Weekly OPD shift timings & booking slot capacity' },
     patient_access: { title: 'Patient Access History', sub: 'Auditable record of family authorizations & revocations' },
     knowledge: { title: 'MediMind Knowledge Base', sub: 'Clinical guidelines, protocols, and authored articles' },
@@ -380,6 +459,9 @@ export function DoctorLayout({ dark, setDark }) {
         isOpen={aiExplainModal.isOpen}
         prediction={aiExplainModal.prediction}
         patientName={aiExplainModal.patientName}
+        onViewFullAnalysis={(pred, pName) => {
+          handleOpenFullAiAnalysis(pred, pName, activeTab === 'ai_explain' ? 'ai_diagnostics' : activeTab);
+        }}
         onClose={() => setAiExplainModal({ isOpen: false, prediction: null, patientName: '' })}
       />
 
@@ -480,7 +562,7 @@ export function DoctorLayout({ dark, setDark }) {
           </button>
 
           <button
-            className={`doctor-nav-item ${activeTab === 'ai_diagnostics' ? 'active' : ''}`}
+            className={`doctor-nav-item ${activeTab === 'ai_diagnostics' || activeTab === 'ai_explain' ? 'active' : ''}`}
             onClick={() => handleNavigate('ai_diagnostics')}
           >
             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -653,6 +735,7 @@ export function DoctorLayout({ dark, setDark }) {
               onOpenNewConsultation={() => handleOpenNewConsultation()}
               onOpenNewPrescription={() => handleOpenNewPrescription()}
               onOpenAiExplain={handleOpenAiExplain}
+              onOpenFullAiAnalysis={handleOpenFullAiAnalysis}
             />
           )}
 
@@ -673,14 +756,18 @@ export function DoctorLayout({ dark, setDark }) {
               onOpenNewConsultation={handleOpenNewConsultation}
               onOpenNewPrescription={handleOpenNewPrescription}
               onOpenAiExplain={handleOpenAiExplain}
+              onOpenFullAiAnalysis={handleOpenFullAiAnalysis}
             />
           )}
 
           {activeTab === 'appointments' && (
             <AppointmentsView
               appointments={appointments}
+              patients={patients}
               onSelectPatient={handleSelectPatient}
               onOpenNewConsultation={handleOpenNewConsultation}
+              onOpenAiExplain={handleOpenAiExplain}
+              onOpenFullAiAnalysis={handleOpenFullAiAnalysis}
               onUpdateStatus={async (id, status) => {
                 await doctorService.updateAppointmentStatus(id, status);
                 const updated = await doctorService.getAppointments();
@@ -712,6 +799,23 @@ export function DoctorLayout({ dark, setDark }) {
             <AiDiagnosticView
               patients={patients}
               onOpenAiExplain={handleOpenAiExplain}
+              onOpenFullAiAnalysis={handleOpenFullAiAnalysis}
+              onOpenNewConsultation={handleOpenNewConsultation}
+            />
+          )}
+
+          {activeTab === 'ai_explain' && (
+            <AiExplainabilityView
+              prediction={currentAiPrediction}
+              patient={currentAiPatient}
+              onBack={() => {
+                if (aiReturnTab === 'patient_profile' && (selectedAiPatientId || selectedPatientId)) {
+                  setSelectedPatientId(selectedAiPatientId || selectedPatientId);
+                  handleNavigate('patient_profile');
+                } else {
+                  handleNavigate(aiReturnTab || 'ai_diagnostics');
+                }
+              }}
               onOpenNewConsultation={handleOpenNewConsultation}
             />
           )}

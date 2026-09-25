@@ -8,6 +8,7 @@ export function PatientProfileView({
   onOpenNewConsultation,
   onOpenNewPrescription,
   onOpenAiExplain,
+  onOpenFullAiAnalysis,
 }) {
   const [activeTab, setActiveTab] = useState('summary');
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -381,14 +382,34 @@ export function PatientProfileView({
                     <strong>Clinical Saliency Interpretation:</strong> {pred.explanation}
                   </p>
 
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', paddingTop: '4px' }}>
-                    {pred.gradCamAvailable && (
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', paddingTop: '4px', flexWrap: 'wrap' }}>
+                    {onOpenAiExplain && (
                       <button
-                        className="doctor-btn doctor-btn-primary doctor-btn-sm"
+                        type="button"
+                        className="doctor-btn doctor-btn-outline doctor-btn-sm"
                         onClick={() => onOpenAiExplain(pred, patient.name)}
                       >
-                        Launch Grad-CAM Heatmap Analysis &rarr;
+                        AI Summary
                       </button>
+                    )}
+                    {onOpenFullAiAnalysis ? (
+                      <button
+                        type="button"
+                        className="doctor-btn doctor-btn-primary doctor-btn-sm"
+                        onClick={() => onOpenFullAiAnalysis(pred, patient.id, 'patient_profile')}
+                      >
+                        View Full AI Analysis &rarr;
+                      </button>
+                    ) : (
+                      pred.gradCamAvailable && (
+                        <button
+                          type="button"
+                          className="doctor-btn doctor-btn-primary doctor-btn-sm"
+                          onClick={() => onOpenAiExplain(pred, patient.name)}
+                        >
+                          Launch Grad-CAM Heatmap Analysis &rarr;
+                        </button>
+                      )
                     )}
                   </div>
                 </div>

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 export function AiDiagnosticView({
   patients = [],
   onOpenAiExplain,
+  onOpenFullAiAnalysis,
   onOpenNewConsultation,
 }) {
   const [selectedPatientFilter, setSelectedPatientFilter] = useState('All');
@@ -107,22 +108,36 @@ export function AiDiagnosticView({
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid var(--doctor-border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid var(--doctor-border)', flexWrap: 'wrap', gap: '8px' }}>
               <span style={{ fontSize: '11.5px', color: 'var(--doctor-text-muted)' }}>
                 Target: <strong>{scan.targetOrgan}</strong>
               </span>
-              <div style={{ display: 'flex', gap: '6px' }}>
-                {scan.gradCamAvailable && (
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                {onOpenAiExplain && (
                   <button
-                    className="doctor-btn doctor-btn-primary doctor-btn-sm"
+                    type="button"
+                    className="doctor-btn doctor-btn-outline doctor-btn-sm"
                     onClick={() => onOpenAiExplain(scan, scan.patientName)}
+                    style={{ fontSize: '11px', padding: '4px 8px' }}
                   >
-                    Heatmap &rarr;
+                    Summary
+                  </button>
+                )}
+                {onOpenFullAiAnalysis && (
+                  <button
+                    type="button"
+                    className="doctor-btn doctor-btn-primary doctor-btn-sm"
+                    onClick={() => onOpenFullAiAnalysis(scan, scan.patientId, 'ai_diagnostics')}
+                    style={{ fontSize: '11px', padding: '4px 8px' }}
+                  >
+                    View Explainability &rarr;
                   </button>
                 )}
                 <button
+                  type="button"
                   className="doctor-btn doctor-btn-outline doctor-btn-sm"
                   onClick={() => onOpenNewConsultation(patients.find((p) => p.id === scan.patientId))}
+                  style={{ fontSize: '11px', padding: '4px 8px' }}
                 >
                   Consult
                 </button>

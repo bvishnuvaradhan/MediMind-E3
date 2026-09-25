@@ -1,6 +1,12 @@
 import React, { useEffect } from 'react';
 
-export function AiExplainabilityModal({ isOpen, onClose, prediction, patientName }) {
+export function AiExplainabilityModal({
+  isOpen,
+  onClose,
+  prediction,
+  patientName,
+  onViewFullAnalysis,
+}) {
   // Lock background scroll when modal is open and handle Escape key
   useEffect(() => {
     if (!isOpen) return;
@@ -24,38 +30,47 @@ export function AiExplainabilityModal({ isOpen, onClose, prediction, patientName
   if (!isOpen || !prediction) return null;
 
   return (
-    <div className="doctor-modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="ai-modal-title">
-      <div className="doctor-modal-box lg" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="doctor-modal-overlay"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ai-modal-title"
+    >
+      <div className="doctor-modal-box" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="doctor-modal-header">
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span className="doctor-badge doctor-badge-draft">{prediction.pipeline || 'Deep Radiographic AI'}</span>
+              <span className="doctor-badge doctor-badge-draft">
+                {prediction.pipeline || 'AI Pre-Screen'}
+              </span>
               <span style={{ fontSize: '12px', color: 'var(--doctor-text-muted)' }}>
                 Model: <strong>{prediction.modelEngine || 'ResNet50-Ortho-v2.4'}</strong>
               </span>
             </div>
             <h3 id="ai-modal-title" className="doctor-modal-title" style={{ marginTop: '4px' }}>
-              AI Clinical Decision Support & Explainability
+              AI Clinical Decision Support Summary
             </h3>
-            <div style={{ fontSize: '12.5px', color: 'var(--doctor-text-muted)' }}>
-              Authorized Patient: <strong>{patientName}</strong> • Inference Date: <strong>{prediction.date}</strong>
+            <div style={{ fontSize: '12px', color: 'var(--doctor-text-muted)' }}>
+              Authorized Patient: <strong>{patientName}</strong> • Date: <strong>{prediction.date}</strong>
             </div>
           </div>
-          <button className="doctor-btn-icon" onClick={onClose} aria-label="Close decision support modal">
+          <button className="doctor-btn-icon" onClick={onClose} aria-label="Close summary modal">
             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Scrollable Body */}
+        {/* Concise Modal Body */}
         <div className="doctor-modal-body" tabIndex={0} style={{ outline: 'none' }}>
           {/* Finding summary pill */}
           <div
             style={{
               padding: '14px 18px',
-              backgroundColor: prediction.riskLevel === 'High' ? 'var(--doctor-soft-coral)' : 'var(--doctor-soft-teal)',
+              backgroundColor:
+                prediction.riskLevel === 'High' ? 'var(--doctor-soft-coral)' : 'var(--doctor-soft-teal)',
               borderRadius: '10px',
               display: 'flex',
               justifyContent: 'space-between',
@@ -67,26 +82,33 @@ export function AiExplainabilityModal({ isOpen, onClose, prediction, patientName
             <div>
               <div
                 style={{
-                  fontSize: '11.5px',
+                  fontSize: '11px',
                   color: prediction.riskLevel === 'High' ? 'var(--doctor-coral)' : 'var(--doctor-teal)',
                   fontWeight: 700,
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
                 }}
               >
-                AI Diagnostic Telemetry Finding
+                AI Diagnostic Telemetry Result
               </div>
-              <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--doctor-text-primary)', marginTop: '2px' }}>
+              <div
+                style={{
+                  fontSize: '15px',
+                  fontWeight: 800,
+                  color: 'var(--doctor-text-primary)',
+                  marginTop: '2px',
+                }}
+              >
                 {prediction.finding}
               </div>
               <div style={{ fontSize: '12px', color: 'var(--doctor-text-muted)', marginTop: '2px' }}>
-                Target Anatomical Region: <strong>{prediction.targetOrgan || 'Right Knee & Distal Femur'}</strong>
+                Target Region: <strong>{prediction.targetOrgan || 'Right Knee & Distal Femur'}</strong>
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
               <div
                 style={{
-                  fontSize: '24px',
+                  fontSize: '22px',
                   fontWeight: 800,
                   color: prediction.riskLevel === 'High' ? 'var(--doctor-coral)' : 'var(--doctor-teal)',
                 }}
@@ -94,77 +116,24 @@ export function AiExplainabilityModal({ isOpen, onClose, prediction, patientName
                 {prediction.confidence}%
               </div>
               <div style={{ fontSize: '11px', color: 'var(--doctor-text-muted)', fontWeight: 600 }}>
-                Model Confidence
+                Confidence
               </div>
             </div>
           </div>
 
-          {/* Explainability & Grad-CAM Visualizer Area */}
-          {prediction.realGradCamUrl ? (
-            <div style={{ border: '1px solid var(--doctor-border)', borderRadius: '10px', overflow: 'hidden' }}>
-              <div style={{ padding: '10px 16px', backgroundColor: 'var(--doctor-bg)', borderBottom: '1px solid var(--doctor-border)', fontSize: '13px', fontWeight: 600 }}>
-                Grad-CAM Heatmap Localization: {prediction.targetOrgan}
-              </div>
-              <div style={{ padding: '16px', display: 'flex', justifyContent: 'center' }}>
-                <img
-                  src={prediction.realGradCamUrl}
-                  alt={`Grad-CAM heatmap localization for ${prediction.targetOrgan}`}
-                  style={{ maxHeight: '260px', borderRadius: '8px', objectFit: 'contain' }}
-                />
-              </div>
-            </div>
-          ) : (
-            /* Neutral un-fabricated state when no real visual asset exists */
-            <div
-              style={{
-                padding: '16px 18px',
-                backgroundColor: 'var(--doctor-bg)',
-                border: '1px solid var(--doctor-border)',
-                borderRadius: '10px',
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '12px',
-              }}
-            >
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '8px',
-                  backgroundColor: 'var(--doctor-card)',
-                  border: '1px solid var(--doctor-border)',
-                  display: 'grid',
-                  placeItems: 'center',
-                  fontSize: '16px',
-                  flexShrink: 0,
-                }}
-              >
-                📊
-              </div>
-              <div>
-                <strong style={{ fontSize: '13px', color: 'var(--doctor-text-primary)' }}>
-                  Grad-CAM visualization unavailable
-                </strong>
-                <p style={{ margin: '3px 0 0', fontSize: '12px', color: 'var(--doctor-text-muted)', lineHeight: 1.5 }}>
-                  Visual pixel-level heatmap image asset is not provided for this scan record. Advisory diagnostic attention localization is documented via textual saliency telemetry below.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Clinical Saliency Explanation */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--doctor-text-primary)' }}>
-              Grad-CAM Saliency Analysis & Model Explanation:
+          {/* Saliency Summary */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--doctor-text-primary)' }}>
+              Explainability Telemetry:
             </span>
             <p
               style={{
                 margin: 0,
-                fontSize: '13px',
+                fontSize: '12.5px',
                 color: 'var(--doctor-text-secondary)',
                 lineHeight: 1.5,
                 backgroundColor: 'var(--doctor-bg)',
-                padding: '12px 14px',
+                padding: '10px 12px',
                 borderRadius: '8px',
                 border: '1px solid var(--doctor-border)',
               }}
@@ -173,27 +142,38 @@ export function AiExplainabilityModal({ isOpen, onClose, prediction, patientName
             </p>
           </div>
 
-          {/* Strict Clinical Safety Disclaimer */}
+          {/* Human-in-the-Loop Clinical Disclaimer */}
           <div
             style={{
-              padding: '12px 14px',
+              padding: '10px 12px',
               backgroundColor: 'var(--doctor-warning-bg)',
               borderRadius: '8px',
               borderLeft: '4px solid var(--doctor-warning)',
-              fontSize: '12px',
+              fontSize: '11.5px',
               color: '#78350f',
-              lineHeight: 1.45,
+              lineHeight: 1.4,
             }}
           >
-            <strong>Human-in-the-Loop Clinical Mandate:</strong> This AI feature provides advisory diagnostic decision support. It does not replace comprehensive clinical examination, patient history, or certified radiologist sign-off.
+            <strong>Human-in-the-Loop Mandate:</strong> This advisory AI feature supports clinical workflow and does not replace certified physician assessment or radiologist sign-off.
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Footer with View Full AI Analysis & Close */}
         <div className="doctor-modal-footer">
-          <button className="doctor-btn doctor-btn-primary" onClick={onClose}>
-            Close Decision Support
+          <button type="button" className="doctor-btn doctor-btn-outline" onClick={onClose}>
+            Close
           </button>
+          {onViewFullAnalysis && (
+            <button
+              type="button"
+              className="doctor-btn doctor-btn-primary"
+              onClick={() => {
+                onViewFullAnalysis(prediction, patientName);
+              }}
+            >
+              View Full AI Analysis &rarr;
+            </button>
+          )}
         </div>
       </div>
     </div>

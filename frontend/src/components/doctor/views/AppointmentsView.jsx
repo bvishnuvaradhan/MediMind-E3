@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 
 export function AppointmentsView({
   appointments = [],
+  patients = [],
   onSelectPatient,
   onOpenNewConsultation,
+  onOpenAiExplain,
+  onOpenFullAiAnalysis,
   onUpdateStatus,
 }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -34,7 +37,7 @@ export function AppointmentsView({
               Outpatient Consultation Schedule & Appointments
             </h2>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--doctor-text-muted)' }}>
-              Manage today's booked OPD patient consultation slots and triage
+              Manage today's booked OPD patient consultation slots, AI screening, and deep analysis
             </p>
           </div>
           <button className="doctor-btn doctor-btn-primary" onClick={() => onOpenNewConsultation()}>
@@ -99,7 +102,7 @@ export function AppointmentsView({
                 <th>Consultation Type & Purpose</th>
                 <th>AI Pre-Screen</th>
                 <th>Status</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th style={{ textAlign: 'right', minWidth: '320px' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -110,57 +113,116 @@ export function AppointmentsView({
                   </td>
                 </tr>
               ) : (
-                filteredAppointments.map((apt) => (
-                  <tr key={apt.id}>
-                    <td>
-                      <span style={{ fontWeight: 800, color: 'var(--doctor-primary)', fontFamily: 'monospace' }}>
-                        {apt.token}
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ fontWeight: 700 }}>{apt.patientName}</div>
-                      <div style={{ fontSize: '11.5px', color: 'var(--doctor-text-muted)' }}>
-                        {apt.patientGender}, {apt.patientAge} yrs
-                      </div>
-                    </td>
-                    <td>
-                      <div style={{ fontWeight: 600 }}>{apt.time}</div>
-                      <div style={{ fontSize: '11px', color: 'var(--doctor-text-muted)' }}>{apt.date}</div>
-                    </td>
-                    <td>
-                      <div style={{ fontWeight: 500 }}>{apt.type}</div>
-                      <div style={{ fontSize: '11.5px', color: 'var(--doctor-text-muted)' }}>{apt.purpose}</div>
-                    </td>
-                    <td>
-                      <span className="doctor-badge doctor-badge-completed" style={{ fontSize: '11px' }}>
-                        {apt.aiPreCheck || 'Screened'}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`doctor-badge doctor-badge-${apt.status.toLowerCase().replace(' ', '-')}`}>
-                        {apt.status}
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
-                        <button
-                          className="doctor-btn doctor-btn-primary doctor-btn-sm"
-                          onClick={() => onSelectPatient(apt.patientId)}
-                        >
-                          Records
-                        </button>
-                        {apt.status !== 'Completed' && (
+                filteredAppointments.map((apt) => {
+                  const patient = patients.find((p) => p.id === apt.patientId);
+                  const prediction = patient?.aiPredictions?.[0];
+
+                  return (
+                    <tr key={apt.id}>
+                      <td>
+                        <span style={{ fontWeight: 800, color: 'var(--doctor-primary)', fontFamily: 'monospace' }}>
+                          {apt.token}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ fontWeight: 700 }}>{apt.patientName}</div>
+                        <div style={{ fontSize: '11.5px', color: 'var(--doctor-text-muted)' }}>
+                          {apt.patientGender}, {apt.patientAge} yrs
+                        </div>
+                      </td>
+                      <td>
+                        <div style={{ fontWeight: 600 }}>{apt.time}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--doctor-text-muted)' }}>{apt.date}</div>
+                      </td>
+                      <td>
+                        <div style={{ fontWeight: 500 }}>{apt.type}</div>
+                        <div style={{ fontSize: '11.5px', color: 'var(--doctor-text-muted)' }}>{apt.purpose}</div>
+                      </td>
+                      <td>
+                        {prediction && onOpenAiExplain ? (
                           <button
-                            className="doctor-btn doctor-btn-outline doctor-btn-sm"
-                            onClick={() => onUpdateStatus(apt.id, 'Completed')}
+                            type="button"
+                            className="doctor-badge doctor-badge-completed"
+                            style={{ fontSize: '11px', cursor: 'pointer', border: 'none', textAlign: 'left' }}
+                            onClick={() => onOpenAiExplain(prediction, apt.patientName)}
+                            title="Click to view concise AI Pre-Screen summary"
                           >
-                            Mark Done
+                            🔍 {apt.aiPreCheck || prediction.finding || 'Screened'}
                           </button>
+                        ) : apt.aiPreCheck ? (
+                          <span className="doctor-badge doctor-badge-completed" style={{ fontSize: '11px' }}>
+                            {apt.aiPreCheck}
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: '12px', color: 'var(--doctor-text-muted)' }}>
+                            No AI Pre-Screen
+                          </span>
                         )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                      <td>
+                        <span className={`doctor-badge doctor-badge-${apt.status.toLowerCase().replace(' ', '-')}`}>
+                          {apt.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                          {/* AI Actions: AI Pre-Screen + View Full AI Analysis */}
+                          {prediction && onOpenFullAiAnalysis ? (
+                            <button
+                              type="button"
+                              className="doctor-btn doctor-btn-sm doctor-btn-outline"
+                              style={{
+                                fontSize: '11px',
+                                padding: '4px 8px',
+                                color: 'var(--doctor-teal)',
+                                borderColor: 'var(--doctor-teal)',
+                              }}
+                              onClick={() => onOpenFullAiAnalysis(prediction, apt.patientId, 'appointments')}
+                              title="Open dedicated full AI analysis and Grad-CAM telemetry view"
+                            >
+                              View Full AI Analysis
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="doctor-btn doctor-btn-sm doctor-btn-outline"
+                              disabled
+                              style={{
+                                fontSize: '11px',
+                                padding: '4px 8px',
+                                opacity: 0.5,
+                                cursor: 'not-allowed',
+                              }}
+                              title="Full AI analysis is not available for this appointment."
+                            >
+                              No AI Analysis
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            className="doctor-btn doctor-btn-primary doctor-btn-sm"
+                            onClick={() => onSelectPatient(apt.patientId)}
+                            style={{ fontSize: '11px', padding: '4px 8px' }}
+                          >
+                            Records
+                          </button>
+
+                          {apt.status !== 'Completed' && (
+                            <button
+                              type="button"
+                              className="doctor-btn doctor-btn-outline doctor-btn-sm"
+                              onClick={() => onUpdateStatus(apt.id, 'Completed')}
+                              style={{ fontSize: '11px', padding: '4px 8px' }}
+                            >
+                              Mark Done
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
