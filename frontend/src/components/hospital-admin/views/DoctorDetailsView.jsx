@@ -178,7 +178,7 @@ export function DoctorDetailsView({ doctor, onBack, onToggleStatus }) {
               </div>
             </div>
             <p style={{ margin: 0, fontSize: '12px', color: 'var(--ha-text-secondary)', lineHeight: 1.5 }}>
-              Hospital Administrators oversee doctor active status, clinical schedules, and hospital-wide appointment volumes. In accordance with the locked MediMind permission matrix, Hospital Administrators do <strong>not</strong> have access to private patient medical charts, consultation notes, or diagnostic scans.
+              Hospital Administrators oversee doctor active status, clinical privileges, and hospital-wide operational volumes. In accordance with the locked MediMind permission matrix, Hospital Administrators do <strong>not</strong> have access to private patient medical charts, consultation notes, or diagnostic scans.
             </p>
           </div>
         </div>
