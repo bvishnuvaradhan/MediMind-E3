@@ -18,15 +18,16 @@ export function DoctorPerformanceView({
     const rawOnTime = perf.onTimeRate ?? doc.onTimeRate ?? 95;
     const numOnTime = typeof rawOnTime === 'string' ? parseFloat(rawOnTime.replace(/%/g, '')) : Number(rawOnTime);
 
-    // Parse numeric completion rate safely
-    const rawCompletion = perf.completionRate ?? 85;
-    const numCompletion = typeof rawCompletion === 'string' ? parseFloat(rawCompletion.replace(/%/g, '')) : Number(rawCompletion);
+    // Scheduled and completed consultations
+    const monthlyScheduled = perf.monthlyAppointments || 20;
+    const completedConsultations = perf.completedConsultations || doc.consultationsCompleted || 0;
+    const calculatedRate = monthlyScheduled > 0 ? Math.round((completedConsultations / monthlyScheduled) * 100) : 85;
 
     return {
       ...doc,
-      consultations: perf.completedConsultations || doc.consultationsCompleted || 0,
-      monthlyScheduled: perf.monthlyAppointments || 20,
-      completionRate: isNaN(numCompletion) ? 85 : numCompletion,
+      consultations: completedConsultations,
+      monthlyScheduled,
+      completionRate: calculatedRate,
       ratingScore: perf.patientRating || doc.rating || 5.0,
       onTimeRate: isNaN(numOnTime) ? 95 : numOnTime,
       workload: Number(doc.workload) || 0,
@@ -62,6 +63,7 @@ export function DoctorPerformanceView({
   // KPI Calculations
   const activeDoctorsCount = combinedData.filter((d) => d.status === 'Active').length;
   const totalConsultations = combinedData.reduce((sum, d) => sum + d.consultations, 0);
+  const totalScheduled = combinedData.reduce((sum, d) => sum + d.monthlyScheduled, 0);
   const totalCaseload = combinedData.reduce((sum, d) => sum + d.workload, 0);
   const avgOnTime = combinedData.length > 0
     ? Math.round(combinedData.reduce((sum, d) => sum + d.onTimeRate, 0) / combinedData.length)
@@ -69,8 +71,8 @@ export function DoctorPerformanceView({
   const avgSatisfaction = combinedData.length > 0
     ? (combinedData.reduce((sum, d) => sum + d.ratingScore, 0) / combinedData.length).toFixed(1)
     : '4.8';
-  const avgCompletion = combinedData.length > 0
-    ? Math.round(combinedData.reduce((sum, d) => sum + d.completionRate, 0) / combinedData.length)
+  const overallCompletionRate = totalScheduled > 0
+    ? Math.round((totalConsultations / totalScheduled) * 100)
     : 85;
 
   return (
@@ -137,7 +139,7 @@ export function DoctorPerformanceView({
           label="Patient Satisfaction"
           value={`★ ${avgSatisfaction}`}
           tone="coral"
-          change={`${avgCompletion}% completion`}
+          change={`${overallCompletionRate}% completion rate`}
           changeType="positive"
           subtext={`${totalCaseload} active bookings`}
           icon={
@@ -154,33 +156,60 @@ export function DoctorPerformanceView({
         <div className="dh-card">
           <div className="dh-card-header">
             <div>
-              <h3 className="dh-card-title">Consultation Activity & Completion</h3>
-              <div className="dh-card-description">Completed consultations vs monthly caseload</div>
+              <h3 className="dh-card-title">Consultation Volume & Completion</h3>
+              <div className="dh-card-description">Scheduled vs completed consultations by doctor</div>
             </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '8px' }}>
             {combinedData.map((doc) => {
-              const maxVal = Math.max(...combinedData.map((d) => d.consultations), 20);
-              const barPct = Math.round((doc.consultations / maxVal) * 100);
+              const scheduled = doc.monthlyScheduled || 20;
+              const completed = doc.consultations || 0;
+              const rate = doc.completionRate || 0;
+              const maxVal = Math.max(...combinedData.map((d) => d.monthlyScheduled || 20), 20);
+              const schedPct = Math.round((scheduled / maxVal) * 100);
+              const compPct = Math.round((completed / maxVal) * 100);
 
               return (
-                <div key={doc.id} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div key={doc.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingBottom: '12px', borderBottom: '1px solid var(--dh-border-subtle, rgba(0,0,0,0.05))' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div className="dh-avatar-circle" style={{ width: '28px', height: '28px', fontSize: '11px' }}>
                         {doc.avatarInitials}
                       </div>
-                      <span style={{ fontWeight: 600, fontSize: '13px', color: 'var(--dh-text-primary)' }}>
+                      <span style={{ fontWeight: 700, fontSize: '13.5px', color: 'var(--dh-text-primary)' }}>
                         {doc.name}
                       </span>
                     </div>
-                    <div style={{ fontSize: '12px', color: 'var(--dh-text-muted)' }}>
-                      <strong style={{ color: 'var(--dh-text-primary)' }}>{doc.consultations}</strong> completed • <span style={{ color: 'var(--dh-teal)', fontWeight: 600 }}>{doc.completionRate}% rate</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px' }}>
+                      <span style={{ color: 'var(--dh-text-muted)' }}>
+                        Scheduled: <strong style={{ color: 'var(--dh-text-primary)' }}>{scheduled}</strong>
+                      </span>
+                      <span style={{ color: 'var(--dh-text-muted)' }}>
+                        Completed: <strong style={{ color: 'var(--dh-teal)' }}>{completed}</strong>
+                      </span>
+                      <span className="dh-badge dh-badge-completed" style={{ fontSize: '11px', fontWeight: 700 }}>
+                        {rate}% Completion
+                      </span>
                     </div>
                   </div>
-                  <div className="dh-progress-container" style={{ height: '8px' }}>
-                    <div className="dh-progress-fill teal" style={{ width: `${barPct}%` }} />
+
+                  {/* Paired Visual Comparison Bars */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
+                      <span style={{ width: '65px', color: 'var(--dh-text-muted)' }}>Scheduled</span>
+                      <div className="dh-progress-container" style={{ height: '6px', flex: 1 }}>
+                        <div className="dh-progress-fill" style={{ width: `${schedPct}%`, backgroundColor: 'var(--dh-primary-light)' }} />
+                      </div>
+                      <span style={{ width: '24px', textAlign: 'right', fontWeight: 600, color: 'var(--dh-text-secondary)' }}>{scheduled}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
+                      <span style={{ width: '65px', color: 'var(--dh-text-muted)' }}>Completed</span>
+                      <div className="dh-progress-container" style={{ height: '6px', flex: 1 }}>
+                        <div className="dh-progress-fill teal" style={{ width: `${compPct}%` }} />
+                      </div>
+                      <span style={{ width: '24px', textAlign: 'right', fontWeight: 600, color: 'var(--dh-teal)' }}>{completed}</span>
+                    </div>
                   </div>
                 </div>
               );
