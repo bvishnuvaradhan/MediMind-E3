@@ -37,7 +37,6 @@ import { PlatformDashboard } from './views/PlatformDashboard';
 import { HospitalsView } from './views/HospitalsView';
 import { HospitalAdminsView } from './views/HospitalAdminsView';
 import { DepartmentsView } from './views/DepartmentsView';
-import { DoctorsView } from './views/DoctorsView';
 import { FamilyAccountsView } from './views/FamilyAccountsView';
 import { AppointmentsView } from './views/AppointmentsView';
 import { AiAnalyticsView } from './views/AiAnalyticsView';
@@ -53,7 +52,6 @@ const pageToHash = {
   'Hospitals': 'hospitals',
   'Hospital Admins': 'hospital-admins',
   'Departments': 'departments',
-  'Doctors': 'doctors',
   'Family Accounts': 'family-accounts',
   'Hospital Performance': 'hospital-performance',
   'Platform Appointments Overview': 'appointments',
@@ -70,7 +68,7 @@ const hashToPage = {
   hospitals: 'Hospitals',
   'hospital-admins': 'Hospital Admins',
   departments: 'Departments',
-  doctors: 'Doctors',
+  doctors: 'Hospitals',
   'family-accounts': 'Family Accounts',
   'hospital-performance': 'Hospital Performance',
   appointments: 'Platform Appointments Overview',
@@ -155,7 +153,6 @@ export function ChairmanLayout({ dark, setDark }) {
         { label: 'Hospitals', icon: Building2 },
         { label: 'Hospital Admins', icon: UserCheck },
         { label: 'Departments', icon: Layers },
-        { label: 'Doctors', icon: Stethoscope },
         { label: 'Family Accounts', icon: UsersRound },
       ],
     },
@@ -431,7 +428,6 @@ export function ChairmanLayout({ dark, setDark }) {
             <HospitalAdminsView initialAction={viewParams.action || null} announce={announce} />
           )}
           {currentPage === 'Departments' && <DepartmentsView onNavigate={navigateTo} />}
-          {currentPage === 'Doctors' && <DoctorsView />}
           {currentPage === 'Family Accounts' && <FamilyAccountsView />}
           {currentPage === 'Hospital Performance' && <HospitalPerformanceView />}
           {(currentPage === 'Platform Appointments Overview' || currentPage === 'Appointments') && (
