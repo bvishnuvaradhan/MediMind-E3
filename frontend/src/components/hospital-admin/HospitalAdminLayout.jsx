@@ -13,7 +13,6 @@ import {
   Sparkles,
   FileText,
   BookOpen,
-  FileCode,
   Settings,
   LogOut,
   Moon,
@@ -58,12 +57,12 @@ import { DepartmentAnalyticsView } from './views/DepartmentAnalyticsView';
 import { AiAnalyticsView } from './views/AiAnalyticsView';
 import { ReportsView } from './views/ReportsView';
 import { KnowledgeActivityView } from './views/KnowledgeActivityView';
-import { ActivityAuditView } from './views/ActivityAuditView';
 import { SettingsView } from './views/SettingsView';
 
 // Modals
 import { EditHospitalModal } from './components/EditHospitalModal';
 import { CreateDepartmentModal } from './components/CreateDepartmentModal';
+import { EditDepartmentModal } from './components/EditDepartmentModal';
 import { CreateDepartmentHeadModal } from './components/CreateDepartmentHeadModal';
 import { GenerateReportModal } from './components/GenerateReportModal';
 import { ConfirmationModal } from './components/ConfirmationModal';
@@ -82,7 +81,6 @@ const navItems = [
   ['AI Analytics', 'AI Analytics', Sparkles],
   ['Reports', 'Reports', FileText],
   ['Knowledge Activity', 'Knowledge Activity', BookOpen],
-  ['Activity / Audit', 'Activity / Audit', FileCode],
   ['Settings', 'Settings', Settings],
 ];
 
@@ -102,7 +100,6 @@ const pageToHash = {
   'AI Analytics': 'ai-analytics',
   'Reports': 'reports',
   'Knowledge Activity': 'knowledge-activity',
-  'Activity / Audit': 'activity-audit',
   'Settings': 'settings',
 };
 
@@ -180,6 +177,8 @@ export function HospitalAdminLayout({ dark, setDark }) {
   // Active Modals
   const [showEditHospitalModal, setShowEditHospitalModal] = useState(false);
   const [showCreateDeptModal, setShowCreateDeptModal] = useState(false);
+  const [showEditDeptModal, setShowEditDeptModal] = useState(false);
+  const [selectedEditDept, setSelectedEditDept] = useState(null);
   const [showCreateHeadModal, setShowCreateHeadModal] = useState(false);
   const [showGenerateReportModal, setShowGenerateReportModal] = useState(false);
   const [confirmModal, setConfirmModal] = useState(null);
@@ -227,6 +226,15 @@ export function HospitalAdminLayout({ dark, setDark }) {
     setDepartments(updatedDepts);
     setShowCreateDeptModal(false);
     announce(`Created department: ${deptData.name}`);
+  };
+
+  const handleEditDepartment = async (deptId, updatedData) => {
+    const updated = await hospitalAdminService.updateDepartment(deptId, updatedData);
+    const updatedDepts = await hospitalAdminService.getDepartments();
+    setDepartments(updatedDepts);
+    setShowEditDeptModal(false);
+    setSelectedEditDept(null);
+    announce(`Updated department: ${updated.name}`);
   };
 
   const handleToggleDepartmentStatus = (deptId) => {
@@ -345,6 +353,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
           doctors={doctors}
           appointments={appointments}
           analytics={analytics}
+          auditLogs={auditLogs}
           navigate={navigate}
           onOpenCreateHead={() => setShowCreateHeadModal(true)}
           onOpenEditHospital={() => setShowEditHospitalModal(true)}
@@ -364,6 +373,10 @@ export function HospitalAdminLayout({ dark, setDark }) {
         <DepartmentsView
           departments={departments}
           onOpenCreateDept={() => setShowCreateDeptModal(true)}
+          onOpenEditDept={(dept) => {
+            setSelectedEditDept(dept);
+            setShowEditDeptModal(true);
+          }}
           onToggleStatus={handleToggleDepartmentStatus}
           navigate={navigate}
         />
@@ -483,14 +496,6 @@ export function HospitalAdminLayout({ dark, setDark }) {
       return (
         <KnowledgeActivityView
           knowledge={knowledge}
-        />
-      );
-    }
-    if (currentPage === 'Activity / Audit') {
-      return (
-        <ActivityAuditView
-          auditLogs={auditLogs}
-          departments={departments}
         />
       );
     }
@@ -639,7 +644,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
 
           <div className="ha-security-pill">
             <ShieldCheck size={16} />
-            <span>NABH-Certified Hospital Admin Portal</span>
+            <span>Hospital Administration</span>
           </div>
         </div>
       </aside>
@@ -702,6 +707,18 @@ export function HospitalAdminLayout({ dark, setDark }) {
         <CreateDepartmentModal
           onClose={() => setShowCreateDeptModal(false)}
           onSave={handleCreateDepartment}
+        />
+      )}
+
+      {showEditDeptModal && selectedEditDept && (
+        <EditDepartmentModal
+          department={selectedEditDept}
+          departmentHeads={departmentHeads}
+          onClose={() => {
+            setShowEditDeptModal(false);
+            setSelectedEditDept(null);
+          }}
+          onSave={handleEditDepartment}
         />
       )}
 

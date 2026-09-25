@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   Stethoscope,
   ChevronRight,
+  ShieldCheck,
+  FileCode,
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 
@@ -20,12 +22,17 @@ export function DashboardView({
   doctors,
   appointments,
   analytics,
+  auditLogs = [],
   navigate,
   onOpenCreateHead,
   onOpenEditHospital,
 }) {
   const kpis = analytics.kpis || {};
   const todayAppointments = appointments.filter((a) => a.date === '2026-09-24');
+
+  const totalBeds = Number(hospital.totalBeds) || 250;
+  const occupiedBeds = Number(hospital.occupiedBeds) || 210;
+  const occupancyPct = Math.round((occupiedBeds / totalBeds) * 100);
 
   return (
     <div>
@@ -51,7 +58,7 @@ export function DashboardView({
               {hospital.name}
             </h1>
             <p style={{ margin: 0, fontSize: '13px', opacity: 0.85, maxWidth: '640px' }}>
-              {hospital.address} · {hospital.accreditation} · 250 Beds (84% Occupancy)
+              {hospital.address} · {hospital.accreditation} · {totalBeds} Beds ({occupancyPct}% Occupancy)
             </p>
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
@@ -161,7 +168,7 @@ export function DashboardView({
                       {dept.name}
                     </strong>
                     <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>
-                      Head: {dept.headName} · {dept.doctorsCount} Doctors
+                      Head: {dept.headName} · {dept.doctorsCount} Doctors · {dept.wardCapacity || 40} Beds
                     </span>
                   </div>
                 </div>
@@ -239,7 +246,7 @@ export function DashboardView({
       </div>
 
       {/* Operational Highlights & AI Diagnostic Metrics */}
-      <div className="ha-card-panel">
+      <div className="ha-card-panel" style={{ marginBottom: '24px' }}>
         <div className="ha-card-panel-header">
           <div>
             <h3>Hospital Operational Performance</h3>
@@ -282,9 +289,9 @@ export function DashboardView({
               <strong style={{ fontSize: '12px' }}>Bed Occupancy</strong>
             </div>
             <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--ha-text-primary)' }}>
-              {hospital.occupancyRate || '84%'}
+              {occupancyPct}%
             </div>
-            <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>210 of 250 beds occupied</span>
+            <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>{occupiedBeds} of {totalBeds} beds occupied</span>
           </div>
 
           <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
@@ -299,7 +306,73 @@ export function DashboardView({
           </div>
         </div>
       </div>
+
+      {/* Recent Administrative Activity Section */}
+      <div className="ha-card-panel">
+        <div className="ha-card-panel-header">
+          <div>
+            <h3>Recent Administrative Activity</h3>
+            <p>Recent configuration, department, and institutional governance changes</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--ha-text-muted)' }}>
+            <ShieldCheck size={14} style={{ color: 'var(--ha-teal)' }} />
+            <span>Audit Trail Active</span>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {auditLogs.slice(0, 5).map((log) => (
+            <div
+              key={log.id}
+              style={{
+                padding: '12px 14px',
+                borderRadius: '8px',
+                border: '1px solid var(--ha-border)',
+                backgroundColor: 'var(--ha-bg)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '12px',
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    backgroundColor: 'var(--ha-soft-bg)',
+                    color: 'var(--ha-primary)',
+                    display: 'grid',
+                    placeItems: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <FileCode size={16} />
+                </div>
+                <div>
+                  <strong style={{ fontSize: '12px', color: 'var(--ha-text-primary)', display: 'block' }}>
+                    {log.action}
+                  </strong>
+                  <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>
+                    Actor: {log.actor} · Unit: {log.department}
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>
+                  {log.timestamp}
+                </span>
+                <span className="ha-badge success" style={{ fontSize: '10px' }}>
+                  {log.status || 'Verified'}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
-

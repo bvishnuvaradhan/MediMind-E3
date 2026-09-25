@@ -1,18 +1,48 @@
 import { useState } from 'react';
-import { X, Plus, Layers, BedDouble } from 'lucide-react';
+import { X, Save, Layers, BedDouble, UserCheck } from 'lucide-react';
 
-export function CreateDepartmentModal({ onClose, onSave }) {
+export function EditDepartmentModal({
+  department,
+  departmentHeads = [],
+  onClose,
+  onSave,
+}) {
   const [formData, setFormData] = useState({
-    name: '',
-    code: '',
-    specialization: '',
-    wardCapacity: 40,
-    floor: 'Level 1, Wing A',
-    aiService: 'General Health Triaging',
-    description: '',
+    name: department.name || '',
+    code: department.code || '',
+    specialization: department.specialization || department.name || '',
+    wardCapacity: department.wardCapacity || 40,
+    headId: department.headId || '',
+    headName: department.headName || 'Unassigned',
+    headEmail: department.headEmail || '',
+    status: department.status || 'Active',
+    floor: department.floor || 'Level 1, Wing A',
+    aiService: department.aiService || 'General Health Triaging',
+    description: department.description || '',
   });
 
   const [error, setError] = useState('');
+
+  const handleHeadChange = (headId) => {
+    if (!headId) {
+      setFormData({
+        ...formData,
+        headId: '',
+        headName: 'Unassigned',
+        headEmail: '',
+      });
+      return;
+    }
+    const found = departmentHeads.find((h) => h.id === headId);
+    if (found) {
+      setFormData({
+        ...formData,
+        headId: found.id,
+        headName: found.name,
+        headEmail: found.email,
+      });
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -30,11 +60,11 @@ export function CreateDepartmentModal({ onClose, onSave }) {
     }
 
     setError('');
-    onSave({
+    onSave(department.id, {
       ...formData,
       wardCapacity: Number(formData.wardCapacity),
       code: formData.code.trim().toUpperCase(),
-      specialization: formData.specialization.trim() || formData.name.trim(),
+      specialization: formData.specialization.trim(),
     });
   };
 
@@ -44,7 +74,7 @@ export function CreateDepartmentModal({ onClose, onSave }) {
         <div className="ha-modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Layers size={20} style={{ color: 'var(--ha-primary)' }} />
-            <h3>Create Hospital Department</h3>
+            <h3>Edit Department: {department.name}</h3>
           </div>
           <button className="ha-modal-close-btn" onClick={onClose} aria-label="Close modal">
             <X size={18} />
@@ -66,7 +96,6 @@ export function CreateDepartmentModal({ onClose, onSave }) {
                   <input
                     type="text"
                     className="ha-input"
-                    placeholder="e.g. Neurology & Spine"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
@@ -77,7 +106,6 @@ export function CreateDepartmentModal({ onClose, onSave }) {
                   <input
                     type="text"
                     className="ha-input"
-                    placeholder="e.g. NEURO"
                     value={formData.code}
                     onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                     required
@@ -91,7 +119,6 @@ export function CreateDepartmentModal({ onClose, onSave }) {
                   <input
                     type="text"
                     className="ha-input"
-                    placeholder="e.g. Neuro-trauma & Spine Surgery"
                     value={formData.specialization}
                     onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
                   />
@@ -104,7 +131,6 @@ export function CreateDepartmentModal({ onClose, onSave }) {
                     type="number"
                     min="1"
                     className="ha-input"
-                    placeholder="e.g. 40"
                     value={formData.wardCapacity}
                     onChange={(e) => setFormData({ ...formData, wardCapacity: e.target.value })}
                     required
@@ -114,11 +140,42 @@ export function CreateDepartmentModal({ onClose, onSave }) {
 
               <div className="ha-form-row">
                 <div className="ha-form-group">
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <UserCheck size={14} style={{ color: 'var(--ha-teal)' }} /> Department Head Assignment
+                  </label>
+                  <select
+                    className="ha-select"
+                    value={formData.headId}
+                    onChange={(e) => handleHeadChange(e.target.value)}
+                  >
+                    <option value="">Unassigned</option>
+                    {departmentHeads.map((head) => (
+                      <option key={head.id} value={head.id}>
+                        {head.name} ({head.department})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="ha-form-group">
+                  <label>Operating Status</label>
+                  <select
+                    className="ha-select"
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="ha-form-row">
+                <div className="ha-form-group">
                   <label>Floor / Wing Location</label>
                   <input
                     type="text"
                     className="ha-input"
-                    placeholder="e.g. Level 3, Wing B"
                     value={formData.floor}
                     onChange={(e) => setFormData({ ...formData, floor: e.target.value })}
                   />
@@ -143,7 +200,6 @@ export function CreateDepartmentModal({ onClose, onSave }) {
                 <textarea
                   rows={3}
                   className="ha-textarea"
-                  placeholder="Describe the clinical focus and operational scope of this department..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
@@ -156,8 +212,8 @@ export function CreateDepartmentModal({ onClose, onSave }) {
               Cancel
             </button>
             <button type="submit" className="ha-btn ha-btn-primary">
-              <Plus size={16} />
-              Create Department
+              <Save size={16} />
+              Save Changes
             </button>
           </div>
         </form>

@@ -1,14 +1,18 @@
 import { useState } from 'react';
-import { X, FileText, Download } from 'lucide-react';
+import { X, FileText, Download, AlertTriangle } from 'lucide-react';
 
 export function GenerateReportModal({ onClose, onGenerate }) {
   const [formData, setFormData] = useState({
-    title: 'Hospital Operational Summary Report',
+    title: 'Comprehensive Appointment & Consultation Throughput Report',
     category: 'Appointments',
-    period: 'Current Month (September 2026)',
+    period: 'This Month',
+    fromDate: '2026-09-01',
+    toDate: '2026-09-25',
     format: 'PDF / CSV',
     summary: 'Aggregated operational metrics including appointment volumes, department throughput, doctor workload, and AI triaging statistics.',
   });
+
+  const [error, setError] = useState('');
 
   const handleCategoryChange = (category) => {
     let defaultTitle = 'Hospital Operational Summary Report';
@@ -38,7 +42,27 @@ export function GenerateReportModal({ onClose, onGenerate }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onGenerate(formData);
+    if (formData.period === 'Custom Range') {
+      if (!formData.fromDate || !formData.toDate) {
+        setError('Both From Date and To Date are required for Custom Range.');
+        return;
+      }
+      if (formData.fromDate > formData.toDate) {
+        setError('From Date must be earlier than or equal to To Date.');
+        return;
+      }
+    }
+    setError('');
+
+    const finalPeriod =
+      formData.period === 'Custom Range'
+        ? `${formData.fromDate} to ${formData.toDate}`
+        : formData.period;
+
+    onGenerate({
+      ...formData,
+      period: finalPeriod,
+    });
   };
 
   return (
@@ -49,13 +73,20 @@ export function GenerateReportModal({ onClose, onGenerate }) {
             <FileText size={20} style={{ color: 'var(--ha-primary)' }} />
             <h3>Generate Hospital Report</h3>
           </div>
-          <button className="ha-modal-close-btn" onClick={onClose}>
+          <button className="ha-modal-close-btn" onClick={onClose} aria-label="Close modal">
             <X size={18} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="ha-modal-body">
+            {error && (
+              <div style={{ padding: '8px 12px', borderRadius: '6px', backgroundColor: 'var(--ha-error-bg)', color: 'var(--ha-error)', fontSize: '12px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <AlertTriangle size={15} />
+                <span>{error}</span>
+              </div>
+            )}
+
             <div className="ha-form">
               <div className="ha-form-group">
                 <label>Report Category</label>
@@ -90,10 +121,12 @@ export function GenerateReportModal({ onClose, onGenerate }) {
                     value={formData.period}
                     onChange={(e) => setFormData({ ...formData, period: e.target.value })}
                   >
-                    <option value="Current Month (September 2026)">Current Month (September 2026)</option>
-                    <option value="Q3 2026 (Jul - Sep)">Q3 2026 (Jul - Sep)</option>
-                    <option value="Year-to-Date 2026">Year-to-Date 2026</option>
-                    <option value="Last 30 Days (Rolling)">Last 30 Days (Rolling)</option>
+                    <option value="This Month">This Month</option>
+                    <option value="Last Month">Last Month</option>
+                    <option value="This Quarter">This Quarter</option>
+                    <option value="Last Quarter">Last Quarter</option>
+                    <option value="This Year">This Year</option>
+                    <option value="Custom Range">Custom Range</option>
                   </select>
                 </div>
                 <div className="ha-form-group">
@@ -109,6 +142,31 @@ export function GenerateReportModal({ onClose, onGenerate }) {
                   </select>
                 </div>
               </div>
+
+              {formData.period === 'Custom Range' && (
+                <div className="ha-form-row">
+                  <div className="ha-form-group">
+                    <label>From Date</label>
+                    <input
+                      type="date"
+                      className="ha-input"
+                      value={formData.fromDate}
+                      onChange={(e) => setFormData({ ...formData, fromDate: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="ha-form-group">
+                    <label>To Date</label>
+                    <input
+                      type="date"
+                      className="ha-input"
+                      value={formData.toDate}
+                      onChange={(e) => setFormData({ ...formData, toDate: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="ha-form-group">
                 <label>Scope & Executive Summary</label>
@@ -136,4 +194,3 @@ export function GenerateReportModal({ onClose, onGenerate }) {
     </div>
   );
 }
-

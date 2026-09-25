@@ -2,17 +2,18 @@ import {
   Layers,
   Plus,
   Stethoscope,
-  Clock,
   Sparkles,
   BedDouble,
   ToggleLeft,
   ToggleRight,
   MapPin,
+  Edit,
 } from 'lucide-react';
 
 export function DepartmentsView({
   departments,
   onOpenCreateDept,
+  onOpenEditDept,
   onToggleStatus,
   navigate,
 }) {
@@ -55,9 +56,16 @@ export function DepartmentsView({
                   <h3 style={{ margin: 0, fontFamily: 'Montserrat', fontSize: '16px', fontWeight: 700 }}>
                     {dept.name}
                   </h3>
-                  <span style={{ fontSize: '11px', color: 'var(--ha-primary)', fontWeight: 700 }}>
-                    CODE: {dept.code}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--ha-primary)', fontWeight: 700 }}>
+                      CODE: {dept.code}
+                    </span>
+                    {dept.specialization && (
+                      <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>
+                        · {dept.specialization}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -104,28 +112,34 @@ export function DepartmentsView({
                   <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>Bed Capacity</span>
                 </div>
                 <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ha-text-primary)' }}>
-                  {dept.wardCapacity} Beds ({dept.bedOccupancy})
+                  {dept.wardCapacity} Beds {dept.bedOccupancy ? `(${dept.bedOccupancy})` : ''}
                 </div>
               </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', color: 'var(--ha-text-muted)', paddingTop: '8px', borderTop: '1px solid var(--ha-border)' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Clock size={13} /> {dept.operatingHours}
+                <MapPin size={13} /> {dept.floor || 'Level 1'}
               </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <MapPin size={13} /> {dept.floor}
+              <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>
+                Completed Consultations: {dept.completedConsultations || 0}
               </span>
             </div>
 
             {/* Actions */}
-            <div style={{ display: 'flex', gap: '10px', marginTop: 'auto', paddingTop: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', marginTop: 'auto', paddingTop: '8px' }}>
+              <button
+                className="ha-btn ha-btn-primary ha-btn-sm"
+                style={{ flex: 1 }}
+                onClick={() => onOpenEditDept(dept)}
+              >
+                <Edit size={14} /> Edit Department
+              </button>
               <button
                 className="ha-btn ha-btn-secondary ha-btn-sm"
-                style={{ flex: 1 }}
                 onClick={() => navigate('Doctors')}
               >
-                View Doctors
+                Doctors
               </button>
               <button
                 className="ha-btn ha-btn-outline ha-btn-sm"
@@ -133,7 +147,6 @@ export function DepartmentsView({
                 title={dept.status === 'Active' ? 'Deactivate department' : 'Activate department'}
               >
                 {dept.status === 'Active' ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
-                {dept.status === 'Active' ? 'Deactivate' : 'Activate'}
               </button>
             </div>
           </div>
@@ -142,4 +155,3 @@ export function DepartmentsView({
     </div>
   );
 }
-

@@ -36,9 +36,19 @@ export const hospitalAdminService = {
   },
 
   async updateHospitalProfile(updatedData) {
-    hospitalProfileState = { ...hospitalProfileState, ...updatedData };
+    const totalBeds = Number(updatedData.totalBeds) || hospitalProfileState.totalBeds || 250;
+    const occupiedBeds = Number(updatedData.occupiedBeds) || hospitalProfileState.occupiedBeds || 210;
+    const occupancyRate = `${Math.round((occupiedBeds / totalBeds) * 100)}%`;
+
+    hospitalProfileState = {
+      ...hospitalProfileState,
+      ...updatedData,
+      totalBeds,
+      occupiedBeds,
+      occupancyRate,
+    };
     this.logAuditEvent(
-      'Updated Hospital General Information & Contact Details',
+      'Updated Hospital General Information & Facility Parameters',
       'Hospital Administration'
     );
     return { ...hospitalProfileState };
@@ -50,6 +60,7 @@ export const hospitalAdminService = {
   },
 
   async createDepartment(departmentData) {
+    const wardCap = Number(departmentData.wardCapacity) || 40;
     const newDept = {
       id: `dept_${Date.now()}`,
       code: (departmentData.code || departmentData.name.slice(0, 4)).toUpperCase(),
@@ -58,9 +69,10 @@ export const hospitalAdminService = {
       completedConsultations: 0,
       aiPredictionsCount: 0,
       status: 'Active',
-      wardCapacity: 40,
       bedOccupancy: '0%',
+      specialization: departmentData.specialization || departmentData.name,
       ...departmentData,
+      wardCapacity: wardCap,
     };
     departmentsState = [newDept, ...departmentsState];
     this.logAuditEvent(
@@ -71,9 +83,17 @@ export const hospitalAdminService = {
   },
 
   async updateDepartment(deptId, updatedData) {
-    departmentsState = departmentsState.map(d =>
-      d.id === deptId ? { ...d, ...updatedData } : d
-    );
+    departmentsState = departmentsState.map(d => {
+      if (d.id === deptId) {
+        const wardCap = updatedData.wardCapacity !== undefined ? Number(updatedData.wardCapacity) : d.wardCapacity;
+        return {
+          ...d,
+          ...updatedData,
+          wardCapacity: wardCap,
+        };
+      }
+      return d;
+    });
     const updated = departmentsState.find(d => d.id === deptId);
     if (updated) {
       this.logAuditEvent(
