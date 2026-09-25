@@ -1031,6 +1031,30 @@
   }
 }
 
+/* Mobile Backdrop */
+.dh-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 90;
+}
+
+.dh-mobile-menu-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--dh-text-primary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.dh-mobile-menu-btn:hover {
+  background-color: var(--dh-card-hover);
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .dh-sidebar {
@@ -1043,6 +1067,15 @@
   }
   .dh-sidebar.open {
     left: 0;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
+  }
+  .dh-sidebar-backdrop.open {
+    display: block;
+  }
+  .dh-mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .dh-topbar {
     padding: 0 16px;

@@ -148,6 +148,8 @@ export function DepartmentHeadLayout({ dark, setDark }) {
     loadData();
   }, []);
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const showToast = (text, type = 'success') => {
     setToast({ text, type });
     setTimeout(() => setToast(null), 3500);
@@ -156,6 +158,7 @@ export function DepartmentHeadLayout({ dark, setDark }) {
   const handleNavigate = (tab) => {
     startTransition(() => {
       setActiveTab(tab);
+      setMobileMenuOpen(false);
       if (tab !== 'doctor_details') {
         setSelectedDoctorId(null);
       }
@@ -286,8 +289,15 @@ export function DepartmentHeadLayout({ dark, setDark }) {
         authorName={profile?.name || 'Dr. Priya Sharma'}
       />
 
+      {/* Mobile Drawer Backdrop */}
+      <div
+        className={`dh-sidebar-backdrop ${mobileMenuOpen ? 'open' : ''}`}
+        onClick={() => setMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
+
       {/* Sidebar */}
-      <aside className="dh-sidebar">
+      <aside className={`dh-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="dh-brand">
           <div className="dh-brand-mark">
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -484,6 +494,15 @@ export function DepartmentHeadLayout({ dark, setDark }) {
         {/* Topbar */}
         <header className="dh-topbar">
           <div className="dh-topbar-left">
+            <button
+              className="dh-mobile-menu-btn"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle navigation menu"
+            >
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
             <div>
               <h1 className="dh-page-title">{tabTitles[activeTab]?.title || 'Department Head Workspace'}</h1>
               <div className="dh-page-subtitle">{tabTitles[activeTab]?.sub}</div>
@@ -509,7 +528,6 @@ export function DepartmentHeadLayout({ dark, setDark }) {
               <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m-6 0H9" />
               </svg>
-              <span className="dh-notification-dot" />
             </button>
           </div>
         </header>

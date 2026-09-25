@@ -158,6 +158,8 @@ export function DoctorLayout({ dark, setDark }) {
     loadData();
   }, []);
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const showToast = (text, type = 'success') => {
     setToast({ text, type });
     setTimeout(() => setToast(null), 3500);
@@ -166,6 +168,7 @@ export function DoctorLayout({ dark, setDark }) {
   const handleNavigate = (tab) => {
     startTransition(() => {
       setActiveTab(tab);
+      setMobileMenuOpen(false);
       if (tab !== 'patient_profile') {
         setSelectedPatientId(null);
       }
@@ -388,8 +391,15 @@ export function DoctorLayout({ dark, setDark }) {
         onClose={() => setIsCreateArticleOpen(false)}
       />
 
+      {/* Mobile Drawer Backdrop */}
+      <div
+        className={`doctor-sidebar-backdrop ${mobileMenuOpen ? 'open' : ''}`}
+        onClick={() => setMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
+
       {/* Sidebar */}
-      <aside className="doctor-sidebar">
+      <aside className={`doctor-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="doctor-brand">
           <div className="doctor-brand-mark">
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -591,6 +601,15 @@ export function DoctorLayout({ dark, setDark }) {
         {/* Topbar */}
         <header className="doctor-topbar">
           <div className="doctor-topbar-left">
+            <button
+              className="doctor-mobile-menu-btn"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle navigation menu"
+            >
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
             <div>
               <h1 className="doctor-page-title">{tabTitles[activeTab]?.title || 'Doctor Workspace'}</h1>
               <div className="doctor-page-subtitle">{tabTitles[activeTab]?.sub}</div>

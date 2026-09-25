@@ -142,6 +142,8 @@ export function FamilyLayout({ dark, setDark }) {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const announce = (message) => {
     setToast(message);
     window.setTimeout(() => setToast(''), 2600);
@@ -150,6 +152,7 @@ export function FamilyLayout({ dark, setDark }) {
   const navigate = (nextPage, extra = {}) => {
     setPage(nextPage);
     setProfileOpen(false);
+    setMobileMenuOpen(false);
 
     if (extra.doctor) setSelectedDoctor(extra.doctor);
     if (extra.returnTo) setReturnTo(extra.returnTo);
@@ -603,7 +606,14 @@ export function FamilyLayout({ dark, setDark }) {
 
   return (
     <div className={`app-shell ${dark ? 'dark-theme' : ''}`}>
-      <aside className="sidebar">
+      {/* Mobile Drawer Backdrop */}
+      <div
+        className={`sidebar-backdrop ${mobileMenuOpen ? 'open' : ''}`}
+        onClick={() => setMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
+
+      <aside className={`sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="brand">
           <div className="brand-mark">
             <HeartPulse size={20} />
@@ -702,7 +712,7 @@ export function FamilyLayout({ dark, setDark }) {
         <header className="topbar">
           <button
             className="icon-button mobile-menu"
-            onClick={() => announce('Navigation menu')}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle navigation menu"
           >
             <Menu size={20} />

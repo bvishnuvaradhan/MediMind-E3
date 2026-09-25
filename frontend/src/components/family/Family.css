@@ -57,6 +57,16 @@
   height: 100vh;
   overflow-y: auto;
   z-index: 20;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 19;
 }
 
 .brand {
@@ -1359,7 +1369,16 @@
 
 @media (max-width: 768px) {
   .sidebar {
-    display: none;
+    transform: translateX(-100%);
+    width: 280px;
+    z-index: 30;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
+  }
+  .sidebar-backdrop.open {
+    display: block;
   }
   .main-content {
     margin-left: 0;
