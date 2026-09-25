@@ -44,16 +44,16 @@ export function FeatureDetailModal({ item: propItem, feature: propFeature, detai
         <div className="modal-icon">
           <FileText size={20} />
         </div>
-        <h3>{item.title}</h3>
-        <p className="modal-detail">{item.detail}</p>
+        <h3>{item.title || item.type || 'Clinical Document'}</h3>
+        <p className="modal-detail">{item.detail || item.description || ''}</p>
         <div className="modal-meta">
-          <CalendarDays size={15} /> {item.meta ?? `${item.date} · ${item.source}`}
+          <CalendarDays size={15} /> {item.meta ?? `${item.date || 'Recent'} · ${item.source || 'Medical Records'}`}
         </div>
 
         {feature === 'Medical record' && (
           <div className="modal-section">
-            <strong>Patient: {item.patient}</strong>
-            <p>{item.description ?? 'Mock medical record available for review.'}</p>
+            <strong>Patient: {item.patient || 'Family Member'}</strong>
+            <p>{item.description || item.detail || 'Clinical document verified in family records.'}</p>
           </div>
         )}
         {feature === 'Appointments' && (

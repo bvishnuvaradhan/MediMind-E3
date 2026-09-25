@@ -20,7 +20,7 @@ export function ContactSupportModal({ isOpen, onClose, userEmail, announce }) {
     }
 
     setSubmitted(true);
-    announce('Support ticket #MM-8942 received. Our clinical help team will contact you shortly.');
+    announce('Support request received for this session. A confirmation copy has been acknowledged.');
   };
 
   const handleDone = () => {
@@ -66,9 +66,9 @@ export function ContactSupportModal({ isOpen, onClose, userEmail, announce }) {
             <div style={{ width: '50px', height: '50px', borderRadius: '50%', backgroundColor: '#dcfce7', color: '#16a34a', display: 'grid', placeItems: 'center' }}>
               <CheckCircle size={28} />
             </div>
-            <h3 style={{ fontSize: '17px', margin: 0, color: 'var(--family-ink)' }}>Support Ticket Created</h3>
+            <h3 style={{ fontSize: '17px', margin: 0, color: 'var(--family-ink)' }}>Support Request Acknowledged</h3>
             <p style={{ fontSize: '13px', color: 'var(--family-muted)', maxWidth: '380px', lineHeight: '1.5' }}>
-              Your ticket <strong>#MM-8942</strong> has been logged. An email confirmation has been sent to <strong>{formData.email}</strong>. Our support team typically responds within 2 hours.
+              Your inquiry has been logged in this session for <strong>{formData.email}</strong>. Our clinical help team will review the submitted details.
             </p>
             <button type="button" className="primary-button" onClick={handleDone} style={{ marginTop: '8px' }}>
               Close

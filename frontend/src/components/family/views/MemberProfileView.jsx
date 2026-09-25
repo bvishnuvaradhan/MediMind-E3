@@ -8,7 +8,13 @@ import {
 import { initialRecords } from '../../../data/familyMockData';
 import { RecordRow } from '../components/RecordRow';
 
-export function MemberProfileView({ member, records = initialRecords, navigate, announce }) {
+export function MemberProfileView({
+  member,
+  records = initialRecords,
+  navigate,
+  announce,
+  openFeatureModal,
+}) {
   const memberRecords = records.filter(
     (r) => !r.patient || r.patient.toLowerCase() === member.name.toLowerCase()
   );
