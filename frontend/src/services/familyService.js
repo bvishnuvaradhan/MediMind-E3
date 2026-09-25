@@ -100,6 +100,10 @@ export const familyService = {
     return [...doctorAccessState];
   },
 
+  async getDoctorAccess() {
+    return [...doctorAccessState];
+  },
+
   async grantDoctorAccess(grant) {
     const newGrant = {
       ...grant,

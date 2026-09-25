@@ -102,7 +102,7 @@ export function DepartmentsView({
                   <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>AI Pipeline</span>
                 </div>
                 <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ha-text-primary)' }}>
-                  {dept.aiService.split('(')[0]}
+                  {(dept.aiService || dept.linkedAi || 'None Configured').split('(')[0]}
                 </div>
               </div>
 
@@ -112,7 +112,7 @@ export function DepartmentsView({
                   <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>Bed Capacity</span>
                 </div>
                 <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ha-text-primary)' }}>
-                  {dept.wardCapacity} Beds {dept.bedOccupancy ? `(${dept.bedOccupancy})` : ''}
+                  {dept.wardCapacity || dept.bedCapacity || 0} Beds {dept.bedOccupancy ? `(${dept.bedOccupancy})` : ''}
                 </div>
               </div>
             </div>

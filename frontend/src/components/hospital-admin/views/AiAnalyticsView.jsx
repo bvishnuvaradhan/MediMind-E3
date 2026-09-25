@@ -8,8 +8,8 @@ import {
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 
-export function AiAnalyticsView({ analytics }) {
-  const ai = analytics.aiAggregateMetrics || {};
+export function AiAnalyticsView({ analytics = {} }) {
+  const ai = analytics?.aiAggregateMetrics || analytics || {};
 
   return (
     <div>

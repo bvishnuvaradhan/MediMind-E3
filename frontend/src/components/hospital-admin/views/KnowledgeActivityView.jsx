@@ -9,18 +9,24 @@ import {
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 
-export function KnowledgeActivityView({ knowledge }) {
+export function KnowledgeActivityView({ knowledge, articles: propArticles }) {
   const [search, setSearch] = useState('');
   const [selectedArticle, setSelectedArticle] = useState(null);
-  const stats = knowledge.stats || {};
-  const articles = knowledge.recentArticles || [];
+  const stats = (knowledge && knowledge.stats) ? knowledge.stats : (propArticles && propArticles.stats ? propArticles.stats : {});
+  const rawArticles = Array.isArray(propArticles)
+    ? propArticles
+    : (propArticles?.recentArticles || (Array.isArray(knowledge) ? knowledge : knowledge?.recentArticles) || []);
+  const articles = Array.isArray(rawArticles) ? rawArticles : [];
 
   const filteredArticles = articles.filter((art) => {
+    const title = art.title || '';
+    const author = art.author || art.authorName || '';
+    const dept = art.department || art.departmentName || '';
     return (
       !search ||
-      art.title.toLowerCase().includes(search.toLowerCase()) ||
-      art.author.toLowerCase().includes(search.toLowerCase()) ||
-      art.department.toLowerCase().includes(search.toLowerCase())
+      title.toLowerCase().includes(search.toLowerCase()) ||
+      author.toLowerCase().includes(search.toLowerCase()) ||
+      dept.toLowerCase().includes(search.toLowerCase())
     );
   });
 

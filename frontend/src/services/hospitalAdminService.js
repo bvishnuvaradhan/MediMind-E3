@@ -341,9 +341,19 @@ export const hospitalAdminService = {
 
   // --- Knowledge Activity ---
   async getKnowledgeActivity() {
+    const articles = Array.isArray(knowledgeState) ? knowledgeState : (knowledgeState.recentArticles || []);
     return {
-      stats: { ...knowledgeState.stats },
-      recentArticles: [...knowledgeState.recentArticles],
+      stats: {
+        totalArticles: articles.length,
+        totalPublished: articles.length,
+        publishedThisMonth: 4,
+        peerReviewsPending: 2,
+        clinicalGuidelinesActive: 8,
+        orthopedicsPublished: articles.filter(a => a.department === 'Orthopedics').length,
+        diabetologyPublished: articles.filter(a => a.department?.includes('Diab')).length,
+        cardiologyPublished: articles.filter(a => a.department === 'Cardiology').length,
+      },
+      recentArticles: [...articles],
     };
   },
 

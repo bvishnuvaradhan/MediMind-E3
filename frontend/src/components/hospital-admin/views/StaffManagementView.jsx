@@ -9,41 +9,60 @@ import {
 } from 'lucide-react';
 
 export function StaffManagementView({
-  departmentHeads,
-  doctors,
-  departments,
-  onToggleHeadStatus,
-  onToggleDoctorStatus,
-  onSelectHead,
-  onSelectDoctor,
-  onOpenCreateHead,
+  departmentHeads = [],
+  doctors = [],
+  departments = [],
+  staff: propStaff,
+  onToggleHeadStatus = () => {},
+  onToggleDoctorStatus = () => {},
+  onSelectHead = () => {},
+  onSelectDoctor = () => {},
+  onOpenCreateHead = () => {},
 }) {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [deptFilter, setDeptFilter] = useState('ALL');
 
-  const headsList = departmentHeads.map((h) => ({
-    ...h,
-    staffType: 'Department Head',
-    roleTag: 'HEAD',
-  }));
+  let combinedStaff = [];
+  if (Array.isArray(propStaff) && propStaff.length > 0) {
+    combinedStaff = propStaff.map(s => ({
+      ...s,
+      staffType: s.staffType || (s.role === 'HEAD' || s.isHead ? 'Department Head' : 'Staff Doctor'),
+      roleTag: s.roleTag || (s.role === 'HEAD' || s.isHead ? 'HEAD' : 'DOCTOR'),
+      department: s.department || s.departmentName || '',
+    }));
+  } else {
+    const headsList = (departmentHeads || []).map((h) => ({
+      ...h,
+      staffType: 'Department Head',
+      roleTag: 'HEAD',
+      department: h.department || h.departmentName || '',
+    }));
 
-  const docsList = doctors.map((d) => ({
-    ...d,
-    staffType: 'Staff Doctor',
-    roleTag: 'DOCTOR',
-  }));
+    const docsList = (doctors || []).map((d) => ({
+      ...d,
+      staffType: 'Staff Doctor',
+      roleTag: 'DOCTOR',
+      department: d.department || d.departmentName || '',
+    }));
 
-  const combinedStaff = [...headsList, ...docsList];
+    combinedStaff = [...headsList, ...docsList];
+  }
+
+  const headsCount = combinedStaff.filter(s => s.roleTag === 'HEAD').length;
+  const docsCount = combinedStaff.filter(s => s.roleTag === 'DOCTOR').length;
 
   const filteredStaff = combinedStaff.filter((staff) => {
     const matchesRole = roleFilter === 'ALL' || staff.roleTag === roleFilter;
     const matchesDept = deptFilter === 'ALL' || staff.departmentId === deptFilter;
+    const staffName = staff.name || '';
+    const staffEmail = staff.email || '';
+    const staffDept = staff.department || staff.departmentName || '';
     const matchesSearch =
       !search ||
-      staff.name.toLowerCase().includes(search.toLowerCase()) ||
-      staff.email.toLowerCase().includes(search.toLowerCase()) ||
-      staff.department.toLowerCase().includes(search.toLowerCase());
+      staffName.toLowerCase().includes(search.toLowerCase()) ||
+      staffEmail.toLowerCase().includes(search.toLowerCase()) ||
+      staffDept.toLowerCase().includes(search.toLowerCase());
     return matchesRole && matchesDept && matchesSearch;
   });
 
@@ -56,7 +75,7 @@ export function StaffManagementView({
           </div>
           <div>
             <h1>Hospital Staff Directory & Management</h1>
-            <p>Unified oversight of clinical staff across 3 Department Heads and 9 Staff Doctors (Total: 12 Clinical Staff)</p>
+            <p>Unified oversight of clinical staff across {headsCount} Department Heads and {docsCount} Staff Doctors (Total: {combinedStaff.length} Clinical Staff)</p>
           </div>
         </div>
 
@@ -69,15 +88,15 @@ export function StaffManagementView({
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '20px' }}>
         <div style={{ padding: '14px', borderRadius: '10px', backgroundColor: 'var(--ha-card)', border: '1px solid var(--ha-border)' }}>
           <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Total Staff</span>
-          <div style={{ fontSize: '20px', fontWeight: 800 }}>12 Personnel</div>
+          <div style={{ fontSize: '20px', fontWeight: 800 }}>{combinedStaff.length} Personnel</div>
         </div>
         <div style={{ padding: '14px', borderRadius: '10px', backgroundColor: 'var(--ha-card)', border: '1px solid var(--ha-border)' }}>
           <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Department Heads</span>
-          <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--ha-indigo)' }}>3 Heads</div>
+          <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--ha-indigo)' }}>{headsCount} Heads</div>
         </div>
         <div style={{ padding: '14px', borderRadius: '10px', backgroundColor: 'var(--ha-card)', border: '1px solid var(--ha-border)' }}>
           <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Practicing Doctors</span>
-          <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--ha-primary)' }}>9 Doctors</div>
+          <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--ha-primary)' }}>{docsCount} Doctors</div>
         </div>
         <div style={{ padding: '14px', borderRadius: '10px', backgroundColor: 'var(--ha-card)', border: '1px solid var(--ha-border)' }}>
           <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Active Status</span>
@@ -107,13 +126,13 @@ export function StaffManagementView({
             className={`ha-filter-pill ${roleFilter === 'HEAD' ? 'active' : ''}`}
             onClick={() => setRoleFilter('HEAD')}
           >
-            Department Heads (3)
+            Department Heads ({headsCount})
           </button>
           <button
             className={`ha-filter-pill ${roleFilter === 'DOCTOR' ? 'active' : ''}`}
             onClick={() => setRoleFilter('DOCTOR')}
           >
-            Staff Doctors (9)
+            Staff Doctors ({docsCount})
           </button>
         </div>
 
@@ -165,7 +184,7 @@ export function StaffManagementView({
                         border: '1px solid var(--ha-border)',
                       }}
                     >
-                      {staff.avatarInitials}
+                      {staff.avatarInitials || (staff.name || 'MD').slice(0, 2).toUpperCase()}
                     </div>
                     <div>
                       <strong style={{ fontSize: '13px', display: 'block' }}>{staff.name}</strong>
@@ -189,7 +208,7 @@ export function StaffManagementView({
                   </span>
                 </td>
                 <td>
-                  <span style={{ fontSize: '12px', fontWeight: 500 }}>{staff.department}</span>
+                  <span style={{ fontSize: '12px', fontWeight: 500 }}>{staff.department || staff.departmentName}</span>
                 </td>
                 <td>
                   <span style={{ fontSize: '12px', color: 'var(--ha-text-muted)' }}>{staff.phone}</span>
@@ -198,7 +217,7 @@ export function StaffManagementView({
                   <span style={{ fontSize: '12px' }}>{staff.specialization || staff.qualification}</span>
                 </td>
                 <td>
-                  <span className={`ha-badge ${staff.status.toLowerCase()}`}>{staff.status}</span>
+                  <span className={`ha-badge ${(staff.status || 'Active').toLowerCase()}`}>{staff.status || 'Active'}</span>
                 </td>
                 <td style={{ textAlign: 'right' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>

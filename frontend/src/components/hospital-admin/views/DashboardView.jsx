@@ -17,21 +17,23 @@ import { StatCard } from '../components/StatCard';
 
 export function DashboardView({
   hospital,
-  departments,
-  departmentHeads,
-  doctors,
-  appointments,
-  analytics,
+  hospitalProfile,
+  departments = [],
+  departmentHeads = [],
+  doctors = [],
+  appointments = [],
+  analytics = {},
   auditLogs = [],
   navigate,
   onOpenCreateHead,
   onOpenEditHospital,
 }) {
-  const kpis = analytics.kpis || {};
-  const todayAppointments = appointments.filter((a) => a.date === '2026-09-24');
+  const hosp = hospital || hospitalProfile || {};
+  const kpis = analytics.kpis || analytics || {};
+  const todayAppointments = (appointments || []).filter((a) => a.date === '2026-09-24' || a.date?.includes('Today') || a.date?.includes('24 Sep'));
 
-  const totalBeds = Number(hospital.totalBeds) || 250;
-  const occupiedBeds = Number(hospital.occupiedBeds) || 210;
+  const totalBeds = Number(hosp.totalBeds || hosp.bedCapacity || 250);
+  const occupiedBeds = Number(hosp.occupiedBeds || 210);
   const occupancyPct = Math.round((occupiedBeds / totalBeds) * 100);
 
   return (
@@ -55,10 +57,10 @@ export function DashboardView({
               </span>
             </div>
             <h1 style={{ margin: '0 0 6px', fontFamily: 'Montserrat', fontSize: '26px', fontWeight: 800 }}>
-              {hospital.name}
+              {hosp.name || 'Hospital Administration'}
             </h1>
             <p style={{ margin: 0, fontSize: '13px', opacity: 0.85, maxWidth: '640px' }}>
-              {hospital.address} · {hospital.accreditation} · {totalBeds} Beds ({occupancyPct}% Occupancy)
+              {hosp.address || 'Medical City Center'} · {hosp.accreditation || 'NABH Certified'} · {totalBeds} Beds ({occupancyPct}% Occupancy)
             </p>
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>

@@ -12,9 +12,10 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
-export function HospitalProfileView({ hospital, onEdit }) {
-  const totalBeds = Number(hospital.totalBeds) || 250;
-  const occupiedBeds = Number(hospital.occupiedBeds) || 210;
+export function HospitalProfileView({ hospital, profile, onEdit }) {
+  const hosp = hospital || profile || {};
+  const totalBeds = Number(hosp.totalBeds || hosp.bedCapacity || 250);
+  const occupiedBeds = Number(hosp.occupiedBeds || 210);
   const occupancyPct = Math.round((occupiedBeds / totalBeds) * 100);
 
   return (
@@ -48,11 +49,11 @@ export function HospitalProfileView({ hospital, onEdit }) {
                 Hospital Name
               </span>
               <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ha-text-primary)' }}>
-                {hospital.name}
+                {hosp.name || 'Hospital Administration'}
               </div>
-              {hospital.tagline && (
+              {hosp.tagline && (
                 <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--ha-text-secondary)' }}>
-                  {hospital.tagline}
+                  {hosp.tagline}
                 </p>
               )}
             </div>
@@ -62,14 +63,14 @@ export function HospitalProfileView({ hospital, onEdit }) {
                 <span className="ha-info-label">
                   <MapPin size={13} /> Physical Address
                 </span>
-                <span className="ha-info-value">{hospital.address}</span>
+                <span className="ha-info-value">{hosp.address}</span>
               </div>
 
               <div className="ha-info-tile">
                 <span className="ha-info-label">
                   <Phone size={13} /> General Phone
                 </span>
-                <span className="ha-info-value">{hospital.phone}</span>
+                <span className="ha-info-value">{hosp.phone}</span>
               </div>
 
               <div className="ha-info-tile" style={{ backgroundColor: 'var(--ha-error-bg)', borderColor: '#fca5a5' }}>
@@ -77,7 +78,7 @@ export function HospitalProfileView({ hospital, onEdit }) {
                   <Phone size={13} /> 24/7 Emergency
                 </span>
                 <span className="ha-info-value" style={{ color: 'var(--ha-error)', fontWeight: 700 }}>
-                  {hospital.emergencyPhone}
+                  {hosp.emergencyPhone}
                 </span>
               </div>
 
@@ -85,15 +86,15 @@ export function HospitalProfileView({ hospital, onEdit }) {
                 <span className="ha-info-label">
                   <Mail size={13} /> Contact Email
                 </span>
-                <span className="ha-info-value" style={{ fontSize: '12px' }}>{hospital.email}</span>
+                <span className="ha-info-value" style={{ fontSize: '12px' }}>{hosp.email}</span>
               </div>
 
-              {hospital.adminEmail && (
+              {hosp.adminEmail && (
                 <div className="ha-info-tile">
                   <span className="ha-info-label">
                     <Mail size={13} /> Admin Email
                   </span>
-                  <span className="ha-info-value" style={{ fontSize: '12px' }}>{hospital.adminEmail}</span>
+                  <span className="ha-info-value" style={{ fontSize: '12px' }}>{hosp.adminEmail}</span>
                 </div>
               )}
 
@@ -101,24 +102,24 @@ export function HospitalProfileView({ hospital, onEdit }) {
                 <span className="ha-info-label">
                   <Globe size={13} /> Website
                 </span>
-                <span className="ha-info-value" style={{ fontSize: '12px' }}>{hospital.website}</span>
+                <span className="ha-info-value" style={{ fontSize: '12px' }}>{hosp.website}</span>
               </div>
 
               <div className="ha-info-tile" style={{ gridColumn: 'span 2' }}>
                 <span className="ha-info-label">
                   <Clock size={13} /> Operating Hours
                 </span>
-                <span className="ha-info-value">{hospital.operatingHours}</span>
+                <span className="ha-info-value">{hosp.operatingHours}</span>
               </div>
             </div>
 
-            {hospital.description && (
+            {hosp.description && (
               <div style={{ paddingTop: '12px', borderTop: '1px solid var(--ha-border)' }}>
                 <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: '4px' }}>
                   Institutional Overview
                 </span>
                 <p style={{ margin: 0, fontSize: '12px', color: 'var(--ha-text-secondary)', lineHeight: 1.5 }}>
-                  {hospital.description}
+                  {hosp.description}
                 </p>
               </div>
             )}
@@ -150,9 +151,9 @@ export function HospitalProfileView({ hospital, onEdit }) {
                   <Award size={18} />
                   <span style={{ fontSize: '12px', fontWeight: 600 }}>Accreditation</span>
                 </div>
-                <div style={{ fontSize: '15px', fontWeight: 800 }}>{hospital.accreditation || 'NABH & JCI Accredited'}</div>
+                <div style={{ fontSize: '15px', fontWeight: 800 }}>{hosp.accreditation || 'NABH & JCI Accredited'}</div>
                 <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>
-                  Valid through {hospital.accreditationValidThrough || '2028'}
+                  Valid through {hosp.accreditationValidThrough || '2028'}
                 </span>
               </div>
             </div>
@@ -161,10 +162,10 @@ export function HospitalProfileView({ hospital, onEdit }) {
               <ShieldCheck size={20} style={{ color: 'var(--ha-teal)', flexShrink: 0 }} />
               <div>
                 <strong style={{ fontSize: '12px', display: 'block' }}>
-                  State Healthcare License: {hospital.licenseNumber || 'KA-MED-HOSP-2018-0941'}
+                  State Healthcare License: {hosp.licenseNumber || 'KA-MED-HOSP-2018-0941'}
                 </strong>
                 <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>
-                  Established {hospital.establishedYear || 2018} · {hospital.facilityLevel || 'Certified Level-3 Multi-Specialty Facility'}
+                  Established {hosp.establishedYear || 2018} · {hosp.facilityLevel || 'Certified Level-3 Multi-Specialty Facility'}
                 </span>
               </div>
             </div>
@@ -177,7 +178,7 @@ export function HospitalProfileView({ hospital, onEdit }) {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
-              {hospital.facilities?.map((facility) => (
+              {(hosp.facilities || []).map((facility) => (
                 <div
                   key={facility}
                   style={{
