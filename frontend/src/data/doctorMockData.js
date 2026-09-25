@@ -27,15 +27,16 @@ export const initialDoctorProfile = {
   totalConsultationsCompleted: 42,
   description: 'Specialist in arthroscopic knee reconstruction, minimally invasive joint arthroplasty, and acute orthopedic trauma triage. Certified in AI-assisted radiological diagnosis.',
   availabilitySchedule: [
-    { day: 'Monday', time: '09:00 AM – 03:00 PM', slots: 12, status: 'Active' },
-    { day: 'Tuesday', time: '09:00 AM – 01:00 PM', slots: 8, status: 'Active' },
-    { day: 'Wednesday', time: '09:00 AM – 03:00 PM', slots: 12, status: 'Active' },
-    { day: 'Thursday', time: '09:00 AM – 01:00 PM', slots: 8, status: 'Active' },
-    { day: 'Friday', time: '09:00 AM – 03:00 PM', slots: 12, status: 'Active' },
-    { day: 'Saturday', time: '09:00 AM – 12:00 PM', slots: 6, status: 'Active' },
-    { day: 'Sunday', time: 'Off Duty', slots: 0, status: 'Off' },
+    { day: 'Monday', isWorking: true, startTime: '09:00', endTime: '15:00', lunchStart: '13:00', lunchEnd: '14:00' },
+    { day: 'Tuesday', isWorking: true, startTime: '09:00', endTime: '13:00', lunchStart: '13:00', lunchEnd: '14:00' },
+    { day: 'Wednesday', isWorking: true, startTime: '09:00', endTime: '15:00', lunchStart: '13:00', lunchEnd: '14:00' },
+    { day: 'Thursday', isWorking: true, startTime: '09:00', endTime: '13:00', lunchStart: '13:00', lunchEnd: '14:00' },
+    { day: 'Friday', isWorking: true, startTime: '09:00', endTime: '15:00', lunchStart: '13:00', lunchEnd: '14:00' },
+    { day: 'Saturday', isWorking: true, startTime: '09:00', endTime: '12:00', lunchStart: '13:00', lunchEnd: '14:00' },
+    { day: 'Sunday', isWorking: false, startTime: '09:00', endTime: '13:00', lunchStart: '13:00', lunchEnd: '14:00' },
   ],
-  slotDurationMinutes: 15,
+  slotDurationMinutes: 20,
+  bufferMinutes: 3,
 };
 
 export const initialAuthorizedPatients = [

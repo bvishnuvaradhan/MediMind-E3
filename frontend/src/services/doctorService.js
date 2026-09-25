@@ -43,11 +43,12 @@ export const doctorService = {
     return { ...profileState };
   },
 
-  async updateAvailability(schedule, slotDuration) {
+  async updateAvailability(schedule, slotDuration, bufferMinutes) {
     profileState = {
       ...profileState,
       availabilitySchedule: schedule || profileState.availabilitySchedule,
       slotDurationMinutes: slotDuration || profileState.slotDurationMinutes,
+      bufferMinutes: bufferMinutes || profileState.bufferMinutes || 3,
     };
     return { ...profileState };
   },

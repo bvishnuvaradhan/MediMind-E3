@@ -274,8 +274,8 @@ export function DoctorLayout({ dark, setDark }) {
   };
 
   // Availability & Settings handlers
-  const handleSaveAvailability = async (schedule, slotDuration) => {
-    const updated = await doctorService.updateAvailability(schedule, slotDuration);
+  const handleSaveAvailability = async (schedule, slotDuration, bufferMinutes) => {
+    const updated = await doctorService.updateAvailability(schedule, slotDuration, bufferMinutes);
     setDoctorProfile(updated);
     showToast('OPD availability schedule updated');
   };

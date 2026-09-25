@@ -779,12 +779,13 @@
   border-radius: 14px;
   width: 100%;
   max-width: 620px;
-  max-height: 90vh;
+  max-height: min(90vh, calc(100vh - 32px));
   display: flex;
   flex-direction: column;
   box-shadow: var(--doctor-shadow-lg);
   animation: docSlideUp 0.2s ease;
   overflow: hidden;
+  position: relative;
 }
 
 .doctor-modal-box.lg {
@@ -797,6 +798,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
 }
 
 .doctor-modal-title {
@@ -809,9 +811,12 @@
 .doctor-modal-body {
   padding: 24px;
   overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .doctor-modal-footer {
@@ -822,6 +827,23 @@
   justify-content: flex-end;
   gap: 10px;
   background-color: var(--doctor-bg);
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .doctor-modal-overlay {
+    padding: 10px;
+  }
+  .doctor-modal-box {
+    max-height: calc(100vh - 20px);
+    border-radius: 10px;
+  }
+  .doctor-modal-header,
+  .doctor-modal-body,
+  .doctor-modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
 
 /* Form Controls */
