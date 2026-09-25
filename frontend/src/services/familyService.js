@@ -8,7 +8,7 @@ import {
   initialPresentationData,
   initialBookedSlots,
   initialDoctorAccess,
-} from '../data/familyMockData';
+} from '../data/medimindData';
 
 let membersState = [...initialFamilyMembers];
 let recordsState = [...initialRecords];

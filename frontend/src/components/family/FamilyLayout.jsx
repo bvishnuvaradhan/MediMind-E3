@@ -27,7 +27,7 @@ import {
   initialRecords,
   initialBookedSlots,
   initialDoctorAccess,
-} from '../../data/familyMockData';
+} from '../../data/medimindData';
 import { FeatureDetailModal } from './components/FeatureDetailModal';
 import { AppointmentDetailModal } from './components/AppointmentDetailModal';
 import { CancelAppointmentModal } from './components/CancelAppointmentModal';

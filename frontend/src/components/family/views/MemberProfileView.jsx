@@ -11,7 +11,7 @@ import {
   Pencil,
   Trash2,
 } from 'lucide-react';
-import { initialRecords } from '../../../data/familyMockData';
+import { initialRecords } from '../../../data/medimindData';
 import { RecordRow } from '../components/RecordRow';
 import { EditMemberModal } from '../components/EditMemberModal';
 

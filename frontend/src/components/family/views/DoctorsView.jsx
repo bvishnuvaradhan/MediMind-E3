@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Stethoscope, CalendarDays, ArrowUpRight, Clock } from 'lucide-react';
-import { initialPresentationData } from '../../../data/familyMockData';
+import { initialPresentationData } from '../../../data/medimindData';
 
 export function DoctorsView({
   announce,

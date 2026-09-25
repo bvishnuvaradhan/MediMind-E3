@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FileText, Upload, Users } from 'lucide-react';
-import { initialRecords } from '../../../data/familyMockData';
+import { initialRecords } from '../../../data/medimindData';
 import { RecordRow } from '../components/RecordRow';
 import { UploadRecordModal } from '../components/UploadRecordModal';
 import { DeleteRecordModal } from '../components/DeleteRecordModal';

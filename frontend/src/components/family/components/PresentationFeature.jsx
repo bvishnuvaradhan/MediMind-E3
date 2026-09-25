@@ -1,5 +1,5 @@
 import { CalendarDays, ArrowUpRight } from 'lucide-react';
-import { initialPresentationData } from '../../../data/familyMockData';
+import { initialPresentationData } from '../../../data/medimindData';
 
 export function PresentationFeature({
   page,

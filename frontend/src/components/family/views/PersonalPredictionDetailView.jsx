@@ -11,7 +11,7 @@ import {
   CalendarPlus,
   AlertCircle,
 } from 'lucide-react';
-import { initialPresentationData } from '../../../data/familyMockData';
+import { initialPresentationData } from '../../../data/medimindData';
 
 export function PersonalPredictionDetailView({
   prediction,

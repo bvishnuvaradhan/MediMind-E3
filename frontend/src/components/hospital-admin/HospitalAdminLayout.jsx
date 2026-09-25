@@ -35,7 +35,7 @@ import {
   initialKnowledgeActivity,
   initialAuditLogs,
   initialHospitalSettings,
-} from '../../data/hospitalAdminMockData';
+} from '../../data/medimindData';
 import './HospitalAdmin.css';
 
 // Views

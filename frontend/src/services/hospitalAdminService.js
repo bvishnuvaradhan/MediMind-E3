@@ -13,7 +13,7 @@ import {
   initialKnowledgeActivity,
   initialAuditLogs,
   initialHospitalSettings,
-} from '../data/hospitalAdminMockData';
+} from '../data/medimindData';
 
 // In-memory state for prototype lifecycle
 let hospitalProfileState = { ...initialHospitalProfile };

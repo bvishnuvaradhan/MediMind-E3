@@ -10,7 +10,7 @@ import {
   ShieldCheck,
   RefreshCw,
 } from 'lucide-react';
-import { initialRecords, initialPresentationData } from '../../../data/familyMockData';
+import { initialRecords, initialPresentationData } from '../../../data/medimindData';
 import { RecordRow } from '../components/RecordRow';
 
 export function DashboardView({
