@@ -3,9 +3,8 @@ import React from 'react';
 export function WorkloadView({
   doctors = [],
 }) {
-  const totalCapacity = doctors.reduce((sum, d) => sum + (Number(d.maxCapacity) || 0), 0);
   const totalWorkload = doctors.reduce((sum, d) => sum + (Number(d.workload) || 0), 0);
-  const overallUtilization = totalCapacity > 0 ? Math.round((totalWorkload / totalCapacity) * 100) : 0;
+  const activeDoctorsCount = doctors.filter((d) => d.status === 'Active').length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -14,20 +13,20 @@ export function WorkloadView({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <h2 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 4px', color: 'var(--dh-text-primary)' }}>
-              Department Workload & Clinical Capacity Overview
+              Department Workload & Active Caseload Overview
             </h2>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--dh-text-muted)' }}>
-              Monitor outpatient consultation caseload, utilization rates, and buffer capacity across faculty specialists
+              Monitor outpatient consultation caseload and operational room assignments across faculty specialists
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
             <div style={{ padding: '8px 14px', backgroundColor: 'var(--dh-soft-bg)', borderRadius: '8px', textAlign: 'center' }}>
-              <div style={{ fontSize: '11px', color: 'var(--dh-text-muted)', textTransform: 'uppercase' }}>Overall Dept Load</div>
-              <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--dh-primary-light)' }}>{overallUtilization}%</div>
+              <div style={{ fontSize: '11px', color: 'var(--dh-text-muted)', textTransform: 'uppercase' }}>Active Faculty</div>
+              <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--dh-primary-light)' }}>{activeDoctorsCount} / {doctors.length} Doctors</div>
             </div>
             <div style={{ padding: '8px 14px', backgroundColor: 'var(--dh-soft-teal)', borderRadius: '8px', textAlign: 'center' }}>
-              <div style={{ fontSize: '11px', color: 'var(--dh-teal)', textTransform: 'uppercase' }}>Available Buffer</div>
-              <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--dh-teal)' }}>{Math.max(0, totalCapacity - totalWorkload)} Slots</div>
+              <div style={{ fontSize: '11px', color: 'var(--dh-teal)', textTransform: 'uppercase' }}>Total Active Load</div>
+              <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--dh-teal)' }}>{totalWorkload} Active Bookings</div>
             </div>
           </div>
         </div>
@@ -36,11 +35,7 @@ export function WorkloadView({
       {/* Doctor Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
         {doctors.map((doc) => {
-          const cap = Number(doc.maxCapacity) || 25;
           const load = Number(doc.workload) || 0;
-          const utilPct = Math.round((load / cap) * 100);
-          const isHigh = utilPct >= 80;
-          const colorClass = utilPct > 85 ? 'red' : utilPct > 65 ? 'amber' : 'green';
 
           return (
             <div key={doc.id} className="dh-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -63,33 +58,25 @@ export function WorkloadView({
                 </span>
               </div>
 
-              {/* Progress and numbers */}
-              <div style={{ padding: '12px 14px', backgroundColor: 'var(--dh-bg)', borderRadius: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '12.5px', color: 'var(--dh-text-secondary)', fontWeight: 600 }}>
-                    Active Consultations / Max Quota
+              {/* Workload Display */}
+              <div style={{ padding: '14px', backgroundColor: 'var(--dh-bg)', borderRadius: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--dh-text-secondary)', fontWeight: 600 }}>
+                    Active Consultations Caseload
                   </span>
-                  <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--dh-text-primary)' }}>
-                    {load} / {cap} ({utilPct}%)
+                  <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--dh-primary-light)' }}>
+                    {load} Active
                   </span>
                 </div>
-                <div className="dh-progress-container" style={{ height: '10px' }}>
-                  <div className={`dh-progress-fill ${colorClass}`} style={{ width: `${Math.min(utilPct, 100)}%` }} />
-                </div>
-                {isHigh && (
-                  <div style={{ marginTop: '8px', fontSize: '11.5px', color: 'var(--dh-coral)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <span>⚠</span> Approaching maximum daily clinical capacity
-                  </div>
-                )}
               </div>
 
               {/* Allocation Information */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid var(--dh-border)' }}>
                 <span style={{ fontSize: '12px', color: 'var(--dh-text-muted)' }}>
-                  Assigned Room: <strong>{doc.room}</strong>
+                  Allocated Room: <strong style={{ color: 'var(--dh-text-primary)' }}>{doc.room}</strong>
                 </span>
-                <span style={{ fontSize: '11.5px', color: 'var(--dh-text-muted)', fontStyle: 'italic' }}>
-                  Capacity set by Clinician ({cap}/day)
+                <span style={{ fontSize: '12px', color: 'var(--dh-text-muted)' }}>
+                  Completed Cases: <strong>{doc.consultationsCompleted}</strong>
                 </span>
               </div>
             </div>

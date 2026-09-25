@@ -24,7 +24,6 @@ export function DoctorDetailsView({
   const doctorAppointments = appointments.filter(
     (a) => a.doctorId === doctor.id || (a.doctorName && a.doctorName.includes(doctor.name.split(' ').slice(-1)[0]))
   );
-  const utilPct = Math.round((doctor.workload / doctor.maxCapacity) * 100);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -95,8 +94,8 @@ export function DoctorDetailsView({
               <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--dh-text-primary)', marginTop: '2px' }}>{doctor.consultationsCompleted}</div>
             </div>
             <div style={{ padding: '12px 18px', backgroundColor: 'var(--dh-bg)', borderRadius: '10px', border: '1px solid var(--dh-border)', textAlign: 'center' }}>
-              <div className="dh-info-label">Capacity Load</div>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--dh-primary-light)', marginTop: '2px' }}>{utilPct}%</div>
+              <div className="dh-info-label">Active Load</div>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--dh-primary-light)', marginTop: '2px' }}>{doctor.workload} Cases</div>
             </div>
           </div>
         </div>
@@ -111,7 +110,7 @@ export function DoctorDetailsView({
               <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--dh-blue)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-              Faculty Doctor Profile & Credentials (Clinician Managed)
+              Faculty Doctor Profile & Credentials
             </h4>
           </div>
 
@@ -143,14 +142,14 @@ export function DoctorDetailsView({
           </div>
         </div>
 
-        {/* Section 2: Operational Assignment & Shift Allocation */}
+        {/* Section 2: Operational Assignment & Status */}
         <div className="dh-card">
           <div className="dh-section-header">
             <h4 className="dh-section-title">
               <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--dh-teal)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              Operational Assignment & Capacity
+              Operational Assignment & Department Status
             </h4>
           </div>
 
@@ -160,15 +159,7 @@ export function DoctorDetailsView({
               <span className="dh-info-value highlight">{doctor.room}</span>
             </div>
             <div className="dh-info-tile">
-              <span className="dh-info-label">OPD Shift Schedule</span>
-              <span className="dh-info-value">{doctor.schedule}</span>
-            </div>
-            <div className="dh-info-tile">
-              <span className="dh-info-label">Daily Capacity Quota</span>
-              <span className="dh-info-value teal">{doctor.maxCapacity} patients / day</span>
-            </div>
-            <div className="dh-info-tile">
-              <span className="dh-info-label">Current Workload</span>
+              <span className="dh-info-label">Current Active Load</span>
               <span className="dh-info-value">{doctor.workload} active bookings</span>
             </div>
             <div className="dh-info-tile">

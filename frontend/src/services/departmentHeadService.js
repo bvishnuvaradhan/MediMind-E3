@@ -7,7 +7,6 @@ import {
   initialDepartmentInfo,
   initialDepartmentDoctors,
   initialDepartmentAppointments,
-  initialDepartmentSchedules,
   initialDepartmentAnalytics,
   initialDoctorPerformance,
   initialDepartmentArticles,
@@ -19,7 +18,6 @@ let profileState = { ...initialDepartmentHeadProfile };
 let departmentInfoState = { ...initialDepartmentInfo };
 let doctorsState = [...initialDepartmentDoctors];
 let appointmentsState = [...initialDepartmentAppointments];
-let schedulesState = [...initialDepartmentSchedules];
 let analyticsState = { ...initialDepartmentAnalytics };
 let performanceState = [...initialDoctorPerformance];
 let articlesState = [...initialDepartmentArticles];
@@ -65,7 +63,7 @@ export const departmentHeadService = {
           d.name.toLowerCase().includes(q) ||
           d.specialization.toLowerCase().includes(q) ||
           d.email.toLowerCase().includes(q) ||
-          d.room.toLowerCase().includes(q)
+          (d.room && d.room.toLowerCase().includes(q))
       );
     }
     return list;
@@ -91,7 +89,6 @@ export const departmentHeadService = {
       avatarInitials: initials,
       avatarTone: 'coral',
       workload: 0,
-      maxCapacity: Number(doctorData.maxCapacity) || 25,
       rating: 5.0,
       consultationsCompleted: 0,
       todayAppointments: 0,
@@ -112,7 +109,7 @@ export const departmentHeadService = {
 
   async updateDoctor(doctorId, updatedData) {
     doctorsState = doctorsState.map((d) =>
-      d.id === doctorId ? { ...d, ...updatedData, maxCapacity: Number(updatedData.maxCapacity) || d.maxCapacity } : d
+      d.id === doctorId ? { ...d, ...updatedData } : d
     );
     return doctorsState.find((d) => d.id === doctorId);
   },
@@ -135,7 +132,7 @@ export const departmentHeadService = {
     return doctorsState.find((d) => d.id === doctorId);
   },
 
-  // --- Appointments ---
+  // --- Appointments (View-Only) ---
   async getAppointments(filters = {}) {
     let list = [...appointmentsState];
     if (filters.status && filters.status !== 'All') {
@@ -158,42 +155,6 @@ export const departmentHeadService = {
       );
     }
     return list;
-  },
-
-  async updateAppointmentStatus(appointmentId, status) {
-    appointmentsState = appointmentsState.map((a) =>
-      a.id === appointmentId ? { ...a, status } : a
-    );
-    return appointmentsState.find((a) => a.id === appointmentId);
-  },
-
-  // --- Schedules / Rosters ---
-  async getSchedules(filters = {}) {
-    let list = [...schedulesState];
-    if (filters.day && filters.day !== 'All') {
-      list = list.filter((s) => s.day === filters.day);
-    }
-    if (filters.doctorId && filters.doctorId !== 'All') {
-      list = list.filter((s) => s.doctorId === filters.doctorId);
-    }
-    return list;
-  },
-
-  async updateScheduleStatus(scheduleId, status) {
-    schedulesState = schedulesState.map((s) =>
-      s.id === scheduleId ? { ...s, status } : s
-    );
-    return schedulesState.find((s) => s.id === scheduleId);
-  },
-
-  async createScheduleShift(shiftData) {
-    const newShift = {
-      id: `sch_${Date.now()}`,
-      status: 'Active',
-      ...shiftData,
-    };
-    schedulesState = [newShift, ...schedulesState];
-    return newShift;
   },
 
   // --- Analytics ---

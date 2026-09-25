@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 export function AppointmentsView({
   appointments = [],
   doctors = [],
-  onUpdateAppointmentStatus,
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -31,11 +30,11 @@ export function AppointmentsView({
               Department OPD Appointment Schedule
             </h2>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--dh-text-muted)' }}>
-              Operational tracking of consultation slots and patient triage flow
+              View-only operational tracking of consultation slots and patient triage flow
             </p>
           </div>
           <div style={{ padding: '6px 12px', backgroundColor: 'var(--dh-soft-bg)', borderRadius: '6px', fontSize: '12px', color: 'var(--dh-primary-light)', fontWeight: 600 }}>
-            Operational View (Zero Private Clinical History Access)
+            Operational View-Only (Zero Private Clinical History Access)
           </div>
         </div>
       </div>
@@ -92,19 +91,18 @@ export function AppointmentsView({
             <thead>
               <tr>
                 <th>Token</th>
-                <th>Patient Details</th>
+                <th>Patient Identifier</th>
                 <th>Attending Doctor</th>
                 <th>Slot Time</th>
                 <th>Type</th>
                 <th>AI Triage Pre-Check</th>
-                <th>Status</th>
-                <th style={{ textAlign: 'right' }}>Operational Actions</th>
+                <th style={{ textAlign: 'right' }}>Status</th>
               </tr>
             </thead>
             <tbody>
               {filteredAppointments.length === 0 ? (
                 <tr>
-                  <td colSpan="8" style={{ textAlign: 'center', padding: '32px', color: 'var(--dh-text-muted)' }}>
+                  <td colSpan="7" style={{ textAlign: 'center', padding: '32px', color: 'var(--dh-text-muted)' }}>
                     No appointments found matching the selected filters.
                   </td>
                 </tr>
@@ -141,41 +139,10 @@ export function AppointmentsView({
                           {apt.aiScreening || (apt.aiTriaged ? 'AI Triage Complete' : 'Manual Triage')}
                         </span>
                       </td>
-                      <td>
+                      <td style={{ textAlign: 'right' }}>
                         <span className={`dh-badge dh-badge-${statusClass}`}>
                           {statusStr}
                         </span>
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
-                          {(statusStr === 'Confirmed' || statusStr === 'Scheduled') && (
-                            <button
-                              type="button"
-                              className="dh-btn dh-btn-primary dh-btn-sm"
-                              onClick={() => onUpdateAppointmentStatus(apt.id, 'In Progress')}
-                            >
-                              Check In
-                            </button>
-                          )}
-                          {statusStr === 'In Progress' && (
-                            <button
-                              type="button"
-                              className="dh-btn dh-btn-outline dh-btn-sm"
-                              onClick={() => onUpdateAppointmentStatus(apt.id, 'Completed')}
-                            >
-                              Mark Done
-                            </button>
-                          )}
-                          {statusStr !== 'Completed' && statusStr !== 'Cancelled' && (
-                            <button
-                              type="button"
-                              className="dh-btn dh-btn-danger dh-btn-sm"
-                              onClick={() => onUpdateAppointmentStatus(apt.id, 'Cancelled')}
-                            >
-                              Cancel
-                            </button>
-                          )}
-                        </div>
                       </td>
                     </tr>
                   );

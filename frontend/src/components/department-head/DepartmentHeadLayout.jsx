@@ -7,7 +7,6 @@ import { useAuth } from '../../context/useAuth';
 import DashboardView from './views/DashboardView';
 import DoctorsView from './views/DoctorsView';
 import DoctorDetailsView from './views/DoctorDetailsView';
-import SchedulesView from './views/SchedulesView';
 import AppointmentsView from './views/AppointmentsView';
 import WorkloadView from './views/WorkloadView';
 import DepartmentAnalyticsView from './views/DepartmentAnalyticsView';
@@ -26,7 +25,6 @@ const validDepartmentHeadTabs = [
   'dashboard',
   'doctors',
   'doctor_details',
-  'schedules',
   'appointments',
   'workload',
   'analytics',
@@ -91,7 +89,6 @@ export function DepartmentHeadLayout({ dark, setDark }) {
   const [departmentInfo, setDepartmentInfo] = useState(null);
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
-  const [schedules, setSchedules] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [performance, setPerformance] = useState([]);
   const [articles, setArticles] = useState([]);
@@ -118,7 +115,6 @@ export function DepartmentHeadLayout({ dark, setDark }) {
         dept,
         docs,
         apts,
-        schs,
         anlyt,
         perf,
         arts,
@@ -128,7 +124,6 @@ export function DepartmentHeadLayout({ dark, setDark }) {
         departmentHeadService.getDepartmentInfo(),
         departmentHeadService.getDoctors(),
         departmentHeadService.getAppointments(),
-        departmentHeadService.getSchedules(),
         departmentHeadService.getAnalytics(),
         departmentHeadService.getDoctorPerformance(),
         departmentHeadService.getArticles(),
@@ -139,7 +134,6 @@ export function DepartmentHeadLayout({ dark, setDark }) {
       setDepartmentInfo(dept);
       setDoctors(docs);
       setAppointments(apts);
-      setSchedules(schs);
       setAnalytics(anlyt);
       setPerformance(perf);
       setArticles(arts);
@@ -189,19 +183,6 @@ export function DepartmentHeadLayout({ dark, setDark }) {
     showToast(`Doctor status updated to ${newStatus}`);
   };
 
-
-  const handleUpdateScheduleStatus = async (scheduleId, newStatus) => {
-    const updated = await departmentHeadService.updateScheduleStatus(scheduleId, newStatus);
-    setSchedules((prev) => prev.map((s) => (s.id === scheduleId ? updated : s)));
-    showToast('Shift roster status updated');
-  };
-
-  const handleUpdateAppointmentStatus = async (aptId, newStatus) => {
-    const updated = await departmentHeadService.updateAppointmentStatus(aptId, newStatus);
-    setAppointments((prev) => prev.map((a) => (a.id === aptId ? updated : a)));
-    showToast(`Appointment marked as ${newStatus}`);
-  };
-
   const handleCreateArticle = async (articleData) => {
     const newArt = await departmentHeadService.createArticle(articleData);
     setArticles((prev) => [newArt, ...prev]);
@@ -226,10 +207,9 @@ export function DepartmentHeadLayout({ dark, setDark }) {
   const tabTitles = {
     dashboard: { title: 'Orthopedics Department Hub', sub: 'Overview, today’s roster, active caseload & AI diagnostics' },
     doctors: { title: 'Department Faculty & Doctors', sub: 'Provision and manage department clinical staff' },
-    doctor_details: { title: currentDoctor ? currentDoctor.name : 'Doctor Profile', sub: 'Clinical credentials & assigned schedule' },
-    schedules: { title: 'Duty Rosters & Room Allocations', sub: 'OPD shifts & 24/7 trauma emergency coverage' },
-    appointments: { title: 'Department OPD Appointments', sub: 'Operational slot and patient triage coordination' },
-    workload: { title: 'Workload & Capacity Management', sub: 'Caseload utilization & capacity rebalancing' },
+    doctor_details: { title: currentDoctor ? currentDoctor.name : 'Doctor Profile', sub: 'Clinical credentials & assigned room' },
+    appointments: { title: 'Department OPD Appointments', sub: 'Operational slot and patient triage flow' },
+    workload: { title: 'Workload & Caseload Management', sub: 'Active caseload oversight across specialists' },
     analytics: { title: 'Department Operational Analytics', sub: 'Outpatient volume trends & ward bed occupancy' },
     ai_analytics: { title: 'AI Fracture Detection Telemetry', sub: 'Aggregate diagnostic accuracy & classification' },
     performance: { title: 'Doctor Quality Benchmarking', sub: 'Patient satisfaction, on-time rates & peer rankings' },
@@ -337,16 +317,6 @@ export function DepartmentHeadLayout({ dark, setDark }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             Faculty Doctors
-          </button>
-
-          <button
-            className={`dh-nav-item ${activeTab === 'schedules' ? 'active' : ''}`}
-            onClick={() => handleNavigate('schedules')}
-          >
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            Duty Rosters & Shifts
           </button>
 
           <button
@@ -567,19 +537,10 @@ export function DepartmentHeadLayout({ dark, setDark }) {
             />
           )}
 
-          {activeTab === 'schedules' && (
-            <SchedulesView
-              schedules={schedules}
-              doctors={doctors}
-              onUpdateScheduleStatus={handleUpdateScheduleStatus}
-            />
-          )}
-
           {activeTab === 'appointments' && (
             <AppointmentsView
               appointments={appointments}
               doctors={doctors}
-              onUpdateAppointmentStatus={handleUpdateAppointmentStatus}
             />
           )}
 

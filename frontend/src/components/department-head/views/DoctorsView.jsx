@@ -17,7 +17,7 @@ export function DoctorsView({
       doc.name.toLowerCase().includes(query) ||
       doc.specialization.toLowerCase().includes(query) ||
       doc.email.toLowerCase().includes(query) ||
-      doc.room.toLowerCase().includes(query);
+      (doc.room && doc.room.toLowerCase().includes(query));
     return matchesStatus && matchesSearch;
   });
 
@@ -81,8 +81,8 @@ export function DoctorsView({
               <tr>
                 <th>Doctor</th>
                 <th>Specialization & Qualification</th>
-                <th>OPD Room & Schedule</th>
-                <th>Workload / Capacity</th>
+                <th>Allocated OPD Room</th>
+                <th>Active Caseload</th>
                 <th>Satisfaction</th>
                 <th>Status</th>
                 <th style={{ textAlign: 'right' }}>Actions</th>
@@ -97,9 +97,6 @@ export function DoctorsView({
                 </tr>
               ) : (
                 filteredDoctors.map((doc) => {
-                  const utilPct = Math.round((doc.workload / doc.maxCapacity) * 100);
-                  const colorClass = utilPct > 85 ? 'red' : utilPct > 65 ? 'amber' : 'green';
-
                   return (
                     <tr key={doc.id}>
                       <td>
@@ -120,18 +117,13 @@ export function DoctorsView({
                         </div>
                       </td>
                       <td>
-                        <div style={{ fontWeight: 500 }}>{doc.room}</div>
-                        <div style={{ fontSize: '11.5px', color: 'var(--dh-text-muted)' }}>{doc.schedule}</div>
+                        <span className="dh-badge dh-badge-draft" style={{ fontWeight: 600 }}>
+                          {doc.room}
+                        </span>
                       </td>
                       <td>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '110px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px' }}>
-                            <span>{doc.workload} / {doc.maxCapacity}</span>
-                            <span style={{ fontWeight: 600 }}>{utilPct}%</span>
-                          </div>
-                          <div className="dh-progress-container" style={{ height: '6px' }}>
-                            <div className={`dh-progress-fill ${colorClass}`} style={{ width: `${utilPct}%` }} />
-                          </div>
+                        <div style={{ fontWeight: 700, color: 'var(--dh-text-primary)', fontSize: '13px' }}>
+                          {doc.workload} active bookings
                         </div>
                       </td>
                       <td>

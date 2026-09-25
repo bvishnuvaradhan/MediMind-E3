@@ -94,7 +94,7 @@ function EditDoctorForm({ doctor, onSave, onClose }) {
 
           {/* Clinician & Admin Managed Read-Only Information */}
           <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--dh-text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '8px' }}>
-            Clinician & Hospital Admin Managed (Read-Only)
+            Clinician Profile Details (Read-Only)
           </div>
 
           <div className="dh-form-row">
@@ -149,25 +149,6 @@ function EditDoctorForm({ doctor, onSave, onClose }) {
               <input
                 className="dh-input"
                 value={doctor.experience || ''}
-                disabled
-              />
-            </div>
-          </div>
-
-          <div className="dh-form-row">
-            <div className="dh-form-group">
-              <label className="dh-label">OPD Shift Schedule (Clinician Managed)</label>
-              <input
-                className="dh-input"
-                value={doctor.schedule || ''}
-                disabled
-              />
-            </div>
-            <div className="dh-form-group">
-              <label className="dh-label">Max Consultation Capacity (Clinician Managed)</label>
-              <input
-                className="dh-input"
-                value={doctor.maxCapacity ? `${doctor.maxCapacity} patients / day` : '25 patients / day'}
                 disabled
               />
             </div>

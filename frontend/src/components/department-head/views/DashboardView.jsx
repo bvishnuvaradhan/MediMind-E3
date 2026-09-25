@@ -124,9 +124,6 @@ export function DashboardView({
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {doctors.map((doc) => {
-              const utilPct = Math.round((doc.workload / doc.maxCapacity) * 100);
-              const colorClass = utilPct > 85 ? 'red' : utilPct > 65 ? 'amber' : 'green';
-
               return (
                 <div key={doc.id} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -144,14 +141,11 @@ export function DashboardView({
                       </div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--dh-text-primary)' }}>
-                        {doc.workload} / {doc.maxCapacity} slots
+                      <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--dh-primary-light)' }}>
+                        {doc.workload} active cases
                       </span>
-                      <div style={{ fontSize: '11px', color: 'var(--dh-text-muted)' }}>{utilPct}% capacity</div>
+                      <div style={{ fontSize: '11px', color: 'var(--dh-text-muted)' }}>{doc.status}</div>
                     </div>
-                  </div>
-                  <div className="dh-progress-container">
-                    <div className={`dh-progress-fill ${colorClass}`} style={{ width: `${utilPct}%` }} />
                   </div>
                 </div>
               );

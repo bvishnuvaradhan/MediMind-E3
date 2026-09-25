@@ -157,24 +157,17 @@ export function CreateDoctorModal({ isOpen, onClose, onSave, departmentName = 'O
               </div>
             </div>
 
-            <div className="dh-form-row">
-              <div className="dh-form-group">
-                <label className="dh-label">Allocated OPD Room *</label>
-                <input
-                  className="dh-input"
-                  name="room"
-                  placeholder="e.g. OPD Room 208"
-                  value={formData.room}
-                  onChange={handleChange}
-                  required
-                />
-                <span className="dh-input-hint">Assigned consultation room managed by Department Head.</span>
-              </div>
-              <div className="dh-form-group" style={{ justifyContent: 'center' }}>
-                <div style={{ padding: '10px 12px', backgroundColor: 'var(--dh-soft-bg)', borderRadius: '8px', fontSize: '12px', color: 'var(--dh-text-secondary)', lineHeight: 1.4 }}>
-                  <strong>Clinician-Managed Settings:</strong> OPD Shift Schedule and Consultation Capacity are configured directly by the doctor from their Clinician Portal.
-                </div>
-              </div>
+            <div className="dh-form-group">
+              <label className="dh-label">Allocated OPD Room *</label>
+              <input
+                className="dh-input"
+                name="room"
+                placeholder="e.g. OPD Room 208"
+                value={formData.room}
+                onChange={handleChange}
+                required
+              />
+              <span className="dh-input-hint">Assigned consultation room managed by Department Head.</span>
             </div>
           </div>
 
