@@ -1,7 +1,7 @@
 // MediMind Platform - Chairman & Platform Owner Portal Layout
 // Strictly follows locked specifications in PLATFORM OWNER.txt, permission matrix.txt, and Frontend_Designs_and_Colors.txt
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   HeartPulse,
   LayoutDashboard,
@@ -50,14 +50,70 @@ import { KnowledgeActivityView } from './views/KnowledgeActivityView';
 import { AuditLogsView } from './views/AuditLogsView';
 import { SettingsView } from './views/SettingsView';
 
+const pageToHash = {
+  'Platform Dashboard': 'dashboard',
+  'Platform Analytics': 'platform-analytics',
+  'Hospitals': 'hospitals',
+  'Hospital Admins': 'hospital-admins',
+  'Departments': 'departments',
+  'Doctors': 'doctors',
+  'Family Accounts': 'family-accounts',
+  'Appointments': 'appointments',
+  'AI Analytics': 'ai-analytics',
+  'Hospital Performance': 'hospital-performance',
+  'Department Performance': 'department-performance',
+  'Reports': 'reports',
+  'Knowledge Activity': 'knowledge-activity',
+  'Audit Logs': 'audit-logs',
+  'Settings': 'settings',
+};
+
+const hashToPage = Object.fromEntries(
+  Object.entries(pageToHash).map(([page, hash]) => [hash, page])
+);
+
+const getInitialPage = () => {
+  if (typeof window === 'undefined') return 'Platform Dashboard';
+  const hash = window.location.hash.replace('#', '').trim();
+  if (hash && hashToPage[hash]) return hashToPage[hash];
+  const saved = sessionStorage.getItem('medimind_chairman_tab');
+  if (saved && pageToHash[saved]) return saved;
+  return 'Platform Dashboard';
+};
+
 export function ChairmanLayout({ dark, setDark }) {
   const { user, logout, switchRole } = useAuth();
-  const [currentPage, setCurrentPage] = useState('Platform Dashboard');
+  const [currentPage, setCurrentPage] = useState(getInitialPage);
   const [viewParams, setViewParams] = useState({});
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [toast, setToast] = useState('');
+
+  // Synchronize state with sessionStorage and URL hash
+  useEffect(() => {
+    sessionStorage.setItem('medimind_chairman_tab', currentPage);
+    const targetHash = pageToHash[currentPage] || 'dashboard';
+    if (window.location.hash !== `#${targetHash}`) {
+      window.history.replaceState(null, '', `#${targetHash}`);
+    }
+  }, [currentPage]);
+
+  // Handle browser Back / Forward navigation
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '').trim();
+      if (hash && hashToPage[hash]) {
+        setCurrentPage(hashToPage[hash]);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('popstate', handleHashChange);
+    };
+  }, []);
 
   const announce = (msg) => {
     setToast(msg);
@@ -121,6 +177,13 @@ export function ChairmanLayout({ dark, setDark }) {
 
   return (
     <div className={`chairman-shell ${dark ? 'dark-theme' : ''}`}>
+      {/* Mobile Drawer Backdrop */}
+      <div
+        className={`chairman-sidebar-backdrop ${mobileMenuOpen ? 'open' : ''}`}
+        onClick={() => setMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
+
       {/* Sidebar Navigation */}
       <aside className={`chairman-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="chairman-brand">
