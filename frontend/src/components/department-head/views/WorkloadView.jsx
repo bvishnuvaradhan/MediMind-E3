@@ -1,25 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 export function WorkloadView({
   doctors = [],
-  onUpdateDoctorCapacity,
 }) {
-  const [editingCapacityId, setEditingCapacityId] = useState(null);
-  const [tempCapacity, setTempCapacity] = useState(25);
-
-  const totalCapacity = doctors.reduce((sum, d) => sum + d.maxCapacity, 0);
-  const totalWorkload = doctors.reduce((sum, d) => sum + d.workload, 0);
+  const totalCapacity = doctors.reduce((sum, d) => sum + (Number(d.maxCapacity) || 0), 0);
+  const totalWorkload = doctors.reduce((sum, d) => sum + (Number(d.workload) || 0), 0);
   const overallUtilization = totalCapacity > 0 ? Math.round((totalWorkload / totalCapacity) * 100) : 0;
-
-  const handleStartEdit = (doc) => {
-    setEditingCapacityId(doc.id);
-    setTempCapacity(doc.maxCapacity);
-  };
-
-  const handleSaveCapacity = (doctorId) => {
-    onUpdateDoctorCapacity(doctorId, Number(tempCapacity));
-    setEditingCapacityId(null);
-  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -28,10 +14,10 @@ export function WorkloadView({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <h2 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 4px', color: 'var(--dh-text-primary)' }}>
-              Department Workload & Clinical Capacity Management
+              Department Workload & Clinical Capacity Overview
             </h2>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--dh-text-muted)' }}>
-              Monitor and rebalance outpatient consultation caseload across faculty specialists
+              Monitor outpatient consultation caseload, utilization rates, and buffer capacity across faculty specialists
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
@@ -41,7 +27,7 @@ export function WorkloadView({
             </div>
             <div style={{ padding: '8px 14px', backgroundColor: 'var(--dh-soft-teal)', borderRadius: '8px', textAlign: 'center' }}>
               <div style={{ fontSize: '11px', color: 'var(--dh-teal)', textTransform: 'uppercase' }}>Available Buffer</div>
-              <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--dh-teal)' }}>{totalCapacity - totalWorkload} Slots</div>
+              <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--dh-teal)' }}>{Math.max(0, totalCapacity - totalWorkload)} Slots</div>
             </div>
           </div>
         </div>
@@ -50,7 +36,9 @@ export function WorkloadView({
       {/* Doctor Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
         {doctors.map((doc) => {
-          const utilPct = Math.round((doc.workload / doc.maxCapacity) * 100);
+          const cap = Number(doc.maxCapacity) || 25;
+          const load = Number(doc.workload) || 0;
+          const utilPct = Math.round((load / cap) * 100);
           const isHigh = utilPct >= 80;
           const colorClass = utilPct > 85 ? 'red' : utilPct > 65 ? 'amber' : 'green';
 
@@ -82,7 +70,7 @@ export function WorkloadView({
                     Active Consultations / Max Quota
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--dh-text-primary)' }}>
-                    {doc.workload} / {doc.maxCapacity} ({utilPct}%)
+                    {load} / {cap} ({utilPct}%)
                   </span>
                 </div>
                 <div className="dh-progress-container" style={{ height: '10px' }}>
@@ -95,36 +83,14 @@ export function WorkloadView({
                 )}
               </div>
 
-              {/* Capacity Setting */}
+              {/* Allocation Information */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid var(--dh-border)' }}>
-                {editingCapacityId === doc.id ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
-                    <input
-                      type="number"
-                      className="dh-input"
-                      style={{ width: '90px' }}
-                      value={tempCapacity}
-                      onChange={(e) => setTempCapacity(e.target.value)}
-                      min="5"
-                      max="50"
-                    />
-                    <button className="dh-btn dh-btn-primary dh-btn-sm" onClick={() => handleSaveCapacity(doc.id)}>
-                      Save
-                    </button>
-                    <button className="dh-btn dh-btn-outline dh-btn-sm" onClick={() => setEditingCapacityId(null)}>
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <span style={{ fontSize: '12px', color: 'var(--dh-text-muted)' }}>
-                      Assigned Room: <strong>{doc.room}</strong>
-                    </span>
-                    <button className="dh-btn dh-btn-outline dh-btn-sm" onClick={() => handleStartEdit(doc)}>
-                      Adjust Quota
-                    </button>
-                  </>
-                )}
+                <span style={{ fontSize: '12px', color: 'var(--dh-text-muted)' }}>
+                  Assigned Room: <strong>{doc.room}</strong>
+                </span>
+                <span style={{ fontSize: '11.5px', color: 'var(--dh-text-muted)', fontStyle: 'italic' }}>
+                  Capacity set by Clinician ({cap}/day)
+                </span>
               </div>
             </div>
           );

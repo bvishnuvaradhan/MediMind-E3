@@ -8,19 +8,22 @@ export function DoctorPerformanceView({
 
   const combinedData = doctors.map((doc) => {
     const perf = performanceData.find((p) => p.doctorId === doc.id) || {};
+    const rawOnTime = perf.onTimeRate ?? doc.onTimeRate ?? 95;
+    const numOnTime = typeof rawOnTime === 'string' ? parseFloat(rawOnTime.replace(/%/g, '')) : Number(rawOnTime);
+
     return {
       ...doc,
       consultations: perf.consultationsCompleted || doc.consultationsCompleted || 0,
       ratingScore: perf.patientSatisfaction || doc.rating || 5.0,
-      onTimeRate: perf.onTimeRate || 95,
+      onTimeRate: isNaN(numOnTime) ? 95 : numOnTime,
       avgTime: perf.avgConsultationTime || '15 min',
     };
   });
 
   const sortedData = [...combinedData].sort((a, b) => {
-    if (sortBy === 'rating') return b.ratingScore - a.ratingScore;
-    if (sortBy === 'consultations') return b.consultations - a.consultations;
-    if (sortBy === 'onTime') return b.onTimeRate - a.onTimeRate;
+    if (sortBy === 'rating') return (b.ratingScore || 0) - (a.ratingScore || 0);
+    if (sortBy === 'consultations') return (b.consultations || 0) - (a.consultations || 0);
+    if (sortBy === 'onTime') return (b.onTimeRate || 0) - (a.onTimeRate || 0);
     return 0;
   });
 

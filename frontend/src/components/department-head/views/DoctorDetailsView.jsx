@@ -22,7 +22,7 @@ export function DoctorDetailsView({
   }
 
   const doctorAppointments = appointments.filter(
-    (a) => a.doctorId === doctor.id || a.doctorName.includes(doctor.name.split(' ').slice(-1)[0])
+    (a) => a.doctorId === doctor.id || (a.doctorName && a.doctorName.includes(doctor.name.split(' ').slice(-1)[0]))
   );
   const utilPct = Math.round((doctor.workload / doctor.maxCapacity) * 100);
 
@@ -38,13 +38,13 @@ export function DoctorDetailsView({
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            Edit Doctor Profile
+            Edit Assignment & Status
           </button>
           <button
             className={`dh-btn ${doctor.status === 'Active' ? 'dh-btn-outline' : 'dh-btn-primary'}`}
-            onClick={() => onToggleStatus(doctor.id, doctor.status === 'Active' ? 'On Leave' : 'Active')}
+            onClick={() => onToggleStatus(doctor.id, doctor.status === 'Active' ? 'Inactive' : 'Active')}
           >
-            {doctor.status === 'Active' ? 'Set On Leave' : 'Set Active'}
+            {doctor.status === 'Active' ? 'Deactivate Doctor' : 'Activate Doctor'}
           </button>
         </div>
       </div>
@@ -111,7 +111,7 @@ export function DoctorDetailsView({
               <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--dh-blue)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-              Faculty Doctor Profile & Credentials
+              Faculty Doctor Profile & Credentials (Clinician Managed)
             </h4>
           </div>
 
@@ -213,18 +213,18 @@ export function DoctorDetailsView({
                   {doctorAppointments.map((apt) => (
                     <tr key={apt.id}>
                       <td style={{ fontWeight: 800, color: 'var(--dh-primary-light)', fontFamily: 'monospace' }}>
-                        {apt.token}
+                        {apt.token || apt.id}
                       </td>
                       <td>
-                        <div style={{ fontWeight: 600 }}>{apt.patientName}</div>
+                        <div style={{ fontWeight: 600 }}>{apt.patientRef || apt.patientName || 'Unknown Patient'}</div>
                       </td>
-                      <td style={{ fontWeight: 500 }}>{apt.time}</td>
+                      <td style={{ fontWeight: 500 }}>{apt.time || apt.slotTime || '09:00 AM'}</td>
                       <td>
-                        <span className="dh-badge dh-badge-draft">{apt.type}</span>
+                        <span className="dh-badge dh-badge-draft">{apt.type || 'In-Person OPD'}</span>
                       </td>
                       <td>
-                        <span className={`dh-badge dh-badge-${apt.status.toLowerCase().replace(' ', '-')}`}>
-                          {apt.status}
+                        <span className={`dh-badge dh-badge-${(apt.status || 'scheduled').toLowerCase().replace(' ', '-')}`}>
+                          {apt.status || 'Scheduled'}
                         </span>
                       </td>
                     </tr>

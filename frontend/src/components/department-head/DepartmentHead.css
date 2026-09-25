@@ -845,12 +845,22 @@
   margin: 0;
 }
 
+.dh-modal-box form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
 .dh-modal-body {
   padding: 24px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-height: 0;
+  flex: 1;
 }
 
 .dh-modal-footer {

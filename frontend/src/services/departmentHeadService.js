@@ -127,18 +127,11 @@ export const departmentHeadService = {
   async toggleDoctorStatus(doctorId) {
     doctorsState = doctorsState.map((d) => {
       if (d.id === doctorId) {
-        const nextStatus = d.status === 'Active' ? 'On Leave' : 'Active';
+        const nextStatus = d.status === 'Active' ? 'Inactive' : 'Active';
         return { ...d, status: nextStatus };
       }
       return d;
     });
-    return doctorsState.find((d) => d.id === doctorId);
-  },
-
-  async updateDoctorCapacity(doctorId, newCapacity) {
-    doctorsState = doctorsState.map((d) =>
-      d.id === doctorId ? { ...d, maxCapacity: Math.max(5, Math.min(50, Number(newCapacity))) } : d
-    );
     return doctorsState.find((d) => d.id === doctorId);
   },
 
@@ -158,10 +151,10 @@ export const departmentHeadService = {
       const q = filters.search.toLowerCase();
       list = list.filter(
         (a) =>
-          a.patientName.toLowerCase().includes(q) ||
-          a.doctorName.toLowerCase().includes(q) ||
-          a.token.toLowerCase().includes(q) ||
-          a.type.toLowerCase().includes(q)
+          (a.patientName || a.patientRef || '').toLowerCase().includes(q) ||
+          (a.doctorName || '').toLowerCase().includes(q) ||
+          (a.token || a.id || '').toLowerCase().includes(q) ||
+          (a.type || '').toLowerCase().includes(q)
       );
     }
     return list;

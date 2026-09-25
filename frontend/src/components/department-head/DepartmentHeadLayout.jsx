@@ -189,11 +189,6 @@ export function DepartmentHeadLayout({ dark, setDark }) {
     showToast(`Doctor status updated to ${newStatus}`);
   };
 
-  const handleUpdateDoctorCapacity = async (docId, newCapacity) => {
-    const updated = await departmentHeadService.updateDoctorCapacity(docId, newCapacity);
-    setDoctors((prev) => prev.map((d) => (d.id === docId ? updated : d)));
-    showToast(`Consultation capacity updated for ${updated.name}`);
-  };
 
   const handleUpdateScheduleStatus = async (scheduleId, newStatus) => {
     const updated = await departmentHeadService.updateScheduleStatus(scheduleId, newStatus);
@@ -591,7 +586,6 @@ export function DepartmentHeadLayout({ dark, setDark }) {
           {activeTab === 'workload' && (
             <WorkloadView
               doctors={doctors}
-              onUpdateDoctorCapacity={handleUpdateDoctorCapacity}
             />
           )}
 

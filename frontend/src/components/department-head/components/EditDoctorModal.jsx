@@ -2,16 +2,8 @@ import React, { useState } from 'react';
 
 function EditDoctorForm({ doctor, onSave, onClose }) {
   const [formData, setFormData] = useState({
-    name: doctor?.name || '',
-    email: doctor?.email || '',
-    phone: doctor?.phone || '',
-    specialization: doctor?.specialization || '',
-    qualification: doctor?.qualification || '',
-    experience: doctor?.experience || '',
     room: doctor?.room || '',
-    schedule: doctor?.schedule || '',
-    status: doctor?.status || 'Active',
-    maxCapacity: doctor?.maxCapacity || 25,
+    status: doctor?.status === 'Inactive' ? 'Inactive' : 'Active',
   });
 
   const [error, setError] = useState('');
@@ -24,14 +16,18 @@ function EditDoctorForm({ doctor, onSave, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim()) {
-      setError('Please provide doctor name.');
+    if (!formData.room.trim()) {
+      setError('Please provide an allocated OPD room.');
       return;
     }
     setError('');
     setSubmitting(true);
     try {
-      await onSave(doctor.id, formData);
+      await onSave(doctor.id, {
+        ...doctor,
+        room: formData.room,
+        status: formData.status,
+      });
       onClose();
     } catch {
       setError('Failed to update doctor profile.');
@@ -44,9 +40,9 @@ function EditDoctorForm({ doctor, onSave, onClose }) {
     <div className="dh-modal-box lg" onClick={(e) => e.stopPropagation()}>
       <div className="dh-modal-header">
         <div>
-          <h3 className="dh-modal-title">Edit Doctor Profile</h3>
+          <h3 className="dh-modal-title">Edit Faculty Doctor Operational Assignment</h3>
           <div className="dh-card-description">
-            Update operational and clinical information for {doctor.name}
+            Update allocated OPD room and operational status for {doctor.name}
           </div>
         </div>
         <button className="dh-btn-icon" onClick={onClose} aria-label="Close modal">
@@ -64,25 +60,57 @@ function EditDoctorForm({ doctor, onSave, onClose }) {
             </div>
           )}
 
+          {/* Department Head Editable Controls */}
+          <div style={{ padding: '14px', backgroundColor: 'var(--dh-soft-bg)', borderRadius: '8px', border: '1px solid var(--dh-border)', marginBottom: '16px' }}>
+            <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--dh-primary-light)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '12px' }}>
+              Department Head Operational Controls
+            </div>
+            <div className="dh-form-row">
+              <div className="dh-form-group">
+                <label className="dh-label">Allocated OPD Room *</label>
+                <input
+                  className="dh-input"
+                  name="room"
+                  value={formData.room}
+                  onChange={handleChange}
+                  placeholder="e.g. Room 302, OPD Block B"
+                  required
+                />
+              </div>
+              <div className="dh-form-group">
+                <label className="dh-label">Doctor Status *</label>
+                <select
+                  className="dh-select"
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Clinician & Admin Managed Read-Only Information */}
+          <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--dh-text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '8px' }}>
+            Clinician & Hospital Admin Managed (Read-Only)
+          </div>
+
           <div className="dh-form-row">
             <div className="dh-form-group">
-              <label className="dh-label">Doctor Full Name *</label>
+              <label className="dh-label">Doctor Full Name</label>
               <input
                 className="dh-input"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
+                value={doctor.name || ''}
+                disabled
               />
             </div>
             <div className="dh-form-group">
               <label className="dh-label">Official Hospital Email</label>
               <input
                 className="dh-input"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
+                value={doctor.email || ''}
                 disabled
               />
             </div>
@@ -90,91 +118,57 @@ function EditDoctorForm({ doctor, onSave, onClose }) {
 
           <div className="dh-form-row">
             <div className="dh-form-group">
-              <label className="dh-label">Status</label>
-              <select
-                className="dh-select"
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-              >
-                <option value="Active">Active (Available)</option>
-                <option value="On Leave">On Leave</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
-            <div className="dh-form-group">
               <label className="dh-label">Contact Phone</label>
               <input
                 className="dh-input"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
+                value={doctor.phone || ''}
+                disabled
               />
             </div>
-          </div>
-
-          <div className="dh-form-row">
             <div className="dh-form-group">
               <label className="dh-label">Specialization</label>
               <input
                 className="dh-input"
-                name="specialization"
-                value={formData.specialization}
-                onChange={handleChange}
+                value={doctor.specialization || ''}
+                disabled
               />
             </div>
+          </div>
+
+          <div className="dh-form-row">
             <div className="dh-form-group">
               <label className="dh-label">Qualifications</label>
               <input
                 className="dh-input"
-                name="qualification"
-                value={formData.qualification}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          <div className="dh-form-row">
-            <div className="dh-form-group">
-              <label className="dh-label">Allocated OPD Room</label>
-              <input
-                className="dh-input"
-                name="room"
-                value={formData.room}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="dh-form-group">
-              <label className="dh-label">OPD Shift Schedule</label>
-              <input
-                className="dh-input"
-                name="schedule"
-                value={formData.schedule}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          <div className="dh-form-row">
-            <div className="dh-form-group">
-              <label className="dh-label">Max Daily Consultation Capacity</label>
-              <input
-                type="number"
-                className="dh-input"
-                name="maxCapacity"
-                value={formData.maxCapacity}
-                onChange={handleChange}
-                min="5"
-                max="50"
+                value={doctor.qualification || ''}
+                disabled
               />
             </div>
             <div className="dh-form-group">
               <label className="dh-label">Clinical Experience</label>
               <input
                 className="dh-input"
-                name="experience"
-                value={formData.experience}
-                onChange={handleChange}
+                value={doctor.experience || ''}
+                disabled
+              />
+            </div>
+          </div>
+
+          <div className="dh-form-row">
+            <div className="dh-form-group">
+              <label className="dh-label">OPD Shift Schedule (Clinician Managed)</label>
+              <input
+                className="dh-input"
+                value={doctor.schedule || ''}
+                disabled
+              />
+            </div>
+            <div className="dh-form-group">
+              <label className="dh-label">Max Consultation Capacity (Clinician Managed)</label>
+              <input
+                className="dh-input"
+                value={doctor.maxCapacity ? `${doctor.maxCapacity} patients / day` : '25 patients / day'}
+                disabled
               />
             </div>
           </div>

@@ -64,7 +64,6 @@ export function DoctorsView({
             >
               <option value="All">All Doctor Statuses</option>
               <option value="Active">Active</option>
-              <option value="On Leave">On Leave</option>
               <option value="Inactive">Inactive</option>
             </select>
           </div>
@@ -165,10 +164,10 @@ export function DoctorsView({
                           </button>
                           <button
                             className={`dh-btn dh-btn-sm ${doc.status === 'Active' ? 'dh-btn-outline' : 'dh-btn-primary'}`}
-                            onClick={() => onToggleStatus(doc.id, doc.status === 'Active' ? 'On Leave' : 'Active')}
-                            title={doc.status === 'Active' ? 'Set On Leave' : 'Set Active'}
+                            onClick={() => onToggleStatus(doc.id, doc.status === 'Active' ? 'Inactive' : 'Active')}
+                            title={doc.status === 'Active' ? 'Deactivate Doctor' : 'Activate Doctor'}
                           >
-                            {doc.status === 'Active' ? 'Set Leave' : 'Set Active'}
+                            {doc.status === 'Active' ? 'Deactivate' : 'Activate'}
                           </button>
                         </div>
                       </td>

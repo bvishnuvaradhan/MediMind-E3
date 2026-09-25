@@ -9,8 +9,6 @@ export function CreateDoctorModal({ isOpen, onClose, onSave, departmentName = 'O
     qualification: 'MBBS, MS (Orthopedics)',
     experience: '5 years',
     room: 'OPD Room 208',
-    schedule: 'Mon, Wed, Fri (09:00 - 15:00)',
-    maxCapacity: 25,
   });
 
   const [error, setError] = useState('');
@@ -32,7 +30,10 @@ export function CreateDoctorModal({ isOpen, onClose, onSave, departmentName = 'O
     setError('');
     setSubmitting(true);
     try {
-      await onSave(formData);
+      await onSave({
+        ...formData,
+        status: 'Active',
+      });
       onClose();
     } catch {
       setError('Failed to provision doctor account.');
@@ -158,24 +159,21 @@ export function CreateDoctorModal({ isOpen, onClose, onSave, departmentName = 'O
 
             <div className="dh-form-row">
               <div className="dh-form-group">
-                <label className="dh-label">Allocated OPD Room</label>
+                <label className="dh-label">Allocated OPD Room *</label>
                 <input
                   className="dh-input"
                   name="room"
                   placeholder="e.g. OPD Room 208"
                   value={formData.room}
                   onChange={handleChange}
+                  required
                 />
+                <span className="dh-input-hint">Assigned consultation room managed by Department Head.</span>
               </div>
-              <div className="dh-form-group">
-                <label className="dh-label">OPD Shift Schedule</label>
-                <input
-                  className="dh-input"
-                  name="schedule"
-                  placeholder="e.g. Mon, Wed, Fri (09:00 - 15:00)"
-                  value={formData.schedule}
-                  onChange={handleChange}
-                />
+              <div className="dh-form-group" style={{ justifyContent: 'center' }}>
+                <div style={{ padding: '10px 12px', backgroundColor: 'var(--dh-soft-bg)', borderRadius: '8px', fontSize: '12px', color: 'var(--dh-text-secondary)', lineHeight: 1.4 }}>
+                  <strong>Clinician-Managed Settings:</strong> OPD Shift Schedule and Consultation Capacity are configured directly by the doctor from their Clinician Portal.
+                </div>
               </div>
             </div>
           </div>

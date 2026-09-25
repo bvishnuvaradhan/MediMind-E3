@@ -244,33 +244,44 @@ export function DashboardView({
               </tr>
             </thead>
             <tbody>
-              {appointments.slice(0, 5).map((apt) => (
-                <tr key={apt.id}>
-                  <td style={{ fontWeight: 700, color: 'var(--dh-primary-light)' }}>{apt.token}</td>
-                  <td>
-                    <div style={{ fontWeight: 600 }}>{apt.patientName}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--dh-text-muted)' }}>{apt.gender}, {apt.age}y</div>
-                  </td>
-                  <td>
-                    <div style={{ fontWeight: 500 }}>{apt.doctorName}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--dh-text-muted)' }}>{apt.room}</div>
-                  </td>
-                  <td>{apt.time}</td>
-                  <td>
-                    <span className="dh-badge dh-badge-draft">{apt.type}</span>
-                  </td>
-                  <td>
-                    <span className="dh-badge dh-badge-completed" style={{ fontSize: '11px' }}>
-                      {apt.aiScreening || 'Screened'}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`dh-badge dh-badge-${apt.status.toLowerCase().replace(' ', '-')}`}>
-                      {apt.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {appointments.slice(0, 5).map((apt) => {
+                const statusStr = apt.status || 'Confirmed';
+                const statusClass = statusStr.toLowerCase().replace(/\s+/g, '-');
+                const tokenText = apt.token || apt.id?.toUpperCase() || 'ORTHO-OPD';
+                const patientLabel = apt.patientRef || apt.patientName || 'Operational Patient Ref';
+
+                return (
+                  <tr key={apt.id}>
+                    <td style={{ fontWeight: 700, color: 'var(--dh-primary-light)', fontFamily: 'monospace' }}>
+                      {tokenText}
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 600 }}>{patientLabel}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--dh-text-muted)' }}>
+                        {apt.gender && apt.age ? `${apt.gender}, ${apt.age}y` : (apt.mode || 'In-Person')}
+                      </div>
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 500 }}>{apt.doctorName || 'Assigned Clinician'}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--dh-text-muted)' }}>{apt.room || 'OPD Room'}</div>
+                    </td>
+                    <td>{apt.time}</td>
+                    <td>
+                      <span className="dh-badge dh-badge-draft">{apt.type}</span>
+                    </td>
+                    <td>
+                      <span className="dh-badge dh-badge-completed" style={{ fontSize: '11px' }}>
+                        {apt.aiScreening || (apt.aiTriaged ? 'AI Triage Complete' : 'Manual Triage')}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`dh-badge dh-badge-${statusClass}`}>
+                        {statusStr}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

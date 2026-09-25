@@ -10,13 +10,14 @@ export function AppointmentsView({
   const [doctorFilter, setDoctorFilter] = useState('All');
 
   const filteredAppointments = appointments.filter((apt) => {
-    const matchesStatus = statusFilter === 'All' || apt.status === statusFilter;
+    const status = apt.status || 'Confirmed';
+    const matchesStatus = statusFilter === 'All' || status === statusFilter;
     const matchesDoctor = doctorFilter === 'All' || apt.doctorId === doctorFilter;
     const q = searchTerm.toLowerCase();
-    const matchesSearch =
-      apt.patientName.toLowerCase().includes(q) ||
-      apt.token.toLowerCase().includes(q) ||
-      apt.doctorName.toLowerCase().includes(q);
+    const patientStr = (apt.patientRef || apt.patientName || '').toLowerCase();
+    const tokenStr = (apt.token || apt.id || '').toLowerCase();
+    const docStr = (apt.doctorName || '').toLowerCase();
+    const matchesSearch = patientStr.includes(q) || tokenStr.includes(q) || docStr.includes(q);
     return matchesStatus && matchesDoctor && matchesSearch;
   });
 
@@ -60,6 +61,7 @@ export function AppointmentsView({
             >
               <option value="All">All Appointment Statuses</option>
               <option value="Confirmed">Confirmed</option>
+              <option value="Scheduled">Scheduled</option>
               <option value="In Progress">In Progress</option>
               <option value="Completed">Completed</option>
               <option value="Cancelled">Cancelled</option>
@@ -107,67 +109,77 @@ export function AppointmentsView({
                   </td>
                 </tr>
               ) : (
-                filteredAppointments.map((apt) => (
-                  <tr key={apt.id}>
-                    <td>
-                      <span style={{ fontWeight: 800, color: 'var(--dh-primary-light)', fontFamily: 'monospace', fontSize: '13px' }}>
-                        {apt.token}
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ fontWeight: 600 }}>{apt.patientName}</div>
-                      <div style={{ fontSize: '11.5px', color: 'var(--dh-text-muted)' }}>
-                        {apt.gender}, {apt.age}y
-                      </div>
-                    </td>
-                    <td>
-                      <div style={{ fontWeight: 600 }}>{apt.doctorName}</div>
-                      <div style={{ fontSize: '11px', color: 'var(--dh-text-muted)' }}>{apt.room}</div>
-                    </td>
-                    <td style={{ fontWeight: 500 }}>{apt.time}</td>
-                    <td>
-                      <span className="dh-badge dh-badge-draft">{apt.type}</span>
-                    </td>
-                    <td>
-                      <span className="dh-badge dh-badge-completed" style={{ fontSize: '11px' }}>
-                        {apt.aiScreening || 'AI Triage Complete'}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`dh-badge dh-badge-${apt.status.toLowerCase().replace(' ', '-')}`}>
-                        {apt.status}
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
-                        {apt.status === 'Confirmed' && (
-                          <button
-                            className="dh-btn dh-btn-primary dh-btn-sm"
-                            onClick={() => onUpdateAppointmentStatus(apt.id, 'In Progress')}
-                          >
-                            Check In
-                          </button>
-                        )}
-                        {apt.status === 'In Progress' && (
-                          <button
-                            className="dh-btn dh-btn-outline dh-btn-sm"
-                            onClick={() => onUpdateAppointmentStatus(apt.id, 'Completed')}
-                          >
-                            Mark Done
-                          </button>
-                        )}
-                        {apt.status !== 'Completed' && apt.status !== 'Cancelled' && (
-                          <button
-                            className="dh-btn dh-btn-danger dh-btn-sm"
-                            onClick={() => onUpdateAppointmentStatus(apt.id, 'Cancelled')}
-                          >
-                            Cancel
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                filteredAppointments.map((apt) => {
+                  const statusStr = apt.status || 'Confirmed';
+                  const statusClass = statusStr.toLowerCase().replace(/\s+/g, '-');
+                  const tokenText = apt.token || apt.id?.toUpperCase() || 'ORTHO-OPD';
+                  const patientLabel = apt.patientRef || apt.patientName || 'Operational Patient Ref';
+
+                  return (
+                    <tr key={apt.id}>
+                      <td>
+                        <span style={{ fontWeight: 800, color: 'var(--dh-primary-light)', fontFamily: 'monospace', fontSize: '13px' }}>
+                          {tokenText}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ fontWeight: 600 }}>{patientLabel}</div>
+                        <div style={{ fontSize: '11.5px', color: 'var(--dh-text-muted)' }}>
+                          {apt.gender && apt.age ? `${apt.gender}, ${apt.age}y` : (apt.mode || 'In-Person')}
+                        </div>
+                      </td>
+                      <td>
+                        <div style={{ fontWeight: 600 }}>{apt.doctorName || 'Assigned Clinician'}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--dh-text-muted)' }}>{apt.room || 'OPD Room'}</div>
+                      </td>
+                      <td style={{ fontWeight: 500 }}>{apt.time}</td>
+                      <td>
+                        <span className="dh-badge dh-badge-draft">{apt.type}</span>
+                      </td>
+                      <td>
+                        <span className="dh-badge dh-badge-completed" style={{ fontSize: '11px' }}>
+                          {apt.aiScreening || (apt.aiTriaged ? 'AI Triage Complete' : 'Manual Triage')}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`dh-badge dh-badge-${statusClass}`}>
+                          {statusStr}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                          {(statusStr === 'Confirmed' || statusStr === 'Scheduled') && (
+                            <button
+                              type="button"
+                              className="dh-btn dh-btn-primary dh-btn-sm"
+                              onClick={() => onUpdateAppointmentStatus(apt.id, 'In Progress')}
+                            >
+                              Check In
+                            </button>
+                          )}
+                          {statusStr === 'In Progress' && (
+                            <button
+                              type="button"
+                              className="dh-btn dh-btn-outline dh-btn-sm"
+                              onClick={() => onUpdateAppointmentStatus(apt.id, 'Completed')}
+                            >
+                              Mark Done
+                            </button>
+                          )}
+                          {statusStr !== 'Completed' && statusStr !== 'Cancelled' && (
+                            <button
+                              type="button"
+                              className="dh-btn dh-btn-danger dh-btn-sm"
+                              onClick={() => onUpdateAppointmentStatus(apt.id, 'Cancelled')}
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
