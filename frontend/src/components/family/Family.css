@@ -711,10 +711,16 @@
 }
 
 .insight-card {
-  position: relative;
   display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: 16px;
   padding: 22px 24px;
+}
+
+.insight-card > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
 }
 
 .insight-icon {
@@ -729,28 +735,27 @@
 }
 
 .insight-copy {
-  max-width: 200px;
   margin: 6px 0 12px;
   color: var(--family-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.5;
+  max-width: 100%;
 }
 
 .insight-ring {
-  position: absolute;
-  right: 24px;
-  top: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 68px;
-  height: 68px;
+  width: 70px;
+  height: 70px;
   border: 6px solid #e0e7ff;
   border-top-color: #6366f1;
   border-right-color: #818cf8;
   border-radius: var(--radius-full);
   color: #312e81;
+  flex-shrink: 0;
+  margin-left: 12px;
 }
 
 .insight-ring span {

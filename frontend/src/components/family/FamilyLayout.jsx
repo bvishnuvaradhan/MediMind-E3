@@ -181,6 +181,37 @@ export function FamilyLayout({ dark, setDark }) {
     }
   };
 
+  const handleDeleteRecord = (recordToDelete) => {
+    setRecords((prev) =>
+      prev.filter(
+        (r) =>
+          r !== recordToDelete &&
+          !(
+            r.type === recordToDelete.type &&
+            r.date === recordToDelete.date &&
+            r.patient === recordToDelete.patient &&
+            (r.title === recordToDelete.title || !r.title)
+          )
+      )
+    );
+    if (recordToDelete.patient) {
+      setFamilyMembers((prev) =>
+        prev.map((m) =>
+          m.name.toLowerCase() === recordToDelete.patient.toLowerCase()
+            ? { ...m, records: Math.max(0, (m.records || 1) - 1) }
+            : m
+        )
+      );
+    }
+    announce(`Medical record "${recordToDelete.title || recordToDelete.type}" removed.`);
+  };
+
+  const handleUpdateMember = (updatedMember) => {
+    setFamilyMembers((prev) =>
+      prev.map((m, idx) => (idx === memberIndex ? updatedMember : m))
+    );
+  };
+
   const handleGrantAccess = (grant) => {
     const exists = doctorAccess.some(
       (entry) =>
@@ -377,6 +408,8 @@ export function FamilyLayout({ dark, setDark }) {
           navigate={navigate}
           announce={announce}
           openFeatureModal={openFeatureModal}
+          onUpdateMember={handleUpdateMember}
+          onDeleteMember={familyMembers.length > 1 ? () => handleDeleteMember(memberIndex) : null}
         />
       );
     }
@@ -403,6 +436,7 @@ export function FamilyLayout({ dark, setDark }) {
           announce={announce}
           openFeatureModal={openFeatureModal}
           onAddRecord={handleAddRecord}
+          onDeleteRecord={handleDeleteRecord}
         />
       );
     }

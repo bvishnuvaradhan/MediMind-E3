@@ -53,7 +53,15 @@ export function PredictionInputModal({
     fracture: {
       title: 'Fracture Detection AI (ResNet-50 CNN)',
       department: 'Orthopedics',
-      relatedDoctor: 'Dr. Rahul Mehta',
+      relatedDoctor: {
+        name: 'Dr. Rahul Mehta',
+        title: 'Dr. Rahul Mehta',
+        role: 'Chief of Orthopedics',
+        department: 'Orthopedics',
+        hospital: 'MediMind Central Hospital',
+        initials: 'RM',
+        tone: 'coral',
+      },
       icon: Activity,
       color: 'coral',
       description: 'Evaluates musculoskeletal X-ray radiographs with Grad-CAM heatmap localization to identify cortical disruptions, hairline fissures, or osteopathic fractures.',
@@ -62,7 +70,15 @@ export function PredictionInputModal({
     diabetes: {
       title: 'Diabetes 3-Year Risk Forecaster (XGBoost)',
       department: 'Diabetology',
-      relatedDoctor: 'Dr. Kavya Shah',
+      relatedDoctor: {
+        name: 'Dr. Kavya Shah',
+        title: 'Dr. Kavya Shah',
+        role: 'Senior Diabetologist & Endocrinologist',
+        department: 'Diabetology',
+        hospital: 'Manipal Hospital, Whitefield',
+        initials: 'KS',
+        tone: 'lilac',
+      },
       icon: Activity,
       color: 'lilac',
       description: 'Predicts 3-year type-2 diabetes onset probability utilizing metabolic biomarkers, glycemic parameters, and patient demographic indicators.',
@@ -71,7 +87,15 @@ export function PredictionInputModal({
     heart: {
       title: 'Cardiovascular Risk Engine (Framingham AI)',
       department: 'Cardiology',
-      relatedDoctor: 'Dr. Ananya Rao',
+      relatedDoctor: {
+        name: 'Dr. Ananya Rao',
+        title: 'Dr. Ananya Rao',
+        role: 'Lead Cardiologist',
+        department: 'Cardiology',
+        hospital: 'Fortis Healthcare, Bannerghatta',
+        initials: 'AR',
+        tone: 'mint',
+      },
       icon: HeartPulse,
       color: 'mint',
       description: 'Computes 5-year atherosclerotic cardiovascular disease (ASCVD) risk profile based on lipid levels, hemodynamics, and lifestyle factors.',
@@ -80,7 +104,15 @@ export function PredictionInputModal({
     general: {
       title: 'General Health Risk Synthesizer',
       department: 'General Medicine',
-      relatedDoctor: 'Dr. Kumar Iyer',
+      relatedDoctor: {
+        name: 'Dr. Kumar Iyer',
+        title: 'Dr. Kumar Iyer',
+        role: 'Senior Consultant - General Medicine',
+        department: 'General Medicine',
+        hospital: 'Apollo Hospitals, Greams Road',
+        initials: 'KI',
+        tone: 'coral',
+      },
       icon: ShieldCheck,
       color: 'yellow',
       description: 'Synthesizes unified family health history, reported clinical symptoms, lifestyle indices, and recent records into a holistic decision-support risk estimate.',
@@ -116,6 +148,7 @@ export function PredictionInputModal({
       }
       attachedDoc = {
         name: uploadedFileName,
+        title: uploadedFileName,
         type: newRec.type,
         date: formattedDate,
         source: 'Uploaded by Family',
@@ -126,6 +159,7 @@ export function PredictionInputModal({
       if (found) {
         attachedDoc = {
           name: `${found.type} (${found.date})`,
+          title: found.title || found.type,
           type: found.type,
           date: found.date,
           source: 'Existing Medical Record',
@@ -140,6 +174,7 @@ export function PredictionInputModal({
       date: formattedDate,
       relatedDoctor: currentConfig.relatedDoctor,
       department: currentConfig.department,
+      attachedDoc: attachedDoc,
       documentUsed: attachedDoc,
     };
 
@@ -245,7 +280,7 @@ export function PredictionInputModal({
           </p>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--family-primary)', fontWeight: '600' }}>
             <span>Patient: {member?.name || 'Father'}</span>
-            <span>Related Specialist: {currentConfig.relatedDoctor} ({currentConfig.department})</span>
+            <span>Related Specialist: {currentConfig.relatedDoctor.name} ({currentConfig.department})</span>
           </div>
         </div>
 
