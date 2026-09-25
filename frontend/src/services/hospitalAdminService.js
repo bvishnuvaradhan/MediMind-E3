@@ -102,9 +102,17 @@ export const hospitalAdminService = {
     return updated;
   },
 
+  async getDepartmentById(deptId) {
+    return departmentsState.find(d => d.id === deptId) || null;
+  },
+
   // --- Department Heads ---
   async getDepartmentHeads() {
     return [...departmentHeadsState];
+  },
+
+  async getDepartmentHeadById(headId) {
+    return departmentHeadsState.find(h => h.id === headId) || null;
   },
 
   async createDepartmentHead(headData) {

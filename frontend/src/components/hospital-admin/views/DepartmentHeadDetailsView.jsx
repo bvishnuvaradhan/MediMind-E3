@@ -7,6 +7,7 @@ import {
   Building2,
   BookOpen,
   Users,
+  ShieldCheck,
 } from 'lucide-react';
 
 export function DepartmentHeadDetailsView({ head, onBack, onToggleStatus }) {
@@ -35,7 +36,7 @@ export function DepartmentHeadDetailsView({ head, onBack, onToggleStatus }) {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}>
         {/* Profile Card */}
         <div className="ha-card-panel" style={{ margin: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
@@ -64,35 +65,47 @@ export function DepartmentHeadDetailsView({ head, onBack, onToggleStatus }) {
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', color: 'var(--ha-text-muted)', fontSize: '11px', fontWeight: 600 }}>
-                <Building2 size={14} /> ASSIGNED CLINICAL DEPARTMENT
-              </div>
-              <div style={{ fontSize: '13px', fontWeight: 700 }}>{head.department}</div>
+          <div className="ha-info-grid">
+            <div className="ha-info-tile">
+              <span className="ha-info-label">
+                <Building2 size={13} /> Assigned Department
+              </span>
+              <span className="ha-info-value">{head.department}</span>
             </div>
 
-            <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', color: 'var(--ha-text-muted)', fontSize: '11px', fontWeight: 600 }}>
-                <GraduationCap size={14} /> MEDICAL QUALIFICATIONS
-              </div>
-              <div style={{ fontSize: '13px', fontWeight: 600 }}>{head.qualification}</div>
+            <div className="ha-info-tile">
+              <span className="ha-info-label">
+                <GraduationCap size={13} /> Qualifications
+              </span>
+              <span className="ha-info-value">{head.qualification}</span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--ha-text-muted)', fontSize: '11px', marginBottom: '4px' }}>
-                  <Phone size={13} /> PHONE
-                </div>
-                <div style={{ fontSize: '12px', fontWeight: 600 }}>{head.phone}</div>
-              </div>
+            <div className="ha-info-tile">
+              <span className="ha-info-label">
+                <Calendar size={13} /> Clinical Experience
+              </span>
+              <span className="ha-info-value">{head.experience}</span>
+            </div>
 
-              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--ha-text-muted)', fontSize: '11px', marginBottom: '4px' }}>
-                  <Mail size={13} /> EMAIL
-                </div>
-                <div style={{ fontSize: '12px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis' }}>{head.email}</div>
-              </div>
+            <div className="ha-info-tile">
+              <span className="ha-info-label">
+                <Calendar size={13} /> Assigned Date
+              </span>
+              <span className="ha-info-value">{head.assignedDate}</span>
+            </div>
+
+            <div className="ha-info-tile">
+              <span className="ha-info-label">
+                <Phone size={13} /> Official Phone
+              </span>
+              <span className="ha-info-value">{head.phone}</span>
+            </div>
+
+            <div className="ha-info-tile">
+              <span className="ha-info-label">
+                <Mail size={13} /> Work Email
+              </span>
+              <span className="ha-info-value" style={{ fontSize: '12px' }}>{head.email}</span>
             </div>
           </div>
         </div>
@@ -133,7 +146,10 @@ export function DepartmentHeadDetailsView({ head, onBack, onToggleStatus }) {
 
           <div className="ha-card-panel" style={{ margin: 0 }}>
             <div className="ha-card-panel-header">
-              <h3>Administrative Authority Scope</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ShieldCheck size={18} style={{ color: 'var(--ha-teal)' }} />
+                <h3>Administrative Authority Scope</h3>
+              </div>
             </div>
             <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--ha-text-secondary)', lineHeight: 1.6 }}>
               <li>Authorized to create and provision Doctor accounts within {head.department}.</li>

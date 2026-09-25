@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import {
   HeartPulse,
   Building2,
@@ -23,6 +23,7 @@ import {
   ShieldCheck,
   ChevronRight,
   Menu,
+  X,
 } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
 import { hospitalAdminService } from '../../services/hospitalAdminService';
@@ -85,14 +86,96 @@ const navItems = [
   ['Settings', 'Settings', Settings],
 ];
 
+const pageToHash = {
+  'Dashboard': 'dashboard',
+  'Hospital Profile': 'hospital-profile',
+  'Departments': 'departments',
+  'Department Heads': 'department-heads',
+  'Department Head Details': 'department-head-details',
+  'Doctors': 'doctors',
+  'Doctor Details': 'doctor-details',
+  'Staff Management': 'staff-management',
+  'Appointments': 'appointments',
+  'Schedules': 'schedules',
+  'Hospital Analytics': 'hospital-analytics',
+  'Department Analytics': 'department-analytics',
+  'AI Analytics': 'ai-analytics',
+  'Reports': 'reports',
+  'Knowledge Activity': 'knowledge-activity',
+  'Activity / Audit': 'activity-audit',
+  'Settings': 'settings',
+};
+
+const hashToPage = Object.fromEntries(
+  Object.entries(pageToHash).map(([page, hash]) => [hash, page])
+);
+
+const getInitialPage = () => {
+  if (typeof window === 'undefined') return 'Dashboard';
+  const hash = window.location.hash.replace('#', '').trim();
+  if (hash && hashToPage[hash]) return hashToPage[hash];
+  const saved = sessionStorage.getItem('medimind_ha_tab');
+  if (saved && pageToHash[saved]) return saved;
+  return 'Dashboard';
+};
+
+const getInitialHeadId = () => {
+  if (typeof window === 'undefined') return null;
+  return sessionStorage.getItem('medimind_ha_head_id') || null;
+};
+
+const getInitialDoctorId = () => {
+  if (typeof window === 'undefined') return null;
+  return sessionStorage.getItem('medimind_ha_doc_id') || null;
+};
+
 export function HospitalAdminLayout({ dark, setDark }) {
   const { user, logout, switchRole } = useAuth();
-  const [currentPage, setCurrentPage] = useState('Dashboard');
+  const [, startTransition] = useTransition();
+
+  const [currentPage, setCurrentPage] = useState(getInitialPage);
   const [toast, setToast] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Selected Detail States
-  const [selectedHead, setSelectedHead] = useState(null);
-  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [selectedHeadId, setSelectedHeadId] = useState(getInitialHeadId);
+  const [selectedDoctorId, setSelectedDoctorId] = useState(getInitialDoctorId);
+
+  // Synchronize state with sessionStorage and URL hash
+  useEffect(() => {
+    sessionStorage.setItem('medimind_ha_tab', currentPage);
+    if (selectedHeadId) {
+      sessionStorage.setItem('medimind_ha_head_id', selectedHeadId);
+    } else {
+      sessionStorage.removeItem('medimind_ha_head_id');
+    }
+    if (selectedDoctorId) {
+      sessionStorage.setItem('medimind_ha_doc_id', selectedDoctorId);
+    } else {
+      sessionStorage.removeItem('medimind_ha_doc_id');
+    }
+
+    const targetHash = pageToHash[currentPage] || 'dashboard';
+    if (window.location.hash !== `#${targetHash}`) {
+      window.history.replaceState(null, '', `#${targetHash}`);
+    }
+  }, [currentPage, selectedHeadId, selectedDoctorId]);
+
+  // Handle browser Back / Forward navigation
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '').trim();
+      if (hash && hashToPage[hash]) {
+        setCurrentPage(hashToPage[hash]);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('popstate', handleHashChange);
+    };
+  }, []);
 
   // Active Modals
   const [showEditHospitalModal, setShowEditHospitalModal] = useState(false);
@@ -120,9 +203,15 @@ export function HospitalAdminLayout({ dark, setDark }) {
   };
 
   const navigate = (page) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    startTransition(() => {
+      setCurrentPage(page);
+      setMobileMenuOpen(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   };
+
+  const selectedHead = departmentHeads.find(h => h.id === selectedHeadId) || departmentHeads[0];
+  const selectedDoctor = doctors.find(d => d.id === selectedDoctorId) || doctors[0];
 
   // --- Handlers ---
   const handleSaveHospitalProfile = async (updatedData) => {
@@ -184,9 +273,6 @@ export function HospitalAdminLayout({ dark, setDark }) {
         await hospitalAdminService.toggleDepartmentHeadStatus(headId);
         const updatedHeads = await hospitalAdminService.getDepartmentHeads();
         setDepartmentHeads(updatedHeads);
-        if (selectedHead && selectedHead.id === headId) {
-          setSelectedHead(updatedHeads.find((h) => h.id === headId));
-        }
         setConfirmModal(null);
         announce(`Updated account status for ${head.name}`);
       },
@@ -206,9 +292,6 @@ export function HospitalAdminLayout({ dark, setDark }) {
         await hospitalAdminService.toggleDoctorStatus(doctorId);
         const updatedDocs = await hospitalAdminService.getDoctors();
         setDoctors(updatedDocs);
-        if (selectedDoctor && selectedDoctor.id === doctorId) {
-          setSelectedDoctor(updatedDocs.find((d) => d.id === doctorId));
-        }
         setConfirmModal(null);
         announce(`Updated clinical privileges for ${doc.name}`);
       },
@@ -293,7 +376,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
           onOpenCreateHead={() => setShowCreateHeadModal(true)}
           onToggleStatus={handleToggleHeadStatus}
           onSelectHead={(head) => {
-            setSelectedHead(head);
+            setSelectedHeadId(head.id);
             navigate('Department Head Details');
           }}
         />
@@ -302,7 +385,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
     if (currentPage === 'Department Head Details') {
       return (
         <DepartmentHeadDetailsView
-          head={selectedHead || departmentHeads[0]}
+          head={selectedHead}
           onBack={() => navigate('Department Heads')}
           onToggleStatus={handleToggleHeadStatus}
         />
@@ -314,7 +397,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
           doctors={doctors}
           departments={departments}
           onSelectDoctor={(doc) => {
-            setSelectedDoctor(doc);
+            setSelectedDoctorId(doc.id);
             navigate('Doctor Details');
           }}
           onToggleStatus={handleToggleDoctorStatus}
@@ -324,7 +407,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
     if (currentPage === 'Doctor Details') {
       return (
         <DoctorDetailsView
-          doctor={selectedDoctor || doctors[0]}
+          doctor={selectedDoctor}
           onBack={() => navigate('Doctors')}
           onToggleStatus={handleToggleDoctorStatus}
         />
@@ -339,11 +422,11 @@ export function HospitalAdminLayout({ dark, setDark }) {
           onToggleHeadStatus={handleToggleHeadStatus}
           onToggleDoctorStatus={handleToggleDoctorStatus}
           onSelectHead={(head) => {
-            setSelectedHead(head);
+            setSelectedHeadId(head.id);
             navigate('Department Head Details');
           }}
           onSelectDoctor={(doc) => {
-            setSelectedDoctor(doc);
+            setSelectedDoctorId(doc.id);
             navigate('Doctor Details');
           }}
           onOpenCreateHead={() => setShowCreateHeadModal(true)}
@@ -429,13 +512,31 @@ export function HospitalAdminLayout({ dark, setDark }) {
 
   return (
     <div className={`ha-shell ${dark ? 'dark-theme' : ''}`}>
+      {/* Mobile Backdrop */}
+      <div
+        className={`ha-sidebar-backdrop ${mobileMenuOpen ? 'open' : ''}`}
+        onClick={() => setMobileMenuOpen(false)}
+      />
+
       {/* Sidebar */}
-      <aside className="ha-sidebar">
-        <div className="ha-brand">
-          <div className="ha-brand-mark">
-            <HeartPulse size={20} />
+      <aside className={`ha-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="ha-brand">
+            <div className="ha-brand-mark">
+              <HeartPulse size={20} />
+            </div>
+            <span>Medi<span>Mind</span></span>
           </div>
-          <span>Medi<span>Mind</span></span>
+          {mobileMenuOpen && (
+            <button
+              className="ha-icon-btn"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{ border: 0, marginRight: '8px' }}
+              aria-label="Close menu"
+            >
+              <X size={18} />
+            </button>
+          )}
         </div>
 
         {/* Hospital Indicator Badge */}
@@ -549,7 +650,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
               className="ha-icon-btn mobile-menu"
-              onClick={() => announce('Navigation menu')}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle navigation menu"
             >
               <Menu size={18} />

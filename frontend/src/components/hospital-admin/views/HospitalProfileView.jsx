@@ -51,61 +51,49 @@ export function HospitalProfileView({ hospital, onEdit }) {
               </p>
             </div>
 
-            <div style={{ padding: '14px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                <MapPin size={16} style={{ color: 'var(--ha-primary)' }} />
-                <strong style={{ fontSize: '12px' }}>Physical Address</strong>
-              </div>
-              <div style={{ fontSize: '13px', color: 'var(--ha-text-secondary)', lineHeight: 1.4 }}>
-                {hospital.address}
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--ha-text-muted)', marginBottom: '4px' }}>
-                  <Phone size={14} />
-                  <span style={{ fontSize: '11px' }}>General Phone</span>
-                </div>
-                <div style={{ fontSize: '12px', fontWeight: 600 }}>{hospital.phone}</div>
+            <div className="ha-info-grid">
+              <div className="ha-info-tile" style={{ gridColumn: 'span 2' }}>
+                <span className="ha-info-label">
+                  <MapPin size={13} /> Physical Address
+                </span>
+                <span className="ha-info-value">{hospital.address}</span>
               </div>
 
-              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-error-bg)', border: '1px solid #fca5a5' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--ha-error)', marginBottom: '4px' }}>
-                  <Phone size={14} />
-                  <span style={{ fontSize: '11px', fontWeight: 700 }}>24/7 Emergency</span>
-                </div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ha-error)' }}>
+              <div className="ha-info-tile">
+                <span className="ha-info-label">
+                  <Phone size={13} /> General Phone
+                </span>
+                <span className="ha-info-value">{hospital.phone}</span>
+              </div>
+
+              <div className="ha-info-tile" style={{ backgroundColor: 'var(--ha-error-bg)', borderColor: '#fca5a5' }}>
+                <span className="ha-info-label" style={{ color: 'var(--ha-error)' }}>
+                  <Phone size={13} /> 24/7 Emergency
+                </span>
+                <span className="ha-info-value" style={{ color: 'var(--ha-error)', fontWeight: 700 }}>
                   {hospital.emergencyPhone}
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--ha-text-muted)', marginBottom: '4px' }}>
-                  <Mail size={14} />
-                  <span style={{ fontSize: '11px' }}>Contact Email</span>
-                </div>
-                <div style={{ fontSize: '12px', fontWeight: 600 }}>{hospital.email}</div>
+                </span>
               </div>
 
-              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--ha-text-muted)', marginBottom: '4px' }}>
-                  <Globe size={14} />
-                  <span style={{ fontSize: '11px' }}>Website</span>
-                </div>
-                <div style={{ fontSize: '12px', fontWeight: 600 }}>{hospital.website}</div>
+              <div className="ha-info-tile">
+                <span className="ha-info-label">
+                  <Mail size={13} /> Contact Email
+                </span>
+                <span className="ha-info-value" style={{ fontSize: '12px' }}>{hospital.email}</span>
               </div>
-            </div>
 
-            <div style={{ padding: '14px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                <Clock size={16} style={{ color: 'var(--ha-teal)' }} />
-                <strong style={{ fontSize: '12px' }}>Hospital Operating Hours</strong>
+              <div className="ha-info-tile">
+                <span className="ha-info-label">
+                  <Globe size={13} /> Website
+                </span>
+                <span className="ha-info-value" style={{ fontSize: '12px' }}>{hospital.website}</span>
               </div>
-              <div style={{ fontSize: '13px', color: 'var(--ha-text-secondary)' }}>
-                {hospital.operatingHours}
+
+              <div className="ha-info-tile" style={{ gridColumn: 'span 2' }}>
+                <span className="ha-info-label">
+                  <Clock size={13} /> Operating Hours
+                </span>
+                <span className="ha-info-value">{hospital.operatingHours}</span>
               </div>
             </div>
           </div>

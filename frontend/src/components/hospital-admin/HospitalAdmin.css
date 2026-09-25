@@ -814,6 +814,47 @@
   gap: 14px;
 }
 
+/* Structured Info Tiles and Grids */
+.ha-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.ha-info-tile {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background-color: var(--ha-bg);
+  border: 1px solid var(--ha-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ha-info-tile.highlight {
+  background-color: var(--ha-soft-bg);
+  border-color: #c7d2fe;
+}
+
+.ha-info-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ha-text-muted);
+}
+
+.ha-info-value {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ha-text-primary);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
 /* Toast */
 .ha-toast {
   position: fixed;
@@ -856,11 +897,24 @@
   transition: width 0.3s ease;
 }
 
+/* Mobile Sidebar Drawer & Backdrop */
+.ha-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 19;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1050px) {
   .ha-sidebar {
     width: 220px;
     flex-basis: 220px;
+  }
+  .ha-main-content {
+    margin-left: 220px;
   }
   .ha-topbar, .ha-page-content {
     padding-left: 20px;
@@ -870,7 +924,23 @@
 
 @media (max-width: 768px) {
   .ha-sidebar {
-    display: none;
+    position: fixed;
+    left: -280px;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    flex-basis: 280px;
+    z-index: 30;
+    transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .ha-sidebar.open {
+    left: 0;
+  }
+  .ha-sidebar-backdrop.open {
+    display: block;
+  }
+  .ha-main-content {
+    margin-left: 0;
   }
   .ha-search-box {
     display: none;
@@ -879,3 +949,4 @@
     grid-template-columns: 1fr;
   }
 }
+

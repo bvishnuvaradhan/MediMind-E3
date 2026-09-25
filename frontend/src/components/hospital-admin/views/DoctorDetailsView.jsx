@@ -9,10 +9,14 @@ import {
   Star,
   Activity,
   CheckCircle,
+  ShieldCheck,
+  User,
 } from 'lucide-react';
 
 export function DoctorDetailsView({ doctor, onBack, onToggleStatus }) {
   if (!doctor) return null;
+
+  const workloadPct = Math.round((doctor.workload / (doctor.maxCapacity || 25)) * 100);
 
   return (
     <div>
@@ -37,7 +41,7 @@ export function DoctorDetailsView({ doctor, onBack, onToggleStatus }) {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}>
         {/* Doctor Summary Card */}
         <div className="ha-card-panel" style={{ margin: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
@@ -71,43 +75,47 @@ export function DoctorDetailsView({ doctor, onBack, onToggleStatus }) {
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--ha-text-muted)', fontSize: '11px', fontWeight: 600, marginBottom: '2px' }}>
-                <Building2 size={13} /> CLINICAL DEPARTMENT
-              </div>
-              <div style={{ fontSize: '13px', fontWeight: 700 }}>{doctor.department}</div>
+          <div className="ha-info-grid">
+            <div className="ha-info-tile">
+              <span className="ha-info-label">
+                <Building2 size={13} /> Clinical Department
+              </span>
+              <span className="ha-info-value">{doctor.department}</span>
             </div>
 
-            <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--ha-text-muted)', fontSize: '11px', fontWeight: 600, marginBottom: '2px' }}>
-                <GraduationCap size={13} /> QUALIFICATIONS & SPECIALTY
-              </div>
-              <div style={{ fontSize: '13px', fontWeight: 600 }}>{doctor.qualification}</div>
-              <span style={{ fontSize: '11px', color: 'var(--ha-primary)' }}>{doctor.specialization}</span>
+            <div className="ha-info-tile">
+              <span className="ha-info-label">
+                <GraduationCap size={13} /> Specialization
+              </span>
+              <span className="ha-info-value">{doctor.specialization}</span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <div style={{ padding: '10px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--ha-text-muted)', fontSize: '11px', marginBottom: '2px' }}>
-                  <Phone size={12} /> PHONE
-                </div>
-                <div style={{ fontSize: '11px', fontWeight: 600 }}>{doctor.phone}</div>
-              </div>
-
-              <div style={{ padding: '10px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--ha-text-muted)', fontSize: '11px', marginBottom: '2px' }}>
-                  <Mail size={12} /> EMAIL
-                </div>
-                <div style={{ fontSize: '11px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis' }}>{doctor.email}</div>
-              </div>
+            <div className="ha-info-tile">
+              <span className="ha-info-label">
+                <User size={13} /> Qualifications
+              </span>
+              <span className="ha-info-value">{doctor.qualification}</span>
             </div>
 
-            <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--ha-text-muted)', fontSize: '11px', fontWeight: 600, marginBottom: '2px' }}>
-                <Clock size={13} /> CONSULTATION SCHEDULE
-              </div>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ha-teal)' }}>{doctor.schedule}</div>
+            <div className="ha-info-tile">
+              <span className="ha-info-label">
+                <Clock size={13} /> Consultation Schedule
+              </span>
+              <span className="ha-info-value">{doctor.schedule}</span>
+            </div>
+
+            <div className="ha-info-tile">
+              <span className="ha-info-label">
+                <Phone size={13} /> Official Phone
+              </span>
+              <span className="ha-info-value">{doctor.phone}</span>
+            </div>
+
+            <div className="ha-info-tile">
+              <span className="ha-info-label">
+                <Mail size={13} /> Work Email
+              </span>
+              <span className="ha-info-value" style={{ fontSize: '12px' }}>{doctor.email}</span>
             </div>
           </div>
         </div>
@@ -151,12 +159,12 @@ export function DoctorDetailsView({ doctor, onBack, onToggleStatus }) {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
                 <span style={{ color: 'var(--ha-text-muted)' }}>Capacity Utilization</span>
-                <strong>{Math.round((doctor.workload / doctor.maxCapacity) * 100)}%</strong>
+                <strong>{workloadPct}%</strong>
               </div>
               <div className="ha-progress-bar-bg">
                 <div
                   className="ha-progress-bar-fill"
-                  style={{ width: `${(doctor.workload / doctor.maxCapacity) * 100}%` }}
+                  style={{ width: `${workloadPct}%` }}
                 />
               </div>
             </div>
@@ -164,7 +172,10 @@ export function DoctorDetailsView({ doctor, onBack, onToggleStatus }) {
 
           <div className="ha-card-panel" style={{ margin: 0 }}>
             <div className="ha-card-panel-header">
-              <h3>Role Isolation & Governance Notice</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ShieldCheck size={18} style={{ color: 'var(--ha-teal)' }} />
+                <h3>Role Isolation & Governance Notice</h3>
+              </div>
             </div>
             <p style={{ margin: 0, fontSize: '12px', color: 'var(--ha-text-secondary)', lineHeight: 1.5 }}>
               Hospital Administrators oversee doctor active status, clinical schedules, and hospital-wide appointment volumes. In accordance with the locked MediMind permission matrix, Hospital Administrators do <strong>not</strong> have access to private patient medical charts, consultation notes, or diagnostic scans.
