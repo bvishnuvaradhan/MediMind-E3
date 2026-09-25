@@ -13,7 +13,6 @@ import {
   CalendarDays,
   Sparkles,
   TrendingUp,
-  BarChart3,
   Award,
   FileText,
   BookOpen,
@@ -44,10 +43,8 @@ import { AppointmentsView } from './views/AppointmentsView';
 import { AiAnalyticsView } from './views/AiAnalyticsView';
 import { PlatformAnalyticsView } from './views/PlatformAnalyticsView';
 import { HospitalPerformanceView } from './views/HospitalPerformanceView';
-import { DepartmentPerformanceView } from './views/DepartmentPerformanceView';
 import { ReportsView } from './views/ReportsView';
 import { KnowledgeActivityView } from './views/KnowledgeActivityView';
-import { AuditLogsView } from './views/AuditLogsView';
 import { SettingsView } from './views/SettingsView';
 
 const pageToHash = {
@@ -58,26 +55,40 @@ const pageToHash = {
   'Departments': 'departments',
   'Doctors': 'doctors',
   'Family Accounts': 'family-accounts',
-  'Appointments': 'appointments',
-  'AI Analytics': 'ai-analytics',
   'Hospital Performance': 'hospital-performance',
-  'Department Performance': 'department-performance',
+  'Platform Appointments Overview': 'appointments',
+  'Appointments': 'appointments',
   'Reports': 'reports',
+  'AI Analytics': 'ai-analytics',
   'Knowledge Activity': 'knowledge-activity',
-  'Audit Logs': 'audit-logs',
   'Settings': 'settings',
 };
 
-const hashToPage = Object.fromEntries(
-  Object.entries(pageToHash).map(([page, hash]) => [hash, page])
-);
+const hashToPage = {
+  dashboard: 'Platform Dashboard',
+  'platform-analytics': 'Platform Analytics',
+  hospitals: 'Hospitals',
+  'hospital-admins': 'Hospital Admins',
+  departments: 'Departments',
+  doctors: 'Doctors',
+  'family-accounts': 'Family Accounts',
+  'hospital-performance': 'Hospital Performance',
+  appointments: 'Platform Appointments Overview',
+  'platform-appointments': 'Platform Appointments Overview',
+  reports: 'Reports',
+  'ai-analytics': 'AI Analytics',
+  'knowledge-activity': 'Knowledge Activity',
+  settings: 'Settings',
+};
 
 const getInitialPage = () => {
   if (typeof window === 'undefined') return 'Platform Dashboard';
   const hash = window.location.hash.replace('#', '').trim();
   if (hash && hashToPage[hash]) return hashToPage[hash];
   const saved = sessionStorage.getItem('medimind_chairman_tab');
-  if (saved && pageToHash[saved]) return saved;
+  if (saved && (pageToHash[saved] || hashToPage[saved])) {
+    return pageToHash[saved] ? saved : hashToPage[saved];
+  }
   return 'Platform Dashboard';
 };
 
@@ -121,7 +132,8 @@ export function ChairmanLayout({ dark, setDark }) {
   };
 
   const navigateTo = (pageName, params = {}) => {
-    setCurrentPage(pageName);
+    const normalizedPage = hashToPage[pageName] || (pageToHash[pageName] ? pageName : 'Platform Dashboard');
+    setCurrentPage(normalizedPage);
     setViewParams(params);
     setMobileMenuOpen(false);
     setProfileOpen(false);
@@ -140,33 +152,21 @@ export function ChairmanLayout({ dark, setDark }) {
     {
       group: 'Network & Workforce',
       items: [
-        { label: 'Hospitals', icon: Building2, badge: 2 },
+        { label: 'Hospitals', icon: Building2 },
         { label: 'Hospital Admins', icon: UserCheck },
         { label: 'Departments', icon: Layers },
         { label: 'Doctors', icon: Stethoscope },
-      ],
-    },
-    {
-      group: 'Platform Users',
-      items: [
         { label: 'Family Accounts', icon: UsersRound },
-        { label: 'Appointments', icon: CalendarDays },
-      ],
-    },
-    {
-      group: 'Clinical AI & Knowledge',
-      items: [
-        { label: 'AI Analytics', icon: Sparkles },
-        { label: 'Knowledge Activity', icon: BookOpen },
       ],
     },
     {
       group: 'Performance & Audit',
       items: [
         { label: 'Hospital Performance', icon: Award },
-        { label: 'Department Performance', icon: BarChart3 },
+        { label: 'Platform Appointments Overview', icon: CalendarDays },
         { label: 'Reports', icon: FileText },
-        { label: 'Audit Logs', icon: Activity },
+        { label: 'AI Analytics', icon: Sparkles },
+        { label: 'Knowledge Activity', icon: BookOpen },
       ],
     },
     {
@@ -196,7 +196,7 @@ export function ChairmanLayout({ dark, setDark }) {
             </span>
             <div className="chairman-badge">
               <Crown size={11} />
-              <span>Chairman Portal</span>
+              <span>Platform Administration</span>
             </div>
           </div>
         </div>
@@ -217,7 +217,9 @@ export function ChairmanLayout({ dark, setDark }) {
               <div className="chairman-nav-title">{g.group}</div>
               {g.items.map((item) => {
                 const Icon = item.icon;
-                const isActive = currentPage === item.label;
+                const isActive =
+                  currentPage === item.label ||
+                  (item.label === 'Platform Appointments Overview' && currentPage === 'Appointments');
                 return (
                   <button
                     key={item.label}
@@ -226,7 +228,6 @@ export function ChairmanLayout({ dark, setDark }) {
                   >
                     <Icon size={17} />
                     <span>{item.label}</span>
-                    {item.badge && !isActive && <span className="nav-count-badge">{item.badge}</span>}
                   </button>
                 );
               })}
@@ -417,8 +418,14 @@ export function ChairmanLayout({ dark, setDark }) {
           {currentPage === 'Platform Dashboard' && (
             <PlatformDashboard onNavigate={navigateTo} announce={announce} />
           )}
+          {currentPage === 'Platform Analytics' && <PlatformAnalyticsView />}
           {currentPage === 'Hospitals' && (
-            <HospitalsView initialTab={viewParams.tab || 'hospitals'} announce={announce} />
+            <HospitalsView
+              initialTab={viewParams.tab || 'hospitals'}
+              initialHospitalId={viewParams.hospitalId || null}
+              initialDeptId={viewParams.deptId || null}
+              announce={announce}
+            />
           )}
           {currentPage === 'Hospital Admins' && (
             <HospitalAdminsView initialAction={viewParams.action || null} announce={announce} />
@@ -426,14 +433,13 @@ export function ChairmanLayout({ dark, setDark }) {
           {currentPage === 'Departments' && <DepartmentsView onNavigate={navigateTo} />}
           {currentPage === 'Doctors' && <DoctorsView />}
           {currentPage === 'Family Accounts' && <FamilyAccountsView />}
-          {currentPage === 'Appointments' && <AppointmentsView />}
-          {currentPage === 'AI Analytics' && <AiAnalyticsView />}
-          {currentPage === 'Platform Analytics' && <PlatformAnalyticsView />}
           {currentPage === 'Hospital Performance' && <HospitalPerformanceView />}
-          {currentPage === 'Department Performance' && <DepartmentPerformanceView />}
+          {(currentPage === 'Platform Appointments Overview' || currentPage === 'Appointments') && (
+            <AppointmentsView />
+          )}
           {currentPage === 'Reports' && <ReportsView announce={announce} />}
+          {currentPage === 'AI Analytics' && <AiAnalyticsView />}
           {currentPage === 'Knowledge Activity' && <KnowledgeActivityView />}
-          {currentPage === 'Audit Logs' && <AuditLogsView />}
           {currentPage === 'Settings' && <SettingsView announce={announce} />}
         </main>
       </div>

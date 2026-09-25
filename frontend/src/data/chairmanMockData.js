@@ -120,6 +120,7 @@ export const initialHospitalAdmins = [
 export const initialDepartments = [
   {
     id: 'DEP-ORTHO',
+    hospitalId: 'HOSP-001',
     name: 'Orthopedics',
     icon: 'Bone',
     headName: 'Dr. Priya Nair',
@@ -135,6 +136,7 @@ export const initialDepartments = [
   },
   {
     id: 'DEP-DIAB',
+    hospitalId: 'HOSP-001',
     name: 'Diabetology',
     icon: 'Stethoscope',
     headName: 'Dr. Arun Verma',
@@ -150,6 +152,7 @@ export const initialDepartments = [
   },
   {
     id: 'DEP-CARD',
+    hospitalId: 'HOSP-001',
     name: 'Cardiology',
     icon: 'HeartPulse',
     headName: 'Dr. Meera Sundaram',
@@ -169,6 +172,7 @@ export const initialDoctors = [
   // Orthopedics (3 doctors)
   {
     id: 'DOC-ORTHO-1',
+    hospitalId: 'HOSP-001',
     name: 'Dr. Priya Nair',
     department: 'Orthopedics',
     hospital: 'MediMind Central Hospital',
@@ -184,6 +188,7 @@ export const initialDoctors = [
   },
   {
     id: 'DOC-ORTHO-2',
+    hospitalId: 'HOSP-001',
     name: 'Dr. Rahul Mehta',
     department: 'Orthopedics',
     hospital: 'MediMind Central Hospital',
@@ -199,6 +204,7 @@ export const initialDoctors = [
   },
   {
     id: 'DOC-ORTHO-3',
+    hospitalId: 'HOSP-001',
     name: 'Dr. Vikram Rao',
     department: 'Orthopedics',
     hospital: 'MediMind Central Hospital',
@@ -215,6 +221,7 @@ export const initialDoctors = [
   // Diabetology (3 doctors)
   {
     id: 'DOC-DIAB-1',
+    hospitalId: 'HOSP-001',
     name: 'Dr. Arun Verma',
     department: 'Diabetology',
     hospital: 'MediMind Central Hospital',
@@ -230,6 +237,7 @@ export const initialDoctors = [
   },
   {
     id: 'DOC-DIAB-2',
+    hospitalId: 'HOSP-001',
     name: 'Dr. Kavya Shah',
     department: 'Diabetology',
     hospital: 'MediMind Central Hospital',
@@ -245,6 +253,7 @@ export const initialDoctors = [
   },
   {
     id: 'DOC-DIAB-3',
+    hospitalId: 'HOSP-001',
     name: 'Dr. Sneha Patil',
     department: 'Diabetology',
     hospital: 'MediMind Central Hospital',
@@ -261,6 +270,7 @@ export const initialDoctors = [
   // Cardiology (3 doctors)
   {
     id: 'DOC-CARD-1',
+    hospitalId: 'HOSP-001',
     name: 'Dr. Meera Sundaram',
     department: 'Cardiology',
     hospital: 'MediMind Central Hospital',
@@ -276,6 +286,7 @@ export const initialDoctors = [
   },
   {
     id: 'DOC-CARD-2',
+    hospitalId: 'HOSP-001',
     name: 'Dr. Ananya Rao',
     department: 'Cardiology',
     hospital: 'MediMind Central Hospital',
@@ -291,6 +302,7 @@ export const initialDoctors = [
   },
   {
     id: 'DOC-CARD-3',
+    hospitalId: 'HOSP-001',
     name: 'Dr. Kumar Iyer',
     department: 'Cardiology',
     hospital: 'MediMind Central Hospital',
@@ -667,3 +679,39 @@ export const initialPlatformSettings = {
     weeklyPlatformDigest: true,
   },
 };
+
+export const initialAppointmentAnalytics = {
+  totalAppointments: 128,
+  currentMonthName: 'September 2026',
+  currentMonthVolume: 128,
+  previousMonthName: 'August 2026',
+  previousMonthVolume: 104,
+  absoluteGrowth: 24,
+  percentageGrowth: 23.08,
+  completedVolume: 96,
+  completionRate: '75.0%',
+  scheduledVolume: 24,
+  scheduledRate: '18.8%',
+  cancelledVolume: 8,
+  cancellationRate: '6.2%',
+  historicalMonthlyTrends: [
+    { month: 'May 2026', volume: 62, completed: 48, scheduled: 9, cancelled: 5 },
+    { month: 'Jun 2026', volume: 78, completed: 60, scheduled: 12, cancelled: 6 },
+    { month: 'Jul 2026', volume: 91, completed: 70, scheduled: 15, cancelled: 6 },
+    { month: 'Aug 2026', volume: 104, completed: 80, scheduled: 18, cancelled: 6 },
+    { month: 'Sep 2026', volume: 128, completed: 96, scheduled: 24, cancelled: 8 },
+  ],
+  departmentThroughput: [
+    { department: 'Orthopedics', count: 48, percentage: 37.5, color: '#4338ca', doctorsCount: 3, avgPerDoctor: 16.0 },
+    { department: 'Diabetology', count: 42, percentage: 32.8, color: '#0f766e', doctorsCount: 3, avgPerDoctor: 14.0 },
+    { department: 'Cardiology', count: 38, percentage: 29.7, color: '#db2777', doctorsCount: 3, avgPerDoctor: 12.7 },
+  ],
+  consultationModeDistribution: [
+    { mode: 'In-person Visit', count: 74, percentage: 57.8, color: '#2563eb' },
+    { mode: 'Video Teleconsultation', count: 34, percentage: 26.6, color: '#0f766e' },
+    { mode: 'Audio Consultation', count: 20, percentage: 15.6, color: '#d97706' },
+  ],
+  utilizationRate: '91.4%',
+  averageConsultationsPerSpecialist: 14.2,
+};
+

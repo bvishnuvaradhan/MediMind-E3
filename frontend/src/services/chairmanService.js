@@ -11,6 +11,7 @@ import {
   initialDoctors,
   initialFamilyAccounts,
   initialAppointmentsLedger,
+  initialAppointmentAnalytics,
   initialAiAnalytics,
   initialKnowledgeActivity,
   initialAuditLogs,
@@ -26,6 +27,7 @@ let departments = [...initialDepartments];
 let doctors = [...initialDoctors];
 let familyAccounts = [...initialFamilyAccounts];
 let appointmentsLedger = [...initialAppointmentsLedger];
+let appointmentAnalytics = { ...initialAppointmentAnalytics };
 let aiAnalytics = { ...initialAiAnalytics };
 let knowledgeArticles = [...initialKnowledgeActivity];
 let auditLogs = [...initialAuditLogs];
@@ -232,20 +234,35 @@ export const chairmanService = {
   },
 
   // Departments
-  getDepartments: async () => {
-    return [...departments];
+  getDepartments: async (hospitalId = 'All') => {
+    if (!hospitalId || hospitalId === 'All') return [...departments];
+    return departments.filter(d => d.hospitalId === hospitalId || d.hospitalName === hospitalId);
+  },
+
+  getDepartmentsByHospitalId: async (hospitalId) => {
+    if (!hospitalId || hospitalId === 'All') return [...departments];
+    return departments.filter(d => d.hospitalId === hospitalId || d.hospitalName === hospitalId);
   },
 
   // Doctors (Administrative workforce overview, strictly NO patient records)
-  getDoctors: async (search = '', departmentFilter = 'All') => {
+  getDoctors: async (search = '', departmentFilter = 'All', hospitalFilter = 'All') => {
     return doctors.filter(doc => {
       const matchSearch = search ? (
         doc.name.toLowerCase().includes(search.toLowerCase()) ||
         doc.specialization.toLowerCase().includes(search.toLowerCase()) ||
         doc.department.toLowerCase().includes(search.toLowerCase())
       ) : true;
-      const matchDept = departmentFilter === 'All' ? true : doc.department === departmentFilter;
-      return matchSearch && matchDept;
+      const matchDept = (!departmentFilter || departmentFilter === 'All') ? true : doc.department === departmentFilter;
+      const matchHosp = (!hospitalFilter || hospitalFilter === 'All') ? true : (doc.hospitalId === hospitalFilter || doc.hospital === hospitalFilter);
+      return matchSearch && matchDept && matchHosp;
+    });
+  },
+
+  getDoctorsByDepartmentAndHospital: async (departmentName, hospitalId) => {
+    return doctors.filter(doc => {
+      const matchDept = !departmentName || departmentName === 'All' || doc.department.toLowerCase() === departmentName.toLowerCase();
+      const matchHosp = !hospitalId || hospitalId === 'All' || doc.hospitalId === hospitalId || doc.hospital === hospitalId;
+      return matchDept && matchHosp;
     });
   },
 
@@ -261,7 +278,12 @@ export const chairmanService = {
     );
   },
 
-  // Appointments (Operational ledger)
+  // Platform Aggregate Appointments Overview (Zero patient rows)
+  getAppointmentAnalytics: async () => {
+    return { ...appointmentAnalytics };
+  },
+
+  // Appointments (Operational ledger - backwards compatible helper)
   getAppointmentsLedger: async (filters = {}) => {
     let result = [...appointmentsLedger];
     if (filters.department && filters.department !== 'All') {

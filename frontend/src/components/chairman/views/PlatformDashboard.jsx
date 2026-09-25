@@ -8,7 +8,6 @@ import {
   UsersRound,
   Sparkles,
   CalendarDays,
-  Activity,
   ArrowUpRight,
   ShieldCheck,
   Clock,
@@ -339,12 +338,12 @@ export function PlatformDashboard({ onNavigate }) {
           <button
             className="secondary-button"
             style={{ padding: '14px', justifyContent: 'flex-start', gap: '10px' }}
-            onClick={() => onNavigate('Audit Logs')}
+            onClick={() => onNavigate('Appointments')}
           >
-            <Activity size={18} color="#d97706" />
+            <CalendarDays size={18} color="#d97706" />
             <div style={{ textAlign: 'left' }}>
-              <strong style={{ display: 'block', fontSize: '12px' }}>System Audit Logs</strong>
-              <small style={{ color: 'var(--chair-muted)', fontSize: '10px' }}>Microservice security trails</small>
+              <strong style={{ display: 'block', fontSize: '12px' }}>Appointments Overview</strong>
+              <small style={{ color: 'var(--chair-muted)', fontSize: '10px' }}>Aggregate scheduling metrics</small>
             </div>
           </button>
         </div>
