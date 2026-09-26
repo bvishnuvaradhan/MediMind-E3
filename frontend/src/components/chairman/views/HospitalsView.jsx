@@ -42,6 +42,7 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
   const [doctorSearch, setDoctorSearch] = useState('');
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedRequestForModal, setSelectedRequestForModal] = useState(null);
   const [actionConfirm, setActionConfirm] = useState(null); // { type: 'approve'|'reject', request }
 
   // New hospital form state
@@ -410,26 +411,36 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
                         </div>
                       </div>
 
-                      {req.status === 'Pending' && (
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <button
-                            className="primary-button"
-                            style={{ background: '#16a34a' }}
-                            onClick={() => setActionConfirm({ type: 'approve', request: req })}
-                          >
-                            <CheckCircle size={15} />
-                            <span>Approve</span>
-                          </button>
-                          <button
-                            className="secondary-button"
-                            style={{ color: '#dc2626', borderColor: '#fca5a5' }}
-                            onClick={() => setActionConfirm({ type: 'reject', request: req })}
-                          >
-                            <XCircle size={15} />
-                            <span>Reject</span>
-                          </button>
-                        </div>
-                      )}
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <button
+                          className="secondary-button"
+                          style={{ fontSize: '12px', padding: '7px 12px' }}
+                          onClick={() => setSelectedRequestForModal(req)}
+                        >
+                          <Eye size={14} />
+                          <span>View Details</span>
+                        </button>
+                        {req.status === 'Pending' && (
+                          <>
+                            <button
+                              className="primary-button"
+                              style={{ background: '#16a34a', fontSize: '12px', padding: '7px 12px' }}
+                              onClick={() => setActionConfirm({ type: 'approve', request: req })}
+                            >
+                              <CheckCircle size={14} />
+                              <span>Approve</span>
+                            </button>
+                            <button
+                              className="secondary-button"
+                              style={{ color: '#dc2626', borderColor: '#fca5a5', fontSize: '12px', padding: '7px 12px' }}
+                              onClick={() => setActionConfirm({ type: 'reject', request: req })}
+                            >
+                              <XCircle size={14} />
+                              <span>Reject</span>
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
 
                     <div
@@ -999,6 +1010,152 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
               <button className="primary-button" onClick={() => setSelectedDoctorModal(null)}>
                 Close Profile
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Request Details Modal */}
+      {selectedRequestForModal && (
+        <div className="modal-overlay" onClick={() => setSelectedRequestForModal(null)}>
+          <div className="modal-dialog" style={{ maxWidth: '640px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div
+                  style={{
+                    display: 'grid',
+                    placeItems: 'center',
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '10px',
+                    background: '#fef3c7',
+                    color: '#d97706',
+                  }}
+                >
+                  <Clock size={20} />
+                </div>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: '18px' }}>{selectedRequestForModal.name}</h2>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--chair-muted)' }}>
+                      ID: {selectedRequestForModal.id} · Submitted {selectedRequestForModal.submittedDate}
+                    </span>
+                    <span className={`badge badge-${selectedRequestForModal.status.toLowerCase()}`}>
+                      {selectedRequestForModal.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <button className="close-form" onClick={() => setSelectedRequestForModal(null)}>
+                <X size={16} />
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '13px', margin: '16px 0' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', background: 'var(--chair-bg)', padding: '14px', borderRadius: '10px' }}>
+                <div>
+                  <span style={{ color: 'var(--chair-muted)', fontSize: '11px', display: 'block' }}>FACILITY TYPE</span>
+                  <strong>{selectedRequestForModal.type}</strong>
+                </div>
+                <div>
+                  <span style={{ color: 'var(--chair-muted)', fontSize: '11px', display: 'block' }}>PROPOSED BED CAPACITY</span>
+                  <strong>{selectedRequestForModal.bedCapacity} Beds</strong>
+                </div>
+                <div>
+                  <span style={{ color: 'var(--chair-muted)', fontSize: '11px', display: 'block' }}>ACCREDITATION</span>
+                  <strong>{selectedRequestForModal.accreditation || 'NABH Certified'}</strong>
+                </div>
+                <div>
+                  <span style={{ color: 'var(--chair-muted)', fontSize: '11px', display: 'block' }}>HEALTHCARE LICENSE</span>
+                  <strong>{selectedRequestForModal.licenseNumber || 'Verified State Registration'}</strong>
+                </div>
+              </div>
+
+              <div>
+                <span style={{ color: 'var(--chair-muted)', fontSize: '11px', display: 'block', marginBottom: '4px' }}>FACILITY LOCATION & ADDRESS</span>
+                <p style={{ margin: 0, color: 'var(--chair-ink)' }}>
+                  {selectedRequestForModal.address}, {selectedRequestForModal.city}, {selectedRequestForModal.state}
+                </p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <span style={{ color: 'var(--chair-muted)', fontSize: '11px', display: 'block' }}>PRIMARY CONTACT</span>
+                  <strong>{selectedRequestForModal.contactPerson}</strong>
+                  <div style={{ fontSize: '12px', color: 'var(--chair-muted)' }}>{selectedRequestForModal.contactRole}</div>
+                </div>
+                <div>
+                  <span style={{ color: 'var(--chair-muted)', fontSize: '11px', display: 'block' }}>COMMUNICATION</span>
+                  <div style={{ fontSize: '12px', color: 'var(--chair-ink)' }}>{selectedRequestForModal.email}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--chair-muted)' }}>{selectedRequestForModal.phone}</div>
+                </div>
+              </div>
+
+              <div>
+                <span style={{ color: 'var(--chair-muted)', fontSize: '11px', display: 'block', marginBottom: '6px' }}>REQUESTED CLINICAL DEPARTMENTS</span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {selectedRequestForModal.requestedDepartments?.map((dept) => (
+                    <span
+                      key={dept}
+                      style={{
+                        padding: '4px 10px',
+                        background: 'var(--chair-card)',
+                        border: '1px solid var(--chair-border)',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        color: 'var(--chair-sapphire)',
+                      }}
+                    >
+                      {dept}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {selectedRequestForModal.notes && (
+                <div style={{ background: '#f8fafc', border: '1px solid var(--chair-border)', borderRadius: '8px', padding: '12px' }}>
+                  <span style={{ color: 'var(--chair-muted)', fontSize: '11px', display: 'block', marginBottom: '4px' }}>APPLICATION JUSTIFICATION</span>
+                  <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--chair-ink)', lineHeight: 1.5 }}>
+                    {selectedRequestForModal.notes}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <button className="secondary-button" onClick={() => setSelectedRequestForModal(null)}>
+                Close
+              </button>
+
+              {selectedRequestForModal.status === 'Pending' && (
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    className="secondary-button"
+                    style={{ color: '#dc2626', borderColor: '#fca5a5' }}
+                    onClick={() => {
+                      const req = selectedRequestForModal;
+                      setSelectedRequestForModal(null);
+                      setActionConfirm({ type: 'reject', request: req });
+                    }}
+                  >
+                    <XCircle size={15} />
+                    <span>Reject Request</span>
+                  </button>
+                  <button
+                    className="primary-button"
+                    style={{ background: '#16a34a' }}
+                    onClick={() => {
+                      const req = selectedRequestForModal;
+                      setSelectedRequestForModal(null);
+                      setActionConfirm({ type: 'approve', request: req });
+                    }}
+                  >
+                    <CheckCircle size={15} />
+                    <span>Approve & Onboard</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

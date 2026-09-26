@@ -213,6 +213,58 @@ export const hospitals = [
 ];
 
 // ==========================================
+// 2.5. PENDING HOSPITAL ONBOARDING REQUESTS (EXACTLY 2 PENDING)
+// ==========================================
+export const hospitalRequests = [
+  {
+    id: 'REQ-HOSP-001',
+    name: 'Aster Prime Healthcare',
+    type: 'Tertiary Care & Super-Specialty Hospital',
+    city: 'Hyderabad',
+    state: 'Telangana',
+    country: 'India',
+    address: 'Plot 4, HITEC City Main Rd, Madhapur, Hyderabad, Telangana 500081',
+    contactPerson: 'Dr. Ramesh Naidu',
+    contactRole: 'Medical Director & Chief of Surgery',
+    phone: '+91 40 4969 1100',
+    emergencyPhone: '+91 40 4969 1199',
+    email: 'ramesh.naidu@asterprime.health',
+    requestedDepartments: ['Orthopedics', 'Cardiology', 'General Medicine', 'Neurology'],
+    bedCapacity: 350,
+    accreditation: 'NABH Certified & ISO 9001:2015',
+    facilityLevel: 'Tertiary Care Super-Specialty Center',
+    establishedYear: 2018,
+    licenseNumber: 'TS-MED-HOSP-2018-0941',
+    notes: 'Applying for MediMind Platform integration with focus on automated fracture triage and interventional cardiology telemetry.',
+    status: 'Pending',
+    submittedDate: '22 Sep 2026',
+  },
+  {
+    id: 'REQ-HOSP-002',
+    name: 'Fortis Memorial Health Institute',
+    type: 'Multi-Specialty Research & Clinical Hospital',
+    city: 'Bengaluru',
+    state: 'Karnataka',
+    country: 'India',
+    address: '154/9 Bannerghatta Main Rd, Opp IIMB, Bengaluru, Karnataka 560076',
+    contactPerson: 'Dr. Ananya Sen',
+    contactRole: 'Chief Operating Officer & Head of Clinical Operations',
+    phone: '+91 80 6621 4400',
+    emergencyPhone: '+91 80 6621 4499',
+    email: 'ananya.sen@fortishealth.in',
+    requestedDepartments: ['Cardiology', 'Diabetology & Endocrinology', 'Pediatrics & Neonatology'],
+    bedCapacity: 420,
+    accreditation: 'JCI & NABH Accredited',
+    facilityLevel: 'Quaternary Care & Research Institute',
+    establishedYear: 2016,
+    licenseNumber: 'KA-MED-HOSP-2016-0428',
+    notes: 'Seeking platform onboarding for cross-hospital referral connectivity, diabetic renal protocol synchronization, and cardiac telemetry.',
+    status: 'Pending',
+    submittedDate: '24 Sep 2026',
+  },
+];
+
+// ==========================================
 // 3. HOSPITAL ADMINS (6 TOTAL: H1=2, H2=1, H3=3)
 // ==========================================
 export const hospitalAdmins = [
@@ -4692,6 +4744,16 @@ export function validateCentralDataset() {
     }
   });
 
+  // Hospital Requests Validation
+  if (hospitalRequests.length !== 2) {
+    summary.errors.push(`Must have exactly 2 hospital onboarding requests, found ${hospitalRequests.length}`);
+  }
+  hospitalRequests.forEach(req => {
+    if (!req.id || !req.name || !req.city || !req.contactPerson || !req.email) {
+      summary.errors.push(`Hospital Request ${req.id || 'unknown'} is missing required fields`);
+    }
+  });
+
   return {
     valid: summary.errors.length === 0,
     summary,
@@ -4712,6 +4774,7 @@ export const initialPlatformSummary = {
   totalDoctors: doctors.length,
   totalFamilyAccounts: families.length,
   totalFamilyMembers: familyMembers.length,
+  pendingHospitalRequests: hospitalRequests.filter(r => r.status === 'Pending').length,
   totalAppointments: 570,
   completedAppointments: 428,
   upcomingAppointments: 108,
@@ -4727,7 +4790,7 @@ export const initialPlatformSummary = {
 };
 
 export const initialHospitals = hospitals;
-export const initialHospitalRequests = [];
+export const initialHospitalRequests = hospitalRequests;
 export const initialHospitalAdmins = hospitalAdmins;
 export const initialDepartments = departments;
 export const initialDoctors = doctors;
@@ -5160,6 +5223,7 @@ export const initialPresentationData = {
 export const medimindDataset = {
   aiModules,
   hospitals,
+  hospitalRequests,
   hospitalAdmins,
   departments,
   departmentHeads,
