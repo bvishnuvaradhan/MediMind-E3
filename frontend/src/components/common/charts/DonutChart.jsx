@@ -120,7 +120,7 @@ export function DonutChart({
                 fontSize="10"
                 fontWeight="600"
                 fill="currentColor"
-                opacity={0.6}
+                opacity={0.65}
               >
                 {hoveredIndex !== null
                   ? `${slices[hoveredIndex].percentage}%`
@@ -129,6 +129,32 @@ export function DonutChart({
             </g>
           )}
         </svg>
+
+        {/* Slice Tooltip for Pie Mode */}
+        {isPie && hoveredIndex !== null && slices[hoveredIndex] && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '4px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: '#0f172a',
+              color: '#f8fafc',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              fontSize: '11px',
+              boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)',
+              pointerEvents: 'none',
+              zIndex: 50,
+              whiteSpace: 'nowrap',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+            }}
+          >
+            <span style={{ color: '#94a3b8' }}>{slices[hoveredIndex].label}: </span>
+            <strong style={{ color: '#ffffff' }}>{slices[hoveredIndex].val}</strong>
+            <span style={{ color: '#38bdf8', marginLeft: '4px' }}>({slices[hoveredIndex].percentage}%)</span>
+          </div>
+        )}
       </div>
 
       {showLegend && (

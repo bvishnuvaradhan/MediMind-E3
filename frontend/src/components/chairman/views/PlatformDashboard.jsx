@@ -243,15 +243,17 @@ export function PlatformDashboard({ onNavigate }) {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {(() => {
-              const fRuns = aiData.modules?.fracture?.totalRuns || 31;
-              const dRuns = aiData.modules?.diabetes?.totalRuns || 28;
-              const hRuns = aiData.modules?.heartDisease?.totalRuns || 32;
-              const total = fRuns + dRuns + hRuns;
+              const fRuns = aiData.modules?.fracture?.totalRuns || 165;
+              const dRuns = aiData.modules?.diabetes?.totalRuns || 142;
+              const hRuns = aiData.modules?.heartDisease?.totalRuns || 138;
+              const gRuns = aiData.modules?.generalHealth?.totalRuns || 95;
+              const total = fRuns + dRuns + hRuns + gRuns;
 
               const chartData = [
                 { label: 'Fracture Detection (CNN)', value: fRuns, color: '#2563eb' },
                 { label: 'Diabetes Risk (ML)', value: dRuns, color: '#0f766e' },
                 { label: 'Heart Disease Risk (ML)', value: hRuns, color: '#4338ca' },
+                { label: 'General Health (NLP)', value: gRuns, color: '#d97706' },
               ];
 
               return (

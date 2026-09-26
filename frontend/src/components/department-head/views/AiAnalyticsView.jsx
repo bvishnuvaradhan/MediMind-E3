@@ -154,17 +154,17 @@ export function AiAnalyticsView({ analytics }) {
           </div>
 
           <RadarChart
-            metrics={['Accuracy', 'Sensitivity', 'Specificity', 'Latency', 'Uptime']}
+            metrics={['Accuracy', 'Sensitivity', 'Specificity', 'F1-Score', 'Uptime']}
             size={200}
             data={[
               {
                 name: 'ResNet50-Ortho-v2.4',
                 values: [
-                  parseFloat(aiData.accuracy) || 97.4,
-                  parseFloat(aiData.sensitivity) || 96.8,
-                  parseFloat(aiData.specificity) || 98.1,
-                  94, // latency score
-                  parseFloat(aiData.uptime) || 99.98,
+                  parseFloat(aiData.accuracy) || 98.4,
+                  parseFloat(aiData.sensitivity) || 98.1,
+                  parseFloat(aiData.specificity) || 98.8,
+                  97.5, // F1-Score / Precision %
+                  parseFloat(aiData.uptime) || 99.9,
                 ],
                 color: '#2563eb',
               },

@@ -157,6 +157,31 @@ export function BarChart({
             );
           })}
         </svg>
+
+        {/* Horizontal Tooltip */}
+        {hoveredItem && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '4px',
+              right: '12px',
+              backgroundColor: '#0f172a',
+              color: '#f8fafc',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              fontSize: '11.5px',
+              boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
+              pointerEvents: 'none',
+              zIndex: 50,
+              whiteSpace: 'nowrap',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+            }}
+          >
+            <span style={{ color: '#94a3b8', marginRight: '6px' }}>{hoveredItem.label}:</span>
+            <strong style={{ color: '#ffffff' }}>{hoveredItem.val}</strong>
+            <span style={{ color: '#cbd5e1', marginLeft: '4px' }}>({hoveredItem.sName})</span>
+          </div>
+        )}
       </div>
     );
   }
@@ -368,25 +393,25 @@ export function BarChart({
         <div
           style={{
             position: 'absolute',
-            top: 0,
-            left: `${Math.min(80, Math.max(15, (hoveredItem.x / chartWidth) * 100))}%`,
+            top: '8px',
+            left: `${Math.min(82, Math.max(18, (hoveredItem.x / chartWidth) * 100))}%`,
             transform: 'translateX(-50%)',
-            backgroundColor: 'var(--chair-card, #1e293b)',
-            color: '#ffffff',
-            padding: '6px 10px',
-            borderRadius: '6px',
-            fontSize: '11px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            backgroundColor: '#0f172a',
+            color: '#f8fafc',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            fontSize: '11.5px',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
             pointerEvents: 'none',
-            zIndex: 10,
+            zIndex: 50,
             whiteSpace: 'nowrap',
-            border: '1px solid rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
           }}
         >
-          <div style={{ fontWeight: 700, opacity: 0.85 }}>{hoveredItem.label}</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-            <span>{hoveredItem.sName}:</span>
-            <strong>{hoveredItem.val}</strong>
+          <div style={{ fontWeight: 700, color: '#94a3b8', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{hoveredItem.label}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+            <span style={{ color: '#cbd5e1' }}>{hoveredItem.sName}:</span>
+            <strong style={{ color: '#ffffff', fontSize: '12px' }}>{hoveredItem.val}</strong>
           </div>
         </div>
       )}

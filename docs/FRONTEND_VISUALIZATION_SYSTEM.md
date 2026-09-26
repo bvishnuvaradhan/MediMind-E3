@@ -12,7 +12,9 @@ The MediMind Data Visualization System is a purpose-built, responsive, pure-SVG 
 ### Core Architectural Principles
 1. **Data-Driven Semantic Mapping**: Every visualization is chosen based on the underlying mathematical relationship in the centralized dataset (`src/data/medimindData.js`), transitioning away from decorative progress bars into genuine analytical graphics (time series, distributions, paired bivariate observations, workflow funnels, qualitative target comparisons, temporal density matrices, and multidimensional attribute polygons).
 2. **Pure SVG React Architecture**: Built directly with React SVG primitives (`<svg>`, `<path>`, `<circle>`, `<polygon>`, `<rect>`) without external heavy charting libraries (e.g., Chart.js, Recharts, D3). This guarantees zero runtime bundle bloat, zero version conflicts with React 19, responsive viewBox scaling, and CSS variable styling integration.
-3. **Single Source of Truth**: All charts strictly derive and compute their metrics from the centralized dataset (`src/data/medimindData.js`) and role-specific selectors without separate mock datasets.
+3. **Rock-Solid High-Contrast Tooltips**: Unified dark slate tooltips (`#0f172a`, text `#f8fafc`) with subtle borders and shadows, eliminating blank/white-on-white rendering bugs, clipping artifacts, and z-index issues. Full touch and mobile tap support is built-in.
+4. **Complete 4-Module AI Representation**: All clinical intelligence views represent all 4 MediMind AI modules: Fracture Detection (`ai_fracture`), Diabetes Risk (`ai_diabetes`), Heart Disease Risk (`ai_cardio`), and General Health Assessment (`ai_general`).
+5. **Proper Metric Segregation**: Percentage performance metrics (Accuracy, Sensitivity, Specificity, Uptime) are rendered on the 0–100% Radar Chart, while millisecond inference Latency is segregated into dedicated Horizontal Bar Charts.
 
 ---
 
@@ -22,15 +24,15 @@ The charting library is housed in `frontend/src/components/common/charts/` with 
 
 | Component | File Path | Supported Layouts / Modes | Key Features |
 | :--- | :--- | :--- | :--- |
-| **LineChart** | `LineChart.jsx` | Multi-series, Area Gradient, Smooth Bézier / Linear | Auto Y-axis step calculation, dynamic viewBox, hover point tooltips, interactive legend, smooth cubic Bézier curves (`C` control points). |
-| **BarChart** | `BarChart.jsx` | Grouped Vertical, Stacked Vertical, Horizontal | Multi-metric series grouping, horizontal comparison layout, hover callouts, value labels, accessible SVGs. |
-| **DonutChart** | `DonutChart.jsx` | Donut, Pie | Trigonometric arc calculations (`sin`/`cos`), animated hover offsets, center summary badge, custom legends. |
+| **LineChart** | `LineChart.jsx` | Multi-series, Area Gradient, Smooth Bézier / Linear | Auto Y-axis step calculation, dynamic viewBox, high-contrast dark tooltip, interactive legend, smooth cubic Bézier curves (`C` control points). |
+| **BarChart** | `BarChart.jsx` | Grouped Vertical, Stacked Vertical, Horizontal | Multi-metric series grouping, horizontal comparison layout, high-contrast hover callouts, value labels, accessible SVGs. |
+| **DonutChart** | `DonutChart.jsx` | Donut, Pie | Trigonometric arc calculations (`sin`/`cos`), animated hover offsets, center summary badge, custom legends, slice tooltip. |
 | **ScatterPlot** | `ScatterPlot.jsx` | 2D Cartesian Numerical Plane | Dual continuous axes ($X, Y$), reference/benchmark lines (e.g. 95% on-time benchmark), categorical color coding, interactive point tooltips. |
-| **FunnelChart** | `FunnelChart.jsx` | Multi-Stage Workflow Pipeline | Trapezoidal stage projection, stage-to-stage conversion rates, bottleneck drop-off indicators, step count metrics. |
+| **FunnelChart** | `FunnelChart.jsx` | Multi-Stage Workflow Pipeline | Trapezoidal stage projection, stage-to-stage conversion rates, bottleneck drop-off indicators, step count metrics, stage tooltips. |
 | **RadialGauge** | `RadialGauge.jsx` | 180° Half-Arc, 240° Swept Arc | Calibration zones (Normal/Moderate/High), central numeric display, gradient sweep paths, status color coding. |
 | **BulletChart** | `BulletChart.jsx` | Stephen Few Quantitative Bullet | Qualitative background ranges (e.g. Optimal, Warning, Critical), actual performance bar, comparative target indicator line. |
 | **HeatmapChart** | `HeatmapChart.jsx` | 2D Matrix Grid (e.g. Days $\times$ Time Slots) | Quantized intensity heat scale, cell value tooltips, flexible row/column axis labels, high-density visualization. |
-| **RadarChart** | `RadarChart.jsx` | Multidimensional Polygonal Spider Chart | Concentric polygonal grid webs, multi-attribute axis spokes (Accuracy, Sensitivity, Specificity, Latency, Uptime), overlaid translucent polygons. |
+| **RadarChart** | `RadarChart.jsx` | Multidimensional Polygonal Spider Chart | Concentric polygonal grid webs, multi-attribute axis spokes (Accuracy, Sensitivity, Specificity, Uptime), interactive vertex tooltips. |
 
 ---
 
@@ -39,12 +41,13 @@ The charting library is housed in `frontend/src/components/common/charts/` with 
 ### A. Chairman / Platform Executive
 | View File | Visualization | Chart Component | Data Source (`medimindData.js`) | Semantic Purpose |
 | :--- | :--- | :--- | :--- | :--- |
-| `PlatformDashboard.jsx` | AI Engine Volume Distribution | `DonutChart` | `aiAggregateMetrics` (Fracture CNN, Diabetes ML, Heart ML) | Part-to-whole share of clinical AI workload across models. |
+| `PlatformDashboard.jsx` | AI Engine Volume Distribution | `DonutChart` | `aiAggregateMetrics` (All 4 AI Modules: Fracture, Diabetes, Heart, General Health) | Part-to-whole share of clinical AI workload across all 4 platform models. |
 | `PlatformAnalyticsView.jsx` | User Account Composition | `DonutChart` | `platformStats.usersByRole` | Proportional split of active user accounts by role. |
 | `PlatformAnalyticsView.jsx` | Platform Telemetry & Uptime | `RadialGauge` | Platform System Health (99.9%) | System reliability gauge with threshold indicator. |
 | `PlatformAnalyticsView.jsx` | Appointment Resolution Share | `DonutChart` | Aggregated appointment status counts | Breakdown of completed, scheduled, cancelled, and pending appointments. |
-| `AiAnalyticsView.jsx` | Monthly AI Volume Trajectory | `LineChart` (Area) | `aiAggregateMetrics.monthlyVolume` | Multi-month volume trends across Fracture, Diabetes, and Heart models. |
-| `AiAnalyticsView.jsx` | Diagnostic Model Calibration | `RadarChart` | `aiAggregateMetrics` (Accuracy, Sensitivity, Specificity, Latency, Uptime) | Multi-attribute performance radar comparing clinical AI models. |
+| `AiAnalyticsView.jsx` | Monthly AI Volume Trajectory | `LineChart` (Area) | `aiAggregateMetrics.monthlyVolume` (4 series) | Multi-month volume trends across Fracture, Diabetes, Heart, and General Health. |
+| `AiAnalyticsView.jsx` | Diagnostic Model Calibration | `RadarChart` | `aiAggregateMetrics` (Accuracy, Sensitivity, Specificity, Uptime) | Multi-attribute performance radar comparing all 4 clinical AI models. |
+| `AiAnalyticsView.jsx` | Inference Latency by Module | `BarChart` (Horizontal) | `aiAggregateMetrics` latency values (ms) | Dedicated latency comparison across all 4 AI modules. |
 | `HospitalPerformanceView.jsx` | Comparative Network Throughput | `BarChart` (Grouped) | `hospitals` (Visits, AI Scans, Active Doctors) | Side-by-side grouped multi-metric comparison across the 3 network hospitals. |
 | `HospitalPerformanceView.jsx` | Inpatient Capacity vs Target | `BulletChart` | `hospitals[].bedCapacity` & occupancy targets | Actual bed utilization against capacity thresholds. |
 
@@ -61,8 +64,9 @@ The charting library is housed in `frontend/src/components/common/charts/` with 
 | `DepartmentAnalyticsView.jsx` | Departmental Patient & AI Flow | `BarChart` (Grouped) | Hospital departments (Patient volume & AI scans) | Cross-department operational comparison. |
 | `DepartmentAnalyticsView.jsx` | Patient Volume Allocation | `DonutChart` | Department patient share | Departmental contribution to total hospital load. |
 | `DepartmentAnalyticsView.jsx` | Ward Bed Utilization | `BulletChart` | Department ward capacities vs targets | Individual department inpatient occupancy. |
-| `AiAnalyticsView.jsx` | AI Model Utilization Share | `DonutChart` | Hospital AI analytics | Share of inference requests per clinical AI module. |
-| `AiAnalyticsView.jsx` | Model Reliability Radar | `RadarChart` | AI accuracy, sensitivity, specificity, speed, uptime | Multi-dimensional evaluation of AI model safety. |
+| `AiAnalyticsView.jsx` | AI Model Utilization Share | `DonutChart` | Hospital AI analytics (All deployed models) | Share of inference requests per clinical AI module. |
+| `AiAnalyticsView.jsx` | Model Reliability Radar | `RadarChart` | Accuracy, Sensitivity, Specificity, Uptime | Multi-dimensional evaluation of AI model reliability. |
+| `AiAnalyticsView.jsx` | Inference Latency by Module | `BarChart` (Horizontal) | Inference latency per AI module (ms) | Turnaround time comparison across active AI screening services. |
 
 ---
 
@@ -75,8 +79,8 @@ The charting library is housed in `frontend/src/components/common/charts/` with 
 | `DoctorPerformanceView.jsx` | Caseload vs On-Time Rate | `ScatterPlot` | Department doctors (Active Cases vs On-Time %) | 2D bivariate analysis with 95% clinical benchmark line. |
 | `DoctorPerformanceView.jsx` | Scheduled vs Completed Encounters | `BarChart` (Grouped) | Department doctors throughput logs | Direct comparison of scheduled appointments vs completions. |
 | `AiAnalyticsView.jsx` | Anatomical Anomaly Distribution | `DonutChart` | Orthopedic/department anomaly classifications | Categorical distribution of diagnosed clinical anomalies. |
-| `AiAnalyticsView.jsx` | AI Detection Speed by Modality | `BarChart` (Horizontal) | Inference latency per clinical examination type | Latency benchmark comparison. |
-| `AiAnalyticsView.jsx` | Diagnostic Algorithm Performance | `RadarChart` | Precision, recall, F1, latency, uptime metrics | Multi-attribute algorithm safety profile. |
+| `AiAnalyticsView.jsx` | AI Anomaly Region Breakdown | `BarChart` (Horizontal) | Anatomical fracture breakdown counts | Regional prevalence comparison. |
+| `AiAnalyticsView.jsx` | Diagnostic Algorithm Performance | `RadarChart` | Accuracy, Sensitivity, Specificity, F1-Score, Uptime | Multi-attribute algorithm safety and precision profile. |
 | `WorkloadView.jsx` | Doctor Active Caseload vs Completed | `BarChart` (Grouped) | Workload allocation across department physicians | Physician workload balancing visualization. |
 
 ---
@@ -108,7 +112,7 @@ The charting library is housed in `frontend/src/components/common/charts/` with 
 | **LineChart / AreaChart** | Multi-month continuous time-series trends | 3 |
 | **BarChart (Grouped Vertical)** | Multi-series comparative categorical throughput | 6 |
 | **BarChart (Single Vertical)** | Daily/weekly periodic encounter volume | 2 |
-| **BarChart (Horizontal)** | Ranked latency, feature importance, and risk sensitivities | 3 |
+| **BarChart (Horizontal)** | Ranked latency, feature importance, and risk sensitivities | 5 |
 | **DonutChart / PieChart** | Part-to-whole categorical compositions | 9 |
 | **ScatterPlot** | Bivariate continuous observations (Caseload vs On-Time Rate) | 1 |
 | **FunnelChart** | Multi-stage clinical workflow throughput & conversion | 1 |
@@ -116,7 +120,7 @@ The charting library is housed in `frontend/src/components/common/charts/` with 
 | **BulletChart** | Target-to-actual comparisons within qualitative ranges | 4 |
 | **HeatmapChart** | 2D temporal intensity matrices (Days $\times$ Time Slots) | 2 |
 | **RadarChart** | Multidimensional algorithm performance polygons | 3 |
-| **Total Visualizations** | **Diverse, mathematically-sound clinical graphics** | **39** |
+| **Total Visualizations** | **Diverse, mathematically-sound clinical graphics** | **41** |
 
 ---
 
@@ -137,6 +141,7 @@ During the system design audit, several chart types were deliberately evaluated 
 
 ## 6. Verification & Quality Assurance
 
-- **Code Quality**: Verified clean with `npx oxlint` (0 errors, 0 warnings across all modified components).
-- **Bundle Compilation**: Production build verified clean with `vite build`.
-- **Styling & Theming**: All SVG components inherit CSS variables from MediMind's design system (`var(--color-primary)`, `var(--color-background)`, etc.) ensuring full visual consistency across light and dark modes.
+- **Code Quality**: Verified clean with `npx oxlint` (0 errors, 0 warnings across all 128 components).
+- **Bundle Compilation**: Production build verified clean with `vite build` (0 build errors).
+- **Dataset Consistency**: `validateCentralDataset()` passes with `valid: true, errors: []`.
+- **Styling & Theming**: All SVG components inherit CSS variables from MediMind's design system with high-contrast tooltip fallbacks ensuring zero blank tooltips in light or dark themes.

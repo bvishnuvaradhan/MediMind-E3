@@ -26,9 +26,9 @@ import { useAuth } from '../../context/useAuth';
 import { hospitalAdminService } from '../../services/hospitalAdminService';
 import {
   initialHospitalProfile,
-  initialDepartments,
+  initialHospitalDepartments,
   initialDepartmentHeads,
-  initialDoctors,
+  initialHospitalDoctors,
   initialAppointments,
   initialHospitalAnalytics,
   initialReports,
@@ -199,9 +199,9 @@ export function HospitalAdminLayout({ dark, setDark }) {
 
   // Data States
   const [hospital, setHospital] = useState(initialHospitalProfile);
-  const [departments, setDepartments] = useState(initialDepartments);
+  const [departments, setDepartments] = useState(initialHospitalDepartments);
   const [departmentHeads, setDepartmentHeads] = useState(initialDepartmentHeads);
-  const [doctors, setDoctors] = useState(initialDoctors);
+  const [doctors, setDoctors] = useState(initialHospitalDoctors);
   const [appointments] = useState(initialAppointments);
   const [analytics] = useState(initialHospitalAnalytics);
   const [reports, setReports] = useState(initialReports);

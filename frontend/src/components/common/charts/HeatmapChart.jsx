@@ -147,22 +147,24 @@ export function HeatmapChart({
         <div
           style={{
             position: 'absolute',
-            top: 0,
-            left: `${Math.min(80, Math.max(15, (hoveredCell.x / chartWidth) * 100))}%`,
+            top: '4px',
+            left: `${Math.min(82, Math.max(18, (hoveredCell.x / chartWidth) * 100))}%`,
             transform: 'translateX(-50%)',
-            backgroundColor: 'var(--chair-card, #1e293b)',
-            color: '#ffffff',
-            padding: '5px 9px',
-            borderRadius: '5px',
-            fontSize: '11px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            backgroundColor: '#0f172a',
+            color: '#f8fafc',
+            padding: '6px 12px',
+            borderRadius: '6px',
+            fontSize: '11.5px',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)',
             pointerEvents: 'none',
-            zIndex: 10,
+            zIndex: 50,
             whiteSpace: 'nowrap',
-            border: '1px solid rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
           }}
         >
-          <strong>{hoveredCell.yLabel} · {hoveredCell.xLabel}:</strong> {hoveredCell.val} appointments
+          <span style={{ color: '#94a3b8' }}>{hoveredCell.yLabel} · {hoveredCell.xLabel}: </span>
+          <strong style={{ color: '#38bdf8' }}>{hoveredCell.val}</strong>
+          <span style={{ color: '#e2e8f0', marginLeft: '4px' }}>consultations</span>
         </div>
       )}
     </div>

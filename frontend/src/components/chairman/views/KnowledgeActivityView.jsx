@@ -18,19 +18,28 @@ export function KnowledgeActivityView() {
   useEffect(() => {
     async function load() {
       const data = await chairmanService.getKnowledgeArticles();
-      setArticles(data);
+      setArticles(data || []);
     }
     load();
   }, []);
 
-  const filtered = articles.filter((a) => {
+  const filtered = (articles || []).filter((a) => {
     const s = search.toLowerCase();
+    const title = a.title || '';
+    const author = a.author || '';
+    const dept = a.department || '';
     return (
-      a.title.toLowerCase().includes(s) ||
-      a.author.toLowerCase().includes(s) ||
-      a.department.toLowerCase().includes(s)
+      title.toLowerCase().includes(s) ||
+      author.toLowerCase().includes(s) ||
+      dept.toLowerCase().includes(s)
     );
   });
+
+  const totalPublished = articles.length;
+  const uniqueAuthors = new Set(articles.map(a => a.author).filter(Boolean)).size;
+  const orthoCount = articles.filter(a => a.department === 'Orthopedics').length;
+  const diabCount = articles.filter(a => a.department?.includes('Diab')).length;
+  const cardioCount = articles.filter(a => a.department === 'Cardiology').length;
 
   return (
     <div className="knowledge-activity-view">
@@ -53,27 +62,27 @@ export function KnowledgeActivityView() {
       <div className="stats-grid" style={{ marginBottom: '24px' }}>
         <div className="stat-card">
           <p>Total Published Articles</p>
-          <h3 style={{ marginTop: '8px' }}>24</h3>
+          <h3 style={{ marginTop: '8px' }}>{totalPublished}</h3>
           <small style={{ color: 'var(--chair-muted)' }}>Publicly accessible healthcare library</small>
         </div>
         <div className="stat-card">
           <p>Active Doctor Authors</p>
-          <h3 style={{ marginTop: '8px' }}>7</h3>
+          <h3 style={{ marginTop: '8px' }}>{uniqueAuthors}</h3>
           <small style={{ color: 'var(--chair-muted)' }}>Contributing clinicians</small>
         </div>
         <div className="stat-card">
           <p>🦴 Orthopedics Publications</p>
-          <h3 style={{ marginTop: '8px' }}>10</h3>
+          <h3 style={{ marginTop: '8px' }}>{orthoCount}</h3>
           <small style={{ color: 'var(--chair-muted)' }}>Skeletal & trauma care</small>
         </div>
         <div className="stat-card">
           <p>🩺 Diabetology Publications</p>
-          <h3 style={{ marginTop: '8px' }}>7</h3>
+          <h3 style={{ marginTop: '8px' }}>{diabCount}</h3>
           <small style={{ color: 'var(--chair-muted)' }}>Glycemic & metabolic research</small>
         </div>
         <div className="stat-card">
           <p>❤️ Cardiology Publications</p>
-          <h3 style={{ marginTop: '8px' }}>7</h3>
+          <h3 style={{ marginTop: '8px' }}>{cardioCount}</h3>
           <small style={{ color: 'var(--chair-muted)' }}>Coronary & vascular health</small>
         </div>
       </div>
@@ -105,7 +114,7 @@ export function KnowledgeActivityView() {
                 <th>Department</th>
                 <th>Published Date</th>
                 <th>Reader Views</th>
-                <th>Est. Read Time</th>
+                <th>Category</th>
                 <th>Review Status</th>
                 <th>Action</th>
               </tr>
@@ -121,13 +130,13 @@ export function KnowledgeActivityView() {
                   <td>
                     <span className="badge badge-info">{art.department}</span>
                   </td>
-                  <td>{art.publishedDate}</td>
+                  <td>{art.publishedDate || art.date || '—'}</td>
                   <td>
-                    <strong>{art.viewsCount.toLocaleString()}</strong> reads
+                    <strong>{(art.viewsCount || art.views || 0).toLocaleString()}</strong> reads
                   </td>
-                  <td>{art.readTime}</td>
+                  <td>{art.category || art.readTime || 'Clinical Protocol'}</td>
                   <td>
-                    <span className="badge badge-approved">{art.status}</span>
+                    <span className="badge badge-approved">{art.status || 'Published'}</span>
                   </td>
                   <td>
                     <button
@@ -169,15 +178,15 @@ export function KnowledgeActivityView() {
               <div style={{ display: 'flex', gap: '16px', padding: '12px', background: 'var(--chair-bg)', borderRadius: '10px' }}>
                 <div>
                   <small style={{ color: 'var(--chair-muted)', fontSize: '10px' }}>PUBLISHED</small>
-                  <div style={{ fontWeight: 600 }}>{selectedArticle.publishedDate}</div>
+                  <div style={{ fontWeight: 600 }}>{selectedArticle.publishedDate || selectedArticle.date || '—'}</div>
                 </div>
                 <div>
                   <small style={{ color: 'var(--chair-muted)', fontSize: '10px' }}>TOTAL VIEWS</small>
-                  <div style={{ fontWeight: 600 }}>{selectedArticle.viewsCount.toLocaleString()} reads</div>
+                  <div style={{ fontWeight: 600 }}>{(selectedArticle.viewsCount || selectedArticle.views || 0).toLocaleString()} reads</div>
                 </div>
                 <div>
-                  <small style={{ color: 'var(--chair-muted)', fontSize: '10px' }}>READ TIME</small>
-                  <div style={{ fontWeight: 600 }}>{selectedArticle.readTime}</div>
+                  <small style={{ color: 'var(--chair-muted)', fontSize: '10px' }}>CATEGORY</small>
+                  <div style={{ fontWeight: 600 }}>{selectedArticle.category || 'Clinical Protocol'}</div>
                 </div>
               </div>
 
@@ -204,3 +213,5 @@ export function KnowledgeActivityView() {
     </div>
   );
 }
+
+export default KnowledgeActivityView;

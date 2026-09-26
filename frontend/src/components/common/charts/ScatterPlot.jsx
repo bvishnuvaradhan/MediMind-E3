@@ -225,31 +225,31 @@ export function ScatterPlot({
         <div
           style={{
             position: 'absolute',
-            top: 0,
-            left: `${Math.min(80, Math.max(15, (hoveredPoint.px / chartWidth) * 100))}%`,
+            top: '8px',
+            left: `${Math.min(82, Math.max(18, (hoveredPoint.px / chartWidth) * 100))}%`,
             transform: 'translateX(-50%)',
-            backgroundColor: 'var(--chair-card, #1e293b)',
-            color: '#ffffff',
+            backgroundColor: '#0f172a',
+            color: '#f8fafc',
             padding: '8px 12px',
-            borderRadius: '6px',
-            fontSize: '11px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            borderRadius: '8px',
+            fontSize: '11.5px',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
             pointerEvents: 'none',
-            zIndex: 10,
+            zIndex: 50,
             whiteSpace: 'nowrap',
-            border: '1px solid rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
           }}
         >
-          <div style={{ fontWeight: 700, fontSize: '12px' }}>{hoveredPoint.label}</div>
-          {hoveredPoint.sub && <div style={{ fontSize: '10px', opacity: 0.75 }}>{hoveredPoint.sub}</div>}
-          <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            <div>
-              <span>{xLabel || 'X'}: </span>
-              <strong>{hoveredPoint.xVal}</strong>
+          <div style={{ fontWeight: 700, fontSize: '12px', color: '#ffffff' }}>{hoveredPoint.label}</div>
+          {hoveredPoint.sub && <div style={{ fontSize: '10.5px', color: '#94a3b8', marginTop: '1px' }}>{hoveredPoint.sub}</div>}
+          <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '3px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '4px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+              <span style={{ color: '#cbd5e1' }}>{xLabel || 'X'}:</span>
+              <strong style={{ color: '#38bdf8' }}>{hoveredPoint.xVal}</strong>
             </div>
-            <div>
-              <span>{yLabel || 'Y'}: </span>
-              <strong>{hoveredPoint.yVal}</strong>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+              <span style={{ color: '#cbd5e1' }}>{yLabel || 'Y'}:</span>
+              <strong style={{ color: '#38bdf8' }}>{hoveredPoint.yVal}</strong>
             </div>
           </div>
         </div>

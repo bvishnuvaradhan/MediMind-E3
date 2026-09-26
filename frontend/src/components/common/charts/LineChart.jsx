@@ -257,31 +257,38 @@ export function LineChart({
         <div
           style={{
             position: 'absolute',
-            top: 0,
-            left: `${Math.min(80, Math.max(15, (getX(hoveredIndex) / chartWidth) * 100))}%`,
+            top: '8px',
+            left: `${Math.min(82, Math.max(18, (getX(hoveredIndex) / chartWidth) * 100))}%`,
             transform: 'translateX(-50%)',
-            backgroundColor: 'var(--chair-card, #1e293b)',
-            color: '#ffffff',
-            padding: '6px 10px',
-            borderRadius: '6px',
-            fontSize: '11px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            backgroundColor: '#0f172a',
+            color: '#f8fafc',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            fontSize: '11.5px',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
             pointerEvents: 'none',
-            zIndex: 10,
+            zIndex: 50,
             whiteSpace: 'nowrap',
-            border: '1px solid rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
           }}
         >
-          <div style={{ fontWeight: 700, marginBottom: '3px', opacity: 0.85 }}>
+          <div style={{ fontWeight: 700, marginBottom: '4px', color: '#94a3b8', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             {data[hoveredIndex][xKey]}
           </div>
-          {series.map((s) => (
-            <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: s.color }} />
-              <span>{s.name || s.key}:</span>
-              <strong>{data[hoveredIndex][s.key]}</strong>
-            </div>
-          ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {series.map((s) => (
+              <div key={s.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: s.color, display: 'inline-block', flexShrink: 0 }} />
+                  <span style={{ color: '#e2e8f0' }}>{s.name || s.key}:</span>
+                </div>
+                <strong style={{ color: '#ffffff', fontWeight: 700 }}>
+                  {data[hoveredIndex][s.key] !== undefined && data[hoveredIndex][s.key] !== null ? data[hoveredIndex][s.key] : '—'}
+                  {s.unit || ''}
+                </strong>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

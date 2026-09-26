@@ -91,6 +91,44 @@ export function FunnelChart({
         })}
       </svg>
 
+      {/* Hover/Tap Tooltip Popup */}
+      {hoveredIndex !== null && stages[hoveredIndex] && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '4px',
+            left: `${Math.min(80, Math.max(20, ((hoveredIndex + 0.5) / stageCount) * 100))}%`,
+            transform: 'translateX(-50%)',
+            backgroundColor: '#0f172a',
+            color: '#f8fafc',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            fontSize: '11.5px',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)',
+            pointerEvents: 'none',
+            zIndex: 50,
+            whiteSpace: 'nowrap',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+          }}
+        >
+          <div style={{ fontWeight: 700, fontSize: '12px', color: '#ffffff' }}>{stages[hoveredIndex].stage}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+            <span style={{ color: '#94a3b8' }}>Active Volume:</span>
+            <strong style={{ color: '#38bdf8' }}>{stages[hoveredIndex].count} encounters</strong>
+          </div>
+          {stages[hoveredIndex].pct && (
+            <div style={{ fontSize: '11px', color: '#4ade80', marginTop: '2px' }}>
+              {stages[hoveredIndex].pct}% clinical throughput
+            </div>
+          )}
+          {stages[hoveredIndex].subtext && (
+            <div style={{ fontSize: '10.5px', color: '#cbd5e1', marginTop: '2px', opacity: 0.9 }}>
+              {stages[hoveredIndex].subtext}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Detail row below */}
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${stageCount}, 1fr)`, gap: '6px', marginTop: '4px', textAlign: 'center' }}>
         {stages.map((st, i) => (
