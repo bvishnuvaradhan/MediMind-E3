@@ -1,5 +1,6 @@
 import React from 'react';
 import StatCard from '../components/StatCard';
+import { DonutChart, BarChart, RadarChart } from '../../common/charts';
 
 export function AiAnalyticsView({ analytics }) {
   const aiData = analytics?.aiPipelineSummary || {
@@ -100,66 +101,84 @@ export function AiAnalyticsView({ analytics }) {
         />
       </div>
 
-      {/* Two Columns: Anatomical Regions & Model Health */}
+      {/* Two Columns: Anatomical Regions Donut & Pipeline Radar Telemetry */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '20px' }}>
-        {/* Anatomical Regions */}
+        {/* Anatomical Regions Donut & Horizontal Bar */}
         <div className="dh-card">
           <div className="dh-card-header">
             <div>
               <h3 className="dh-card-title">Anatomical Fracture Distribution</h3>
-              <div className="dh-card-description">Top fracture locations identified by AI pipeline</div>
+              <div className="dh-card-description">Top fracture locations identified by ResNet50 CNN pipeline</div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {aiData.commonFractureTypes.map((f, i) => {
-              const pct = Math.round((f.count / aiData.fracturesDetected) * 100);
-              return (
-                <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                    <span style={{ fontWeight: 600, color: 'var(--dh-text-primary)' }}>{f.type}</span>
-                    <span style={{ color: 'var(--dh-teal)', fontWeight: 700 }}>
-                      {f.count} cases ({f.confidence} confidence)
-                    </span>
-                  </div>
-                  <div className="dh-progress-container" style={{ height: '8px' }}>
-                    <div className="dh-progress-fill teal" style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-              );
+          <DonutChart
+            data={aiData.commonFractureTypes.map((f, i) => {
+              const colors = ['#f43f5e', '#2563eb', '#0f766e', '#7c3aed'];
+              return {
+                label: f.type,
+                value: f.count,
+                color: colors[i % colors.length],
+              };
             })}
+            size={160}
+            innerRadius={45}
+            outerRadius={70}
+            centerValue={aiData.fracturesDetected}
+            centerLabel="Fractures"
+          />
+
+          <div style={{ marginTop: '14px' }}>
+            <BarChart
+              data={aiData.commonFractureTypes.map((f) => ({
+                label: f.type.split('/')[0].trim(),
+                count: f.count,
+              }))}
+              layout="horizontal"
+              xKey="label"
+              height={140}
+              series={[
+                { key: 'count', name: 'Identified Cases', color: '#0f766e' },
+              ]}
+            />
           </div>
         </div>
 
-        {/* Model Infrastructure & Verification Protocol */}
+        {/* Pipeline Clinical Reliability Radar */}
         <div className="dh-card">
           <div className="dh-card-header">
             <div>
-              <h3 className="dh-card-title">Pipeline Architecture & Clinical Protocols</h3>
-              <div className="dh-card-description">Engine specifications and validation pipeline</div>
+              <h3 className="dh-card-title">Model Calibration & Reliability Radar</h3>
+              <div className="dh-card-description">Multidimensional validation metrics for ResNet50 engine</div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '8px', borderBottom: '1px solid var(--dh-border)' }}>
-              <span style={{ color: 'var(--dh-text-muted)' }}>Convolutional Architecture</span>
-              <span style={{ fontWeight: 600 }}>Deep Residual Network (ResNet50)</span>
+          <RadarChart
+            metrics={['Accuracy', 'Sensitivity', 'Specificity', 'Latency', 'Uptime']}
+            size={200}
+            data={[
+              {
+                name: 'ResNet50-Ortho-v2.4',
+                values: [
+                  parseFloat(aiData.accuracy) || 97.4,
+                  parseFloat(aiData.sensitivity) || 96.8,
+                  parseFloat(aiData.specificity) || 98.1,
+                  94, // latency score
+                  parseFloat(aiData.uptime) || 99.98,
+                ],
+                color: '#2563eb',
+              },
+            ]}
+          />
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--dh-border)', fontSize: '12px' }}>
+            <div style={{ padding: '8px', backgroundColor: 'var(--dh-bg)', borderRadius: '6px' }}>
+              <span style={{ color: 'var(--dh-text-muted)', fontSize: '11px' }}>Architecture</span>
+              <div style={{ fontWeight: 700, marginTop: '2px' }}>ResNet-50 CNN</div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '8px', borderBottom: '1px solid var(--dh-border)' }}>
-              <span style={{ color: 'var(--dh-text-muted)' }}>Input Modality</span>
-              <span style={{ fontWeight: 600 }}>Digital Plain Radiographs (DICOM/PNG)</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '8px', borderBottom: '1px solid var(--dh-border)' }}>
-              <span style={{ color: 'var(--dh-text-muted)' }}>Clinical Verification</span>
-              <span style={{ fontWeight: 600, color: 'var(--dh-success)' }}>Mandatory Attending Radiologist Sign-off</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '8px', borderBottom: '1px solid var(--dh-border)' }}>
-              <span style={{ color: 'var(--dh-text-muted)' }}>Heatmap Localization</span>
-              <span style={{ fontWeight: 600 }}>Grad-CAM Saliency Maps</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--dh-text-muted)' }}>Data Anonymization</span>
-              <span style={{ fontWeight: 600, color: 'var(--dh-blue)' }}>HIPAA / ISO 27001 Compliant</span>
+            <div style={{ padding: '8px', backgroundColor: 'var(--dh-bg)', borderRadius: '6px' }}>
+              <span style={{ color: 'var(--dh-text-muted)', fontSize: '11px' }}>Protocol</span>
+              <div style={{ fontWeight: 700, marginTop: '2px', color: 'var(--dh-success)' }}>Human Sign-off</div>
             </div>
           </div>
         </div>

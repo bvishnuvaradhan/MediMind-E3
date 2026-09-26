@@ -1,5 +1,6 @@
 import React from 'react';
 import StatCard from '../components/StatCard';
+import { FunnelChart } from '../../common/charts';
 
 export function DashboardView({
   doctorProfile,
@@ -102,6 +103,32 @@ export function DashboardView({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           }
+        />
+      </div>
+
+      {/* Today's Clinical Encounter Pipeline Funnel */}
+      <div className="doctor-card">
+        <div className="doctor-card-header">
+          <div>
+            <h3 className="doctor-card-title">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--doctor-primary)' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              Today's Clinical Consultation Workflow Pipeline
+            </h3>
+            <div className="doctor-card-description">Live patient throughput progression through outpatient clinical stages</div>
+          </div>
+        </div>
+
+        <FunnelChart
+          stages={[
+            { stage: '1. Waiting Room', count: 5, color: '#3b82f6', subtext: 'Arrived & Checked In' },
+            { stage: '2. AI Pre-Screened', count: 4, color: '#0ea5e9', subtext: 'X-Ray Saliency Ready' },
+            { stage: '3. In Consultation', count: 2, color: '#6366f1', subtext: 'Active Clinical Exam' },
+            { stage: '4. Rx Formulated', count: 3, color: '#0f766e', subtext: 'E-Prescription Drafted' },
+            { stage: '5. Completed', count: 3, color: '#16a34a', subtext: 'Visit Concluded' },
+          ]}
+          height={160}
         />
       </div>
 

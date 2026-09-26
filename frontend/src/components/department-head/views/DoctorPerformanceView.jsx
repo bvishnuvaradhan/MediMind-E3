@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import StatCard from '../components/StatCard';
+import { ScatterPlot, BarChart } from '../../common/charts';
 
 export function DoctorPerformanceView({
   performanceData = [],
@@ -150,111 +151,61 @@ export function DoctorPerformanceView({
         />
       </div>
 
-      {/* Analytics Visualizations */}
+      {/* Analytics Visualizations: Scatter Plot & Grouped Bar Chart */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '20px' }}>
-        {/* Card 1: Consultation Volume & Completion */}
+        {/* Card 1: Scatter Plot - Completed Consultations vs On-Time Start Rate */}
         <div className="dh-card">
           <div className="dh-card-header">
             <div>
-              <h3 className="dh-card-title">Consultation Volume & Completion</h3>
-              <div className="dh-card-description">Scheduled vs completed consultations by doctor</div>
+              <h3 className="dh-card-title">Clinician Caseload vs Punctuality Correlation</h3>
+              <div className="dh-card-description">Scatter distribution: Completed Consultations vs On-Time Start Rate (95% Benchmark)</div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '8px' }}>
-            {combinedData.map((doc) => {
-              const scheduled = doc.monthlyScheduled || 20;
-              const completed = doc.consultations || 0;
-              const rate = doc.completionRate || 0;
-              const maxVal = Math.max(...combinedData.map((d) => d.monthlyScheduled || 20), 20);
-              const schedPct = Math.round((scheduled / maxVal) * 100);
-              const compPct = Math.round((completed / maxVal) * 100);
-
-              return (
-                <div key={doc.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingBottom: '12px', borderBottom: '1px solid var(--dh-border-subtle, rgba(0,0,0,0.05))' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div className="dh-avatar-circle" style={{ width: '28px', height: '28px', fontSize: '11px' }}>
-                        {doc.avatarInitials}
-                      </div>
-                      <span style={{ fontWeight: 700, fontSize: '13.5px', color: 'var(--dh-text-primary)' }}>
-                        {doc.name}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px' }}>
-                      <span style={{ color: 'var(--dh-text-muted)' }}>
-                        Scheduled: <strong style={{ color: 'var(--dh-text-primary)' }}>{scheduled}</strong>
-                      </span>
-                      <span style={{ color: 'var(--dh-text-muted)' }}>
-                        Completed: <strong style={{ color: 'var(--dh-teal)' }}>{completed}</strong>
-                      </span>
-                      <span className="dh-badge dh-badge-completed" style={{ fontSize: '11px', fontWeight: 700 }}>
-                        {rate}% Completion
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Paired Visual Comparison Bars */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
-                      <span style={{ width: '65px', color: 'var(--dh-text-muted)' }}>Scheduled</span>
-                      <div className="dh-progress-container" style={{ height: '6px', flex: 1 }}>
-                        <div className="dh-progress-fill" style={{ width: `${schedPct}%`, backgroundColor: 'var(--dh-primary-light)' }} />
-                      </div>
-                      <span style={{ width: '24px', textAlign: 'right', fontWeight: 600, color: 'var(--dh-text-secondary)' }}>{scheduled}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
-                      <span style={{ width: '65px', color: 'var(--dh-text-muted)' }}>Completed</span>
-                      <div className="dh-progress-container" style={{ height: '6px', flex: 1 }}>
-                        <div className="dh-progress-fill teal" style={{ width: `${compPct}%` }} />
-                      </div>
-                      <span style={{ width: '24px', textAlign: 'right', fontWeight: 600, color: 'var(--dh-teal)' }}>{completed}</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <ScatterPlot
+            data={combinedData.map((d) => ({
+              x: d.consultations,
+              y: d.onTimeRate,
+              label: d.name,
+              subtext: `${d.specialization} · Rating ★ ${d.ratingScore}`,
+              color: d.onTimeRate >= 95 ? '#0f766e' : '#2563eb',
+            }))}
+            xKey="x"
+            yKey="y"
+            labelKey="label"
+            subKey="subtext"
+            xLabel="Completed Consultations"
+            yLabel="On-Time Rate (%)"
+            height={210}
+            referenceLines={[
+              { axis: 'y', value: 95, label: '95% Benchmark', color: '#16a34a' },
+            ]}
+          />
         </div>
 
-        {/* Card 2: On-Time Start Rate & Satisfaction */}
+        {/* Card 2: Grouped Bar Chart - Scheduled vs Completed by Doctor */}
         <div className="dh-card">
           <div className="dh-card-header">
             <div>
-              <h3 className="dh-card-title">Punctuality & Patient Satisfaction</h3>
-              <div className="dh-card-description">On-time consultation starts and patient ratings</div>
+              <h3 className="dh-card-title">Scheduled vs Completed Consultation Throughput</h3>
+              <div className="dh-card-description">Faculty doctor clinical caseload completion comparison</div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '8px' }}>
-            {combinedData.map((doc) => {
-              return (
-                <div key={doc.id} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div className="dh-avatar-circle" style={{ width: '28px', height: '28px', fontSize: '11px' }}>
-                        {doc.avatarInitials}
-                      </div>
-                      <span style={{ fontWeight: 600, fontSize: '13px', color: 'var(--dh-text-primary)' }}>
-                        {doc.name}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px' }}>
-                      <span style={{ color: 'var(--dh-success)', fontWeight: 700 }}>
-                        {doc.onTimeRate}% On-Time
-                      </span>
-                      <span style={{ color: 'var(--dh-warning)', fontWeight: 700 }}>
-                        ★ {doc.ratingScore}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="dh-progress-container" style={{ height: '8px' }}>
-                    <div className="dh-progress-fill" style={{ width: `${doc.onTimeRate}%`, backgroundColor: 'var(--dh-blue)' }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <BarChart
+            data={combinedData.map((d) => ({
+              label: d.name.replace('Dr. ', '').split(' ')[0],
+              scheduled: d.monthlyScheduled || 20,
+              completed: d.consultations || 0,
+            }))}
+            xKey="label"
+            height={210}
+            yAxisLabel="Cases"
+            series={[
+              { key: 'scheduled', name: 'Scheduled', color: '#93c5fd' },
+              { key: 'completed', name: 'Completed', color: '#0f766e' },
+            ]}
+          />
         </div>
       </div>
 

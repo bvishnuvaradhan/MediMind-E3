@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { initialRecords, initialPresentationData } from '../../../data/medimindData';
 import { RecordRow } from '../components/RecordRow';
+import { RadialGauge } from '../../common/charts';
 
 export function DashboardView({
   member,
@@ -226,9 +227,16 @@ export function DashboardView({
               View prediction <ArrowUpRight size={15} />
             </button>
           </div>
-          <div className="insight-ring">
-            <span>86</span>
-            <small>score</small>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <RadialGauge
+              value={86}
+              min={0}
+              max={100}
+              unit=""
+              label="Score"
+              size={95}
+              color="#0f766e"
+            />
           </div>
         </div>
       </section>

@@ -9,9 +9,9 @@ import {
   Server,
   CheckCircle,
   Clock,
-  XCircle,
 } from 'lucide-react';
 import { chairmanService } from '../../../services/chairmanService';
+import { DonutChart, RadialGauge } from '../../common/charts';
 
 export function PlatformAnalyticsView() {
   const [summary, setSummary] = useState(null);
@@ -25,6 +25,30 @@ export function PlatformAnalyticsView() {
   }, []);
 
   if (!summary) return <div className="loading-state">Loading Platform Analytics...</div>;
+
+  const totalUsers =
+    (summary.totalFamilyMembers || 29) +
+    summary.totalDoctors +
+    summary.totalDepartmentHeads +
+    summary.totalHospitalAdmins;
+
+  const userData = [
+    { label: 'Family Members', value: summary.totalFamilyMembers || 29, color: '#f59e0b' },
+    { label: 'Doctors', value: summary.totalDoctors || 66, color: '#0f766e' },
+    { label: 'Department Heads', value: summary.totalDepartmentHeads || 18, color: '#2563eb' },
+    { label: 'Hospital Admins', value: summary.totalHospitalAdmins || 6, color: '#4338ca' },
+  ];
+
+  const totalAppts = summary.totalAppointments || 128;
+  const compAppts = summary.completedAppointments || 96;
+  const upcomAppts = summary.upcomingAppointments || 24;
+  const cancAppts = summary.cancelledAppointments || 8;
+
+  const apptData = [
+    { label: 'Completed', value: compAppts, color: '#16a34a' },
+    { label: 'Upcoming', value: upcomAppts, color: '#f59e0b' },
+    { label: 'Cancelled', value: cancAppts, color: '#dc2626' },
+  ];
 
   return (
     <div className="platform-analytics-view">
@@ -43,9 +67,9 @@ export function PlatformAnalyticsView() {
         </div>
       </div>
 
-      {/* Grid: 4 Pillars of Analytics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '22px', marginBottom: '28px' }}>
-        {/* Pillar 1: User Analytics */}
+      {/* Grid: 3 Pillars of Analytics with Data Visualizations */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '22px', marginBottom: '28px' }}>
+        {/* Pillar 1: User Analytics with Donut Visualization */}
         <div className="table-card" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
             <div style={{ display: 'grid', placeItems: 'center', width: '38px', height: '38px', borderRadius: '10px', background: '#dbeafe', color: '#2563eb' }}>
@@ -53,31 +77,34 @@ export function PlatformAnalyticsView() {
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>Platform User Directory</h3>
-              <small style={{ color: 'var(--chair-muted)' }}>Registered accounts across all 5 roles</small>
+              <small style={{ color: 'var(--chair-muted)' }}>Distribution across {totalUsers} registered accounts</small>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: 'var(--chair-bg)', borderRadius: '8px', fontSize: '13px' }}>
-              <span>Family Accounts:</span>
-              <strong>{summary.totalFamilyAccounts} ({summary.totalFamilyMembers || 29} Covered Members)</strong>
+          <div style={{ marginBottom: '16px' }}>
+            <DonutChart
+              data={userData}
+              size={150}
+              innerRadius={42}
+              outerRadius={65}
+              centerValue={totalUsers}
+              centerLabel="Accounts"
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', paddingTop: '12px', borderTop: '1px solid var(--chair-border)', fontSize: '12px' }}>
+            <div style={{ padding: '8px', background: 'var(--chair-bg)', borderRadius: '6px' }}>
+              <span style={{ color: 'var(--chair-muted)', fontSize: '11px' }}>Families</span>
+              <div style={{ fontWeight: 700, marginTop: '2px' }}>{summary.totalFamilyAccounts} ({summary.totalFamilyMembers || 29} members)</div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: 'var(--chair-bg)', borderRadius: '8px', fontSize: '13px' }}>
-              <span>Clinical Doctors:</span>
-              <strong>{summary.totalDoctors} Specialists</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: 'var(--chair-bg)', borderRadius: '8px', fontSize: '13px' }}>
-              <span>Department Heads:</span>
-              <strong>{summary.totalDepartmentHeads} Appointed</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: 'var(--chair-bg)', borderRadius: '8px', fontSize: '13px' }}>
-              <span>Hospital Administrators:</span>
-              <strong>{summary.totalHospitalAdmins} Active</strong>
+            <div style={{ padding: '8px', background: 'var(--chair-bg)', borderRadius: '6px' }}>
+              <span style={{ color: 'var(--chair-muted)', fontSize: '11px' }}>Clinical Staff</span>
+              <div style={{ fontWeight: 700, marginTop: '2px' }}>{summary.totalDoctors + summary.totalDepartmentHeads} Faculty</div>
             </div>
           </div>
         </div>
 
-        {/* Pillar 2: Appointment Analytics */}
+        {/* Pillar 2: Appointment Analytics with Donut Visualization */}
         <div className="table-card" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
             <div style={{ display: 'grid', placeItems: 'center', width: '38px', height: '38px', borderRadius: '10px', background: '#ccfbf1', color: '#0f766e' }}>
@@ -85,47 +112,34 @@ export function PlatformAnalyticsView() {
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>Appointment Resolution</h3>
-              <small style={{ color: 'var(--chair-muted)' }}>{summary.totalAppointments} total registered patient visits</small>
+              <small style={{ color: 'var(--chair-muted)' }}>{totalAppts} total registered patient visits</small>
             </div>
           </div>
 
-          {(() => {
-            const total = summary.totalAppointments || 128;
-            const comp = summary.completedAppointments || 96;
-            const upcom = summary.upcomingAppointments || 24;
-            const canc = summary.cancelledAppointments || 8;
-            const compPct = Math.round((comp / total) * 100);
-            const upcomPct = Math.round((upcom / total) * 100);
-            const cancPct = Math.round((canc / total) * 100);
-            return (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: '#dcfce7', borderRadius: '8px', fontSize: '13px', color: '#166534' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <CheckCircle size={15} />
-                    <span>Completed Consultations:</span>
-                  </div>
-                  <strong>{comp} ({compPct}%)</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: '#fef3c7', borderRadius: '8px', fontSize: '13px', color: '#92400e' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Clock size={15} />
-                    <span>Upcoming Scheduled:</span>
-                  </div>
-                  <strong>{upcom} ({upcomPct}%)</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: '#fee2e2', borderRadius: '8px', fontSize: '13px', color: '#991b1b' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <XCircle size={15} />
-                    <span>Cancelled / Rescheduled:</span>
-                  </div>
-                  <strong>{canc} ({cancPct}%)</strong>
-                </div>
-              </div>
-            );
-          })()}
+          <div style={{ marginBottom: '16px' }}>
+            <DonutChart
+              data={apptData}
+              size={150}
+              innerRadius={42}
+              outerRadius={65}
+              centerValue={totalAppts}
+              centerLabel="Visits"
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 10px', background: '#dcfce7', borderRadius: '6px', color: '#166534' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><CheckCircle size={13} /> Completed</span>
+              <strong>{compAppts} ({Math.round((compAppts / totalAppts) * 100)}%)</strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 10px', background: '#fef3c7', borderRadius: '6px', color: '#92400e' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><Clock size={13} /> Upcoming</span>
+              <strong>{upcomAppts} ({Math.round((upcomAppts / totalAppts) * 100)}%)</strong>
+            </div>
+          </div>
         </div>
 
-        {/* Pillar 3: System Health & Microservices */}
+        {/* Pillar 3: System Health & Radial Gauge */}
         <div className="table-card" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
             <div style={{ display: 'grid', placeItems: 'center', width: '38px', height: '38px', borderRadius: '10px', background: '#e0e7ff', color: '#4338ca' }}>
@@ -137,22 +151,27 @@ export function PlatformAnalyticsView() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: 'var(--chair-bg)', borderRadius: '8px', fontSize: '13px' }}>
-              <span>Platform System Uptime:</span>
-              <strong style={{ color: '#16a34a' }}>{summary.systemUptime || '99.98%'}</strong>
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0' }}>
+            <RadialGauge
+              value={99.98}
+              min={95}
+              max={100}
+              unit="%"
+              label="Uptime"
+              subtext="5 Microservice Nodes Healthy"
+              size={150}
+              color="#16a34a"
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', paddingTop: '10px', borderTop: '1px solid var(--chair-border)', fontSize: '12px' }}>
+            <div style={{ padding: '8px', background: 'var(--chair-bg)', borderRadius: '6px' }}>
+              <span style={{ color: 'var(--chair-muted)', fontSize: '11px' }}>Throughput</span>
+              <div style={{ fontWeight: 700, marginTop: '2px' }}>{summary.apiThroughput || '1,420 req/min'}</div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: 'var(--chair-bg)', borderRadius: '8px', fontSize: '13px' }}>
-              <span>API Gateway Throughput:</span>
-              <strong>{summary.apiThroughput || '1,420 req/min'}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: 'var(--chair-bg)', borderRadius: '8px', fontSize: '13px' }}>
-              <span>Average Response Latency:</span>
-              <strong>{summary.avgResponseTime || '142ms'}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: 'var(--chair-bg)', borderRadius: '8px', fontSize: '13px' }}>
-              <span>Microservice Cluster Nodes:</span>
-              <strong>5 Services (All Healthy)</strong>
+            <div style={{ padding: '8px', background: 'var(--chair-bg)', borderRadius: '6px' }}>
+              <span style={{ color: 'var(--chair-muted)', fontSize: '11px' }}>Avg Latency</span>
+              <div style={{ fontWeight: 700, marginTop: '2px' }}>{summary.avgResponseTime || '142ms'}</div>
             </div>
           </div>
         </div>

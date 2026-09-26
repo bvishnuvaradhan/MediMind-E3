@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import {
   TrendingUp,
-  Activity,
   Calendar,
   CheckCircle,
   Clock,
   AlertCircle,
-  Building2,
-  Video,
   ShieldCheck,
   BarChart3,
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
+import {
+  LineChart,
+  BarChart,
+  HeatmapChart,
+  DonutChart,
+  BulletChart,
+} from '../../common/charts';
 
 export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
   const [period, setPeriod] = useState('CURRENT_MONTH');
@@ -27,7 +31,6 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
 
   const totalBeds = Number(hospital.totalBeds) || 250;
   const occupiedBeds = Number(hospital.occupiedBeds) || 210;
-  const occupancyRate = `${Math.round((occupiedBeds / totalBeds) * 100)}%`;
 
   const totalAppts = kpis.totalAppointments || 128;
   const completedAppts = kpis.completedConsultations || 104;
@@ -135,14 +138,14 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
         />
       </div>
 
-      {/* 2-Column Section: Retrospective Growth + Weekly Operational Flow */}
+      {/* 2-Column Section: 5-Month Trajectory Line Chart + Weekly OPD Grouped Bar Chart */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '24px', marginBottom: '24px' }}>
-        {/* Monthly Retrospective Volume Trends */}
+        {/* Monthly Retrospective Volume Trends Line Chart */}
         <div className="ha-card-panel" style={{ margin: 0 }}>
           <div className="ha-card-panel-header">
             <div>
               <h3>Monthly Operational Volume Trends (May – Sep 2026)</h3>
-              <p>Five-month progression of scheduled intake and completed consultations</p>
+              <p>Five-month trajectory of scheduled intake and completed consultations</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--ha-text-muted)' }}>
               <TrendingUp size={14} style={{ color: 'var(--ha-primary)' }} />
@@ -150,83 +153,25 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '12px', marginBottom: '16px' }}>
-            {monthlyTrends.map((item) => {
-              const rate = Math.round((item.completed / item.appointments) * 100);
-              return (
-                <div
-                  key={item.month}
-                  style={{
-                    padding: '12px',
-                    borderRadius: '8px',
-                    backgroundColor: 'var(--ha-bg)',
-                    border: '1px solid var(--ha-border)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '6px',
-                  }}
-                >
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--ha-text-muted)', textTransform: 'uppercase' }}>
-                    {item.month.split(' ')[0]}
-                  </span>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ha-text-primary)' }}>
-                    {item.appointments}
-                  </div>
-                  <div style={{ fontSize: '11px', color: 'var(--ha-teal)', fontWeight: 600 }}>
-                    {item.completed} ({rate}%)
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Visual Bar Progression */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '140px', paddingTop: '16px', paddingBottom: '8px', gap: '10px' }}>
-            {monthlyTrends.map((item) => {
-              const heightPct = Math.round((item.appointments / 140) * 100);
-              const completedHeightPct = Math.round((item.completed / item.appointments) * 100);
-
-              return (
-                <div key={item.month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', height: '100%', justifyContent: 'flex-end' }}>
-                  <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--ha-text-primary)' }}>
-                    {item.completed}
-                  </span>
-
-                  <div
-                    style={{
-                      width: '100%',
-                      maxWidth: '36px',
-                      height: `${heightPct}%`,
-                      backgroundColor: 'var(--ha-soft-bg)',
-                      border: '1px solid var(--ha-border)',
-                      borderRadius: '6px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-end',
-                      overflow: 'hidden',
-                    }}
-                    title={`${item.month}: ${item.completed} of ${item.appointments} completed`}
-                  >
-                    <div
-                      style={{
-                        width: '100%',
-                        height: `${completedHeightPct}%`,
-                        backgroundColor: 'var(--ha-primary)',
-                        borderRadius: '0 0 5px 5px',
-                      }}
-                    />
-                  </div>
-
-                  <span style={{ fontSize: '10px', color: 'var(--ha-text-muted)', fontWeight: 600 }}>
-                    {item.month.split(' ')[0]}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+          <LineChart
+            data={monthlyTrends.map((m) => ({
+              label: m.month.split(' ')[0],
+              appointments: m.appointments,
+              completed: m.completed,
+              aiUsage: m.aiUsage,
+            }))}
+            xKey="label"
+            height={200}
+            yAxisLabel="Consultations"
+            series={[
+              { key: 'appointments', name: 'Intake Bookings', color: '#2563eb', area: true, fillOpacity: 0.18 },
+              { key: 'completed', name: 'Completed Cases', color: '#0f766e', area: true, fillOpacity: 0.12 },
+              { key: 'aiUsage', name: 'AI Screened', color: '#7c3aed' },
+            ]}
+          />
         </div>
 
-        {/* Weekly OPD Operational Flow */}
+        {/* Weekly OPD Operational Flow Grouped Bar Chart */}
         <div className="ha-card-panel" style={{ margin: 0 }}>
           <div className="ha-card-panel-header">
             <div>
@@ -239,115 +184,84 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '180px', paddingTop: '20px', paddingBottom: '10px', gap: '12px' }}>
-            {weeklyData.map((item) => {
-              const heightPct = Math.round((item.scheduled / 30) * 100);
-              const completedHeightPct = Math.round((item.completed / item.scheduled) * 100);
-
-              return (
-                <div key={item.day} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', height: '100%', justifyContent: 'flex-end' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--ha-text-primary)' }}>
-                    {item.completed}
-                  </span>
-
-                  <div
-                    style={{
-                      width: '100%',
-                      maxWidth: '38px',
-                      height: `${heightPct}%`,
-                      backgroundColor: 'var(--ha-soft-bg)',
-                      border: '1px solid var(--ha-border)',
-                      borderRadius: '6px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-end',
-                      overflow: 'hidden',
-                    }}
-                    title={`${item.day}: ${item.completed} completed of ${item.scheduled} scheduled`}
-                  >
-                    <div
-                      style={{
-                        width: '100%',
-                        height: `${completedHeightPct}%`,
-                        backgroundColor: 'var(--ha-teal)',
-                        borderRadius: '0 0 5px 5px',
-                      }}
-                    />
-                  </div>
-
-                  <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', fontWeight: 600 }}>
-                    {item.day}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', fontSize: '11px', color: 'var(--ha-text-muted)', paddingTop: '12px', borderTop: '1px solid var(--ha-border)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <div style={{ width: '10px', height: '10px', backgroundColor: 'var(--ha-teal)', borderRadius: '2px' }} />
-              <span>Completed Consultations</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <div style={{ width: '10px', height: '10px', backgroundColor: 'var(--ha-soft-bg)', border: '1px solid var(--ha-border)', borderRadius: '2px' }} />
-              <span>Scheduled Capacity</span>
-            </div>
-          </div>
+          <BarChart
+            data={weeklyData.map((w) => ({
+              label: w.day,
+              scheduled: w.scheduled,
+              completed: w.completed,
+            }))}
+            xKey="label"
+            height={200}
+            yAxisLabel="Daily Volume"
+            series={[
+              { key: 'scheduled', name: 'Scheduled Capacity', color: '#93c5fd' },
+              { key: 'completed', name: 'Completed Consultations', color: '#0f766e' },
+            ]}
+          />
         </div>
       </div>
 
-      {/* Hospital Infrastructure & Consultation Modalities */}
-      <div className="ha-card-panel">
-        <div className="ha-card-panel-header">
-          <div>
-            <h3>Hospital Operational Modalities & Infrastructure Capacity</h3>
-            <p>Intake channel breakdown, peak scheduling windows, and institution-level bed occupancy</p>
+      {/* 2-Column Section: OPD Hourly Peak Heatmap + Modality / Bed Capacity */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '24px', marginBottom: '24px' }}>
+        {/* OPD Peak Hours Activity Heatmap */}
+        <div className="ha-card-panel" style={{ margin: 0 }}>
+          <div className="ha-card-panel-header">
+            <div>
+              <h3>OPD Clinic Peak Activity Heatmap</h3>
+              <p>Consultation density matrix by day of week and operational time window</p>
+            </div>
           </div>
+
+          <HeatmapChart
+            xLabels={['9 AM', '11 AM', '1 PM', '3 PM', '5 PM']}
+            yLabels={['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']}
+            matrix={[
+              [6, 8, 4, 7, 3], // Mon
+              [7, 9, 5, 8, 2], // Tue
+              [5, 7, 3, 6, 4], // Wed
+              [6, 9, 4, 7, 3], // Thu
+              [4, 6, 3, 5, 2], // Fri
+              [3, 5, 2, 1, 0], // Sat
+            ]}
+            color="#2563eb"
+            height={190}
+          />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
-          <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ha-primary)', marginBottom: '6px' }}>
-              <Building2 size={16} />
-              <strong style={{ fontSize: '12px' }}>In-Person Physical Consultations</strong>
+        {/* Modality Donut + Bed Capacity Bullet Chart */}
+        <div className="ha-card-panel" style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <div className="ha-card-panel-header">
+            <div>
+              <h3>Care Modality Mix & Inpatient Capacity</h3>
+              <p>Consultation channel distribution and facility bed occupancy benchmarks</p>
             </div>
-            <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--ha-text-primary)' }}>
-              78% <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--ha-text-muted)' }}>(100 Bookings)</span>
-            </div>
-            <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>Hospital consultation suites</span>
           </div>
 
-          <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ha-teal)', marginBottom: '6px' }}>
-              <Video size={16} />
-              <strong style={{ fontSize: '12px' }}>Telehealth & Remote Video</strong>
-            </div>
-            <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--ha-text-primary)' }}>
-              22% <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--ha-text-muted)' }}>(28 Bookings)</span>
-            </div>
-            <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>Encrypted remote consultations</span>
-          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', flexWrap: 'wrap', gap: '16px' }}>
+            <DonutChart
+              data={[
+                { label: 'In-Person OPD', value: 100, color: '#2563eb' },
+                { label: 'Telehealth Video', value: 28, color: '#0f766e' },
+              ]}
+              size={140}
+              innerRadius={38}
+              outerRadius={58}
+              centerValue="128"
+              centerLabel="Total Visits"
+            />
 
-          <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ha-indigo)', marginBottom: '6px' }}>
-              <Activity size={16} />
-              <strong style={{ fontSize: '12px' }}>Hospital Bed Occupancy</strong>
+            <div style={{ flex: 1, minWidth: '180px' }}>
+              <BulletChart
+                title="Hospital Inpatient Bed Occupancy"
+                subtitle={`${occupiedBeds} of ${totalBeds} beds occupied`}
+                actual={Math.round((occupiedBeds / totalBeds) * 100)}
+                target={85}
+                max={100}
+                unit="%"
+                ranges={[60, 85, 100]}
+                color="#0f766e"
+              />
             </div>
-            <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--ha-text-primary)' }}>
-              {occupancyRate}
-            </div>
-            <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>{occupiedBeds} of {totalBeds} total beds occupied</span>
-          </div>
-
-          <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ha-warning)', marginBottom: '6px' }}>
-              <Clock size={16} />
-              <strong style={{ fontSize: '12px' }}>Peak Intake Window</strong>
-            </div>
-            <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--ha-text-primary)' }}>
-              09:00 AM – 12:00 PM
-            </div>
-            <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>54% of hospital patient volume</span>
           </div>
         </div>
       </div>

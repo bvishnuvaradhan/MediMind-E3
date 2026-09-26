@@ -3,6 +3,7 @@ import {
   Building2,
 } from 'lucide-react';
 import { chairmanService } from '../../../services/chairmanService';
+import { BarChart, BulletChart } from '../../common/charts';
 
 export function HospitalPerformanceView() {
   const [performance, setPerformance] = useState([]);
@@ -18,6 +19,14 @@ export function HospitalPerformanceView() {
   const totalDoctors = performance.reduce((sum, h) => sum + (Number(h.doctorsCount) || 0), 0);
   const totalVisits = performance.reduce((sum, h) => sum + (Number(h.appointmentsCount) || 0), 0);
   const totalAi = performance.reduce((sum, h) => sum + (Number(h.aiPredictionsCount) || 0), 0);
+
+  // Format data for Grouped BarChart
+  const barChartData = performance.map((h) => ({
+    label: h.name.replace('Hospital', '').replace('MediMind', '').trim(),
+    doctors: h.doctorsCount,
+    appointments: h.appointmentsCount,
+    aiRuns: h.aiPredictionsCount,
+  }));
 
   return (
     <div className="hospital-performance-view">
@@ -57,6 +66,63 @@ export function HospitalPerformanceView() {
           <p>Clinical AI Inferences</p>
           <h3 style={{ marginTop: '8px' }}>{totalAi} Predictions</h3>
           <span className="stat-delta">95.6% Average Confidence</span>
+        </div>
+      </div>
+
+      {/* Visual Comparative Analytics: Grouped Bar & Bullet Charts */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '22px', marginBottom: '24px' }}>
+        {/* Grouped Bar Chart */}
+        <div className="table-card" style={{ padding: '24px' }}>
+          <div style={{ marginBottom: '16px' }}>
+            <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>
+              Comparative Facility Throughput & Staffing
+            </h3>
+            <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
+              Side-by-side volume comparison across active hospital network nodes
+            </p>
+          </div>
+
+          <BarChart
+            data={barChartData}
+            xKey="label"
+            height={200}
+            series={[
+              { key: 'appointments', name: 'Visits', color: '#2563eb' },
+              { key: 'aiRuns', name: 'AI Runs', color: '#0f766e' },
+              { key: 'doctors', name: 'Doctors', color: '#4338ca' },
+            ]}
+          />
+        </div>
+
+        {/* Bullet Charts for Bed Occupancy */}
+        <div className="table-card" style={{ padding: '24px' }}>
+          <div style={{ marginBottom: '16px' }}>
+            <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>
+              Bed Capacity vs Operational Utilization
+            </h3>
+            <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
+              Inpatient capacity benchmarks (Target threshold: 85% occupancy)
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {performance.map((item) => {
+              const utilNum = parseFloat(item.utilizationRate) || 82;
+              return (
+                <BulletChart
+                  key={item.id}
+                  title={item.name}
+                  subtitle={`${item.city} (${item.departmentsCount} Depts)`}
+                  actual={utilNum}
+                  target={85}
+                  max={100}
+                  unit="%"
+                  ranges={[60, 85, 100]}
+                  color={utilNum > 85 ? '#d97706' : '#2563eb'}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
 

@@ -11,6 +11,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { chairmanService } from '../../../services/chairmanService';
+import { LineChart, RadarChart } from '../../common/charts';
 
 export function AiAnalyticsView() {
   const [aiData, setAiData] = useState(null);
@@ -224,10 +225,59 @@ export function AiAnalyticsView() {
         </div>
       </div>
 
+      {/* Visual Analytics: Monthly Trajectory Line Chart & Multi-Attribute Radar */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '22px', marginTop: '24px' }}>
+        {/* Multi-series Area / Line Chart */}
+        <div className="table-card" style={{ padding: '24px' }}>
+          <div style={{ marginBottom: '16px' }}>
+            <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>
+              Monthly Clinical Prediction Volume Trajectory
+            </h3>
+            <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
+              Five-month progression across 3 locked clinical AI models (May – Sep 2026)
+            </p>
+          </div>
+
+          <LineChart
+            data={monthlyVolume}
+            xKey="month"
+            height={200}
+            yAxisLabel="Inferences"
+            series={[
+              { key: 'fracture', name: 'Fracture CNN', color: '#2563eb', area: true, fillOpacity: 0.2 },
+              { key: 'diabetes', name: 'Diabetes ML', color: '#0f766e', area: true, fillOpacity: 0.15 },
+              { key: 'heart', name: 'Heart ML', color: '#4338ca', area: true, fillOpacity: 0.12 },
+            ]}
+          />
+        </div>
+
+        {/* Model Capability Radar Comparison */}
+        <div className="table-card" style={{ padding: '24px' }}>
+          <div style={{ marginBottom: '12px' }}>
+            <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>
+              Multidimensional Diagnostic Calibration Radar
+            </h3>
+            <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
+              Comparative benchmark scoring across clinical performance dimensions
+            </p>
+          </div>
+
+          <RadarChart
+            metrics={['Accuracy', 'Sensitivity', 'Specificity', 'Speed', 'Uptime']}
+            size={210}
+            data={[
+              { name: 'Fracture (ResNet50)', values: [97, 96, 98, 92, 99], color: '#2563eb' },
+              { name: 'Diabetes (XGBoost)', values: [95, 94, 96, 95, 99], color: '#0f766e' },
+              { name: 'Heart Disease (ML)', values: [95, 93, 97, 94, 99], color: '#4338ca' },
+            ]}
+          />
+        </div>
+      </div>
+
       {/* Monthly Volume Trend Table */}
       <div className="table-card" style={{ padding: '24px', marginTop: '24px' }}>
         <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>
-          Monthly Clinical Prediction Volume Trajectory
+          Detailed Clinical Inferences Tabulation
         </h3>
         <div className="table-responsive">
           <table className="data-table">

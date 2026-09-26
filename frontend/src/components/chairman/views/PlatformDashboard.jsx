@@ -16,6 +16,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { chairmanService } from '../../../services/chairmanService';
+import { DonutChart } from '../../common/charts';
 
 export function PlatformDashboard({ onNavigate }) {
   const [summary, setSummary] = useState(null);
@@ -245,42 +246,23 @@ export function PlatformDashboard({ onNavigate }) {
               const fRuns = aiData.modules?.fracture?.totalRuns || 31;
               const dRuns = aiData.modules?.diabetes?.totalRuns || 28;
               const hRuns = aiData.modules?.heartDisease?.totalRuns || 32;
-              const maxRuns = Math.max(fRuns, dRuns, hRuns, 40);
+              const total = fRuns + dRuns + hRuns;
+
+              const chartData = [
+                { label: 'Fracture Detection (CNN)', value: fRuns, color: '#2563eb' },
+                { label: 'Diabetes Risk (ML)', value: dRuns, color: '#0f766e' },
+                { label: 'Heart Disease Risk (ML)', value: hRuns, color: '#4338ca' },
+              ];
+
               return (
-                <>
-                  {/* Fracture Detection */}
-                  <div className="ai-meter-row">
-                    <div className="ai-meter-labels">
-                      <span><b>🦴 Fracture Detection</b> (CNN ResNet50)</span>
-                      <strong>{fRuns} runs ({aiData.modules?.fracture?.avgConfidence || '96.2%'} conf)</strong>
-                    </div>
-                    <div className="ai-meter-bar">
-                      <div className="ai-meter-fill" style={{ width: `${Math.round((fRuns / maxRuns) * 100)}%`, background: '#2563eb' }} />
-                    </div>
-                  </div>
-
-                  {/* Diabetes Risk */}
-                  <div className="ai-meter-row">
-                    <div className="ai-meter-labels">
-                      <span><b>🩺 Diabetes Risk</b> (XGBoost Classifier)</span>
-                      <strong>{dRuns} runs ({aiData.modules?.diabetes?.avgConfidence || '95.4%'} conf)</strong>
-                    </div>
-                    <div className="ai-meter-bar">
-                      <div className="ai-meter-fill" style={{ width: `${Math.round((dRuns / maxRuns) * 100)}%`, background: '#0f766e' }} />
-                    </div>
-                  </div>
-
-                  {/* Heart Disease Risk */}
-                  <div className="ai-meter-row">
-                    <div className="ai-meter-labels">
-                      <span><b>❤️ Heart Disease Risk</b> (Ensemble ML)</span>
-                      <strong>{hRuns} runs ({aiData.modules?.heartDisease?.avgConfidence || '95.2%'} conf)</strong>
-                    </div>
-                    <div className="ai-meter-bar">
-                      <div className="ai-meter-fill" style={{ width: `${Math.round((hRuns / maxRuns) * 100)}%`, background: '#4338ca' }} />
-                    </div>
-                  </div>
-                </>
+                <DonutChart
+                  data={chartData}
+                  size={170}
+                  innerRadius={46}
+                  outerRadius={72}
+                  centerValue={total}
+                  centerLabel="Inferences"
+                />
               );
             })()}
           </div>

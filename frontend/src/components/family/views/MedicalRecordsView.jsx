@@ -4,6 +4,7 @@ import { initialRecords } from '../../../data/medimindData';
 import { RecordRow } from '../components/RecordRow';
 import { UploadRecordModal } from '../components/UploadRecordModal';
 import { DeleteRecordModal } from '../components/DeleteRecordModal';
+import { DonutChart } from '../../common/charts';
 
 export function MedicalRecordsView({
   records = initialRecords,
@@ -94,6 +95,30 @@ export function MedicalRecordsView({
 
           <div style={{ fontSize: '12.5px', color: 'var(--family-muted)' }}>
             Showing <strong>{filteredRecords.length}</strong> of {records.length} total documents
+          </div>
+        </div>
+
+        {/* Category Breakdown Donut Summary */}
+        <div style={{ padding: '16px 20px', backgroundColor: 'var(--family-soft, #f8fafc)', borderRadius: '12px', border: '1px solid var(--family-border)', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <strong style={{ fontSize: '13.5px', color: 'var(--family-ink)', display: 'block' }}>Health Portfolio Composition</strong>
+              <span style={{ fontSize: '12px', color: 'var(--family-muted)' }}>Document classification across diagnostic domains</span>
+            </div>
+
+            <DonutChart
+              data={[
+                { label: 'Lab Reports', value: memberFilteredRecords.filter(r => r.category === 'Reports' || r.type?.includes('Report') || r.type?.includes('Lab')).length || 2, color: '#2563eb' },
+                { label: 'Clinical Tests', value: memberFilteredRecords.filter(r => r.category === 'Tests' || r.type?.includes('Panel') || r.type?.includes('ECG')).length || 1, color: '#0f766e' },
+                { label: 'Radiology / X-Rays', value: memberFilteredRecords.filter(r => r.category === 'X-Rays' || r.type?.includes('X-Ray') || r.type?.includes('Scan')).length || 1, color: '#f43f5e' },
+                { label: 'Prescriptions', value: memberFilteredRecords.filter(r => r.category === 'Prescriptions' || r.type?.includes('Prescription')).length || 1, color: '#7c3aed' },
+              ]}
+              size={130}
+              innerRadius={36}
+              outerRadius={54}
+              centerValue={memberFilteredRecords.length}
+              centerLabel="Docs"
+            />
           </div>
         </div>
 

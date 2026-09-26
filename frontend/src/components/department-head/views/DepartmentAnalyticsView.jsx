@@ -1,5 +1,6 @@
 import React from 'react';
 import StatCard from '../components/StatCard';
+import { BarChart, DonutChart, HeatmapChart } from '../../common/charts';
 
 export function DepartmentAnalyticsView({ analytics, departmentInfo }) {
   const weeklyTrends = analytics?.weeklyConsultationVolume || [
@@ -10,8 +11,6 @@ export function DepartmentAnalyticsView({ analytics, departmentInfo }) {
     { day: 'Fri', count: 18, target: 15 },
     { day: 'Sat', count: 9, target: 10 },
   ];
-
-  const maxVolume = Math.max(...weeklyTrends.map((t) => t.count), 20);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -86,81 +85,81 @@ export function DepartmentAnalyticsView({ analytics, departmentInfo }) {
         />
       </div>
 
-      {/* Two Column Layout: Weekly Volume and Case Types */}
+      {/* Two Column Layout: Weekly Volume BarChart and Subspecialty DonutChart */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '20px' }}>
-        {/* Weekly Consultation Volume Chart */}
+        {/* Weekly Consultation Volume Grouped Bar Chart */}
         <div className="dh-card">
           <div className="dh-card-header">
             <div>
-              <h3 className="dh-card-title">Weekly Consultation Volume</h3>
-              <div className="dh-card-description">Daily patient encounters vs planned capacity</div>
+              <h3 className="dh-card-title">Weekly Consultation Encounters vs Target</h3>
+              <div className="dh-card-description">Daily orthopedic clinic volume compared against planned quota</div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '10px' }}>
-            {weeklyTrends.map((t) => {
-              const pct = Math.round((t.count / maxVolume) * 100);
-              return (
-                <div key={t.day} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ width: '40px', fontSize: '12.5px', fontWeight: 700, color: 'var(--dh-text-secondary)' }}>
-                    {t.day}
-                  </span>
-                  <div style={{ flex: 1, backgroundColor: 'var(--dh-border)', height: '22px', borderRadius: '6px', overflow: 'hidden', position: 'relative' }}>
-                    <div
-                      style={{
-                        width: `${pct}%`,
-                        height: '100%',
-                        backgroundColor: 'var(--dh-primary-light)',
-                        borderRadius: '6px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-end',
-                        paddingRight: '8px',
-                        color: '#ffffff',
-                        fontSize: '11px',
-                        fontWeight: 700,
-                      }}
-                    >
-                      {t.count}
-                    </div>
-                  </div>
-                  <span style={{ fontSize: '11.5px', color: 'var(--dh-text-muted)', width: '60px', textAlign: 'right' }}>
-                    Quota: {t.target}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+          <BarChart
+            data={weeklyTrends.map((t) => ({
+              label: t.day,
+              actual: t.count,
+              target: t.target,
+            }))}
+            xKey="label"
+            height={200}
+            yAxisLabel="Encounters"
+            series={[
+              { key: 'actual', name: 'Actual Encounters', color: '#2563eb' },
+              { key: 'target', name: 'Capacity Target', color: '#93c5fd' },
+            ]}
+          />
         </div>
 
-        {/* Orthopedic Case Subspecialty Distribution */}
+        {/* Orthopedic Case Subspecialty Distribution Donut Chart */}
         <div className="dh-card">
           <div className="dh-card-header">
             <div>
-              <h3 className="dh-card-title">Orthopedic Subspecialty Mix</h3>
-              <div className="dh-card-description">Distribution of clinical cases this month</div>
+              <h3 className="dh-card-title">Orthopedic Subspecialty Case Distribution</h3>
+              <div className="dh-card-description">Breakdown of clinical procedures and diagnoses this cycle</div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {[
-              { sub: 'Trauma & Acute Fractures', pct: 42, count: '20 cases', color: 'var(--dh-coral)' },
-              { sub: 'Joint Arthroplasty (Knee/Hip)', pct: 34, count: '16 cases', color: 'var(--dh-blue)' },
-              { sub: 'Sports Medicine & Arthroscopy', pct: 14, count: '7 cases', color: 'var(--dh-teal)' },
-              { sub: 'Pediatric Musculoskeletal', pct: 10, count: '5 cases', color: 'var(--dh-primary-light)' },
-            ].map((item, i) => (
-              <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                  <span style={{ fontWeight: 600, color: 'var(--dh-text-primary)' }}>{item.sub}</span>
-                  <span style={{ fontWeight: 700, color: 'var(--dh-text-muted)' }}>{item.count} ({item.pct}%)</span>
-                </div>
-                <div className="dh-progress-container" style={{ height: '8px' }}>
-                  <div style={{ width: `${item.pct}%`, height: '100%', backgroundColor: item.color, borderRadius: '4px' }} />
-                </div>
-              </div>
-            ))}
+          <DonutChart
+            data={[
+              { label: 'Trauma & Acute Fractures', value: 20, color: '#f43f5e' },
+              { label: 'Joint Arthroplasty (Knee/Hip)', value: 16, color: '#2563eb' },
+              { label: 'Sports Medicine & Arthroscopy', value: 7, color: '#0f766e' },
+              { label: 'Pediatric Musculoskeletal', value: 5, color: '#7c3aed' },
+            ]}
+            size={160}
+            innerRadius={45}
+            outerRadius={70}
+            centerValue="48"
+            centerLabel="Total Cases"
+          />
+        </div>
+      </div>
+
+      {/* Department Shift Activity Heatmap */}
+      <div className="dh-card">
+        <div className="dh-card-header">
+          <div>
+            <h3 className="dh-card-title">Orthopedic Clinic Hourly Shift Activity Heatmap</h3>
+            <div className="dh-card-description">Consultation intake density across clinical hours and weekdays</div>
           </div>
         </div>
+
+        <HeatmapChart
+          xLabels={['09:00 AM', '11:00 AM', '01:00 PM', '03:00 PM', '05:00 PM']}
+          yLabels={['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']}
+          matrix={[
+            [4, 5, 2, 4, 1], // Mon
+            [5, 6, 3, 4, 2], // Tue
+            [4, 5, 2, 5, 2], // Wed
+            [3, 4, 2, 4, 1], // Thu
+            [5, 7, 3, 4, 2], // Fri
+            [3, 4, 2, 0, 0], // Sat
+          ]}
+          color="#2563eb"
+          height={180}
+        />
       </div>
     </div>
   );

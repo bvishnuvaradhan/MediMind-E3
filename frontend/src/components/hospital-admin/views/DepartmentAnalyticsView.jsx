@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Star,
 } from 'lucide-react';
+import { BarChart, DonutChart, BulletChart } from '../../common/charts';
 
 export function DepartmentAnalyticsView({ analytics = {} }) {
   const [search, setSearch] = useState('');
@@ -140,100 +141,159 @@ export function DepartmentAnalyticsView({ analytics = {} }) {
         </div>
       </div>
 
+      {/* Visual Analytics: Cross-Department Throughput Bar Chart & Volume Share Donut */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '20px', marginBottom: '24px' }}>
+        {/* Department Volume & AI Screenings Grouped Bar Chart */}
+        <div className="ha-card-panel" style={{ margin: 0 }}>
+          <div className="ha-card-panel-header">
+            <div>
+              <h3>Departmental Consultation Volume & AI Utilization</h3>
+              <p>Comparative volume across all operational hospital specialties</p>
+            </div>
+          </div>
+
+          <BarChart
+            data={filteredComparison.map((d) => ({
+              label: d.code || d.department.slice(0, 6),
+              appointments: d.appointments,
+              completed: d.completed,
+              ai: d.aiPredictions,
+            }))}
+            xKey="label"
+            height={200}
+            yAxisLabel="Cases"
+            series={[
+              { key: 'appointments', name: 'Booked Intake', color: '#2563eb' },
+              { key: 'completed', name: 'Completed Cases', color: '#0f766e' },
+              { key: 'ai', name: 'AI Screened', color: '#7c3aed' },
+            ]}
+          />
+        </div>
+
+        {/* Department Share Donut Chart */}
+        <div className="ha-card-panel" style={{ margin: 0 }}>
+          <div className="ha-card-panel-header">
+            <div>
+              <h3>Department Consultation Volume Share</h3>
+              <p>Relative distribution of patient volume across clinical departments</p>
+            </div>
+          </div>
+
+          <DonutChart
+            data={filteredComparison.map((d, i) => {
+              const colors = ['#2563eb', '#0f766e', '#4338ca', '#d97706', '#db2777', '#0891b2'];
+              return {
+                label: d.department,
+                value: d.appointments,
+                color: colors[i % colors.length],
+              };
+            })}
+            size={160}
+            innerRadius={45}
+            outerRadius={70}
+            centerValue={filteredComparison.reduce((sum, d) => sum + d.appointments, 0)}
+            centerLabel="Bookings"
+          />
+        </div>
+      </div>
+
       {/* Comparative Department Cards (Neutral Operational View - No Rankings/Gold) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-        {filteredComparison.map((dept) => (
-          <div key={dept.department} className="ha-card-panel" style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '10px',
-                    backgroundColor: 'var(--ha-soft-bg)',
-                    color: 'var(--ha-primary)',
-                    display: 'grid',
-                    placeItems: 'center',
-                  }}
-                >
-                  <Stethoscope size={20} />
+        {filteredComparison.map((dept) => {
+          const occNum = dept.bedOccupancy ? parseInt(dept.bedOccupancy, 10) : Number(dept.workloadPct) || 75;
+          return (
+            <div key={dept.department} className="ha-card-panel" style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
+                      backgroundColor: 'var(--ha-soft-bg)',
+                      color: 'var(--ha-primary)',
+                      display: 'grid',
+                      placeItems: 'center',
+                    }}
+                  >
+                    <Stethoscope size={20} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontFamily: 'Montserrat', fontSize: '15px', fontWeight: 700 }}>
+                      {dept.department}
+                    </h3>
+                    <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>
+                      {dept.code ? `CODE: ${dept.code} · ` : ''}Head: {dept.headName || 'Assigned Head'}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <h3 style={{ margin: 0, fontFamily: 'Montserrat', fontSize: '15px', fontWeight: 700 }}>
-                    {dept.department}
-                  </h3>
-                  <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>
-                    {dept.code ? `CODE: ${dept.code} · ` : ''}Head: {dept.headName || 'Assigned Head'}
+
+                <span className="ha-badge success">
+                  {dept.completionRate} Completion
+                </span>
+              </div>
+
+              {/* Metrics 2x2 Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', display: 'block' }}>Consultations</span>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ha-text-primary)' }}>
+                    {dept.completed} / {dept.appointments}
+                  </div>
+                  <span style={{ fontSize: '10px', color: 'var(--ha-teal)', fontWeight: 600 }}>
+                    {dept.doctors} Staff Doctors
+                  </span>
+                </div>
+
+                <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', display: 'block' }}>Bed / Ward Occupancy</span>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ha-indigo)' }}>
+                    {dept.bedOccupancy || `${dept.workloadPct}%`}
+                  </div>
+                  <span style={{ fontSize: '10px', color: 'var(--ha-text-muted)' }}>
+                    {dept.bedCapacity ? `${dept.bedCapacity} Total Beds` : 'Ward Capacity'}
+                  </span>
+                </div>
+
+                <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-soft-bg)', border: '1px solid var(--ha-border)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', display: 'block' }}>AI Screenings</span>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ha-primary)' }}>
+                    <Sparkles size={14} style={{ display: 'inline', marginRight: '3px' }} />
+                    {dept.aiPredictions} Cases
+                  </div>
+                  <span style={{ fontSize: '10px', color: 'var(--ha-text-muted)' }}>
+                    Avg {dept.avgConsultationMins} mins/visit
+                  </span>
+                </div>
+
+                <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-soft-bg)', border: '1px solid var(--ha-border)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', display: 'block' }}>Patient Rating</span>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ha-warning)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Star size={15} fill="currentColor" />
+                    <span>{dept.satisfactionRating || '4.8 / 5.0'}</span>
+                  </div>
+                  <span style={{ fontSize: '10px', color: 'var(--ha-text-muted)' }}>
+                    No-Show Rate: {dept.noShowRate || '2.3%'}
                   </span>
                 </div>
               </div>
 
-              <span className="ha-badge success">
-                {dept.completionRate} Completion
-              </span>
-            </div>
-
-            {/* Metrics 2x2 Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-                <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', display: 'block' }}>Consultations</span>
-                <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ha-text-primary)' }}>
-                  {dept.completed} / {dept.appointments}
-                </div>
-                <span style={{ fontSize: '10px', color: 'var(--ha-teal)', fontWeight: 600 }}>
-                  {dept.doctors} Staff Doctors
-                </span>
-              </div>
-
-              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', border: '1px solid var(--ha-border)' }}>
-                <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', display: 'block' }}>Bed / Ward Occupancy</span>
-                <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ha-indigo)' }}>
-                  {dept.bedOccupancy || `${dept.workloadPct}%`}
-                </div>
-                <span style={{ fontSize: '10px', color: 'var(--ha-text-muted)' }}>
-                  {dept.bedCapacity ? `${dept.bedCapacity} Total Beds` : 'Ward Capacity'}
-                </span>
-              </div>
-
-              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-soft-bg)', border: '1px solid var(--ha-border)' }}>
-                <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', display: 'block' }}>AI Screenings</span>
-                <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ha-primary)' }}>
-                  <Sparkles size={14} style={{ display: 'inline', marginRight: '3px' }} />
-                  {dept.aiPredictions} Cases
-                </div>
-                <span style={{ fontSize: '10px', color: 'var(--ha-text-muted)' }}>
-                  Avg {dept.avgConsultationMins} mins/visit
-                </span>
-              </div>
-
-              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-soft-bg)', border: '1px solid var(--ha-border)' }}>
-                <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)', display: 'block' }}>Patient Rating</span>
-                <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ha-warning)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Star size={15} fill="currentColor" />
-                  <span>{dept.satisfactionRating || '4.8 / 5.0'}</span>
-                </div>
-                <span style={{ fontSize: '10px', color: 'var(--ha-text-muted)' }}>
-                  No-Show Rate: {dept.noShowRate || '2.3%'}
-                </span>
-              </div>
-            </div>
-
-            {/* Capacity Progress Bar */}
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
-                <span style={{ color: 'var(--ha-text-muted)' }}>Capacity Utilization Rate</span>
-                <strong>{dept.bedOccupancy || `${dept.workloadPct}%`}</strong>
-              </div>
-              <div className="ha-progress-bar-bg">
-                <div
-                  className="ha-progress-bar-fill"
-                  style={{ width: dept.bedOccupancy ? `${parseInt(dept.bedOccupancy, 10)}%` : `${dept.workloadPct}%` }}
+              {/* Bullet Chart for Ward Capacity */}
+              <div style={{ marginTop: '4px' }}>
+                <BulletChart
+                  title="Ward & Clinic Capacity"
+                  subtitle={`${dept.bedCapacity || 50} beds allocated`}
+                  actual={occNum}
+                  target={85}
+                  max={100}
+                  unit="%"
+                  ranges={[60, 85, 100]}
+                  color={occNum > 85 ? '#d97706' : '#2563eb'}
                 />
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Comparative Department Table */}

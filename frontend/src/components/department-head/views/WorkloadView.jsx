@@ -1,10 +1,17 @@
 import React from 'react';
+import { BarChart } from '../../common/charts';
 
 export function WorkloadView({
   doctors = [],
 }) {
   const totalWorkload = doctors.reduce((sum, d) => sum + (Number(d.workload) || 0), 0);
   const activeDoctorsCount = doctors.filter((d) => d.status === 'Active').length;
+
+  const workloadChartData = doctors.map((d) => ({
+    name: d.name.replace('Dr. ', '').trim(),
+    activeLoad: Number(d.workload) || 0,
+    completed: Number(d.consultationsCompleted) || 0,
+  }));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -30,6 +37,27 @@ export function WorkloadView({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Faculty Workload Comparative Bar Chart */}
+      <div className="dh-card">
+        <div className="dh-card-header">
+          <div>
+            <h3 className="dh-card-title">Faculty Active Caseload vs Completed Throughput</h3>
+            <div className="dh-card-description">Live patient caseload allocation across orthopedic specialists</div>
+          </div>
+        </div>
+
+        <BarChart
+          data={workloadChartData}
+          xKey="name"
+          height={180}
+          yAxisLabel="Patients"
+          series={[
+            { key: 'activeLoad', name: 'Active Bookings', color: '#2563eb' },
+            { key: 'completed', name: 'Completed Cases', color: '#0f766e' },
+          ]}
+        />
       </div>
 
       {/* Doctor Cards */}

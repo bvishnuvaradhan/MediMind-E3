@@ -12,6 +12,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { initialPresentationData } from '../../../data/medimindData';
+import { RadialGauge, BulletChart, BarChart } from '../../common/charts';
 
 export function PersonalPredictionDetailView({
   prediction,
@@ -356,14 +357,21 @@ export function PersonalPredictionDetailView({
             </div>
           </div>
 
-          {/* Score Index Ring (Positioned cleanly in dedicated flex column) */}
-          <div className="insight-ring">
-            <span>{scoreValue}</span>
-            <small>index</small>
+          {/* Score Index Radial Gauge */}
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <RadialGauge
+              value={parseFloat(scoreValue) || 86}
+              min={0}
+              max={100}
+              unit="/100"
+              label="Health Score"
+              size={120}
+              color={activePred.riskLevel === 'High Risk' ? '#dc2626' : activePred.riskLevel === 'Moderate Risk' ? '#d97706' : '#16a34a'}
+            />
           </div>
         </div>
 
-        {/* Population Benchmark Card */}
+        {/* Population Benchmark Card with BulletChart */}
         <div className="activity-panel" style={{ padding: '22px 24px' }}>
           <div className="section-heading" style={{ marginBottom: '12px' }}>
             <div>
@@ -371,31 +379,50 @@ export function PersonalPredictionDetailView({
               <p style={{ fontSize: '12px', color: 'var(--family-muted)', margin: 0 }}>Relative to peer cohort (Age 45–65)</p>
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', margin: '8px 0' }}>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', marginBottom: '4px' }}>
-                <span>{activePred.memberName || 'Patient'}'s Risk Profile</span>
-                <strong style={{ color: 'var(--family-ink)' }}>{activePred.score || '14%'} (Favorable percentile)</strong>
-              </div>
-              <div style={{ height: '8px', backgroundColor: 'var(--family-border)', borderRadius: '4px', overflow: 'hidden' }}>
-                <div style={{ width: '85%', height: '100%', backgroundColor: '#16a34a', borderRadius: '4px' }} />
-              </div>
-            </div>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', marginBottom: '4px' }}>
-                <span>National Demographic Average</span>
-                <span style={{ color: 'var(--family-muted)' }}>38% average risk</span>
-              </div>
-              <div style={{ height: '8px', backgroundColor: 'var(--family-border)', borderRadius: '4px', overflow: 'hidden' }}>
-                <div style={{ width: '38%', height: '100%', backgroundColor: '#94a3b8', borderRadius: '4px' }} />
-              </div>
-            </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', margin: '8px 0' }}>
+            <BulletChart
+              title={`${activePred.memberName || 'Patient'}'s Risk Score`}
+              subtitle="Lower score indicates favorable risk"
+              actual={parseFloat(activePred.score) || 14}
+              target={38}
+              max={100}
+              unit="%"
+              ranges={[25, 50, 100]}
+              color="#16a34a"
+            />
           </div>
+
           <div className="secure-banner" style={{ marginTop: '14px', padding: '10px 12px' }}>
             <ShieldCheck size={16} style={{ flexShrink: 0 }} />
-            <span>Telemetry calibrated with multi-institutional healthcare cohorts.</span>
+            <span>Calibrated against validated multi-institutional healthcare clinical cohorts.</span>
           </div>
         </div>
+      </div>
+
+      {/* Biomarker Risk Factor Weighting Bar Chart */}
+      <div className="activity-panel" style={{ padding: '20px 24px', marginBottom: '20px' }}>
+        <div className="section-heading" style={{ marginBottom: '14px' }}>
+          <div>
+            <h2 style={{ fontSize: '15px', fontWeight: '700', margin: '0 0 2px 0' }}>Biomarker Risk Factor Sensitivity Breakdown</h2>
+            <p style={{ fontSize: '12px', color: 'var(--family-muted)', margin: 0 }}>Clinical indicator calibration & weighting</p>
+          </div>
+        </div>
+
+        <BarChart
+          data={[
+            { factor: 'Resting Blood Pressure', score: 85, status: 'Optimal (122/78 mmHg)' },
+            { factor: 'Serum Lipid Profile', score: 82, status: 'Desirable (<200 mg/dL)' },
+            { factor: 'Glycemic Regulation', score: 90, status: 'Euglycemic (HbA1c 5.4%)' },
+            { factor: 'Cardiorespiratory Rhythm', score: 88, status: 'Regular Sinus 70 bpm' },
+          ]}
+          layout="horizontal"
+          xKey="factor"
+          height={140}
+          series={[
+            { key: 'score', name: 'Health Indicator Score', color: '#0f766e' },
+          ]}
+        />
       </div>
 
       {/* 2. Recommended Specialist & Input Evidence Cards */}
