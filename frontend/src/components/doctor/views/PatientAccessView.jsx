@@ -46,17 +46,17 @@ export function PatientAccessView({ accessHistory = [] }) {
                     </strong>
                   </td>
                   <td>
-                    <div style={{ fontWeight: 500 }}>{item.action}</div>
+                    <div style={{ fontWeight: 500 }}>{item.action || 'Authorization Event'}</div>
                     <div style={{ fontSize: '11.5px', color: 'var(--doctor-text-muted)' }}>
-                      Scope: {item.scope}
+                      Scope: {item.scope || item.accessedItem || 'Complete Unified Medical Record'}
                     </div>
                   </td>
                   <td style={{ color: 'var(--doctor-text-secondary)', fontSize: '12.5px' }}>
-                    {item.date}
+                    {item.date || item.timestamp || 'Recent'}
                   </td>
                   <td>
-                    <span className={`doctor-badge doctor-badge-${item.status.toLowerCase()}`}>
-                      ● {item.status}
+                    <span className={`doctor-badge doctor-badge-${(item.status || 'Active').toLowerCase()}`}>
+                      ● {item.status || 'Active'}
                     </span>
                   </td>
                 </tr>

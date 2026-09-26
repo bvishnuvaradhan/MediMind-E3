@@ -23,7 +23,7 @@ let doctorsState = [...initialDoctors];
 let appointmentsState = [...initialAppointments];
 let analyticsState = { ...initialHospitalAnalytics };
 let reportsState = [...initialReports];
-let knowledgeState = { ...initialKnowledgeActivity };
+let knowledgeState = Array.isArray(initialKnowledgeActivity) ? [...initialKnowledgeActivity] : (initialKnowledgeActivity?.recentArticles ? [...initialKnowledgeActivity.recentArticles] : []);
 let auditLogsState = [...initialAuditLogs];
 let settingsState = { ...initialHospitalSettings };
 
