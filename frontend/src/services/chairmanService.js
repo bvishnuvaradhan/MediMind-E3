@@ -247,21 +247,27 @@ export const chairmanService = {
   // Doctors (Administrative workforce overview, strictly NO patient records)
   getDoctors: async (search = '', departmentFilter = 'All', hospitalFilter = 'All') => {
     return doctors.filter(doc => {
+      const docName = doc.name || '';
+      const docSpec = doc.specialization || doc.qualification || '';
+      const docDept = doc.department || doc.departmentName || '';
+      const docHosp = doc.hospital || doc.hospitalName || '';
       const matchSearch = search ? (
-        doc.name.toLowerCase().includes(search.toLowerCase()) ||
-        doc.specialization.toLowerCase().includes(search.toLowerCase()) ||
-        doc.department.toLowerCase().includes(search.toLowerCase())
+        docName.toLowerCase().includes(search.toLowerCase()) ||
+        docSpec.toLowerCase().includes(search.toLowerCase()) ||
+        docDept.toLowerCase().includes(search.toLowerCase())
       ) : true;
-      const matchDept = (!departmentFilter || departmentFilter === 'All') ? true : doc.department === departmentFilter;
-      const matchHosp = (!hospitalFilter || hospitalFilter === 'All') ? true : (doc.hospitalId === hospitalFilter || doc.hospital === hospitalFilter);
+      const matchDept = (!departmentFilter || departmentFilter === 'All') ? true : (docDept.toLowerCase() === departmentFilter.toLowerCase());
+      const matchHosp = (!hospitalFilter || hospitalFilter === 'All') ? true : (doc.hospitalId === hospitalFilter || docHosp.toLowerCase() === hospitalFilter.toLowerCase());
       return matchSearch && matchDept && matchHosp;
     });
   },
 
   getDoctorsByDepartmentAndHospital: async (departmentName, hospitalId) => {
     return doctors.filter(doc => {
-      const matchDept = !departmentName || departmentName === 'All' || doc.department.toLowerCase() === departmentName.toLowerCase();
-      const matchHosp = !hospitalId || hospitalId === 'All' || doc.hospitalId === hospitalId || doc.hospital === hospitalId;
+      const docDept = doc.department || doc.departmentName || '';
+      const docHosp = doc.hospital || doc.hospitalName || '';
+      const matchDept = !departmentName || departmentName === 'All' || docDept.toLowerCase() === departmentName.toLowerCase();
+      const matchHosp = !hospitalId || hospitalId === 'All' || doc.hospitalId === hospitalId || docHosp.toLowerCase() === hospitalId.toLowerCase();
       return matchDept && matchHosp;
     });
   },
