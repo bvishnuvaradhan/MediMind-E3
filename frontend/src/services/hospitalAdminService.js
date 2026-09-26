@@ -4,22 +4,22 @@
 
 import {
   initialHospitalProfile,
-  initialDepartments,
+  initialHospitalDepartments,
   initialDepartmentHeads,
-  initialDoctors,
+  initialHospitalDoctors,
   initialAppointments,
   initialHospitalAnalytics,
   initialReports,
   initialKnowledgeActivity,
   initialAuditLogs,
   initialHospitalSettings,
-} from '../data/medimindData';
+} from '../data/medimindData.js';
 
 // In-memory state for prototype lifecycle
 let hospitalProfileState = { ...initialHospitalProfile };
-let departmentsState = [...initialDepartments];
+let departmentsState = [...initialHospitalDepartments];
 let departmentHeadsState = [...initialDepartmentHeads];
-let doctorsState = [...initialDoctors];
+let doctorsState = [...initialHospitalDoctors];
 let appointmentsState = [...initialAppointments];
 let analyticsState = { ...initialHospitalAnalytics };
 let reportsState = [...initialReports];

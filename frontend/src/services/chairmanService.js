@@ -16,7 +16,7 @@ import {
   initialKnowledgeActivity,
   initialAuditLogs,
   initialPlatformSettings,
-} from '../data/medimindData';
+} from '../data/medimindData.js';
 
 // In-memory mutable state to support live UI interactions
 let platformSummary = { ...initialPlatformSummary };

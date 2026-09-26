@@ -11,7 +11,7 @@ import {
   initialDoctorPerformance,
   initialDepartmentArticles,
   initialDepartmentSettings,
-} from '../data/medimindData';
+} from '../data/medimindData.js';
 
 // In-memory working state
 let profileState = { ...initialDepartmentHeadProfile };

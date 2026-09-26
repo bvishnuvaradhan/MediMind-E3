@@ -607,13 +607,13 @@ export const departments = [
     headEmail: 'jessy.joseph@stjude.hospital',
     doctorsCount: 5,
     headsCount: 1,
-    linkedAi: 'Fracture Detection (CNN - ResNet50)',
-    aiModuleId: 'ai_fracture',
+    linkedAi: 'General Health Assessment (Clinical NLP)',
+    aiModuleId: 'ai_general',
     bedCapacity: 60,
     occupiedBeds: 50,
     status: 'Active',
     floor: 'Level 4, West Wing',
-    description: 'Comprehensive pediatric care, developmental assessments, newborn intensive care, and pediatric trauma screening.',
+    description: 'Comprehensive pediatric care, developmental assessments, newborn intensive care, and general clinical triage.',
   },
   {
     id: 'DEP-H3-GASTRO',
@@ -627,13 +627,13 @@ export const departments = [
     headEmail: 'sebastian.kora@stjude.hospital',
     doctorsCount: 4,
     headsCount: 1,
-    linkedAi: 'Diabetes Risk Assessment (XGBoost Classifier)',
-    aiModuleId: 'ai_diabetes',
+    linkedAi: 'General Health Assessment (Clinical NLP)',
+    aiModuleId: 'ai_general',
     bedCapacity: 50,
     occupiedBeds: 40,
     status: 'Active',
     floor: 'Level 5, East Wing',
-    description: 'Diagnostic and therapeutic upper GI endoscopy, colonoscopy, ERCP, and metabolic liver disease management.',
+    description: 'Diagnostic and therapeutic upper GI endoscopy, colonoscopy, ERCP, and digestive health assessment.',
   },
   {
     id: 'DEP-H3-NEPHRO',
@@ -647,13 +647,13 @@ export const departments = [
     headEmail: 'zachariah.thomas@stjude.hospital',
     doctorsCount: 4,
     headsCount: 1,
-    linkedAi: 'Diabetes Risk Assessment (XGBoost Classifier)',
-    aiModuleId: 'ai_diabetes',
+    linkedAi: 'General Health Assessment (Clinical NLP)',
+    aiModuleId: 'ai_general',
     bedCapacity: 40,
     occupiedBeds: 34,
     status: 'Active',
     floor: 'Level 5, West Wing',
-    description: 'Chronic kidney disease management, diabetic nephropathy mitigation, and 24/7 hemodialysis station operations.',
+    description: 'Chronic kidney disease management, renal mitigation, and 24/7 hemodialysis station operations.',
   },
 ];
 
@@ -4874,8 +4874,10 @@ export const initialPlatformSettings = platformSettings;
 
 // --- HOSPITAL ADMIN COMPATIBILITY EXPORTS ---
 export const initialHospitalProfile = hospitals[0];
+export const initialHospitalDepartments = departments.filter(d => d.hospitalId === 'HOSP-001');
 export const initialDepartmentHeads = departmentHeads.filter(h => h.hospitalId === 'HOSP-001');
-export const initialAppointments = appointments;
+export const initialHospitalDoctors = doctors.filter(d => d.hospitalId === 'HOSP-001');
+export const initialAppointments = appointments.filter(a => a.hospitalId === 'HOSP-001' || a.hospitalName?.includes('MediMind Central'));
 export const initialHospitalAnalytics = {
   totalOPDConsultations: 184,
   bedOccupancyPercentage: 84,
@@ -5104,26 +5106,29 @@ export const initialBookedSlots = bookedSlots;
 export const initialDoctorAccess = recordAccesses.filter(a => a.familyId === 'FAM-001');
 
 export const initialPresentationData = {
-  Doctors: doctors.slice(0, 4).map(doc => ({
+  Doctors: doctors.map(doc => ({
+    id: doc.id,
     title: doc.name,
     name: doc.name,
     department: doc.departmentName,
     specialty: doc.specialization,
     hospital: doc.hospitalName,
+    hospitalId: doc.hospitalId,
+    departmentId: doc.departmentId,
     detail: `${doc.departmentName} · ${doc.hospitalName}`,
-    meta: `Available today · ${doc.room}`,
+    meta: `Available today · ${doc.room || 'OPD Room 102'}`,
     tone: doc.avatarTone || 'coral',
     initials: doc.avatarInitials || 'DR',
     action: 'Book appointment',
-    qualifications: doc.qualification,
+    qualifications: doc.qualification || 'MBBS, MD',
     boardCertification: `Board Certified in ${doc.departmentName}`,
     experience: `${doc.experience} Clinical Practice`,
     fee: `₹${doc.consultationFee} (In-person) / ₹${doc.videoFee || 650} (Video)`,
     modes: ['In-person OPD Clinic', 'Secure Video Consultation', 'Post-Op Follow-up'],
     nextSlot: 'Today at 10:30 AM',
     rating: `${doc.rating} / 5.0 (240+ verified family reviews)`,
-    schedule: 'Monday – Saturday: 09:00 AM – 03:00 PM OPD',
-    summary: doc.description,
+    schedule: doc.opdSchedule || 'Monday – Saturday: 09:00 AM – 03:00 PM OPD',
+    summary: doc.description || `Specialist in ${doc.departmentName} at ${doc.hospitalName}`,
   })),
   Appointments: appointments.map(apt => ({
     title: `${apt.departmentName} appointment`,

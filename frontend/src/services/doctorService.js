@@ -12,7 +12,7 @@ import {
   initialDoctorArticles,
   initialDoctorNotifications,
   initialDoctorSettings,
-} from '../data/medimindData';
+} from '../data/medimindData.js';
 
 let profileState = { ...initialDoctorProfile };
 let patientsState = [...initialAuthorizedPatients];
