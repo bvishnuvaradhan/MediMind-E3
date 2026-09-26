@@ -92,10 +92,10 @@ export function DashboardView({
         />
         <StatCard
           label="AI Scans Screened"
-          value="3"
+          value={doctorProfile?.totalAiScansScreened || 12}
           tone="coral"
-          change="Fracture CNN Active"
-          changeType="neutral"
+          change="97.4% Model Calibration"
+          changeType="positive"
           subtext="Decision support telemetry"
           icon={
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">

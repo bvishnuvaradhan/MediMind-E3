@@ -60,7 +60,7 @@ export function DashboardView({
     <>
       <section className="welcome-row">
         <div>
-          <p className="eyebrow">Tuesday, 16 September 2026</p>
+          <p className="eyebrow">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
           <h1>
             Welcome back, {member?.name || 'Rohan'} <span>✦</span>
           </h1>

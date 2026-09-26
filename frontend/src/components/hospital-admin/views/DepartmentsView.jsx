@@ -8,7 +8,15 @@ import {
   ToggleRight,
   MapPin,
   Edit,
+  Activity,
+  HeartPulse,
+  Brain,
+  Wind,
+  Droplets,
+  UsersRound,
+  ShieldCheck,
 } from 'lucide-react';
+import { getDepartmentSpecialtyConfig } from '../../../utils/departmentTheme';
 
 export function DepartmentsView({
   departments,
@@ -35,39 +43,55 @@ export function DepartmentsView({
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
-        {departments.map((dept) => (
-          <div key={dept.id} className="ha-card-panel" style={{ display: 'flex', flexDirection: 'column', gap: '16px', margin: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div
-                  style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '10px',
-                    backgroundColor: 'var(--ha-soft-bg)',
-                    color: 'var(--ha-primary)',
-                    display: 'grid',
-                    placeItems: 'center',
-                  }}
-                >
-                  <Stethoscope size={22} />
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, fontFamily: 'Montserrat', fontSize: '16px', fontWeight: 700 }}>
-                    {dept.name}
-                  </h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
-                    <span style={{ fontSize: '11px', color: 'var(--ha-primary)', fontWeight: 700 }}>
-                      CODE: {dept.code}
-                    </span>
-                    {dept.specialization && (
-                      <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>
-                        · {dept.specialization}
+        {departments.map((dept) => {
+          const specialty = getDepartmentSpecialtyConfig(dept);
+          const renderDeptIcon = () => {
+            switch (specialty.iconName) {
+              case 'Activity': return <Activity size={22} />;
+              case 'HeartPulse': return <HeartPulse size={22} />;
+              case 'Brain': return <Brain size={22} />;
+              case 'Wind': return <Wind size={22} />;
+              case 'UsersRound': return <UsersRound size={22} />;
+              case 'Layers': return <Layers size={22} />;
+              case 'Droplets': return <Droplets size={22} />;
+              case 'ShieldCheck': return <ShieldCheck size={22} />;
+              default: return <Stethoscope size={22} />;
+            }
+          };
+
+          return (
+            <div key={dept.id} className="ha-card-panel" style={{ display: 'flex', flexDirection: 'column', gap: '16px', margin: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div
+                    style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '10px',
+                      backgroundColor: specialty.bgColor,
+                      color: specialty.textColor,
+                      display: 'grid',
+                      placeItems: 'center',
+                    }}
+                  >
+                    {renderDeptIcon()}
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontFamily: 'Montserrat', fontSize: '16px', fontWeight: 700 }}>
+                      {dept.name}
+                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                      <span style={{ fontSize: '11px', color: specialty.textColor, fontWeight: 700 }}>
+                        CODE: {dept.code}
                       </span>
-                    )}
+                      {dept.specialization && (
+                        <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>
+                          · {dept.specialization}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
               <span className={`ha-badge ${dept.status.toLowerCase()}`}>
                 {dept.status}
@@ -150,8 +174,9 @@ export function DepartmentsView({
               </button>
             </div>
           </div>
-        ))}
-      </div>
+        );
+      })}
     </div>
+  </div>
   );
 }

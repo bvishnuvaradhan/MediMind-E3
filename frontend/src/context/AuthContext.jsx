@@ -89,6 +89,16 @@ export function AuthProvider({ children }) {
 
   const login = async (email, _password, roleHint = null) => {
     setError(null);
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.clear();
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+      } catch {
+        // ignore storage errors
+      }
+    }
     const cleanEmail = (email || '').trim().toLowerCase();
 
     // Check credentials or roleHint for Doctor
@@ -148,6 +158,16 @@ export function AuthProvider({ children }) {
 
   const signup = async ({ name, email, password: _password }) => {
     setError(null);
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.clear();
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+      } catch {
+        // ignore
+      }
+    }
     const cleanEmail = (email || '').trim().toLowerCase();
     const cleanName = (name || '').trim() || cleanEmail.split('@')[0];
 
@@ -168,11 +188,31 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem(STORAGE_KEY);
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.clear();
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+      } catch {
+        // ignore
+      }
+    }
     setUser(null);
     setError(null);
   };
 
   const switchRole = (targetRole) => {
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.clear();
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+      } catch {
+        // ignore
+      }
+    }
     if (targetRole === 'DOCTOR') {
       setUser(DEFAULT_DOCTOR);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DOCTOR));

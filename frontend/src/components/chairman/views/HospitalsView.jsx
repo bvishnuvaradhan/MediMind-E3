@@ -21,8 +21,13 @@ import {
   Activity,
   HeartPulse,
   ShieldCheck,
+  Brain,
+  Wind,
+  Droplets,
+  UsersRound,
 } from 'lucide-react';
 import { chairmanService } from '../../../services/chairmanService';
+import { getDepartmentSpecialtyConfig } from '../../../utils/departmentTheme';
 
 export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = null, initialDeptId = null, announce }) {
   const [activeTab, setActiveTab] = useState(initialTab); // 'hospitals' | 'requests'
@@ -584,73 +589,101 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
                 </p>
               </div>
             ) : (
-              filteredDepartments.map((dept) => (
-                <div key={dept.id} className="table-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div
-                          style={{
-                            display: 'grid',
-                            placeItems: 'center',
-                            width: '44px',
-                            height: '44px',
-                            borderRadius: '12px',
-                            background: dept.id === 'DEP-ORTHO' ? '#e0e7ff' : dept.id === 'DEP-DIAB' ? '#ccfbf1' : '#fce7f3',
-                            color: dept.id === 'DEP-ORTHO' ? '#4338ca' : dept.id === 'DEP-DIAB' ? '#0f766e' : '#db2777',
-                          }}
-                        >
-                          {dept.id === 'DEP-ORTHO' ? <Activity size={22} /> : dept.id === 'DEP-DIAB' ? <Stethoscope size={22} /> : <HeartPulse size={22} />}
+              filteredDepartments.map((dept) => {
+                const specialty = getDepartmentSpecialtyConfig(dept);
+                const renderIcon = () => {
+                  switch (specialty.iconName) {
+                    case 'Activity': return <Activity size={22} />;
+                    case 'HeartPulse': return <HeartPulse size={22} />;
+                    case 'Brain': return <Brain size={22} />;
+                    case 'Wind': return <Wind size={22} />;
+                    case 'UsersRound': return <UsersRound size={22} />;
+                    case 'Layers': return <Layers size={22} />;
+                    case 'Droplets': return <Droplets size={22} />;
+                    case 'ShieldCheck': return <ShieldCheck size={22} />;
+                    default: return <Stethoscope size={22} />;
+                  }
+                };
+
+                return (
+                  <div
+                    key={dept.id}
+                    className="table-card"
+                    style={{
+                      padding: '24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+                      border: '1px solid var(--chair-border)',
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div
+                            style={{
+                              display: 'grid',
+                              placeItems: 'center',
+                              width: '44px',
+                              height: '44px',
+                              borderRadius: '12px',
+                              background: specialty.bgColor,
+                              color: specialty.textColor,
+                            }}
+                          >
+                            {renderIcon()}
+                          </div>
+                          <div>
+                            <h3 style={{ margin: 0, fontSize: '18px', fontFamily: 'Plus Jakarta Sans' }}>{dept.name}</h3>
+                            <span style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>{drillDownHospital.name}</span>
+                          </div>
+                        </div>
+                        <span className="badge badge-active">{dept.status}</span>
+                      </div>
+
+                      <p style={{ fontSize: '12px', color: 'var(--chair-muted)', margin: '0 0 16px', lineHeight: 1.5 }}>
+                        {dept.description}
+                      </p>
+
+                      <div style={{ padding: '12px 14px', borderRadius: '10px', background: 'var(--chair-bg)', marginBottom: '14px', border: '1px solid var(--chair-border)' }}>
+                        <span style={{ fontSize: '10px', color: 'var(--chair-muted)', display: 'block', fontWeight: 700 }}>DEPARTMENT HEAD</span>
+                        <strong style={{ fontSize: '13px', display: 'block', marginTop: '2px' }}>{dept.headName}</strong>
+                        <small style={{ color: 'var(--chair-muted)', fontSize: '11px' }}>{dept.headEmail}</small>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', borderRadius: '8px', background: specialty.badgeBg, color: specialty.textColor, fontSize: '12px', marginBottom: '16px', border: `1px solid ${specialty.borderColor}` }}>
+                        <Sparkles size={16} />
+                        <span><b>Linked AI:</b> {dept.linkedAi}</span>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', paddingTop: '12px', borderTop: '1px solid var(--chair-border)', textAlign: 'center', marginBottom: '16px' }}>
+                        <div>
+                          <small style={{ color: 'var(--chair-muted)', fontSize: '10px' }}>DOCTORS</small>
+                          <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--chair-sapphire)' }}>{dept.doctorsCount}</div>
                         </div>
                         <div>
-                          <h3 style={{ margin: 0, fontSize: '18px', fontFamily: 'Plus Jakarta Sans' }}>{dept.name}</h3>
-                          <span style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>{drillDownHospital.name}</span>
+                          <small style={{ color: 'var(--chair-muted)', fontSize: '10px' }}>VISITS</small>
+                          <div style={{ fontWeight: 700, fontSize: '15px' }}>{dept.appointmentsCount}</div>
+                        </div>
+                        <div>
+                          <small style={{ color: 'var(--chair-muted)', fontSize: '10px' }}>AI RUNS</small>
+                          <div style={{ fontWeight: 700, fontSize: '15px' }}>{dept.predictionsCount}</div>
                         </div>
                       </div>
-                      <span className="badge badge-active">{dept.status}</span>
                     </div>
 
-                    <p style={{ fontSize: '12px', color: 'var(--chair-muted)', margin: '0 0 16px', lineHeight: 1.5 }}>
-                      {dept.description}
-                    </p>
-
-                    <div style={{ padding: '12px 14px', borderRadius: '10px', background: 'var(--chair-bg)', marginBottom: '14px' }}>
-                      <span style={{ fontSize: '10px', color: 'var(--chair-muted)', display: 'block', fontWeight: 700 }}>DEPARTMENT HEAD</span>
-                      <strong style={{ fontSize: '13px', display: 'block', marginTop: '2px' }}>{dept.headName}</strong>
-                      <small style={{ color: 'var(--chair-muted)', fontSize: '11px' }}>{dept.headEmail}</small>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', borderRadius: '8px', background: 'var(--chair-indigo-soft)', color: 'var(--chair-indigo)', fontSize: '12px', marginBottom: '16px' }}>
-                      <Sparkles size={16} />
-                      <span><b>Linked AI:</b> {dept.linkedAi}</span>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', paddingTop: '12px', borderTop: '1px solid var(--chair-border)', textAlign: 'center', marginBottom: '16px' }}>
-                      <div>
-                        <small style={{ color: 'var(--chair-muted)', fontSize: '10px' }}>DOCTORS</small>
-                        <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--chair-sapphire)' }}>{dept.doctorsCount}</div>
-                      </div>
-                      <div>
-                        <small style={{ color: 'var(--chair-muted)', fontSize: '10px' }}>VISITS</small>
-                        <div style={{ fontWeight: 700, fontSize: '15px' }}>{dept.appointmentsCount}</div>
-                      </div>
-                      <div>
-                        <small style={{ color: 'var(--chair-muted)', fontSize: '10px' }}>AI RUNS</small>
-                        <div style={{ fontWeight: 700, fontSize: '15px' }}>{dept.predictionsCount}</div>
-                      </div>
-                    </div>
+                    <button
+                      className="primary-button"
+                      style={{ width: '100%', justifyContent: 'center' }}
+                      onClick={() => setDrillDownDept(dept)}
+                    >
+                      <Stethoscope size={15} />
+                      <span>View Doctors / Workforce ({dept.doctorsCount}) →</span>
+                    </button>
                   </div>
-
-                  <button
-                    className="primary-button"
-                    style={{ width: '100%', justifyContent: 'center' }}
-                    onClick={() => setDrillDownDept(dept)}
-                  >
-                    <Stethoscope size={15} />
-                    <span>View Doctors / Workforce ({dept.doctorsCount}) →</span>
-                  </button>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

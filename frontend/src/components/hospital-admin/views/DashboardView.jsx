@@ -12,8 +12,15 @@ import {
   ChevronRight,
   ShieldCheck,
   FileCode,
+  HeartPulse,
+  Brain,
+  Wind,
+  Droplets,
+  Layers,
+  UsersRound,
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
+import { getDepartmentSpecialtyConfig } from '../../../utils/departmentTheme';
 
 export function DashboardView({
   hospital,
@@ -35,6 +42,10 @@ export function DashboardView({
   const totalBeds = Number(hosp.totalBeds || hosp.bedCapacity || 250);
   const occupiedBeds = Number(hosp.occupiedBeds || 210);
   const occupancyPct = Math.round((occupiedBeds / totalBeds) * 100);
+
+  const deptSubtext = departments.length > 0
+    ? departments.map((d) => d.name.split(' ')[0]).slice(0, 3).join(', ') + (departments.length > 3 ? '...' : '')
+    : 'Clinical Departments';
 
   return (
     <div>
@@ -89,7 +100,7 @@ export function DashboardView({
         <StatCard
           label="Active Departments"
           value={departments.length}
-          subtext="Orthopedics, Diabetology, Cardiology"
+          subtext={deptSubtext}
           icon={Building2}
           tone="primary"
         />
@@ -135,54 +146,70 @@ export function DashboardView({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {departments.map((dept) => (
-              <div
-                key={dept.id}
-                style={{
-                  padding: '14px 16px',
-                  borderRadius: '10px',
-                  border: '1px solid var(--ha-border)',
-                  backgroundColor: 'var(--ha-bg)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  cursor: 'pointer',
-                }}
-                onClick={() => navigate('Departments')}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div
-                    style={{
-                      width: '38px',
-                      height: '38px',
-                      borderRadius: '8px',
-                      backgroundColor: 'var(--ha-card)',
-                      border: '1px solid var(--ha-border)',
-                      display: 'grid',
-                      placeItems: 'center',
-                      color: 'var(--ha-primary)',
-                    }}
-                  >
-                    <Stethoscope size={18} />
-                  </div>
-                  <div>
-                    <strong style={{ fontSize: '13px', display: 'block', color: 'var(--ha-text-primary)' }}>
-                      {dept.name}
-                    </strong>
-                    <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>
-                      Head: {dept.headName} · {dept.doctorsCount} Doctors · {dept.wardCapacity || 40} Beds
-                    </span>
-                  </div>
-                </div>
+            {departments.map((dept) => {
+              const specialty = getDepartmentSpecialtyConfig(dept);
+              const renderDeptIcon = () => {
+                switch (specialty.iconName) {
+                  case 'Activity': return <Activity size={18} />;
+                  case 'HeartPulse': return <HeartPulse size={18} />;
+                  case 'Brain': return <Brain size={18} />;
+                  case 'Wind': return <Wind size={18} />;
+                  case 'UsersRound': return <UsersRound size={18} />;
+                  case 'Layers': return <Layers size={18} />;
+                  case 'Droplets': return <Droplets size={18} />;
+                  case 'ShieldCheck': return <ShieldCheck size={18} />;
+                  default: return <Stethoscope size={18} />;
+                }
+              };
 
-                <div style={{ textAlign: 'right' }}>
-                  <span className="ha-badge success">{dept.status}</span>
-                  <div style={{ fontSize: '11px', color: 'var(--ha-text-muted)', marginTop: '4px' }}>
-                    {dept.activeAppointments} Active Appts
+              return (
+                <div
+                  key={dept.id}
+                  style={{
+                    padding: '14px 16px',
+                    borderRadius: '10px',
+                    border: '1px solid var(--ha-border)',
+                    backgroundColor: 'var(--ha-bg)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => navigate('Departments')}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '8px',
+                        backgroundColor: specialty.bgColor,
+                        color: specialty.textColor,
+                        display: 'grid',
+                        placeItems: 'center',
+                      }}
+                    >
+                      {renderDeptIcon()}
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: '13px', display: 'block', color: 'var(--ha-text-primary)' }}>
+                        {dept.name}
+                      </strong>
+                      <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>
+                        Head: {dept.headName} · {dept.doctorsCount} Doctors · {dept.wardCapacity || dept.bedCapacity || 40} Beds
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style={{ textAlign: 'right' }}>
+                    <span className="ha-badge success">{dept.status}</span>
+                    <div style={{ fontSize: '11px', color: 'var(--ha-text-muted)', marginTop: '4px' }}>
+                      {dept.activeAppointments || 12} Active Appts
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
