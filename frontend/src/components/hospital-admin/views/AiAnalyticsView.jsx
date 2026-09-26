@@ -19,17 +19,24 @@ export function AiAnalyticsView({ analytics = {} }) {
   const totalRuns = fRuns + dRuns + hRuns + gRuns;
 
   const aiDonutData = [
-    { label: 'Fracture Detection (CNN)', value: fRuns, color: '#4338ca' },
+    { label: 'Fracture Detection (CNN)', value: fRuns, color: '#2563eb' },
     { label: 'Diabetes Risk (ML)', value: dRuns, color: '#0f766e' },
-    { label: 'Heart Disease Risk (ML)', value: hRuns, color: '#2563eb' },
+    { label: 'Heart Disease Risk (ML)', value: hRuns, color: '#7c3aed' },
     { label: 'General Health (NLP)', value: gRuns, color: '#d97706' },
   ];
 
+  const radarData = [
+    { name: 'Fracture Detection', values: [98.4, 98.1, 98.8, 99.9], color: '#2563eb' },
+    { name: 'Diabetes Risk', values: [94.2, 93.5, 94.8, 99.8], color: '#0f766e' },
+    { name: 'Heart Disease Risk', values: [95.7, 95.2, 96.1, 99.9], color: '#7c3aed' },
+    { name: 'General Health Assessment', values: [93.1, 92.4, 93.8, 99.7], color: '#d97706' },
+  ];
+
   const latencyBarData = [
-    { module: 'Fracture (CNN)', latency: 34, color: '#4338ca' },
-    { module: 'Diabetes (ML)', latency: 12, color: '#0f766e' },
-    { module: 'Heart Disease (ML)', latency: 18, color: '#2563eb' },
-    { module: 'General Health (NLP)', latency: 42, color: '#d97706' },
+    { module: 'Fracture Detection', latency: 34, color: '#2563eb' },
+    { module: 'Diabetes Risk', latency: 12, color: '#0f766e' },
+    { module: 'Heart Disease Risk', latency: 18, color: '#7c3aed' },
+    { module: 'General Health Assessment', latency: 42, color: '#d97706' },
   ];
 
   return (
@@ -86,7 +93,7 @@ export function AiAnalyticsView({ analytics = {} }) {
       </div>
 
       {/* Visual Telemetry: AI Distribution Donut, Capability Radar & Latency Bar */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px', marginBottom: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px', marginBottom: '24px' }}>
         {/* Model Volume Share Donut */}
         <div className="ha-card-panel" style={{ margin: 0 }}>
           <div className="ha-card-panel-header">
@@ -106,25 +113,51 @@ export function AiAnalyticsView({ analytics = {} }) {
           />
         </div>
 
-        {/* Model Clinical Capability Radar */}
+        {/* Model Clinical Capability Radar & Calibration Benchmark Table */}
         <div className="ha-card-panel" style={{ margin: 0 }}>
           <div className="ha-card-panel-header">
             <div>
               <h3>AI Reliability & Accuracy Radar</h3>
-              <p>Performance metrics on 0–100% scale across diagnostic pipelines</p>
+              <p>Multi-dimensional operational telemetry across diagnostic pipelines</p>
             </div>
           </div>
 
           <RadarChart
             metrics={['Accuracy', 'Sensitivity', 'Specificity', 'Uptime']}
-            size={195}
-            data={[
-              { name: 'Fracture CNN', values: [98.4, 98.1, 98.8, 99.9], color: '#4338ca' },
-              { name: 'Diabetes ML', values: [94.2, 93.5, 94.8, 99.8], color: '#0f766e' },
-              { name: 'Heart ML', values: [95.7, 95.2, 96.1, 99.9], color: '#2563eb' },
-              { name: 'General Health', values: [93.1, 92.4, 93.8, 99.7], color: '#d97706' },
-            ]}
+            size={200}
+            data={radarData}
+            showLegend
+            allowModeToggle
           />
+
+          {/* Compact 4-Model Clinical Calibration Benchmark Table */}
+          <div style={{ marginTop: '14px', borderTop: '1px solid var(--ha-border, #e2e8f0)', paddingTop: '10px' }}>
+            <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ color: 'var(--ha-text-muted, #64748b)', textAlign: 'left', borderBottom: '1px solid var(--ha-border, #e2e8f0)' }}>
+                  <th style={{ paddingBottom: '6px' }}>AI Module</th>
+                  <th style={{ paddingBottom: '6px', textAlign: 'right' }}>Accuracy</th>
+                  <th style={{ paddingBottom: '6px', textAlign: 'right' }}>Sensitivity</th>
+                  <th style={{ paddingBottom: '6px', textAlign: 'right' }}>Specificity</th>
+                  <th style={{ paddingBottom: '6px', textAlign: 'right' }}>Uptime</th>
+                </tr>
+              </thead>
+              <tbody>
+                {radarData.map((row) => (
+                  <tr key={row.name} style={{ borderBottom: '1px solid rgba(0,0,0,0.03)' }}>
+                    <td style={{ padding: '5px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: row.color, flexShrink: 0 }} />
+                      <strong style={{ color: 'var(--ha-text-primary, #1e293b)' }}>{row.name}</strong>
+                    </td>
+                    <td style={{ textAlign: 'right', fontWeight: 600 }}>{row.values[0]}%</td>
+                    <td style={{ textAlign: 'right', fontWeight: 600 }}>{row.values[1]}%</td>
+                    <td style={{ textAlign: 'right', fontWeight: 600 }}>{row.values[2]}%</td>
+                    <td style={{ textAlign: 'right', color: '#16a34a', fontWeight: 700 }}>{row.values[3]}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Dedicated Latency Horizontal Bar */}
@@ -132,7 +165,7 @@ export function AiAnalyticsView({ analytics = {} }) {
           <div className="ha-card-panel-header">
             <div>
               <h3>Inference Latency by Module (ms)</h3>
-              <p>Average processing turnaround time per inference</p>
+              <p>Average turnaround processing time per inference</p>
             </div>
           </div>
 
@@ -140,7 +173,7 @@ export function AiAnalyticsView({ analytics = {} }) {
             data={latencyBarData}
             layout="horizontal"
             xKey="module"
-            height={160}
+            height={200}
             yMax={50}
             series={[
               { key: 'latency', name: 'Latency (ms)', color: '#0f766e' },

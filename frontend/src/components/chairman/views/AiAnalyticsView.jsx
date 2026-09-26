@@ -34,11 +34,18 @@ export function AiAnalyticsView() {
   const heartMod = modules?.heartDisease || {};
   const generalMod = modules?.generalHealth || {};
 
+  const radarData = [
+    { name: 'Fracture Detection', values: [98.4, 98.1, 98.8, 99.9], color: '#2563eb' },
+    { name: 'Diabetes Risk', values: [94.2, 93.5, 94.8, 99.8], color: '#0f766e' },
+    { name: 'Heart Disease Risk', values: [95.7, 95.2, 96.1, 99.9], color: '#7c3aed' },
+    { name: 'General Health Assessment', values: [93.1, 92.4, 93.8, 99.7], color: '#d97706' },
+  ];
+
   const latencyBarData = [
-    { module: 'Fracture (ResNet50)', latency: 34, color: '#2563eb' },
-    { module: 'Diabetes (XGBoost)', latency: 12, color: '#0f766e' },
-    { module: 'Heart (Ensemble)', latency: 18, color: '#4338ca' },
-    { module: 'General Health (NLP)', latency: 42, color: '#d97706' },
+    { module: 'Fracture Detection', latency: 34, color: '#2563eb' },
+    { module: 'Diabetes Risk', latency: 12, color: '#0f766e' },
+    { module: 'Heart Disease Risk', latency: 18, color: '#7c3aed' },
+    { module: 'General Health Assessment', latency: 42, color: '#d97706' },
   ];
 
   return (
@@ -315,33 +322,59 @@ export function AiAnalyticsView() {
             series={[
               { key: 'fracture', name: 'Fracture CNN', color: '#2563eb', area: true, fillOpacity: 0.2 },
               { key: 'diabetes', name: 'Diabetes ML', color: '#0f766e', area: true, fillOpacity: 0.15 },
-              { key: 'heart', name: 'Heart ML', color: '#4338ca', area: true, fillOpacity: 0.12 },
+              { key: 'heart', name: 'Heart ML', color: '#7c3aed', area: true, fillOpacity: 0.12 },
               { key: 'general', name: 'General Health NLP', color: '#d97706', area: true, fillOpacity: 0.1 },
             ]}
           />
         </div>
 
-        {/* Model Clinical Capability Radar Comparison (Accuracy / Sensitivity / Specificity / Uptime) */}
+        {/* Model Clinical Capability Radar Comparison (Accuracy / Sensitivity / Specificity / Uptime) + Calibration Table */}
         <div className="table-card" style={{ padding: '20px' }}>
           <div style={{ marginBottom: '12px' }}>
             <h3 style={{ margin: '0 0 4px', fontSize: '15px', fontFamily: 'Plus Jakarta Sans' }}>
               Multidimensional Diagnostic Calibration Radar
             </h3>
             <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
-              Comparative benchmark scoring on 0–100% scale across 4 clinical AI models
+              Comparative benchmark scoring on 0–100% scale across all 4 clinical AI models
             </p>
           </div>
 
           <RadarChart
             metrics={['Accuracy', 'Sensitivity', 'Specificity', 'Uptime']}
-            size={200}
-            data={[
-              { name: 'Fracture (ResNet50)', values: [98.4, 98.1, 98.8, 99.9], color: '#2563eb' },
-              { name: 'Diabetes (XGBoost)', values: [94.2, 93.5, 94.8, 99.8], color: '#0f766e' },
-              { name: 'Heart Disease (Ensemble)', values: [95.7, 95.2, 96.1, 99.9], color: '#4338ca' },
-              { name: 'General Health (NLP)', values: [93.1, 92.4, 93.8, 99.7], color: '#d97706' },
-            ]}
+            size={220}
+            data={radarData}
+            showLegend
+            allowModeToggle
           />
+
+          {/* Compact 4-Model Clinical Calibration Benchmark Table */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid var(--chair-border, #e2e8f0)', paddingTop: '12px' }}>
+            <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ color: 'var(--chair-muted, #64748b)', textAlign: 'left', borderBottom: '1px solid var(--chair-border, #e2e8f0)' }}>
+                  <th style={{ paddingBottom: '6px' }}>AI Module</th>
+                  <th style={{ paddingBottom: '6px', textAlign: 'right' }}>Accuracy</th>
+                  <th style={{ paddingBottom: '6px', textAlign: 'right' }}>Sensitivity</th>
+                  <th style={{ paddingBottom: '6px', textAlign: 'right' }}>Specificity</th>
+                  <th style={{ paddingBottom: '6px', textAlign: 'right' }}>Uptime</th>
+                </tr>
+              </thead>
+              <tbody>
+                {radarData.map((row) => (
+                  <tr key={row.name} style={{ borderBottom: '1px solid rgba(0,0,0,0.03)' }}>
+                    <td style={{ padding: '6px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: row.color, flexShrink: 0 }} />
+                      <strong style={{ color: 'var(--chair-text, #334155)' }}>{row.name}</strong>
+                    </td>
+                    <td style={{ textAlign: 'right', fontWeight: 600 }}>{row.values[0]}%</td>
+                    <td style={{ textAlign: 'right', fontWeight: 600 }}>{row.values[1]}%</td>
+                    <td style={{ textAlign: 'right', fontWeight: 600 }}>{row.values[2]}%</td>
+                    <td style={{ textAlign: 'right', color: '#16a34a', fontWeight: 700 }}>{row.values[3]}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Dedicated Horizontal Bar Chart for Latency */}
@@ -359,7 +392,7 @@ export function AiAnalyticsView() {
             data={latencyBarData}
             layout="horizontal"
             xKey="module"
-            height={180}
+            height={200}
             yMax={50}
             series={[
               { key: 'latency', name: 'Latency (ms)', color: '#0f766e' },
