@@ -146,7 +146,7 @@ export function DashboardView({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {departments.map((dept) => {
+            {departments.slice(0, 3).map((dept) => {
               const specialty = getDepartmentSpecialtyConfig(dept);
               const renderDeptIcon = () => {
                 switch (specialty.iconName) {
@@ -229,7 +229,7 @@ export function DashboardView({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {todayAppointments.slice(0, 4).map((apt) => (
+            {todayAppointments.slice(0, 3).map((apt) => (
               <div
                 key={apt.id}
                 style={{
@@ -343,14 +343,22 @@ export function DashboardView({
             <h3>Recent Administrative Activity</h3>
             <p>Recent configuration, department, and institutional governance changes</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--ha-text-muted)' }}>
-            <ShieldCheck size={14} style={{ color: 'var(--ha-teal)' }} />
-            <span>Audit Trail Active</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button
+              className="ha-btn ha-btn-outline ha-btn-sm"
+              onClick={() => navigate('Knowledge & Activity')}
+            >
+              View Activity Log <ArrowRight size={13} />
+            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--ha-text-muted)' }}>
+              <ShieldCheck size={14} style={{ color: 'var(--ha-teal)' }} />
+              <span>Audit Trail Active</span>
+            </div>
           </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {auditLogs.slice(0, 5).map((log) => (
+          {auditLogs.slice(0, 3).map((log) => (
             <div
               key={log.id}
               style={{

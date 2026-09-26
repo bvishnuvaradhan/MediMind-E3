@@ -123,7 +123,7 @@ export function DashboardView({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {doctors.map((doc) => {
+            {doctors.slice(0, 3).map((doc) => {
               return (
                 <div key={doc.id} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -195,7 +195,7 @@ export function DashboardView({
               { type: 'Distal Radius / Wrist', count: 8, confidence: '98.2%' },
               { type: 'Femoral Neck / Hip', count: 5, confidence: '96.5%' },
               { type: 'Tibia / Ankle Malleolus', count: 4, confidence: '97.1%' },
-            ]).map((f, i) => (
+            ]).slice(0, 3).map((f, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12.5px', padding: '6px 8px', backgroundColor: 'var(--dh-bg)', borderRadius: '6px' }}>
                 <span style={{ fontWeight: 500, color: 'var(--dh-text-primary)' }}>{f.type}</span>
                 <span style={{ fontSize: '11.5px', color: 'var(--dh-teal)', fontWeight: 600 }}>{f.count} cases ({f.confidence})</span>
@@ -238,7 +238,7 @@ export function DashboardView({
               </tr>
             </thead>
             <tbody>
-              {appointments.slice(0, 5).map((apt) => {
+              {appointments.slice(0, 3).map((apt) => {
                 const statusStr = apt.status || 'Confirmed';
                 const statusClass = statusStr.toLowerCase().replace(/\s+/g, '-');
                 const tokenText = apt.token || apt.id?.toUpperCase() || 'ORTHO-OPD';

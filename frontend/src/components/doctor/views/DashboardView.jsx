@@ -152,7 +152,7 @@ export function DashboardView({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {todayApts.map((apt) => (
+            {todayApts.slice(0, 3).map((apt) => (
               <div
                 key={apt.id}
                 style={{
@@ -266,7 +266,7 @@ export function DashboardView({
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-          {activePatients.map((pat) => (
+          {activePatients.slice(0, 3).map((pat) => (
             <div
               key={pat.id}
               style={{

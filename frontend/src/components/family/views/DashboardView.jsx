@@ -81,7 +81,7 @@ export function DashboardView({
         </div>
 
         <div className="member-cards">
-          {familyMembers.map((item, index) => (
+          {familyMembers.slice(0, 3).map((item, index) => (
             <button
               className={`member-card ${memberIndex === index ? 'selected' : ''}`}
               key={`${item.name}-${index}`}

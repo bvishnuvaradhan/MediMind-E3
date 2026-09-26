@@ -175,7 +175,7 @@ export function PlatformDashboard({ onNavigate }) {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {hospitals.map((hosp) => (
+            {hospitals.slice(0, 3).map((hosp) => (
               <div
                 key={hosp.id}
                 style={{
