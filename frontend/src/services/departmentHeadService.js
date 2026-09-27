@@ -11,6 +11,7 @@ import {
   initialDoctorPerformance,
   initialDepartmentArticles,
   initialDepartmentSettings,
+  knowledgeArticles,
 } from '../data/medimindData.js';
 
 // In-memory working state
@@ -173,6 +174,19 @@ export const departmentHeadService = {
 
   // --- Knowledge Articles & Reviewer ---
   async getArticles(filters = {}) {
+    if (Array.isArray(knowledgeArticles)) {
+      const existingIds = new Set(articlesState.map((a) => a.id));
+      const deptFromMaster = knowledgeArticles.filter(
+        (a) => a.departmentId === profileState.departmentId || a.department === profileState.departmentName
+      );
+      for (const art of deptFromMaster) {
+        if (!existingIds.has(art.id)) {
+          articlesState.unshift(art);
+          existingIds.add(art.id);
+        }
+      }
+    }
+
     let list = articlesState.filter((a) => {
       // Drafts are strictly private to their author
       if (a.status === 'Draft') {
@@ -228,15 +242,26 @@ export const departmentHeadService = {
       ...articleData,
     };
     articlesState = [newArticle, ...articlesState];
+    if (Array.isArray(knowledgeArticles) && !knowledgeArticles.some((a) => a.id === newArticle.id)) {
+      knowledgeArticles.unshift(newArticle);
+    }
     return newArticle;
   },
 
   async reviewArticle(articleId, { decision, feedback = '' }) {
+    if (Array.isArray(knowledgeArticles) && !articlesState.some((a) => a.id === articleId)) {
+      const fromMaster = knowledgeArticles.find((a) => a.id === articleId);
+      if (fromMaster) {
+        articlesState.unshift({ ...fromMaster });
+      }
+    }
+
     const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    let updatedArt = null;
     articlesState = articlesState.map((art) => {
       if (art.id === articleId) {
         if (decision === 'Approve' || decision === 'Published') {
-          return {
+          updatedArt = {
             ...art,
             status: 'Published',
             publishedDate: today,
@@ -245,8 +270,9 @@ export const departmentHeadService = {
             reviewerName: profileState.name || 'Dr. Priya Sharma',
             reviewerRole: profileState.title || profileState.role || 'Head of Orthopedics & Musculoskeletal Sciences',
           };
+          return updatedArt;
         } else if (decision === 'Changes Requested') {
-          return {
+          updatedArt = {
             ...art,
             status: 'Changes Requested',
             reviewedDate: today,
@@ -255,11 +281,20 @@ export const departmentHeadService = {
             reviewerName: profileState.name || 'Dr. Priya Sharma',
             reviewerRole: profileState.title || profileState.role || 'Head of Orthopedics & Musculoskeletal Sciences',
           };
+          return updatedArt;
         }
       }
       return art;
     });
-    return articlesState.find((a) => a.id === articleId);
+
+    if (Array.isArray(knowledgeArticles) && updatedArt) {
+      const idx = knowledgeArticles.findIndex((a) => a.id === articleId);
+      if (idx !== -1) {
+        knowledgeArticles[idx] = { ...knowledgeArticles[idx], ...updatedArt };
+      }
+    }
+
+    return updatedArt || articlesState.find((a) => a.id === articleId);
   },
 
   // --- Settings ---

@@ -13,6 +13,7 @@ import {
   initialDoctorNotifications,
   initialDoctorSettings,
   departmentHeads,
+  knowledgeArticles,
 } from '../data/medimindData.js';
 
 let profileState = { ...initialDoctorProfile };
@@ -263,6 +264,13 @@ export const doctorService = {
     return finalCons;
   },
 
+  async createConsultation(consultationData) {
+    if (consultationData.status === 'DRAFT') {
+      return this.saveDraftConsultation(consultationData);
+    }
+    return this.finalizeConsultation(consultationData);
+  },
+
   async amendConsultation(consultationId, amendmentData) {
     const original = consultationsState.find((c) => c.id === consultationId);
     if (!original) throw new Error('Consultation not found');
@@ -354,6 +362,13 @@ export const doctorService = {
     }
 
     return finalRx;
+  },
+
+  async createPrescription(rxData) {
+    if (rxData.status === 'DRAFT') {
+      return this.saveDraftPrescription(rxData);
+    }
+    return this.finalizePrescription(rxData);
   },
 
   async correctPrescription(prescriptionId, correctionData) {
@@ -455,6 +470,9 @@ export const doctorService = {
       ...articleData,
     };
     articlesState = [newArt, ...articlesState];
+    if (Array.isArray(knowledgeArticles) && !knowledgeArticles.some((a) => a.id === newArt.id)) {
+      knowledgeArticles.unshift(newArt);
+    }
     return newArt;
   },
 
@@ -484,26 +502,49 @@ export const doctorService = {
       }
       return a;
     });
+
+    if (Array.isArray(knowledgeArticles) && updatedArt) {
+      const idx = knowledgeArticles.findIndex((a) => a.id === articleId);
+      if (idx !== -1) {
+        knowledgeArticles[idx] = { ...knowledgeArticles[idx], ...updatedArt };
+      }
+    }
+
     return updatedArt || articlesState.find((a) => a.id === articleId);
   },
 
   async submitDraftForReview(articleId) {
     const deptHead = this.getDepartmentHead();
     const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-    articlesState = articlesState.map((a) =>
-      a.id === articleId
-        ? {
-            ...a,
-            status: 'Under Review',
-            submittedDate: today,
-            reviewerId: deptHead.id,
-            reviewerName: deptHead.name,
-            reviewerRole: deptHead.title,
-            reviewerFeedback: null,
-          }
-        : a
-    );
-    return articlesState.find((a) => a.id === articleId);
+    let updatedArt = null;
+    articlesState = articlesState.map((a) => {
+      if (a.id === articleId) {
+        updatedArt = {
+          ...a,
+          status: 'Under Review',
+          submittedDate: today,
+          reviewerId: deptHead.id,
+          reviewerName: deptHead.name,
+          reviewerRole: deptHead.title,
+          reviewerFeedback: null,
+        };
+        return updatedArt;
+      }
+      return a;
+    });
+
+    if (Array.isArray(knowledgeArticles) && updatedArt) {
+      const idx = knowledgeArticles.findIndex((a) => a.id === articleId);
+      if (idx !== -1) {
+        knowledgeArticles[idx] = { ...knowledgeArticles[idx], ...updatedArt };
+      }
+    }
+
+    return updatedArt || articlesState.find((a) => a.id === articleId);
+  },
+
+  async submitArticleForReview(articleId) {
+    return this.submitDraftForReview(articleId);
   },
 
   // --- Notifications ---

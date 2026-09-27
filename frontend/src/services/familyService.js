@@ -23,7 +23,13 @@ export const familyService = {
   },
 
   async getMemberByName(name) {
-    return membersState.find((m) => m.name.toLowerCase() === name.toLowerCase()) || null;
+    if (!name) return null;
+    const q = name.trim().toLowerCase();
+    return membersState.find((m) =>
+      (m.name && m.name.toLowerCase() === q) ||
+      (m.fullName && m.fullName.toLowerCase() === q) ||
+      (m.id && m.id.toLowerCase() === q)
+    ) || null;
   },
 
   async addMember(newMember) {
