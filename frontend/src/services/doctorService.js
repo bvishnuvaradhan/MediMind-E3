@@ -12,6 +12,7 @@ import {
   initialDoctorArticles,
   initialDoctorNotifications,
   initialDoctorSettings,
+  departmentHeads,
 } from '../data/medimindData.js';
 
 let profileState = { ...initialDoctorProfile };
@@ -309,6 +310,23 @@ export const doctorService = {
     return prescriptionsState.find((p) => p.id === prescriptionId);
   },
 
+  // --- Department Head Resolution ---
+  getDepartmentHead(departmentId = profileState.departmentId, hospitalId = profileState.hospitalId) {
+    return (
+      departmentHeads.find(
+        (dh) =>
+          (dh.departmentId === departmentId || dh.departmentName === profileState.departmentName) &&
+          (!hospitalId || dh.hospitalId === hospitalId)
+      ) || {
+        id: 'DH-H1-ORTHO',
+        name: 'Dr. Priya Sharma',
+        title: 'Head of Orthopedics & Musculoskeletal Sciences',
+        departmentName: profileState.departmentName || 'Orthopedics',
+        email: 'priya.sharma@medimindhospital.com',
+      }
+    );
+  },
+
   // --- Knowledge Articles ---
   async getArticles(filters = {}) {
     let list = [...articlesState];
@@ -321,34 +339,84 @@ export const doctorService = {
         (a) =>
           a.title.toLowerCase().includes(q) ||
           a.summary.toLowerCase().includes(q) ||
-          (a.tags && a.tags.some((t) => t.toLowerCase().includes(q)))
+          (a.tags && a.tags.some((t) => t.toLowerCase().includes(q))) ||
+          (a.author && a.author.toLowerCase().includes(q))
       );
     }
     return list;
   },
 
   async createArticle(articleData) {
+    const deptHead = this.getDepartmentHead();
+    const isSubmitting = Boolean(articleData.submitForReview);
+    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
     const newArt = {
       id: `art_doc_${Date.now()}`,
       author: profileState.name,
-      authorRole: profileState.title,
-      department: profileState.departmentName,
-      viewsCount: 0,
-      status: articleData.submitForReview ? 'Under Review' : 'Draft',
-      publishedDate: articleData.submitForReview ? 'Pending Review' : 'Draft',
+      authorId: profileState.id || 'doc_001',
+      authorRole: profileState.title || 'Senior Consultant Orthopedic Surgeon',
+      department: profileState.departmentName || 'Orthopedics',
+      departmentId: profileState.departmentId || 'DEP-H1-ORTHO',
+      hospital: profileState.hospitalName || 'MediMind Central Hospital',
+      hospitalId: profileState.hospitalId || 'HOSP-001',
+      views: 0,
+      citations: 0,
+      status: isSubmitting ? 'Under Review' : 'Draft',
+      createdDate: today,
+      submittedDate: isSubmitting ? today : null,
+      reviewerId: deptHead.id,
+      reviewerName: deptHead.name,
+      reviewerRole: deptHead.title,
+      tags: Array.isArray(articleData.tags) ? articleData.tags : (articleData.tags ? articleData.tags.split(',').map(t => t.trim()).filter(Boolean) : []),
       ...articleData,
     };
     articlesState = [newArt, ...articlesState];
     return newArt;
   },
 
+  async updateArticle(articleId, updatedData) {
+    const deptHead = this.getDepartmentHead();
+    const isSubmitting = Boolean(updatedData.submitForReview);
+    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    let updatedArt = null;
+
+    articlesState = articlesState.map((a) => {
+      if (a.id === articleId) {
+        const nextStatus = isSubmitting ? 'Under Review' : (updatedData.status || a.status || 'Draft');
+        updatedArt = {
+          ...a,
+          ...updatedData,
+          status: nextStatus,
+          submittedDate: isSubmitting ? today : a.submittedDate,
+          reviewerId: deptHead.id,
+          reviewerName: deptHead.name,
+          reviewerRole: deptHead.title,
+          reviewerFeedback: isSubmitting ? null : a.reviewerFeedback,
+          tags: Array.isArray(updatedData.tags)
+            ? updatedData.tags
+            : (updatedData.tags ? updatedData.tags.split(',').map(t => t.trim()).filter(Boolean) : (a.tags || [])),
+        };
+        return updatedArt;
+      }
+      return a;
+    });
+    return updatedArt || articlesState.find((a) => a.id === articleId);
+  },
+
   async submitDraftForReview(articleId) {
+    const deptHead = this.getDepartmentHead();
+    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     articlesState = articlesState.map((a) =>
       a.id === articleId
         ? {
             ...a,
             status: 'Under Review',
-            submittedDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+            submittedDate: today,
+            reviewerId: deptHead.id,
+            reviewerName: deptHead.name,
+            reviewerRole: deptHead.title,
+            reviewerFeedback: null,
           }
         : a
     );

@@ -23,7 +23,7 @@
 | `#ai-diagnostic` | `AiDiagnosticView.jsx` | 200 OK | `aiPredictions` | Model tabs (Fracture, Diabetes, Cardio, General), Prediction table, Open explainability trigger | Verified | Fluid (1440–320px) | Yes | **PASS** |
 | `#ai-explainability`| `AiExplainabilityView.jsx`| 200 OK | `selectedPrediction` | Grad-CAM heatmap overlay toggle, Feature importance sliders, Back to diagnostic list | Verified | Fluid (1440–320px) | Yes | **PASS** |
 | `#availability` | `AvailabilityView.jsx` | 200 OK | Doctor availability state | Day of week checkboxes, Start/End time pickers, Lunch break toggle, Buffer minutes, Save | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#knowledge` | `KnowledgeView.jsx` | 200 OK | `initialDoctorArticles` | Category filters, Search title/author, Create article modal, Read full guideline | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#knowledge` | `KnowledgeView.jsx` | 200 OK | `initialDoctorArticles` | Filter tabs (All, My Authored, Drafts, Under Review, Changes Requested, Published), Search title/author, Create/Edit/Resubmit draft modal, Read full guideline | Verified | Fluid (1440–320px) | Yes | **PASS** |
 | `#settings` | `SettingsView.jsx` | 200 OK | Doctor settings | Sound alert toggle, Auto-open AI heatmap, Walk-in allowance, Prescription validity days | Verified | Fluid (1440–320px) | Yes | **PASS** |
 
 ---
@@ -40,9 +40,16 @@
 3. **Consultation & Prescription Lifecycles**:
    - Consultations support `DRAFT` $\rightarrow$ `FINAL` $\rightarrow$ `AMENDED` with tracked amendment reason and timestamps.
    - Prescriptions support `DRAFT` $\rightarrow$ `FINAL` $\rightarrow$ `CORRECTED` with structured medications, dosage frequencies, and visible audit chains displaying previous prescription number, correction reason, and clinician identity.
-4. **Appointment Modality & AI Triage Badging**:
-   - Distinct badges clearly identify appointments requiring AI Pre-Screening (`AI Pre-Screened` with quick view modal) versus direct walk-in encounters (`Walk-in (AI Not Required)`).
-5. **AI Explainability & Diagnostics**:
+4. **Outpatient Appointments & AI Pre-Screen Resolution**:
+   - **Normal Booked Appointments**: Every standard booked appointment resolves to its patient record and linked AI pre-screen prediction (`aiPredictionId`, `moduleId`, or primary prediction). The AI pre-screen badge (`🔍 <Finding> (<Confidence>%)`) and active `"View AI Analysis"` button are interactive and directly open the linked AI telemetry and Grad-CAM diagnostics modal.
+   - **Walk-in Appointments**: Walk-ins are explicitly identified as the sole exception with `"Walk-in (AI Not Required)"` indicator and a non-clickable `"AI Not Required"` pill in Actions.
+   - **Multi-key Resolution**: Seamless resolution across `apt.patientId`, `apt.memberId`, and `apt.patientName` prevents missing predictions or orphaned records.
+5. **Knowledge & Publication Lifecycle**:
+   - **Workflow**: `DRAFT` $\rightarrow$ `Submit for Department Review` $\rightarrow$ `UNDER REVIEW` $\rightarrow$ `Department Head Clinical Review` $\rightarrow$ `PUBLISHED` (or `CHANGES REQUESTED` $\rightarrow$ `Edit & Resubmit` $\rightarrow$ `UNDER REVIEW`).
+   - **Department Head Assignment**: Automatically resolves the clinician's Department Head from central dataset (`doc_001` in `DEP-H1-ORTHO` $\rightarrow$ `DH-H1-ORTHO` Dr. Priya Sharma) without hardcoded IDs.
+   - **Doctor Permissions**: Doctors can draft, edit drafts, submit for review, and edit/resubmit articles with changes requested. Doctors cannot bypass review to publish directly. Under review and published articles are read-only.
+   - **Reviewer Feedback Display**: Articles with changes requested display prominent feedback callouts showing the Department Head's clinical notes.
+6. **AI Explainability & Diagnostics**:
    - Covers all 4 pipelines: Fracture Detection (`ai_fracture`), Diabetes Risk (`ai_diabetes`), Heart Disease Risk (`ai_cardio`), General Health Assessment (`ai_general`).
    - Grad-CAM heatmap overlays on actual radiographs (`rec_002` right knee) with region highlighting and confidence telemetry.
 
@@ -50,7 +57,8 @@
 
 ## 3. End-to-End User Journeys Tested: 100% PASSED
 
-- **Journey 3**: Availability Configuration $\rightarrow$ OPD Queue $\rightarrow$ Select Priya Kapoor $\rightarrow$ Patient Profile $\rightarrow$ Review Right Knee Radiograph & AI Fracture finding $\rightarrow$ Create Consultation Encounter $\rightarrow$ Save as Draft $\rightarrow$ Finalize Consultation $\rightarrow$ Amend with follow-up note $\rightarrow$ Prescribe Glucosamine & Calcium $\rightarrow$ Finalize Prescription.
+- **Journey 3 (OPD Consultation & Diagnostic Flow)**: Availability Configuration $\rightarrow$ OPD Queue $\rightarrow$ Select Priya Kapoor $\rightarrow$ Patient Profile $\rightarrow$ Review Right Knee Radiograph & AI Fracture finding $\rightarrow$ Create Consultation Encounter $\rightarrow$ Save as Draft $\rightarrow$ Finalize Consultation $\rightarrow$ Amend with follow-up note $\rightarrow$ Prescribe Glucosamine & Calcium $\rightarrow$ Finalize Prescription.
+- **Journey 4 (Knowledge Authoring & Review Flow)**: Open Knowledge Hub $\rightarrow$ Create new orthopedic draft guideline $\rightarrow$ Submit for Department Head review (`Dr. Priya Sharma`) $\rightarrow$ View Under Review status banner $\rightarrow$ View Changes Requested feedback on revised articles $\rightarrow$ Edit & Resubmit draft.
 
 ---
 
@@ -58,6 +66,7 @@
 
 - **Department & Hospital Scope**: Dr. Rahul Mehta operates under Orthopedics (`DEP-H1-ORTHO`) at MediMind Central Hospital (`HOSP-001`). Department and Hospital are strictly scope-locked in profile/settings, ensuring clinicians cannot select invalid hospital-department combinations.
 - **Clinical Immutability**: Finalized consultations and prescriptions cannot be deleted; modifications require structured amendments/corrections preserving the original clinical record.
+- **Editorial Review Boundary**: Doctors cannot self-publish guidelines directly into hospital-wide or system-wide knowledge base without Department Head review and approval.
 
 ---
 

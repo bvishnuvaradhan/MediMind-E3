@@ -1,5 +1,31 @@
 import React, { useState } from 'react';
 
+function resolvePatientForAppointment(apt, patients = []) {
+  if (!apt) return null;
+  return (
+    patients.find(
+      (p) =>
+        (apt.patientId && p.id === apt.patientId) ||
+        (apt.memberId && p.memberId === apt.memberId) ||
+        (apt.patientName && p.name.trim().toLowerCase() === apt.patientName.trim().toLowerCase())
+    ) || null
+  );
+}
+
+function resolvePredictionForAppointment(apt, patient) {
+  if (!patient || !patient.aiPredictions || patient.aiPredictions.length === 0) return null;
+  if (apt.aiPredictionId) {
+    const matched = patient.aiPredictions.find((pred) => pred.id === apt.aiPredictionId);
+    if (matched) return matched;
+  }
+  if (apt.aiModuleId || apt.moduleId) {
+    const modId = apt.aiModuleId || apt.moduleId;
+    const matched = patient.aiPredictions.find((pred) => pred.moduleId === modId);
+    if (matched) return matched;
+  }
+  return patient.aiPredictions[0];
+}
+
 export function AppointmentsView({
   appointments = [],
   patients = [],
@@ -114,8 +140,12 @@ export function AppointmentsView({
                 </tr>
               ) : (
                 filteredAppointments.map((apt) => {
-                  const patient = patients.find((p) => p.id === apt.patientId);
-                  const prediction = patient?.aiPredictions?.[0];
+                  const patient = resolvePatientForAppointment(apt, patients);
+                  const prediction = resolvePredictionForAppointment(apt, patient);
+                  const isWalkIn =
+                    apt.type?.toLowerCase().includes('walk-in') ||
+                    apt.type === 'Walk-in' ||
+                    apt.purpose?.toLowerCase().includes('walk-in');
 
                   return (
                     <tr key={apt.id}>
@@ -139,19 +169,36 @@ export function AppointmentsView({
                         <div style={{ fontSize: '11.5px', color: 'var(--doctor-text-muted)' }}>{apt.purpose}</div>
                       </td>
                       <td>
-                        {apt.type?.toLowerCase().includes('walk-in') || apt.type === 'Walk-in' ? (
-                          <span className="doctor-badge" style={{ fontSize: '11px', backgroundColor: '#f1f5f9', color: '#64748b', fontWeight: 600 }}>
+                        {isWalkIn ? (
+                          <span
+                            className="doctor-badge"
+                            style={{
+                              fontSize: '11px',
+                              backgroundColor: 'var(--doctor-bg)',
+                              color: 'var(--doctor-text-muted)',
+                              border: '1px solid var(--doctor-border)',
+                              fontWeight: 600,
+                            }}
+                          >
                             Walk-in (AI Not Required)
                           </span>
                         ) : prediction && onOpenAiExplain ? (
                           <button
                             type="button"
-                            className="doctor-badge doctor-badge-completed"
-                            style={{ fontSize: '11px', cursor: 'pointer', border: 'none', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '4px' }}
+                            className={`doctor-badge ${prediction.riskLevel === 'High' ? 'doctor-badge-high' : 'doctor-badge-completed'}`}
+                            style={{
+                              fontSize: '11.5px',
+                              cursor: 'pointer',
+                              border: 'none',
+                              textAlign: 'left',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                            }}
                             onClick={() => onOpenAiExplain(prediction, apt.patientName)}
                             title="Click to view concise AI Pre-Screen summary"
                           >
-                            🔍 {apt.aiPreCheck || prediction.finding || 'AI Screened (Optimal)'}
+                            🔍 {apt.aiPreCheck || `${prediction.finding} (${prediction.confidence}%)`}
                           </button>
                         ) : apt.aiPreCheck ? (
                           <span className="doctor-badge doctor-badge-completed" style={{ fontSize: '11px' }}>
@@ -159,7 +206,7 @@ export function AppointmentsView({
                           </span>
                         ) : (
                           <span style={{ fontSize: '12px', color: 'var(--doctor-text-muted)' }}>
-                            No AI Pre-Screen
+                            AI Pre-Screen Pending
                           </span>
                         )}
                       </td>
@@ -171,7 +218,7 @@ export function AppointmentsView({
                       <td>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
                           {/* AI Actions: AI Pre-Screen + View Full AI Analysis */}
-                          {apt.type?.toLowerCase().includes('walk-in') || apt.type === 'Walk-in' ? (
+                          {isWalkIn ? (
                             <span
                               style={{
                                 fontSize: '11px',
@@ -180,9 +227,11 @@ export function AppointmentsView({
                                 backgroundColor: 'var(--doctor-bg, #f8fafc)',
                                 borderRadius: '4px',
                                 border: '1px solid var(--doctor-border, #e2e8f0)',
+                                fontWeight: 600,
                               }}
+                              title="Walk-in encounters do not require prior AI screening"
                             >
-                              Walk-in (No AI)
+                              AI Not Required
                             </span>
                           ) : prediction && onOpenFullAiAnalysis ? (
                             <button
@@ -193,11 +242,18 @@ export function AppointmentsView({
                                 padding: '4px 8px',
                                 color: 'var(--doctor-teal)',
                                 borderColor: 'var(--doctor-teal)',
+                                fontWeight: 700,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
                               }}
-                              onClick={() => onOpenFullAiAnalysis(prediction, apt.patientId, 'appointments')}
+                              onClick={() => onOpenFullAiAnalysis(prediction, patient?.id || apt.patientId, 'appointments')}
                               title="Open dedicated full AI analysis and Grad-CAM telemetry view"
                             >
-                              View Full AI Analysis
+                              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                              </svg>
+                              View AI Analysis
                             </button>
                           ) : (
                             <button
@@ -210,7 +266,7 @@ export function AppointmentsView({
                                 opacity: 0.5,
                                 cursor: 'not-allowed',
                               }}
-                              title="Full AI analysis is not available for this appointment."
+                              title="AI analysis is not available for this record."
                             >
                               No AI Analysis
                             </button>
@@ -219,7 +275,7 @@ export function AppointmentsView({
                           <button
                             type="button"
                             className="doctor-btn doctor-btn-primary doctor-btn-sm"
-                            onClick={() => onSelectPatient(apt.patientId)}
+                            onClick={() => onSelectPatient(patient?.id || apt.patientId)}
                             style={{ fontSize: '11px', padding: '4px 8px' }}
                           >
                             Records

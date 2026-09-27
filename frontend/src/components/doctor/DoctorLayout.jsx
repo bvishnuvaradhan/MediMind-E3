@@ -145,7 +145,8 @@ export function DoctorLayout({ dark, setDark }) {
     patientName: '',
   });
 
-  const [isCreateArticleOpen, setIsCreateArticleOpen] = useState(false);
+  const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
+  const [articleModalData, setArticleModalData] = useState(null);
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
     title: '',
@@ -326,14 +327,41 @@ export function DoctorLayout({ dark, setDark }) {
   };
 
   // Article handlers
-  const handleCreateArticle = async (artData) => {
-    const newArt = await doctorService.createArticle(artData);
-    setArticles((prev) => [newArt, ...prev]);
-    showToast(
-      artData.submitForReview
-        ? `Article submitted to Dept Head for review: "${newArt.title}"`
-        : `Article saved as draft: "${newArt.title}"`
-    );
+  const handleOpenCreateArticle = () => {
+    setArticleModalData(null);
+    setIsArticleModalOpen(true);
+  };
+
+  const handleOpenEditArticle = (art) => {
+    setArticleModalData(art);
+    setIsArticleModalOpen(true);
+  };
+
+  const handleSaveArticle = async (artData) => {
+    let saved;
+    if (artData.id) {
+      saved = await doctorService.updateArticle(artData.id, artData);
+      setArticles((prev) => prev.map((a) => (a.id === saved.id ? saved : a)));
+      showToast(
+        artData.submitForReview
+          ? `Article resubmitted to Dept Head for review: "${saved.title}"`
+          : `Article draft updated: "${saved.title}"`
+      );
+    } else {
+      saved = await doctorService.createArticle(artData);
+      setArticles((prev) => [saved, ...prev]);
+      showToast(
+        artData.submitForReview
+          ? `Article submitted to Dept Head for review: "${saved.title}"`
+          : `Article saved as draft: "${saved.title}"`
+      );
+    }
+  };
+
+  const handleSubmitDraftArticle = async (articleId) => {
+    const updated = await doctorService.submitDraftForReview(articleId);
+    setArticles((prev) => prev.map((a) => (a.id === articleId ? updated : a)));
+    showToast(`Article submitted to Dept Head for review: "${updated.title}"`);
   };
 
   const handleOpenAiExplain = (prediction, patientName) => {
@@ -390,6 +418,11 @@ export function DoctorLayout({ dark, setDark }) {
     patients.find((p) => p.name === selectedAiPatientId) ||
     patients.find((p) => p.id === currentAiPrediction?.patientId) ||
     (currentPatient ? currentPatient : null);
+
+  const deptHead = doctorService.getDepartmentHead(
+    doctorProfile?.departmentId,
+    doctorProfile?.hospitalId
+  );
 
   // Tab Titles
   const tabTitles = {
@@ -465,12 +498,18 @@ export function DoctorLayout({ dark, setDark }) {
         onClose={() => setAiExplainModal({ isOpen: false, prediction: null, patientName: '' })}
       />
 
-      {/* Create Article Modal */}
+      {/* Create / Edit Article Modal */}
       <CreateArticleModal
-        isOpen={isCreateArticleOpen}
+        isOpen={isArticleModalOpen}
+        initialData={articleModalData}
         authorName={doctorProfile?.name || 'Dr. Rahul Mehta'}
-        onSave={handleCreateArticle}
-        onClose={() => setIsCreateArticleOpen(false)}
+        reviewerName={deptHead.name}
+        reviewerRole={deptHead.title}
+        onSave={handleSaveArticle}
+        onClose={() => {
+          setIsArticleModalOpen(false);
+          setArticleModalData(null);
+        }}
       />
 
       {/* Mobile Drawer Backdrop */}
@@ -834,7 +873,11 @@ export function DoctorLayout({ dark, setDark }) {
           {activeTab === 'knowledge' && (
             <KnowledgeView
               articles={articles}
-              onOpenCreateArticle={() => setIsCreateArticleOpen(true)}
+              doctorName={doctorProfile?.name || 'Dr. Rahul Mehta'}
+              deptHead={deptHead}
+              onOpenCreateArticle={handleOpenCreateArticle}
+              onOpenEditArticle={handleOpenEditArticle}
+              onSubmitDraft={handleSubmitDraftArticle}
             />
           )}
 
