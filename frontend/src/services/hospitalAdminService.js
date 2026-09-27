@@ -341,19 +341,32 @@ export const hospitalAdminService = {
 
   // --- Knowledge Activity ---
   async getKnowledgeActivity() {
-    const articles = Array.isArray(knowledgeState) ? knowledgeState : (knowledgeState.recentArticles || []);
+    const raw = Array.isArray(knowledgeState) ? knowledgeState : (knowledgeState.recentArticles || []);
+    const currentHospitalId = hospitalProfileState?.id || 'HOSP-001';
+    const currentHospitalName = hospitalProfileState?.name || 'MediMind Central Hospital';
+
+    const hospitalArticles = raw.filter(a => {
+      const isHospitalMatch = (a.hospitalId === currentHospitalId) || (a.hospital === currentHospitalName) || (!a.hospitalId && !a.hospital);
+      const isNotDraft = a.status !== 'Draft';
+      return isHospitalMatch && isNotDraft;
+    });
+
+    const published = hospitalArticles.filter(a => a.status === 'Published');
+    const underReview = hospitalArticles.filter(a => a.status === 'Under Review' || a.status === 'Changes Requested');
+
     return {
       stats: {
-        totalArticles: articles.length,
-        totalPublished: articles.length,
-        publishedThisMonth: 4,
-        peerReviewsPending: 2,
-        clinicalGuidelinesActive: 8,
-        orthopedicsPublished: articles.filter(a => a.department === 'Orthopedics').length,
-        diabetologyPublished: articles.filter(a => a.department?.includes('Diab')).length,
-        cardiologyPublished: articles.filter(a => a.department === 'Cardiology').length,
+        totalArticles: hospitalArticles.length,
+        totalPublished: published.length,
+        publishedThisMonth: published.filter(a => (a.date || a.publishedDate || '').includes('Sep 2026')).length,
+        peerReviewsPending: underReview.length,
+        clinicalGuidelinesActive: hospitalArticles.filter(a => (a.category || '').toLowerCase().includes('clinical') || (a.tags || []).some(t => t.toLowerCase().includes('protocol') || t.toLowerCase().includes('guideline'))).length,
+        orthopedicsPublished: published.filter(a => (a.department || '').includes('Ortho')).length,
+        diabetologyPublished: published.filter(a => (a.department || '').includes('Diab')).length,
+        cardiologyPublished: published.filter(a => (a.department || '').includes('Cardio')).length,
+        generalMedicinePublished: published.filter(a => (a.department || '').includes('General')).length,
       },
-      recentArticles: [...articles],
+      recentArticles: [...hospitalArticles],
     };
   },
 

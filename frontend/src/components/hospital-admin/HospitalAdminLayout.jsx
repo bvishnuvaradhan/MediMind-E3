@@ -513,6 +513,9 @@ export function HospitalAdminLayout({ dark, setDark }) {
       return (
         <KnowledgeActivityView
           knowledge={knowledge}
+          hospital={hospital}
+          departments={departments}
+          doctors={doctors}
         />
       );
     }

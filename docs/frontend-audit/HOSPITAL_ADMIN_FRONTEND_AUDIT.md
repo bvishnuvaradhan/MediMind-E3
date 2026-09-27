@@ -25,7 +25,7 @@
 | `#department-analytics` | `DepartmentAnalyticsView.jsx` | 200 OK | Scoped department metrics | Department comparative throughput (Bar), Caseload distribution, Completion rates | Verified | Fluid (1440–320px) | Yes | **PASS** |
 | `#ai-analytics` | `AiAnalyticsView.jsx` | 200 OK | `initialAiAnalytics` | Hospital-wide AI accuracy (98.2%), 4-module radar chart, Inference latency chart (Bar) | Verified | Fluid (1440–320px) | Yes | **PASS** |
 | `#reports` | `ReportsView.jsx` | 200 OK | `initialReports` | Download audit report PDF, Generate report modal, Filter reports, Audit status badge | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#knowledge` | `KnowledgeActivityView.jsx`| 200 OK | `knowledgeArticles` | Hospital clinical publications, Author department, Citations, Views count, Read article | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#knowledge` | `KnowledgeActivityView.jsx`| 200 OK | `knowledgeArticles` | Multi-filter (Dept, Status, Author, Period), Search, Dynamic item counter, Reset filters, Read-only protocol reader modal | Verified | Fluid (1440–320px) | Yes | **PASS** |
 | `#settings` | `SettingsView.jsx` | 200 OK | Hospital settings | EMR integration status, Emergency OPD override, Auto-dispatch reports, SMS notifications | Verified | Fluid (1440–320px) | Yes | **PASS** |
 
 ---
@@ -36,6 +36,15 @@
    - Rajesh Kumar (`ADM-001`) manages only MediMind Central Hospital (`HOSP-001`). Cannot view or alter St. Jude (`HOSP-002`) or Apex Institute (`HOSP-003`) data.
    - Hospital 2 (`HOSP-002`) correctly supports 3 AI modules (`ai_fracture`, `ai_cardio`, `ai_diabetes`) excluding `ai_general`.
    - Hospital 1 (`HOSP-001`) and Hospital 3 (`HOSP-003`) support all 4 AI modules.
+2. **Knowledge & Article Oversight Filtering**:
+   - Multi-dimensional filter system operating dynamically on hospital knowledge records:
+     - **Department**: All, Orthopedics, Diabetology & Endocrinology, Cardiology, General Medicine.
+     - **Publication Status**: All, Published, Under Review, Changes Requested.
+     - **Author / Doctor**: All, Dr. Priya Sharma, Dr. Suresh Iyer, Dr. Sunita Patel, Dr. Rajesh Gupta, Dr. Rahul Mehta.
+     - **Period**: All, September 2026, Earlier 2026.
+     - **Keyword Search**: Combined with all active filters using AND logic.
+   - Zero exposure of private clinical draft articles (`status === 'Draft'` strictly filtered out).
+   - Read-only institutional oversight archive with responsive modal scrolling and zero unauthorized write/review mutation triggers.
 3. **Dynamic Operational & Department Analytics**:
    - `HospitalAnalyticsView` supports interactive period filters (`Current Month`, `Last Month`, `Q3`, `YTD`) that recompute KPI cards, weekly volume lines, and modality donut distributions in real time.
    - `DepartmentAnalyticsView` features a clean department selector dropdown to dynamically benchmark department-level throughput, caseload distribution, and completion rates without clutter.
