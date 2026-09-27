@@ -401,6 +401,70 @@ export function AiAnalyticsView() {
         </div>
       </div>
 
+      {/* Hospital Network AI Deployment & Module Provisioning Matrix */}
+      <div className="table-card" style={{ padding: '24px', marginTop: '24px' }}>
+        <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>
+          Hospital Network AI Deployment & Provisioning Matrix
+        </h3>
+        <p style={{ margin: '0 0 16px', fontSize: '12px', color: 'var(--chair-muted)' }}>
+          Institutional microservice activation status and diagnostic coverage across network hospitals
+        </p>
+
+        <div className="table-responsive">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Hospital Facility</th>
+                <th>Network ID</th>
+                <th>🦴 Fracture CNN</th>
+                <th>🩺 Diabetes ML</th>
+                <th>❤️ Heart Disease ML</th>
+                <th>🧠 General Health NLP</th>
+                <th>Deployment Coverage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>MediMind Central Hospital</strong>
+                  <div style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>Multi-Specialty Facility</div>
+                </td>
+                <td><span className="badge badge-info">HOSP-001</span></td>
+                <td><span className="badge badge-active">Active</span></td>
+                <td><span className="badge badge-active">Active</span></td>
+                <td><span className="badge badge-active">Active</span></td>
+                <td><span className="badge badge-active">Active</span></td>
+                <td><strong>4 of 4 Modules (100%)</strong></td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>City Care Hospital</strong>
+                  <div style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>Community Healthcare Center</div>
+                </td>
+                <td><span className="badge badge-info">HOSP-002</span></td>
+                <td><span className="badge badge-active">Active</span></td>
+                <td><span className="badge badge-active">Active</span></td>
+                <td><span className="badge badge-active">Active</span></td>
+                <td><span className="badge badge-pending">Not Deployed</span></td>
+                <td><strong style={{ color: '#d97706' }}>3 of 4 Modules (75%)</strong></td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Apex Institute of Medical Sciences</strong>
+                  <div style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>Tertiary Academic Center</div>
+                </td>
+                <td><span className="badge badge-info">HOSP-003</span></td>
+                <td><span className="badge badge-active">Active</span></td>
+                <td><span className="badge badge-active">Active</span></td>
+                <td><span className="badge badge-active">Active</span></td>
+                <td><span className="badge badge-active">Active</span></td>
+                <td><strong>4 of 4 Modules (100%)</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* Monthly Volume Trend Table with All 4 Modules */}
       <div className="table-card" style={{ padding: '24px', marginTop: '24px' }}>
         <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>

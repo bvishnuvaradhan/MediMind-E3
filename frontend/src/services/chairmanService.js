@@ -343,9 +343,9 @@ export const chairmanService = {
     }));
   },
 
-  // Knowledge Activity
+  // Knowledge Activity (Platform-wide oversight, Drafts strictly private to authoring doctors)
   getKnowledgeArticles: async () => {
-    return [...knowledgeArticles];
+    return knowledgeArticles.filter(a => a.status !== 'Draft');
   },
 
   // Audit Logs

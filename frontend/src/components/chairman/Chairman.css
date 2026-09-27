@@ -653,32 +653,42 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.55);
+  background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(4px);
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1000;
+  overflow: hidden;
   animation: auth-fade-in 0.2s ease;
 }
 
 .modal-dialog {
   width: 100%;
-  max-width: 620px;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-width: 640px;
+  max-height: min(90vh, 860px);
+  display: flex;
+  flex-direction: column;
   background: var(--chair-card);
   border: 1px solid var(--chair-border);
   border-radius: 18px;
-  padding: 28px;
   box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+  overflow: hidden;
+  margin: auto;
+}
+
+.modal-dialog.lg {
+  max-width: 840px;
 }
 
 .modal-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
+  padding: 24px 28px 18px;
+  border-bottom: 1px solid var(--chair-border);
+  flex-shrink: 0;
 }
 
 .modal-header h2 {
@@ -694,14 +704,70 @@
   font-size: 12px;
 }
 
+.modal-body {
+  padding: 24px 28px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--chair-border);
+  border-radius: 9999px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--chair-muted);
+}
+
 .modal-footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
-  padding-top: 18px;
+  padding: 18px 28px;
   border-top: 1px solid var(--chair-border);
+  background: var(--chair-bg);
+  flex-shrink: 0;
+}
+
+.modal-dialog > form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 28px;
+}
+
+.modal-dialog > div:not(.modal-header):not(.modal-footer):not(.modal-body) {
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0 28px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-dialog > div:not(.modal-header):not(.modal-footer):not(.modal-body)::-webkit-scrollbar,
+.modal-dialog > form::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-dialog > div:not(.modal-header):not(.modal-footer):not(.modal-body)::-webkit-scrollbar-thumb,
+.modal-dialog > form::-webkit-scrollbar-thumb {
+  background: var(--chair-border);
+  border-radius: 9999px;
 }
 
 /* Form Controls in Chairman Portal */
@@ -921,5 +987,28 @@
   }
   .view-actions {
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 8px;
+  }
+
+  .modal-dialog {
+    max-height: 94vh;
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    padding: 16px 18px 12px;
+  }
+
+  .modal-body {
+    padding: 16px 18px;
+  }
+
+  .modal-footer {
+    padding: 12px 18px;
   }
 }
