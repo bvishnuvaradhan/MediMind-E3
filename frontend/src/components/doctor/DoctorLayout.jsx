@@ -18,6 +18,7 @@ import KnowledgeView from './views/KnowledgeView';
 import SettingsView from './views/SettingsView';
 
 // Modals
+import CreateWalkInModal from './components/CreateWalkInModal';
 import NewConsultationModal from './components/NewConsultationModal';
 import NewPrescriptionModal from './components/NewPrescriptionModal';
 import AiExplainabilityModal from './components/AiExplainabilityModal';
@@ -133,6 +134,7 @@ export function DoctorLayout({ dark, setDark }) {
 
   // UI modal states
   const [toast, setToast] = useState(null);
+  const [isWalkInModalOpen, setIsWalkInModalOpen] = useState(false);
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
   const [consultationModalData, setConsultationModalData] = useState(null);
 
@@ -212,6 +214,22 @@ export function DoctorLayout({ dark, setDark }) {
   const handleSelectPatient = (patientId) => {
     setSelectedPatientId(patientId);
     handleNavigate('patient_profile');
+  };
+
+  // Walk-in encounter handlers
+  const handleOpenAddWalkIn = () => {
+    setIsWalkInModalOpen(true);
+  };
+
+  const handleCreateWalkIn = async (walkInData) => {
+    const res = await doctorService.createWalkInAppointment(walkInData);
+    if (res.appointments) {
+      setAppointments(res.appointments);
+    }
+    if (res.patients) {
+      setPatients(res.patients);
+    }
+    showToast(`Walk-in registered for ${res.appointment.patientName} (${res.appointment.token})`);
   };
 
   // Consultation handlers
@@ -460,12 +478,20 @@ export function DoctorLayout({ dark, setDark }) {
         onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
       />
 
+      {/* Create Walk-in Modal */}
+      <CreateWalkInModal
+        isOpen={isWalkInModalOpen}
+        patients={patients}
+        doctorProfile={doctorProfile}
+        onCreateWalkIn={handleCreateWalkIn}
+        onClose={() => setIsWalkInModalOpen(false)}
+      />
+
       {/* New Consultation Modal */}
       <NewConsultationModal
         isOpen={isConsultationModalOpen}
         initialData={consultationModalData}
         patients={patients}
-        appointments={appointments}
         onSaveDraft={handleSaveConsultationDraft}
         onFinalize={handleFinalizeConsultation}
         onClose={() => {
@@ -771,6 +797,7 @@ export function DoctorLayout({ dark, setDark }) {
               consultations={consultations}
               onNavigate={handleNavigate}
               onSelectPatient={handleSelectPatient}
+              onOpenAddWalkIn={handleOpenAddWalkIn}
               onOpenNewConsultation={() => handleOpenNewConsultation()}
               onOpenNewPrescription={() => handleOpenNewPrescription()}
               onOpenAiExplain={handleOpenAiExplain}
@@ -782,6 +809,7 @@ export function DoctorLayout({ dark, setDark }) {
             <PatientsView
               patients={patients}
               onSelectPatient={handleSelectPatient}
+              onOpenAddWalkIn={handleOpenAddWalkIn}
               onOpenNewConsultation={handleOpenNewConsultation}
             />
           )}
@@ -804,6 +832,7 @@ export function DoctorLayout({ dark, setDark }) {
               appointments={appointments}
               patients={patients}
               onSelectPatient={handleSelectPatient}
+              onOpenAddWalkIn={handleOpenAddWalkIn}
               onOpenNewConsultation={handleOpenNewConsultation}
               onOpenAiExplain={handleOpenAiExplain}
               onOpenFullAiAnalysis={handleOpenFullAiAnalysis}

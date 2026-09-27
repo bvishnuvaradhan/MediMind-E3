@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 export function PatientsView({
   patients = [],
   onSelectPatient,
+  onOpenAddWalkIn,
   onOpenNewConsultation,
 }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,7 +33,18 @@ export function PatientsView({
               Access is strictly restricted to patients who have explicitly granted permission via their Family Portal
             </p>
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            {onOpenAddWalkIn && (
+              <button
+                className="doctor-btn doctor-btn-primary doctor-btn-sm"
+                onClick={onOpenAddWalkIn}
+              >
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                + Add Walk-in
+              </button>
+            )}
             <button
               className="doctor-btn doctor-btn-outline doctor-btn-sm"
               onClick={() => setShowUnauthorizedModal(true)}

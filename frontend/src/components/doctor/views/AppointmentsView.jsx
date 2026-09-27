@@ -30,6 +30,7 @@ export function AppointmentsView({
   appointments = [],
   patients = [],
   onSelectPatient,
+  onOpenAddWalkIn,
   onOpenNewConsultation,
   onOpenAiExplain,
   onOpenFullAiAnalysis,
@@ -66,11 +67,14 @@ export function AppointmentsView({
               Manage today's booked OPD patient consultation slots, AI screening, and deep analysis
             </p>
           </div>
-          <button className="doctor-btn doctor-btn-primary" onClick={() => onOpenNewConsultation()}>
+          <button
+            className="doctor-btn doctor-btn-primary"
+            onClick={() => (onOpenAddWalkIn ? onOpenAddWalkIn() : onOpenNewConsultation())}
+          >
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Walk-in Consultation
+            + Add Walk-in
           </button>
         </div>
       </div>

@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 function ConsultationForm({
   initialData,
   patients = [],
-  appointments = [],
   onSaveDraft,
   onFinalize,
   onClose,
@@ -11,11 +10,9 @@ function ConsultationForm({
   const [formData, setFormData] = useState({
     id: initialData?.id || null,
     patientId: initialData?.patientId || (patients[0]?.id || ''),
-    appointmentId: initialData?.appointmentId || '',
     symptoms: initialData?.symptoms || '',
     observations: initialData?.observations || '',
     diagnosis: initialData?.diagnosis || '',
-    aiPredictionReviewed: initialData?.aiPredictionReviewed || 'Fracture Detection CNN validated (No cortical bone discontinuity observed).',
     treatmentPlan: initialData?.treatmentPlan || '',
     doctorNotes: initialData?.doctorNotes || '',
     followUpDate: initialData?.followUpDate || '',
@@ -42,7 +39,7 @@ function ConsultationForm({
     try {
       await onSaveDraft({
         ...formData,
-        patientName: selectedPatient?.name || 'Authorized Patient',
+        patientName: selectedPatient?.name || 'Patient',
       });
       onClose();
     } catch {
@@ -54,7 +51,7 @@ function ConsultationForm({
 
   const handleFinalizeSubmit = async () => {
     if (!formData.patientId || !formData.symptoms.trim() || !formData.diagnosis.trim()) {
-      setError('Diagnosis and symptoms are required to finalize a medical consultation.');
+      setError('Clinical diagnosis and chief symptoms are required to finalize a medical consultation.');
       return;
     }
     setError('');
@@ -62,7 +59,7 @@ function ConsultationForm({
     try {
       await onFinalize({
         ...formData,
-        patientName: selectedPatient?.name || 'Authorized Patient',
+        patientName: selectedPatient?.name || 'Patient',
       });
       onClose();
     } catch {
@@ -97,42 +94,21 @@ function ConsultationForm({
           </div>
         )}
 
-        <div className="doctor-form-row">
-          <div className="doctor-form-group">
-            <label className="doctor-label">Authorized Patient *</label>
-            <select
-              className="doctor-select"
-              name="patientId"
-              value={formData.patientId}
-              onChange={handleChange}
-              disabled={!!initialData?.patientId}
-            >
-              {patients.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} ({p.gender}, {p.age}y - Blood {p.bloodGroup})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="doctor-form-group">
-            <label className="doctor-label">Linked Appointment Slot</label>
-            <select
-              className="doctor-select"
-              name="appointmentId"
-              value={formData.appointmentId}
-              onChange={handleChange}
-            >
-              <option value="">-- Standalone Consultation --</option>
-              {appointments
-                .filter((a) => a.patientId === formData.patientId)
-                .map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.token} ({a.time} - {a.type})
-                  </option>
-                ))}
-            </select>
-          </div>
+        <div className="doctor-form-group">
+          <label className="doctor-label">Patient *</label>
+          <select
+            className="doctor-select"
+            name="patientId"
+            value={formData.patientId}
+            onChange={handleChange}
+            disabled={!!initialData?.patientId}
+          >
+            {patients.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name} ({p.gender}, {p.age}y — Blood {p.bloodGroup} • ID: {p.id})
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Patient Vitals Quick Banner */}
@@ -173,29 +149,16 @@ function ConsultationForm({
           />
         </div>
 
-        <div className="doctor-form-row">
-          <div className="doctor-form-group">
-            <label className="doctor-label">Clinical Diagnosis & ICD-10 Code *</label>
-            <input
-              className="doctor-input"
-              name="diagnosis"
-              placeholder="e.g. Early Primary Osteoarthritis, Right Knee (ICD-10 M17.11)"
-              value={formData.diagnosis}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="doctor-form-group">
-            <label className="doctor-label">AI Diagnostic Decision Support Note</label>
-            <input
-              className="doctor-input"
-              name="aiPredictionReviewed"
-              placeholder="e.g. Fracture CNN reviewed (No cortical fracture, 94.8% confidence)"
-              value={formData.aiPredictionReviewed}
-              onChange={handleChange}
-            />
-          </div>
+        <div className="doctor-form-group">
+          <label className="doctor-label">Clinical Diagnosis & ICD-10 Code *</label>
+          <input
+            className="doctor-input"
+            name="diagnosis"
+            placeholder="e.g. Early Primary Osteoarthritis, Right Knee (ICD-10 M17.11)"
+            value={formData.diagnosis}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         <div className="doctor-form-group">
@@ -264,7 +227,6 @@ export function NewConsultationModal({
   isOpen,
   initialData,
   patients = [],
-  appointments = [],
   onSaveDraft,
   onFinalize,
   onClose,
@@ -277,7 +239,6 @@ export function NewConsultationModal({
         key={initialData?.id || 'new_cons'}
         initialData={initialData}
         patients={patients}
-        appointments={appointments}
         onSaveDraft={onSaveDraft}
         onFinalize={onFinalize}
         onClose={onClose}

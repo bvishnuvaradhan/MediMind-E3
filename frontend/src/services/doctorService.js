@@ -111,6 +111,80 @@ export const doctorService = {
     return appointmentsState.find((a) => a.id === appointmentId);
   },
 
+  async createWalkInAppointment(walkInData) {
+    let patient = null;
+
+    if (walkInData.isNewPatient && walkInData.newPatientData) {
+      const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      const newPatId = `pat_walkin_${Date.now()}`;
+      patient = {
+        id: newPatId,
+        memberId: `MEM-W-${Math.floor(100 + Math.random() * 900)}`,
+        name: walkInData.newPatientData.name,
+        age: Number(walkInData.newPatientData.age),
+        gender: walkInData.newPatientData.gender || 'Male',
+        bloodGroup: walkInData.newPatientData.bloodGroup || 'B+',
+        phone: walkInData.newPatientData.phone || '+91 98765 00000',
+        email: walkInData.newPatientData.email || `${walkInData.newPatientData.name.toLowerCase().replace(/\s+/g, '.')}@walkin.medimind.org`,
+        emergencyContact: walkInData.newPatientData.emergencyContact || 'Direct Walk-in Patient',
+        relationship: 'Walk-in Patient',
+        familyId: `FAM-WALKIN-${Date.now()}`,
+        accessStatus: 'Active',
+        accessScope: 'Encounter Only (Walk-in)',
+        accessGrantedDate: today,
+        chiefComplaint: walkInData.newPatientData.chiefComplaint || walkInData.purpose || 'Acute outpatient consultation',
+        vitals: {
+          bp: '120/80 mmHg',
+          pulse: '72 bpm',
+          temp: '98.6 °F',
+          weight: '65 kg',
+          height: '165 cm',
+        },
+        allergies: [],
+        chronicConditions: [],
+        medicalRecords: [],
+        aiPredictions: [],
+      };
+      patientsState = [patient, ...patientsState];
+    } else {
+      patient = patientsState.find((p) => p.id === walkInData.patientId) || patientsState[0];
+    }
+
+    const tokenNum = Math.floor(100 + Math.random() * 900);
+    const newAppointment = {
+      id: `apt_walkin_${Date.now()}`,
+      token: `W-${tokenNum}`,
+      patientId: patient?.id || walkInData.patientId,
+      memberId: patient?.memberId || patient?.id || walkInData.patientId,
+      patientName: patient?.name || 'Walk-in Patient',
+      patientAge: patient?.age || 35,
+      patientGender: patient?.gender || 'Male',
+      doctorId: walkInData.doctorId || profileState.id || 'doc_001',
+      doctorName: walkInData.doctorName || profileState.name || 'Dr. Rahul Mehta',
+      department: walkInData.department || profileState.departmentName || 'Orthopedics',
+      departmentId: walkInData.departmentId || profileState.departmentId || 'DEP-H1-ORTHO',
+      hospital: walkInData.hospital || profileState.hospitalName || 'MediMind Central Hospital',
+      hospitalId: walkInData.hospitalId || profileState.hospitalId || 'HOSP-001',
+      date: walkInData.date || `Today, ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`,
+      time: walkInData.time || new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+      type: walkInData.type || 'Walk-in',
+      purpose: walkInData.purpose || patient?.chiefComplaint || 'Walk-in Consultation',
+      status: 'Confirmed',
+      isWalkIn: true,
+      aiPredictionId: null,
+      aiPreCheck: null,
+      moduleId: null,
+    };
+
+    appointmentsState = [newAppointment, ...appointmentsState];
+    return {
+      appointment: newAppointment,
+      patient,
+      patients: [...patientsState],
+      appointments: [...appointmentsState],
+    };
+  },
+
   // --- Consultations ---
   async getConsultations(filters = {}) {
     let list = [...consultationsState];
