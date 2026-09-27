@@ -2,18 +2,22 @@ import React from 'react';
 import StatCard from '../components/StatCard';
 import { DonutChart, BarChart, RadarChart } from '../../common/charts';
 
-export function AiAnalyticsView({ analytics }) {
+export function AiAnalyticsView({ analytics, departmentInfo }) {
+  const departmentName = departmentInfo?.name || 'Orthopedics';
+  
+  // Single department-relevant AI pipeline (Fracture Detection CNN for Orthopedics)
   const aiData = analytics?.aiPipelineSummary || {
     pipelineName: 'Fracture Detection (CNN)',
     modelEngine: 'ResNet50-Ortho-v2.4',
     totalScans: 31,
     fracturesDetected: 19,
     normalScans: 12,
-    accuracy: '97.4%',
-    sensitivity: '96.8%',
-    specificity: '98.1%',
-    avgProcessingTime: '1.4s',
-    uptime: '99.98%',
+    accuracy: '98.4%',
+    sensitivity: '98.1%',
+    specificity: '98.8%',
+    precision: '97.5%',
+    avgProcessingTime: '34ms',
+    uptime: '99.9%',
     commonFractureTypes: [
       { type: 'Distal Radius / Wrist', count: 8, confidence: '98.2%' },
       { type: 'Femoral Neck / Hip', count: 5, confidence: '96.5%' },
@@ -30,17 +34,17 @@ export function AiAnalyticsView({ analytics }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
               <span className="dh-badge dh-badge-completed">Pipeline Online</span>
-              <span style={{ fontSize: '13px', color: 'var(--dh-text-muted)' }}>Model: {aiData.modelEngine}</span>
+              <span style={{ fontSize: '13px', color: 'var(--dh-text-muted)' }}>Scoped to: {departmentName} • Model: {aiData.modelEngine}</span>
             </div>
             <h2 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 4px', color: 'var(--dh-text-primary)' }}>
-              {aiData.pipelineName} Telemetry & Aggregate Diagnostics
+              {aiData.pipelineName} Telemetry & Department Calibration
             </h2>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--dh-text-muted)' }}>
-              Aggregate AI diagnostic accuracy, throughput telemetry, and anatomical fracture classification
+              Single-model clinical reliability radar, diagnostic throughput, and anatomical fracture classification
             </p>
           </div>
           <div style={{ padding: '6px 12px', backgroundColor: 'var(--dh-soft-teal)', borderRadius: '6px', fontSize: '12px', color: 'var(--dh-teal)', fontWeight: 700 }}>
-            Strict Aggregate Data (Zero PHI / Private Image Exposure)
+            Strict Aggregate Telemetry (Zero PHI / Private Image Exposure)
           </div>
         </div>
       </div>
@@ -66,7 +70,7 @@ export function AiAnalyticsView({ analytics }) {
           tone="teal"
           change="Validated by Faculty"
           changeType="positive"
-          subtext="Sensitivity 96.8%"
+          subtext="Sensitivity 98.1%"
           icon={
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -92,7 +96,7 @@ export function AiAnalyticsView({ analytics }) {
           tone="blue"
           change="Real-Time Triage"
           changeType="positive"
-          subtext="Uptime 99.98%"
+          subtext="Uptime 99.9%"
           icon={
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -101,7 +105,7 @@ export function AiAnalyticsView({ analytics }) {
         />
       </div>
 
-      {/* Two Columns: Anatomical Regions Donut & Pipeline Radar Telemetry */}
+      {/* Two Columns: Anatomical Regions Donut & Single Department Pipeline Radar */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '20px' }}>
         {/* Anatomical Regions Donut & Horizontal Bar */}
         <div className="dh-card">
@@ -144,26 +148,26 @@ export function AiAnalyticsView({ analytics }) {
           </div>
         </div>
 
-        {/* Pipeline Clinical Reliability Radar */}
+        {/* Single Department Pipeline Clinical Reliability Radar */}
         <div className="dh-card">
           <div className="dh-card-header">
             <div>
-              <h3 className="dh-card-title">Model Calibration & Reliability Radar</h3>
-              <div className="dh-card-description">Multidimensional validation metrics for ResNet50 engine</div>
+              <h3 className="dh-card-title">Department Model Calibration & Reliability Radar</h3>
+              <div className="dh-card-description">Multidimensional validation metrics for {aiData.modelEngine} ({departmentName})</div>
             </div>
           </div>
 
           <RadarChart
-            metrics={['Accuracy', 'Sensitivity', 'Specificity', 'F1-Score', 'Uptime']}
+            metrics={['Accuracy', 'Sensitivity', 'Specificity', 'Precision', 'Uptime']}
             size={200}
             data={[
               {
-                name: 'ResNet50-Ortho-v2.4',
+                name: aiData.modelEngine,
                 values: [
                   parseFloat(aiData.accuracy) || 98.4,
                   parseFloat(aiData.sensitivity) || 98.1,
                   parseFloat(aiData.specificity) || 98.8,
-                  97.5, // F1-Score / Precision %
+                  parseFloat(aiData.precision) || 97.5,
                   parseFloat(aiData.uptime) || 99.9,
                 ],
                 color: '#2563eb',
@@ -174,7 +178,7 @@ export function AiAnalyticsView({ analytics }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--dh-border)', fontSize: '12px' }}>
             <div style={{ padding: '8px', backgroundColor: 'var(--dh-bg)', borderRadius: '6px' }}>
               <span style={{ color: 'var(--dh-text-muted)', fontSize: '11px' }}>Architecture</span>
-              <div style={{ fontWeight: 700, marginTop: '2px' }}>ResNet-50 CNN</div>
+              <div style={{ fontWeight: 700, marginTop: '2px' }}>ResNet-50 CNN (Ortho)</div>
             </div>
             <div style={{ padding: '8px', backgroundColor: 'var(--dh-bg)', borderRadius: '6px' }}>
               <span style={{ color: 'var(--dh-text-muted)', fontSize: '11px' }}>Protocol</span>

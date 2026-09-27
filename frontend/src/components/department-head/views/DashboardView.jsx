@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import StatCard from '../components/StatCard';
 
 export function DashboardView({
   departmentInfo,
   doctors = [],
   appointments = [],
+  articles = [],
   analytics,
   onNavigate,
   onOpenCreateDoctor,
-  onOpenCreateArticle,
 }) {
+  const [selectedAiApt, setSelectedAiApt] = useState(null);
   const activeDoctors = doctors.filter((d) => d.status === 'Active').length;
   const todayAppointments = appointments.length;
+  const pendingReviews = articles.filter((a) => a.status === 'Under Review');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -37,15 +39,54 @@ export function DashboardView({
               </svg>
               Provision Doctor
             </button>
-            <button className="dh-btn dh-btn-outline" onClick={onOpenCreateArticle}>
+            <button
+              className="dh-btn dh-btn-outline"
+              onClick={() => onNavigate('knowledge')}
+              style={pendingReviews.length > 0 ? { borderColor: 'var(--dh-blue)', color: 'var(--dh-blue)', fontWeight: 700 } : {}}
+            >
               <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
-              Publish Guideline
+              Knowledge Review {pendingReviews.length > 0 && `(${pendingReviews.length})`}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Review Queue Alert if pending */}
+      {pendingReviews.length > 0 && (
+        <div
+          className="dh-card"
+          style={{
+            padding: '12px 20px',
+            backgroundColor: 'var(--dh-soft-bg)',
+            borderLeft: '4px solid var(--dh-blue)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '12px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '18px' }}>⏳</span>
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--dh-primary-light)' }}>
+                {pendingReviews.length} Faculty Manuscript Pending Department Head Peer-Review
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--dh-text-secondary)' }}>
+                Latest: "{pendingReviews[0].title}" by <strong>{pendingReviews[0].author}</strong>
+              </div>
+            </div>
+          </div>
+          <button
+            className="dh-btn dh-btn-primary dh-btn-sm"
+            onClick={() => onNavigate('knowledge')}
+          >
+            Review & Decision &rarr;
+          </button>
+        </div>
+      )}
 
       {/* KPI Stats Grid */}
       <div className="dh-stat-grid">
@@ -92,7 +133,7 @@ export function DashboardView({
           label="AI Scans Screened"
           value={analytics?.aiPipelineSummary?.totalScans || 31}
           tone="teal"
-          change="97.4% accuracy"
+          change="98.4% accuracy"
           changeType="positive"
           subtext="Fracture Detection CNN"
           icon={
@@ -181,7 +222,7 @@ export function DashboardView({
             <div style={{ padding: '12px', backgroundColor: 'var(--dh-soft-bg)', borderRadius: '8px' }}>
               <div style={{ fontSize: '11px', color: 'var(--dh-primary-light)', fontWeight: 600, textTransform: 'uppercase' }}>Avg Inference Latency</div>
               <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--dh-text-primary)' }}>
-                {analytics?.aiPipelineSummary?.avgProcessingTime || '1.4s'}
+                {analytics?.aiPipelineSummary?.avgProcessingTime || '34ms'}
               </div>
               <div style={{ fontSize: '11px', color: 'var(--dh-text-muted)' }}>Real-time triage</div>
             </div>
@@ -243,6 +284,8 @@ export function DashboardView({
                 const statusClass = statusStr.toLowerCase().replace(/\s+/g, '-');
                 const tokenText = apt.token || apt.id?.toUpperCase() || 'ORTHO-OPD';
                 const patientLabel = apt.patientRef || apt.patientName || 'Operational Patient Ref';
+                const isWalkIn = Boolean(apt.isWalkIn) || apt.type === 'Walk-in' || String(tokenText).startsWith('W-');
+                const hasAi = !isWalkIn && apt.aiPreCheck && apt.aiPreCheck !== 'Not Screened';
 
                 return (
                   <tr key={apt.id}>
@@ -264,13 +307,30 @@ export function DashboardView({
                       <span className="dh-badge dh-badge-draft">{apt.type}</span>
                     </td>
                     <td>
-                      {apt.isWalkIn || apt.type === 'Walk-in' ? (
+                      {isWalkIn ? (
                         <span className="dh-badge dh-badge-draft" style={{ fontSize: '11px' }}>
-                          Walk-in (AI Not Required)
+                          Manual Triage
                         </span>
+                      ) : hasAi ? (
+                        <button
+                          type="button"
+                          className="dh-badge dh-badge-completed"
+                          style={{
+                            fontSize: '11px',
+                            cursor: 'pointer',
+                            border: '1px solid rgba(16, 185, 129, 0.3)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                          onClick={() => setSelectedAiApt(apt)}
+                          title="Click to view Operational AI Pre-Screen status"
+                        >
+                          <span>✓</span> {apt.aiPreCheck}
+                        </button>
                       ) : (
-                        <span className="dh-badge dh-badge-completed" style={{ fontSize: '11px' }}>
-                          {apt.aiPreScreen || apt.aiScreening || 'Screened (Low Risk, 94.8%)'}
+                        <span className="dh-badge dh-badge-draft" style={{ fontSize: '11px' }}>
+                          Manual Triage
                         </span>
                       )}
                     </td>
@@ -286,6 +346,73 @@ export function DashboardView({
           </table>
         </div>
       </div>
+
+      {/* Operational AI Pre-Screen Status Modal */}
+      {selectedAiApt && (
+        <div className="dh-modal-overlay" onClick={() => setSelectedAiApt(null)}>
+          <div className="dh-modal-box" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
+            <div className="dh-modal-header">
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                  <span className="dh-badge dh-badge-completed">✓ AI Triage Validated</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, fontFamily: 'monospace', color: 'var(--dh-primary-light)' }}>
+                    {selectedAiApt.token}
+                  </span>
+                </div>
+                <h3 className="dh-modal-title">Operational AI Pre-Screen Status</h3>
+              </div>
+              <button className="dh-btn-icon" onClick={() => setSelectedAiApt(null)} aria-label="Close modal">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="dh-modal-body" style={{ gap: '14px' }}>
+              <div style={{ padding: '14px', backgroundColor: 'var(--dh-soft-teal)', borderRadius: '8px', border: '1px solid rgba(15, 118, 110, 0.2)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--dh-teal)', fontWeight: 700, textTransform: 'uppercase' }}>
+                  Automated Triage Output
+                </div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--dh-text-primary)', marginTop: '2px' }}>
+                  {selectedAiApt.aiPreCheck}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--dh-text-muted)', marginTop: '4px' }}>
+                  Pipeline: <strong>Fracture Detection AI (ResNet-50 CNN)</strong>
+                </div>
+              </div>
+
+              <div className="dh-info-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                <div className="dh-info-tile">
+                  <span className="dh-info-label">Attending Doctor</span>
+                  <span className="dh-info-value" style={{ fontSize: '12.5px' }}>{selectedAiApt.doctorName}</span>
+                </div>
+                <div className="dh-info-tile">
+                  <span className="dh-info-label">Allocated Room</span>
+                  <span className="dh-info-value" style={{ fontSize: '12.5px' }}>{selectedAiApt.room}</span>
+                </div>
+                <div className="dh-info-tile">
+                  <span className="dh-info-label">Appointment Time</span>
+                  <span className="dh-info-value" style={{ fontSize: '12.5px' }}>{selectedAiApt.time}</span>
+                </div>
+                <div className="dh-info-tile">
+                  <span className="dh-info-label">Encounter Type</span>
+                  <span className="dh-info-value" style={{ fontSize: '12.5px' }}>{selectedAiApt.type}</span>
+                </div>
+              </div>
+
+              <div style={{ padding: '10px 12px', backgroundColor: 'var(--dh-soft-bg)', borderRadius: '6px', fontSize: '11.5px', color: 'var(--dh-text-secondary)', lineHeight: 1.4 }}>
+                <strong>Department Head Operational Policy:</strong> Automated pre-screening confirms imaging was triaged prior to slot opening. Detailed clinical predictions, probability heatmaps, and confidential medical history remain isolated to the attending physician's clinical encounter.
+              </div>
+            </div>
+
+            <div className="dh-modal-footer">
+              <button type="button" className="dh-btn dh-btn-primary" onClick={() => setSelectedAiApt(null)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

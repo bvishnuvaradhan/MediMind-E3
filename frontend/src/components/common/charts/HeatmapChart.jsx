@@ -3,11 +3,13 @@ import { useState } from 'react';
 /**
  * Reusable Pure-SVG 2D Matrix Activity Heatmap Component
  * Displays grid matrix of intensity values (e.g. Weekday vs Hourly Appointment Volume)
+ * Supports rich doctor-level breakdown tooltips via optional `detailsMatrix` prop.
  */
 export function HeatmapChart({
   xLabels = ['9 AM', '11 AM', '1 PM', '3 PM', '5 PM'],
   yLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
   matrix = [], // 2D array matrix[yIdx][xIdx] = number
+  detailsMatrix = null, // Optional 2D array detailsMatrix[yIdx][xIdx] = { total: number, doctors: [{ name, count }] }
   color = '#2563eb',
   title = '',
   height = 180,
@@ -99,6 +101,10 @@ export function HeatmapChart({
             const intensity = val > 0 ? Math.max(0.12, val / maxVal) : 0.04;
             const isHovered =
               hoveredCell && hoveredCell.xIdx === xIdx && hoveredCell.yIdx === yIdx;
+            const cellDetails =
+              detailsMatrix && detailsMatrix[yIdx] && detailsMatrix[yIdx][xIdx]
+                ? detailsMatrix[yIdx][xIdx]
+                : null;
 
             return (
               <g key={`c-${yIdx}-${xIdx}`}>
@@ -117,6 +123,7 @@ export function HeatmapChart({
                       xLabel: xLabels[xIdx],
                       yLabel: yLabels[yIdx],
                       val,
+                      details: cellDetails,
                       x: x + w / 2,
                     })
                   }
@@ -147,24 +154,38 @@ export function HeatmapChart({
         <div
           style={{
             position: 'absolute',
-            top: '4px',
-            left: `${Math.min(82, Math.max(18, (hoveredCell.x / chartWidth) * 100))}%`,
-            transform: 'translateX(-50%)',
+            top: '-8px',
+            left: `${Math.min(75, Math.max(25, (hoveredCell.x / chartWidth) * 100))}%`,
+            transform: 'translate(-50%, -100%)',
             backgroundColor: '#0f172a',
             color: '#f8fafc',
-            padding: '6px 12px',
-            borderRadius: '6px',
+            padding: '8px 14px',
+            borderRadius: '8px',
             fontSize: '11.5px',
-            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)',
+            boxShadow: '0 12px 30px -5px rgba(0, 0, 0, 0.6)',
             pointerEvents: 'none',
-            zIndex: 50,
-            whiteSpace: 'nowrap',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
+            zIndex: 100,
+            minWidth: '180px',
+            maxWidth: '280px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
           }}
         >
-          <span style={{ color: '#94a3b8' }}>{hoveredCell.yLabel} · {hoveredCell.xLabel}: </span>
-          <strong style={{ color: '#38bdf8' }}>{hoveredCell.val}</strong>
-          <span style={{ color: '#e2e8f0', marginLeft: '4px' }}>consultations</span>
+          <div style={{ fontWeight: 700, color: '#38bdf8', marginBottom: '2px', fontSize: '12px' }}>
+            {hoveredCell.xLabel} · {hoveredCell.yLabel}
+          </div>
+          <div style={{ fontWeight: 700, color: '#ffffff', marginBottom: hoveredCell.details?.doctors?.length ? '6px' : '0', fontSize: '12.5px' }}>
+            Total Activity: {hoveredCell.details?.total ?? hoveredCell.val}
+          </div>
+          {hoveredCell.details?.doctors && hoveredCell.details.doctors.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', borderTop: '1px solid rgba(255, 255, 255, 0.15)', paddingTop: '5px' }}>
+              {hoveredCell.details.doctors.map((doc, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', fontSize: '11px', color: '#cbd5e1' }}>
+                  <span>{doc.name}:</span>
+                  <strong style={{ color: '#67e8f9' }}>{doc.count}</strong>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

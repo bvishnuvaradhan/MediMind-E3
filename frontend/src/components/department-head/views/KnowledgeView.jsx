@@ -114,18 +114,20 @@ export function KnowledgeView({
               <span style={{ fontSize: '13px', color: 'var(--dh-text-muted)' }}>Peer-Review & Knowledge Base</span>
             </div>
             <h2 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 4px', color: 'var(--dh-text-primary)' }}>
-              Clinical Guidelines & Protocol Peer-Review
+              Knowledge & Publications Review Hub
             </h2>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--dh-text-muted)' }}>
-              Review faculty doctor submissions, enforce standardized clinical workflows, and publish department guidelines.
+              Peer-review faculty manuscripts, request clinical guideline revisions, and manage published protocols for {profile?.departmentName || 'Orthopedics'}.
             </p>
           </div>
-          <button className="dh-btn dh-btn-primary" onClick={onOpenCreateArticle}>
-            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Publish New Protocol
-          </button>
+          {onOpenCreateArticle && (
+            <button className="dh-btn dh-btn-primary" onClick={onOpenCreateArticle}>
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Publish New Guideline
+            </button>
+          )}
         </div>
       </div>
 

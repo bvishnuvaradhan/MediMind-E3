@@ -2,7 +2,58 @@ import React from 'react';
 import StatCard from '../components/StatCard';
 import { BarChart, DonutChart, HeatmapChart } from '../../common/charts';
 
-export function DepartmentAnalyticsView({ analytics, departmentInfo }) {
+function generateHeatmapDetails(matrix, xLabels, yLabels, doctors = []) {
+  const activeDocs = doctors.filter((d) => d.status === 'Active');
+  const docList = activeDocs.length > 0 ? activeDocs : [
+    { name: 'Dr. Rahul Mehta' },
+    { name: 'Dr. Priya Sharma' },
+    { name: 'Dr. Vikram Anand' },
+    { name: 'Dr. Sneha Reddy' },
+  ];
+
+  return matrix.map((row, yIdx) =>
+    row.map((total, xIdx) => {
+      if (total === 0) {
+        return {
+          total: 0,
+          time: xLabels[xIdx],
+          day: yLabels[yIdx],
+          doctors: [],
+        };
+      }
+
+      const numDocs = Math.min(docList.length, total >= 6 ? 3 : total >= 3 ? 2 : 1);
+      const docBreakdown = [];
+      let remaining = total;
+
+      for (let i = 0; i < numDocs; i++) {
+        const isLast = i === numDocs - 1;
+        let count;
+        if (isLast) {
+          count = remaining;
+        } else if (i === 0) {
+          count = Math.max(1, Math.ceil(total * 0.5));
+        } else {
+          count = Math.max(1, Math.floor(remaining / 2));
+        }
+        remaining -= count;
+        docBreakdown.push({
+          name: docList[i].name,
+          count,
+        });
+      }
+
+      return {
+        total,
+        time: xLabels[xIdx],
+        day: yLabels[yIdx],
+        doctors: docBreakdown,
+      };
+    })
+  );
+}
+
+export function DepartmentAnalyticsView({ analytics, departmentInfo, doctors = [] }) {
   const weeklyTrends = analytics?.weeklyConsultationVolume || [
     { day: 'Mon', count: 12, target: 15 },
     { day: 'Tue', count: 14, target: 15 },
@@ -11,6 +62,19 @@ export function DepartmentAnalyticsView({ analytics, departmentInfo }) {
     { day: 'Fri', count: 18, target: 15 },
     { day: 'Sat', count: 9, target: 10 },
   ];
+
+  const xLabels = ['09:00 AM', '11:00 AM', '01:00 PM', '03:00 PM', '05:00 PM'];
+  const yLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const heatmapMatrix = [
+    [4, 5, 2, 4, 1], // Mon
+    [5, 8, 3, 4, 2], // Tue
+    [4, 6, 2, 5, 2], // Wed
+    [3, 5, 2, 4, 1], // Thu
+    [5, 7, 3, 4, 2], // Fri
+    [3, 4, 2, 0, 0], // Sat
+  ];
+
+  const detailsMatrix = generateHeatmapDetails(heatmapMatrix, xLabels, yLabels, doctors);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -142,21 +206,15 @@ export function DepartmentAnalyticsView({ analytics, departmentInfo }) {
         <div className="dh-card-header">
           <div>
             <h3 className="dh-card-title">Orthopedic Clinic Hourly Shift Activity Heatmap</h3>
-            <div className="dh-card-description">Consultation intake density across clinical hours and weekdays</div>
+            <div className="dh-card-description">Consultation intake density across clinical hours and weekdays with doctor-level breakdown on hover</div>
           </div>
         </div>
 
         <HeatmapChart
-          xLabels={['09:00 AM', '11:00 AM', '01:00 PM', '03:00 PM', '05:00 PM']}
-          yLabels={['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']}
-          matrix={[
-            [4, 5, 2, 4, 1], // Mon
-            [5, 6, 3, 4, 2], // Tue
-            [4, 5, 2, 5, 2], // Wed
-            [3, 4, 2, 4, 1], // Thu
-            [5, 7, 3, 4, 2], // Fri
-            [3, 4, 2, 0, 0], // Sat
-          ]}
+          xLabels={xLabels}
+          yLabels={yLabels}
+          matrix={heatmapMatrix}
+          detailsMatrix={detailsMatrix}
           color="#2563eb"
           height={180}
         />

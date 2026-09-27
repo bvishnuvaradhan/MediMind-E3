@@ -223,7 +223,7 @@ export function DepartmentHeadLayout({ dark, setDark }) {
     analytics: { title: 'Department Operational Analytics', sub: 'Outpatient volume trends & ward bed occupancy' },
     ai_analytics: { title: 'AI Fracture Detection Telemetry', sub: 'Aggregate diagnostic accuracy & classification' },
     performance: { title: 'Faculty Doctors Analytics', sub: 'Department consultation performance, patient satisfaction & operational trends' },
-    knowledge: { title: 'Clinical Protocols & Guidelines', sub: 'Department standardized clinical knowledge base' },
+    knowledge: { title: 'Knowledge & Publications Review Hub', sub: 'Department peer-review queue, protocol approvals, and published guidelines' },
     settings: { title: 'Department Settings & Profile', sub: 'Clinical head profile & notification protocols' },
   };
 
@@ -392,7 +392,22 @@ export function DepartmentHeadLayout({ dark, setDark }) {
             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
-            Clinical Guidelines
+            Knowledge & Publications
+            {articles.filter((a) => a.status === 'Under Review').length > 0 && (
+              <span
+                style={{
+                  marginLeft: 'auto',
+                  fontSize: '10.5px',
+                  fontWeight: 700,
+                  padding: '1px 6px',
+                  borderRadius: '10px',
+                  backgroundColor: 'var(--dh-blue)',
+                  color: '#ffffff',
+                }}
+              >
+                {articles.filter((a) => a.status === 'Under Review').length}
+              </span>
+            )}
           </button>
 
           <button
@@ -514,10 +529,10 @@ export function DepartmentHeadLayout({ dark, setDark }) {
               departmentInfo={departmentInfo}
               doctors={doctors}
               appointments={appointments}
+              articles={articles}
               analytics={analytics}
               onNavigate={handleNavigate}
               onOpenCreateDoctor={() => setIsCreateDoctorOpen(true)}
-              onOpenCreateArticle={() => setIsCreateArticleOpen(true)}
             />
           )}
 
@@ -564,11 +579,15 @@ export function DepartmentHeadLayout({ dark, setDark }) {
             <DepartmentAnalyticsView
               analytics={analytics}
               departmentInfo={departmentInfo}
+              doctors={doctors}
             />
           )}
 
           {activeTab === 'ai_analytics' && (
-            <AiAnalyticsView analytics={analytics} />
+            <AiAnalyticsView
+              analytics={analytics}
+              departmentInfo={departmentInfo}
+            />
           )}
 
           {activeTab === 'performance' && (

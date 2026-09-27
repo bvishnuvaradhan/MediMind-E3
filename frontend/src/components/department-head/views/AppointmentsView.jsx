@@ -7,6 +7,7 @@ export function AppointmentsView({
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [doctorFilter, setDoctorFilter] = useState('All');
+  const [selectedAiApt, setSelectedAiApt] = useState(null);
 
   const filteredAppointments = appointments.filter((apt) => {
     const status = apt.status || 'Confirmed';
@@ -34,7 +35,7 @@ export function AppointmentsView({
             </p>
           </div>
           <div style={{ padding: '6px 12px', backgroundColor: 'var(--dh-soft-bg)', borderRadius: '6px', fontSize: '12px', color: 'var(--dh-primary-light)', fontWeight: 600 }}>
-            Operational View-Only (Zero Private Clinical History Access)
+            Operational View-Only (Strict Clinical Patient Privacy Boundary)
           </div>
         </div>
       </div>
@@ -112,6 +113,8 @@ export function AppointmentsView({
                   const statusClass = statusStr.toLowerCase().replace(/\s+/g, '-');
                   const tokenText = apt.token || apt.id?.toUpperCase() || 'ORTHO-OPD';
                   const patientLabel = apt.patientRef || apt.patientName || 'Operational Patient Ref';
+                  const isWalkIn = Boolean(apt.isWalkIn) || apt.type === 'Walk-in' || String(tokenText).startsWith('W-');
+                  const hasAi = !isWalkIn && apt.aiPreCheck && apt.aiPreCheck !== 'Not Screened';
 
                   return (
                     <tr key={apt.id}>
@@ -135,13 +138,30 @@ export function AppointmentsView({
                         <span className="dh-badge dh-badge-draft">{apt.type}</span>
                       </td>
                       <td>
-                        {apt.isWalkIn || apt.type === 'Walk-in' ? (
+                        {isWalkIn ? (
                           <span className="dh-badge dh-badge-draft" style={{ fontSize: '11px' }}>
-                            Walk-in (AI Not Required)
+                            Manual Triage
                           </span>
+                        ) : hasAi ? (
+                          <button
+                            type="button"
+                            className="dh-badge dh-badge-completed"
+                            style={{
+                              fontSize: '11px',
+                              cursor: 'pointer',
+                              border: '1px solid rgba(16, 185, 129, 0.3)',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                            }}
+                            onClick={() => setSelectedAiApt(apt)}
+                            title="Click to view Operational AI Pre-Screen status"
+                          >
+                            <span>✓</span> {apt.aiPreCheck}
+                          </button>
                         ) : (
-                          <span className="dh-badge dh-badge-completed" style={{ fontSize: '11px' }}>
-                            {apt.aiPreScreen || apt.aiScreening || 'Screened (Low Risk, 94.8%)'}
+                          <span className="dh-badge dh-badge-draft" style={{ fontSize: '11px' }}>
+                            Manual Triage
                           </span>
                         )}
                       </td>
@@ -158,6 +178,73 @@ export function AppointmentsView({
           </table>
         </div>
       </div>
+
+      {/* Operational AI Pre-Screen Status Modal */}
+      {selectedAiApt && (
+        <div className="dh-modal-overlay" onClick={() => setSelectedAiApt(null)}>
+          <div className="dh-modal-box" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
+            <div className="dh-modal-header">
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                  <span className="dh-badge dh-badge-completed">✓ AI Triage Validated</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, fontFamily: 'monospace', color: 'var(--dh-primary-light)' }}>
+                    {selectedAiApt.token}
+                  </span>
+                </div>
+                <h3 className="dh-modal-title">Operational AI Pre-Screen Status</h3>
+              </div>
+              <button className="dh-btn-icon" onClick={() => setSelectedAiApt(null)} aria-label="Close modal">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="dh-modal-body" style={{ gap: '14px' }}>
+              <div style={{ padding: '14px', backgroundColor: 'var(--dh-soft-teal)', borderRadius: '8px', border: '1px solid rgba(15, 118, 110, 0.2)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--dh-teal)', fontWeight: 700, textTransform: 'uppercase' }}>
+                  Automated Triage Output
+                </div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--dh-text-primary)', marginTop: '2px' }}>
+                  {selectedAiApt.aiPreCheck}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--dh-text-muted)', marginTop: '4px' }}>
+                  Pipeline: <strong>Fracture Detection AI (ResNet-50 CNN)</strong>
+                </div>
+              </div>
+
+              <div className="dh-info-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                <div className="dh-info-tile">
+                  <span className="dh-info-label">Attending Doctor</span>
+                  <span className="dh-info-value" style={{ fontSize: '12.5px' }}>{selectedAiApt.doctorName}</span>
+                </div>
+                <div className="dh-info-tile">
+                  <span className="dh-info-label">Allocated Room</span>
+                  <span className="dh-info-value" style={{ fontSize: '12.5px' }}>{selectedAiApt.room}</span>
+                </div>
+                <div className="dh-info-tile">
+                  <span className="dh-info-label">Appointment Time</span>
+                  <span className="dh-info-value" style={{ fontSize: '12.5px' }}>{selectedAiApt.time}</span>
+                </div>
+                <div className="dh-info-tile">
+                  <span className="dh-info-label">Encounter Type</span>
+                  <span className="dh-info-value" style={{ fontSize: '12.5px' }}>{selectedAiApt.type}</span>
+                </div>
+              </div>
+
+              <div style={{ padding: '10px 12px', backgroundColor: 'var(--dh-soft-bg)', borderRadius: '6px', fontSize: '11.5px', color: 'var(--dh-text-secondary)', lineHeight: 1.4 }}>
+                <strong>Department Head Operational Policy:</strong> Automated pre-screening confirms imaging was triaged prior to slot opening. Detailed clinical predictions, probability heatmaps, and confidential medical history remain isolated to the attending physician's clinical encounter.
+              </div>
+            </div>
+
+            <div className="dh-modal-footer">
+              <button type="button" className="dh-btn dh-btn-primary" onClick={() => setSelectedAiApt(null)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
