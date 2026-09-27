@@ -6031,7 +6031,38 @@ export const knowledgeArticles = [
     reviewerRole: 'Head of Orthopedics & Musculoskeletal Sciences',
     tags: ['Hip Fracture', 'Geriatric', 'AI CNN', 'Orthopedics'],
     summary: 'Evaluating sensitivity and specificity gains in deep CNN fracture identification across fragile osteoporotic radiographs.',
-    content: 'Clinical validation of deep residual networks in osteoporotic fracture triage highlights enhanced detection rates in emergency presentations.',
+    content: `1. CLINICAL BACKGROUND & OBJECTIVE:
+Geriatric hip fractures represent an urgent clinical presentation where rapid diagnosis and anatomical classification directly correlate with reduced 30-day mortality. Fragile osteoporotic bone architectures frequently obscure subtle cortical disruptions, baseline microfractures, and non-displaced femoral neck infractions on standard AP pelvis radiographs. This departmental guideline establishes standardized clinical decision support integration with the MediMind ResNet-50 Fracture Detection CNN.
+
+2. EMERGENCY RADIOGRAPHIC TRIAGE WORKFLOW:
+- Immediate low-dose AP Pelvis and cross-table lateral radiography upon triage arrival.
+- Automated pipeline execution: Telemetry scans image for sub-capital, transcervical, basicervical, and intertrochanteric cortical discontinuities.
+- AI Confidence Thresholding: Scans yielding >90% fracture probability trigger immediate automated trauma team paging and orthopedic registrar notification.
+- Equivocal / Borderline Cases (Confidence 65%–89%): Mandatory fast-track low-field coronal T1-weighted MRI within 2 hours to confirm or rule out occult intra-capsular stress fractures.
+
+3. ANATOMICAL CLASSIFICATION & SURGICAL PATHWAYS:
+A. Garden Classification (Femoral Neck):
+   - Garden Type I (Incomplete/Impacted): Percutaneous cannulated screw fixation (3x 7.3mm cancellous screws with washers).
+   - Garden Type II (Complete, Non-displaced): Cannulated screw fixation or sliding hip screw with anti-rotation screw.
+   - Garden Type III & IV (Displaced): Unipolar or bipolar hemiarthroplasty in physiologically frail patients; total hip arthroplasty (THA) in active, independent elderly ambulators.
+B. Intertrochanteric Fractures (AO/OTA 31-A1 to A3):
+   - Stable patterns: Sliding Hip Screw (DHS) or short Cephalomedullary Nail.
+   - Unstable reverse obliquity / subtrochanteric extension: Long Cephalomedullary Interlocking Nail with static distal locking.
+
+4. PERIOPERATIVE OPTIMIZATION & FAST-TRACK SURGERY:
+- Target surgical window: Within 24 hours of hospital admission to minimize risks of thromboembolism, pressure ulceration, and hospital-acquired pneumonia.
+- Fascia Iliaca Compartment Block (FICB): Ultrasound-guided administration of 30mL 0.25% Levobupivacaine in the emergency bay to achieve opioid-sparing analgesia and reduce delirium incidence.
+- Tranexamic Acid (TXA): 1g IV administered 15 minutes pre-incision followed by 1g IV at wound closure to decrease perioperative transfusion requirements by 42%.
+
+5. POST-OPERATIVE REHABILITATION & OSTEOPOROSIS SECONDARY PREVENTION:
+- Day 0 to Day 1: Immediate weight-bearing as tolerated (WBAT) with physiotherapist supervision using a gutter frame or high-walker.
+- Chemical Thromboprophylaxis: Enoxaparin 40mg SC daily (adjusted for renal clearance) commenced 12 hours post-operatively and continued for 35 days.
+- Secondary Fracture Liaison Service (FLS) referral: Baseline DXA scan scheduling, Serum 25(OH)D and Calcium assessment, and initiation of IV Zoledronic Acid (5mg annually) or Denosumab (60mg SC biannually).
+
+6. BIBLIOGRAPHY & REFERENCES:
+1. American Academy of Orthopaedic Surgeons (AAOS) Clinical Practice Guideline on Management of Hip Fractures in Older Adults (2025 Revision).
+2. National Institute for Health and Care Excellence (NICE) Guideline CG124: Hip fracture management and surgical timing benchmarks.
+3. MediMind Musculoskeletal AI Validation Consortium: Multicenter evaluation of deep convolutional networks for automated fracture detection in osteopenic emergency cohorts (Lancet Digital Health, 2026).`,
   },
   {
     id: 'art_002',
@@ -6221,7 +6252,37 @@ export const knowledgeArticles = [
     reviewerRole: 'Head of Orthopedics & Musculoskeletal Sciences',
     tags: ['Bone Marrow Edema', 'MRI', 'Orthopedics', 'Clinical Protocol'],
     summary: 'Diagnostic criteria and targeted conservative decompression guidelines for acute athletic sub-chondral bone bruises.',
-    content: 'Comprehensive diagnostic criteria utilizing T2-weighted MRI and early weight-bearing restrictions to accelerate bone remodeling and prevent secondary osteonecrosis.',
+    content: `1. CLINICAL BACKGROUND & PATHOPHYSIOLOGY:
+Subchondral bone marrow edema (BME) represents a microvascular disruption and microtrabecular compression injury resulting from high-energy athletic impaction or focal mechanical overload. If unmanaged, persistent intraosseous hypertension impairs microvascular perfusion, accelerating articular cartilage breakdown and culminating in secondary subchondral collapse and osteonecrosis.
+
+2. MRI DIAGNOSTIC PROTOCOL & AI LESION SEGMENTATION:
+- Standard Knee Protocol: Fast spin-echo T2-weighted fat-suppressed (FS) or Short Tau Inversion Recovery (STIR) sequences in coronal and sagittal planes.
+- Edema Grading System:
+  * Grade 1: Mild interstitial high signal intensity involving <25% of the condylar subchondral volume.
+  * Grade 2: Moderate confluent hyperintensity involving 25% to 50% of the condylar or plateau volume.
+  * Grade 3: Severe extensive edema involving >50% of the anatomical compartment with cortical micro-depression.
+- AI Volumetric Analysis: Integration with MediMind Musculoskeletal MRI volumetric pipeline calculates total edema volume (mL) and tracks 6-week regression kinetics.
+
+3. CONSERVATIVE MANAGEMENT ALGORITHM:
+- Phase 1 (Weeks 0–3): Strict non-weight-bearing (NWB) with crutches for Grade 2/3 lesions to offload peak contact stresses.
+- Pharmacological Decompression Protocol:
+  * Intravenous Iloprost infusion (0.5–2.0 ng/kg/min for 6 hours daily over 5 consecutive days) to reduce vascular resistance and lower intraosseous pressure.
+  * Bisphosphonate therapy: Oral Alendronate 70mg weekly or single-dose IV Zoledronate 5mg to inhibit osteoclast-mediated trabecular resorption.
+- Extracorporeal Shock Wave Therapy (ESWT): High-energy focused ESWT (0.25 mJ/mm², 3000 pulses at 4-week intervals) targeting the focal edema zone to stimulate local angiogenesis and osteoblast activity.
+
+4. SURGICAL SUBCHONDROPLASTY INDICATIONS:
+- Indication: Persistent Grade 3 BME refractory to 12 weeks of structured conservative decompression.
+- Procedure: Percutaneous cannulated delivery of self-setting synthetic calcium phosphate bone substitute into the subchondral defect under fluoroscopic guidance to provide immediate biomechanical scaffolding.
+
+5. RETURN-TO-SPORT CRITERIA:
+- 100% resolution of resting and weight-bearing pain (VAS ≤ 1/10).
+- Follow-up STIR MRI at 8 weeks demonstrating >70% volumetric reduction in high-signal marrow signal.
+- Full symmetrical quadriceps and hamstring isokinetic limb symmetry index (LSI ≥ 90%).
+
+6. REFERENCES:
+1. International Cartilage Regeneration & Joint Preservation Society (ICRS) Bone Marrow Lesion Consensus Statement.
+2. Journal of Bone and Joint Surgery (JBJS): Targeted subchondral decompression in refractory post-traumatic bone marrow edema syndromes (2025).
+3. American Orthopaedic Society for Sports Medicine (AOSSM) Clinical Guidelines on Subchondral Insufficiency Fractures.`,
   },
   {
     id: 'art_010',
@@ -6247,7 +6308,32 @@ export const knowledgeArticles = [
     reviewerFeedback: 'Please expand Section 3 regarding diabetic fasting protocols and cite the latest ASA 2026 clear fluid guidelines before final approval.',
     tags: ['Arthroscopy', 'Pre-Op', 'Surgical Safety', 'Guidelines'],
     summary: 'Standard operating procedure for pre-procedural carbohydrate loading and clear fluid cessation in day-care arthroscopy.',
-    content: 'Pre-operative hydration optimization significantly reduces post-anesthesia nausea in outpatient arthroscopic knee procedures without compromising pulmonary aspiration safety.',
+    content: `1. CLINICAL OBJECTIVE & ERAS FRAMEWORK:
+Enhanced Recovery After Surgery (ERAS) protocols in outpatient orthopedic knee and shoulder arthroscopy demonstrate that prolonged fasting increases catabolic stress, dehydration, post-operative nausea and vomiting (PONV), and patient anxiety. This departmental protocol modernizes fasting times while maintaining zero incidence of pulmonary aspiration.
+
+2. CLEAR FLUIDS & SOLID FOOD TIMING SCHEDULE:
+- Solid Food & Heavy Meals: Cessation strictly 6 hours prior to scheduled induction of anesthesia.
+- Light Breakfast (e.g. toast and clear tea): Allowed up to 6 hours prior to admission.
+- Clear Fluids (Water, pulp-free clear apple juice, electrolyte drinks): Permitted and actively encouraged up to 2 hours prior to operating theater arrival (maximum 400 mL).
+- Pre-Operative Complex Carbohydrate Drink: 400 mL clear maltodextrin solution (12.5%) ingested 2 hours prior to surgery to minimize insulin resistance and maintain cellular hydration.
+
+3. SPECIAL POPULATIONS & DIABETIC FASTING PROTOCOLS:
+- Insulin-Dependent Patients: Schedule as first case on morning operative list. Withhold morning short-acting insulin; reduce basal insulin by 20% on the evening prior.
+- GLP-1 Receptor Agonists (e.g., Semaglutide, Tirzepatide): Discontinue weekly subcutaneous formulations 7 days prior to elective ambulatory surgery due to delayed gastric emptying risks.
+- Emergency / Non-elective Cases: Treat as non-fasted; ultrasound gastric antrum assessment protocol mandatory before airway management.
+
+4. MONITORING, CHECKS & ANESTHETIC SAFETY:
+- Point-of-Care Gastric Ultrasound (POCUS): For equivocal fluid intake or diabetic gastroparesis, perform qualitative antral grading in the semi-recumbent right lateral position.
+- Anti-Emetic Prophylaxis: Dexamethasone 4mg IV at induction + Ondansetron 4mg IV 15 minutes prior to wound dressing completion.
+
+5. AUDIT TRAIL & QUALITY METRICS:
+- Real-time nursing verification check in MediMind Surgical Suite EHR.
+- Monthly department audit tracking thirst/hunger visual analog scores, PONV rescue medication frequency, and time to post-op discharge.
+
+6. CITATIONS & REFERENCES:
+1. American Society of Anesthesiologists (ASA) Practice Guidelines for Preoperative Fasting and the Use of Pharmacologic Agents to Reduce the Risk of Pulmonary Aspiration (Updated 2026).
+2. European Society of Anaesthesiology and Intensive Care (ESAIC) Preoperative Fasting Guidelines.
+3. Enhanced Recovery After Surgery (ERAS®) Society Consensus Guidelines for Ambulatory Orthopedic Surgery.`,
   },
   {
     id: 'art_011',
@@ -6273,7 +6359,38 @@ export const knowledgeArticles = [
     reviewerRole: 'Head of Orthopedics & Musculoskeletal Sciences',
     tags: ['ACL', 'Rehabilitation', 'Sports Medicine', 'Orthopedics'],
     summary: 'Multi-center comparative trial showing accelerated return to daily mobility without increased graft laxity.',
-    content: 'Immediate protected weight-bearing within 48 hours post-ACL reconstruction demonstrated superior quadriceps muscle recruitment and earlier return to normal gait kinematics.',
+    content: `1. CLINICAL HYPOTHESIS & SCIENTIFIC RATIONALE:
+Traditional protocols historically mandated prolonged non-weight-bearing following Anterior Cruciate Ligament Reconstruction (ACLR) out of concern for graft elongation or tunnel widening. Recent biomechanical and clinical trial data prove that early, controlled axial compression promotes graft ligamentization, prevents arthrofibrosis, mitigates profound quadriceps arthrogenic muscle inhibition (AMI), and accelerates return to functional autonomy.
+
+2. SURGICAL GRAFT STRATIFICATION:
+- Bone-Patellar Tendon-Bone (BTB) Autografts: Rigid interference screw bone-to-bone healing allows full weight-bearing as tolerated (FWBAT) immediately on Day 1 in extension brace.
+- Quadrupled Semitendinosus/Gracilis (Hamstring) Autografts: Protected partial weight-bearing (50% body weight) for Days 1–7 transitioning to FWBAT by Day 14.
+- Concomitant Meniscal Repair (Root or Radial Tears): Limit knee flexion to 0°–90° during weight-bearing for the first 4 weeks; avoid open kinetic chain high-torque loads.
+
+3. STRUCTURED PHASE-BY-PHASE REHABILITATION PROGRAM:
+A. Phase 1: Immediate Post-Op (Weeks 0–2):
+   - Primary Goals: Passive knee extension to 0°, reduce hemarthrosis, activate vastus medialis oblique (VMO).
+   - Interventions: Cryotherapy compression cuffs (15 min q2h), patellar mobilizations (Grade I/II), active-assisted heel slides (0°–90°), neuromuscular electrical stimulation (NMES) for quadriceps re-education.
+B. Phase 2: Early Functional Strength (Weeks 3–6):
+   - Discontinue crutches once normal non-antalgic gait is demonstrated and quadriceps lag is absent.
+   - Closed Kinetic Chain (CKC) exercises: Leg press (0°–60°), shallow squats, stationary cycling with low resistance once 100° flexion is attained.
+C. Phase 3: Advanced Neuromuscular Control (Weeks 7–12):
+   - Perturbation training, single-leg balance on unstable surfaces, resisted lateral band walks, slide board drills.
+
+4. OBJECTIVE DISCHARGE & RETURN-TO-SPORT TESTING:
+- KT-1000 / Rolimeter Arthrometric Testing: Symmetrical anterior laxity (<2.5 mm side-to-side difference at 134 N).
+- Y-Balance Test: Anterior, posteromedial, and posterolateral reach symmetry (>95% composite score).
+- Functional Hop Test Battery: Single hop for distance, triple hop, crossover hop, and 6-meter timed hop demonstrating ≥90% Limb Symmetry Index (LSI).
+- Psychological Readiness: Tampa Scale of Kinesiophobia (TSK-11 ≤ 17) and ACL-Return to Sport after Injury (ACL-RSI ≥ 75).
+
+5. COMPLICATIONS & PROTOCOL DEVIATIONS:
+- Cyclops Lesion / Extension Deficit: If passive extension >5° deficit persists beyond Week 4, order high-resolution sagittal MRI and initiate intensive prone hanging protocols.
+- Persistent Joint Effusion (Stroke Test ≥ 2+): Reduce weight-bearing load by 25% for 72 hours, review anti-inflammatory dosing, and reassess closed kinetic chain volume.
+
+6. REFERENCES & LITERATURE CITATIONS:
+1. American Physical Therapy Association (APTA) Clinical Practice Guidelines: Revision 2025 on Knee Stability and Movement Coordination Impairments (ACL Injury).
+2. British Journal of Sports Medicine (BJSM): Evidence-based progression criteria in modern ACL reconstruction rehabilitation.
+3. MediMind Orthopedic Clinical Trials Group: Prospective 5-year multicenter randomized trial on immediate protected axial loading in hamstring vs patellar tendon ACL autografts (2026).`,
   },
 ];
 

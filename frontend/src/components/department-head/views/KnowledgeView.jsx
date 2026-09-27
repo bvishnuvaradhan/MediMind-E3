@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export function KnowledgeView({
   articles = [],
@@ -15,6 +15,17 @@ export function KnowledgeView({
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackError, setFeedbackError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  // Background scroll locking when any reader/reviewer modal is active
+  useEffect(() => {
+    if (selectedArticle || reviewingArticle) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [selectedArticle, reviewingArticle]);
 
   const underReviewArticles = articles.filter((a) => a.status === 'Under Review');
   const changesRequestedArticles = articles.filter((a) => a.status === 'Changes Requested');
@@ -385,9 +396,9 @@ export function KnowledgeView({
               </button>
             </div>
 
-            <div className="dh-modal-body" style={{ lineHeight: 1.6, fontSize: '14px', color: 'var(--dh-text-secondary)', whiteSpace: 'pre-line' }}>
-              {/* Reviewer / Meta */}
-              <div style={{ padding: '12px 16px', backgroundColor: 'var(--dh-bg)', borderRadius: '8px', border: '1px solid var(--dh-border)', marginBottom: '16px', fontSize: '12.5px' }}>
+            <div className="dh-modal-body" data-testid="dh-reader-modal-body">
+              {/* Reviewer / Meta Card */}
+              <div style={{ padding: '12px 16px', backgroundColor: 'var(--dh-bg)', borderRadius: '8px', border: '1px solid var(--dh-border)', fontSize: '12.5px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px' }}>
                   <div>
                     <span style={{ color: 'var(--dh-text-muted)' }}>Status:</span> <strong>{selectedArticle.status}</strong>
@@ -414,11 +425,20 @@ export function KnowledgeView({
                 )}
               </div>
 
-              <div style={{ padding: '12px 16px', backgroundColor: 'var(--dh-soft-bg)', borderRadius: '8px', marginBottom: '16px', color: 'var(--dh-text-primary)', fontWeight: 500 }}>
+              {/* Executive Summary Callout */}
+              <div style={{ padding: '12px 16px', backgroundColor: 'var(--dh-soft-bg)', borderRadius: '8px', color: 'var(--dh-text-primary)', fontWeight: 500, borderLeft: '3px solid var(--dh-blue)' }}>
                 <strong>Executive Summary:</strong> {selectedArticle.summary}
               </div>
 
-              <div>{selectedArticle.content}</div>
+              {/* Full Manuscript Body */}
+              <div style={{ padding: '16px', backgroundColor: 'var(--dh-bg)', borderRadius: '8px', border: '1px solid var(--dh-border)' }}>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--dh-text-muted)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.04em' }}>
+                  Full Protocol Document & Clinical Guidance
+                </div>
+                <div style={{ fontSize: '13.5px', lineHeight: 1.7, color: 'var(--dh-text-secondary)', whiteSpace: 'pre-line' }}>
+                  {selectedArticle.content}
+                </div>
+              </div>
             </div>
 
             <div className="dh-modal-footer">
@@ -467,7 +487,7 @@ export function KnowledgeView({
               </button>
             </div>
 
-            <div className="dh-modal-body">
+            <div className="dh-modal-body" data-testid="dh-reviewer-modal-body">
               {feedbackError && (
                 <div style={{ padding: '10px 14px', borderRadius: '8px', backgroundColor: 'var(--dh-error-bg)', color: 'var(--dh-error)', fontSize: '13px' }}>
                   {feedbackError}
@@ -483,11 +503,11 @@ export function KnowledgeView({
               </div>
 
               {/* Protocol Full Text */}
-              <div style={{ padding: '14px', backgroundColor: 'var(--dh-bg)', borderRadius: '8px', border: '1px solid var(--dh-border)' }}>
+              <div style={{ padding: '16px', backgroundColor: 'var(--dh-bg)', borderRadius: '8px', border: '1px solid var(--dh-border)' }}>
                 <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--dh-text-muted)', textTransform: 'uppercase', marginBottom: '6px' }}>
                   Full Manuscript Content
                 </div>
-                <div style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--dh-text-secondary)', whiteSpace: 'pre-line' }}>
+                <div style={{ fontSize: '13.5px', lineHeight: 1.7, color: 'var(--dh-text-secondary)', whiteSpace: 'pre-line' }}>
                   {reviewingArticle.content}
                 </div>
               </div>

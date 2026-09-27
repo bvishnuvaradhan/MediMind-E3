@@ -49,13 +49,24 @@
 - AI Analytics displays ONE single department-relevant radar for Fracture Detection AI (`ResNet-50 CNN`), avoiding multi-model / cross-department clutter.
 - Reuses verified model metrics: Accuracy `98.4%`, Sensitivity `98.1%`, Specificity `98.8%`, Precision `97.5%`, Uptime `99.9%`.
 
-### 5. Knowledge & Publication Reviewer Workflow & Draft Privacy Isolation
+### 5. Knowledge & Publication Reviewer Workflow & Article/Protocol Scrolling Architecture
 - Clearly visible in sidebar navigation with active review count badge.
 - Dashboard highlights pending manuscripts with 1-click review action.
 - Department Head can open Review Protocol, read full text, Approve & Publish, or Request Changes with mandatory written feedback.
 - Changes Requested articles display reviewer feedback to the author; Published articles are read-only.
 - **Draft Privacy & Article Ownership Rule**: Draft manuscripts are strictly private to their individual author and excluded from the Department Head review queue, `All` protocols listing, category counts, and global search unless authored by the Department Head.
-- **Peer-Review Scrolling & Viewport Resilience**: The Peer Review modal and reader modal feature fixed header/footer containers with a smooth, vertically scrollable content body (`flex: 1 1 auto; overflow-y: auto; max-height: calc(90vh - 140px);`), fully responsive and accessible without overflow or clipping across all viewports down to 320px.
+- **Article & Protocol Viewer Scrolling (Root Cause & Solution)**:
+  - *Root Cause Analysis*: Previously, `.dh-modal-overlay` had `overflow-y: auto` alongside `display: flex; align-items: center`, causing wheel events over the modal and borders to be intercepted by the overlay container rather than reaching the inner content. Furthermore, `document.body` lacked background scroll locking, causing scroll chaining to the background page.
+  - *Architectural Fix*:
+    1. Set `.dh-modal-overlay` to `overflow: hidden` to guarantee wheel/touch events pass directly to the inner scroll container.
+    2. Constrained `.dh-modal-box` to `max-height: min(90vh, 860px)` with `display: flex; flex-direction: column`.
+    3. Designated `.dh-modal-body` as the exclusive vertical scroll container with `flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;`.
+    4. Implemented body scroll locking via `useEffect` in `KnowledgeView.jsx` (`document.body.style.overflow = 'hidden'`) during active modal lifecycle with automatic cleanup on close.
+    5. Enhanced modal body custom scrollbar styling (`::-webkit-scrollbar` track & thumb) across light and dark themes.
+  - *Viewing Paths Verified*:
+    1. **Read Protocol / Article Reader Modal** (`selectedArticle`): Verified across full multi-section clinical protocols (`art_001`, `art_009`, `art_010`, `art_011`) from beginning to end (including clinical background, AI triage workflow, classification, surgical pathways, and references).
+    2. **Peer-Review / Decision Form Modal** (`reviewingArticle`): Verified scrolling across executive summary, full manuscript content, reviewer action buttons, and revision feedback textarea.
+    3. **Create Protocol Modal** (`CreateArticleModal`): Verified form fields and action buttons across desktop (1440px), tablet (768px), and mobile (480px, 320px) viewport heights.
 
 ### 6. Strict Clinical Privacy Boundaries
 - Zero leakage of private patient medical records, raw probability distributions, or confidential prescription drugs in Department Head view.
@@ -64,6 +75,6 @@
 
 ## 3. Verification & Certification Verdict: PASS (CERTIFIED)
 - `oxlint`: 0 errors, 0 warnings across 129 files.
-- `npm run build`: Success in 640ms.
+- `npm run build`: Success in 635ms.
 - `validateCentralDataset()`: `valid: true, errors: []`.
 - All Department Head workflows certified.
