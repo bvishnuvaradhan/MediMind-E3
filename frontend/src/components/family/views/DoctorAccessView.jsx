@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { LockKeyhole, ShieldCheck, Trash2, Plus, CheckCircle2 } from 'lucide-react';
+import { matchesFamilyMember } from '../../../data/medimindData';
 import { RevokeAccessModal } from '../components/RevokeAccessModal';
 import { GrantAccessModal } from '../components/GrantAccessModal';
 
@@ -17,11 +18,13 @@ export function DoctorAccessView({
   const [accessToRevoke, setAccessToRevoke] = useState(null);
   const [selectedMemberFilter, setSelectedMemberFilter] = useState('All');
 
+  const selectedMemberObj = members.find(
+    (m) => m.name === selectedMemberFilter || m.fullName === selectedMemberFilter || m.id === selectedMemberFilter
+  );
+
   const filteredAccess = doctorAccess.filter((entry) => {
     if (selectedMemberFilter === 'All') return true;
-    const target = selectedMemberFilter.toLowerCase();
-    const memberName = (entry.member || '').toLowerCase();
-    return memberName.includes(target) || target.includes(memberName);
+    return matchesFamilyMember(entry, selectedMemberObj);
   });
 
   const handleConfirmRevoke = (entry) => {
@@ -77,10 +80,7 @@ export function DoctorAccessView({
               {members.map((m) => {
                 const mName = m.fullName || m.name;
                 const mRel = m.relationship || m.relation || 'Member';
-                const count = doctorAccess.filter((entry) => {
-                  const entryMember = (entry.member || '').toLowerCase();
-                  return entryMember.includes(m.name.toLowerCase()) || (m.fullName && entryMember.includes(m.fullName.toLowerCase()));
-                }).length;
+                const count = doctorAccess.filter((entry) => matchesFamilyMember(entry, m)).length;
                 return (
                   <option key={m.id || m.name} value={m.name}>
                     {mName} — {mRel} ({count})

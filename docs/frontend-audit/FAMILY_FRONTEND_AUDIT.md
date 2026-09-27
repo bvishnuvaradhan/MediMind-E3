@@ -43,16 +43,21 @@
    - Recent medical records panel displays max 3 items with `"View all"` in section heading.
 2. **Explicit Naming Convention**:
    - All member selectors, headers, and badge indicators follow the explicit `{fullName || name} — {relationship || relation}` format.
-3. **Dynamic Member Filters Across All Family Views**:
-   - `AiPredictionsView`, `MedicalRecordsView`, `AppointmentsView`, `ConsultationsView`, `PrescriptionsView`, and `DoctorAccessView` each provide a member selector dropdown allowing individual member filtering or full family view.
-   - `MemberProfileView` provides an in-situ profile switcher to change member views seamlessly.
-4. **Multi-Modality Record Handling**:
+3. **Dynamic Member Filters & Exact Count Derivation**:
+   - `AppointmentsView`, `ConsultationsView`, `PrescriptionsView`, `MedicalRecordsView`, `AiPredictionsView`, and `DoctorAccessView` strictly derive their data from the authenticated Family Account (`FAM-001`) and its registered members.
+   - `All Family Members ({total})` displays ONLY the count of records belonging to the current family (e.g. 4 Appointments, 3 Consultations, 3 Prescriptions, 5 Medical Records, 4 Doctor Access entries) — never the global 16 appointments dataset.
+   - Individual member dropdown options `{fullName || name} — {relationship || relation} ({count})` derive their counts from the exact relational foreign keys (`memberId` / `patientId` / `familyId`).
+   - Selecting a member filters the list strictly to that member's records; selecting "All Family Members" displays all family-scoped records without global record leakage.
+4. **Clinical Network Hospital $\rightarrow$ Department Dependency (`DoctorsView.jsx`)**:
+   - In the specialist directory (`#doctors`), selecting a hospital dynamically recalibrates the department filter to display ONLY departments active at the chosen hospital facility.
+   - Switching hospital facilities automatically resets any obsolete department selection back to `'All Departments'` to prevent invalid combinations.
+5. **Multi-Modality Record Handling**:
    - Accurately categorizes X-Rays (`rec_002`, `rec_005`), Blood tests (`rec_001`, `rec_004`), and ECGs (`rec_003`).
    - Links records directly to clinical AI inference results with instant access to diagnostic finding details.
-5. **Clinical AI Flow**:
+6. **Clinical AI Flow**:
    - All 4 locked models accessible: Fracture Detection (`ai_fracture`), Diabetes Risk (`ai_diabetes`), Heart Disease Risk (`ai_cardio`), General Health Assessment (`ai_general`).
    - Personal prediction details feature pure-SVG `RadialGauge` and `BulletChart` visual indicators with clear AI safety disclaimer.
-6. **Consent Protocol (`DoctorAccessView.jsx`)**:
+7. **Consent Protocol (`DoctorAccessView.jsx`)**:
    - Patient grants or revokes physician access with real-time state synchronization.
    - Revoking consent for Aarav (`acc_010`) instantly prevents physician access to private records.
 

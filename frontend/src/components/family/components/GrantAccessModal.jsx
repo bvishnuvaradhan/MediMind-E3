@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, LockKeyhole, ShieldCheck } from 'lucide-react';
+import { doctors } from '../../../data/medimindData';
 
 export function GrantAccessModal({
   isOpen,
@@ -8,15 +9,14 @@ export function GrantAccessModal({
   activeMember,
   onGrantAccess,
 }) {
-  const doctorsList = [
-    { name: 'Dr. Rahul Mehta', department: 'Orthopedics', hospital: 'MediMind Central Hospital' },
-    { name: 'Dr. Ananya Rao', department: 'Cardiology', hospital: 'Heart & Wellness Center' },
-    { name: 'Dr. Kavya Shah', department: 'Diabetology', hospital: 'City Care Clinic' },
-    { name: 'Dr. Kumar Iyer', department: 'General Medicine', hospital: 'Apex Health Center' },
-  ];
+  const doctorsList = doctors.map((d) => ({
+    name: d.name,
+    department: d.departmentName,
+    hospital: d.hospitalName,
+  }));
 
   const [selectedMember, setSelectedMember] = useState(activeMember?.name || familyMembers[0]?.name || 'Father');
-  const [selectedDoctorName, setSelectedDoctorName] = useState(doctorsList[0].name);
+  const [selectedDoctorName, setSelectedDoctorName] = useState(doctorsList[0]?.name || 'Dr. Rahul Mehta');
 
   if (!isOpen) return null;
 

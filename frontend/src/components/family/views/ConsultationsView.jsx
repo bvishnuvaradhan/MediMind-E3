@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Activity, Users, ArrowUpRight } from 'lucide-react';
-import { initialPresentationData } from '../../../data/medimindData';
+import { initialPresentationData, matchesFamilyMember } from '../../../data/medimindData';
 
 export function ConsultationsView({
   announce,
@@ -11,12 +11,13 @@ export function ConsultationsView({
 
   const baseItems = initialPresentationData.Consultations || [];
 
+  const selectedMemberObj = familyMembers.find(
+    (m) => m.name === selectedMemberFilter || m.fullName === selectedMemberFilter || m.id === selectedMemberFilter
+  );
+
   const filteredItems = baseItems.filter((item) => {
     if (selectedMemberFilter === 'All') return true;
-    const target = selectedMemberFilter.toLowerCase();
-    const detail = (item.detail || '').toLowerCase();
-    const title = (item.title || '').toLowerCase();
-    return detail.includes(target) || title.includes(target);
+    return matchesFamilyMember(item, selectedMemberObj);
   });
 
   return (
@@ -53,10 +54,7 @@ export function ConsultationsView({
               {familyMembers.map((m) => {
                 const mName = m.fullName || m.name;
                 const mRel = m.relationship || m.relation || 'Member';
-                const count = baseItems.filter((item) => {
-                  const detail = (item.detail || '').toLowerCase();
-                  return detail.includes(m.name.toLowerCase()) || (m.fullName && detail.includes(m.fullName.toLowerCase()));
-                }).length;
+                const count = baseItems.filter((item) => matchesFamilyMember(item, m)).length;
                 return (
                   <option key={m.id || m.name} value={m.name}>
                     {mName} — {mRel} ({count})
@@ -75,7 +73,7 @@ export function ConsultationsView({
         <div className="feature-list">
           {filteredItems.length === 0 ? (
             <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--family-muted)', backgroundColor: 'var(--family-soft)', borderRadius: '10px' }}>
-              No consultation notes found for {selectedMemberFilter === 'All' ? 'any family member' : selectedMemberFilter}.
+              No consultation notes found for {selectedMemberFilter === 'All' ? 'any family member' : (selectedMemberObj?.fullName || selectedMemberFilter)}.
             </div>
           ) : (
             filteredItems.map((item, idx) => (

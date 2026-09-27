@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CalendarDays, Users, Sparkles, Plus, ArrowUpRight } from 'lucide-react';
-import { initialPresentationData } from '../../../data/medimindData';
+import { initialPresentationData, matchesFamilyMember } from '../../../data/medimindData';
 
 export function AppointmentsView({
   announce,
@@ -18,13 +18,14 @@ export function AppointmentsView({
   const baseItems = initialPresentationData.Appointments || [];
   const allAppointments = [...baseItems, ...bookedAppointments];
 
+  const selectedMemberObj = familyMembers.find(
+    (m) => m.name === selectedMemberFilter || m.fullName === selectedMemberFilter || m.id === selectedMemberFilter
+  );
+
   // Filter appointments by member
   const filteredAppointments = allAppointments.filter((apt) => {
     if (selectedMemberFilter === 'All') return true;
-    const target = selectedMemberFilter.toLowerCase();
-    const detail = (apt.detail || '').toLowerCase();
-    const patientName = (apt.patientName || apt.patient || '').toLowerCase();
-    return detail.includes(target) || patientName.includes(target) || target.includes(patientName);
+    return matchesFamilyMember(apt, selectedMemberObj);
   });
 
   return (
@@ -73,11 +74,7 @@ export function AppointmentsView({
               {familyMembers.map((m) => {
                 const mName = m.fullName || m.name;
                 const mRel = m.relationship || m.relation || 'Member';
-                const count = allAppointments.filter((apt) => {
-                  const detail = (apt.detail || '').toLowerCase();
-                  const patientName = (apt.patientName || apt.patient || '').toLowerCase();
-                  return detail.includes(m.name.toLowerCase()) || (m.fullName && detail.includes(m.fullName.toLowerCase())) || patientName.includes(m.name.toLowerCase());
-                }).length;
+                const count = allAppointments.filter((apt) => matchesFamilyMember(apt, m)).length;
                 return (
                   <option key={m.id || m.name} value={m.name}>
                     {mName} — {mRel} ({count})
@@ -96,7 +93,7 @@ export function AppointmentsView({
         <div className="feature-list">
           {filteredAppointments.length === 0 ? (
             <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--family-muted)', backgroundColor: 'var(--family-soft)', borderRadius: '10px' }}>
-              No appointments found for {selectedMemberFilter === 'All' ? 'any family member' : selectedMemberFilter}.
+              No appointments found for {selectedMemberFilter === 'All' ? 'any family member' : (selectedMemberObj?.fullName || selectedMemberFilter)}.
             </div>
           ) : (
             filteredAppointments.map((item, idx) => {

@@ -7083,7 +7083,46 @@ export const initialDoctorSettings = {
   allowEmergencyWalkIns: true,
 };
 
-// --- FAMILY COMPATIBILITY EXPORTS ---
+// --- FAMILY HELPER FUNCTIONS & COMPATIBILITY EXPORTS ---
+export function matchesFamilyMember(item, member) {
+  if (!item || !member) return false;
+
+  const targetId = (member.id || '').toLowerCase();
+  const targetFullName = (member.fullName || '').toLowerCase();
+  const targetName = (member.name || '').toLowerCase();
+
+  const itemMemberId = (item.memberId || item.patientId || '').toLowerCase();
+  const itemPatientName = (item.patientName || item.patient || item.memberName || item.member || '').toLowerCase();
+  const itemDetail = (item.detail || '').toLowerCase();
+  const itemTitle = (item.title || '').toLowerCase();
+
+  if (targetId && itemMemberId && itemMemberId === targetId) return true;
+  if (targetFullName && (itemPatientName === targetFullName || itemDetail.includes(targetFullName) || itemTitle.includes(targetFullName))) return true;
+  if (targetName && (itemPatientName === targetName || itemDetail.includes(targetName) || itemTitle.includes(targetName))) return true;
+
+  return false;
+}
+
+export function getFamilyData(familyId = 'FAM-001') {
+  const members = familyMembers.filter((m) => m.familyId === familyId);
+  const famRecords = medicalRecords.filter((r) => r.familyId === familyId || members.some((m) => matchesFamilyMember(r, m)));
+  const famAppointments = appointments.filter((a) => a.familyId === familyId || members.some((m) => matchesFamilyMember(a, m)));
+  const famConsultations = consultations.filter((c) => members.some((m) => matchesFamilyMember(c, m)));
+  const famPrescriptions = prescriptions.filter((p) => members.some((m) => matchesFamilyMember(p, m)));
+  const famPredictions = aiPredictions.filter((p) => p.familyId === familyId || members.some((m) => matchesFamilyMember(p, m)));
+  const famAccess = recordAccesses.filter((a) => a.familyId === familyId || members.some((m) => matchesFamilyMember(a, m)));
+
+  return {
+    members,
+    records: famRecords,
+    appointments: famAppointments,
+    consultations: famConsultations,
+    prescriptions: famPrescriptions,
+    predictions: famPredictions,
+    doctorAccess: famAccess,
+  };
+}
+
 export const initialFamilyMembers = familyMembers.filter(m => m.familyId === 'FAM-001');
 export const initialRecords = medicalRecords.filter(r => r.familyId === 'FAM-001');
 export const initialBookedSlots = bookedSlots;
@@ -7114,29 +7153,70 @@ export const initialPresentationData = {
     schedule: doc.opdSchedule || 'Monday – Saturday: 09:00 AM – 03:00 PM OPD',
     summary: doc.description || `Specialist in ${doc.departmentName} at ${doc.hospitalName}`,
   })),
-  Appointments: appointments.map(apt => ({
+  Appointments: appointments.filter(a => a.familyId === 'FAM-001').map(apt => ({
+    id: apt.id,
+    token: apt.token,
+    memberId: apt.memberId,
+    familyId: apt.familyId,
+    patientName: apt.patientName,
+    doctorName: apt.doctorName,
+    departmentName: apt.departmentName,
+    hospitalName: apt.hospitalName,
     title: `${apt.departmentName} appointment`,
     detail: `${apt.doctorName} · ${apt.patientName}`,
     meta: `${apt.date} · ${apt.time}`,
     tone: 'coral',
-    initials: apt.token.split('-')[1] || '01',
+    initials: apt.token ? (apt.token.split('-')[1] || '01') : '01',
     action: 'View details',
+    status: apt.status,
+    aiPreCheck: apt.aiPreCheck,
+    fee: apt.fee,
+    date: apt.date,
+    time: apt.time,
+    room: apt.room,
+    type: apt.type,
+    purpose: apt.purpose,
   })),
-  Consultations: consultations.map(cons => ({
+  Consultations: consultations.filter(c => c.patientId?.startsWith('MEM-001-') || c.patientName?.includes('Kapoor')).map(cons => ({
+    id: cons.id,
+    patientId: cons.patientId,
+    patientName: cons.patientName,
+    doctorName: cons.doctorName,
+    departmentId: cons.departmentId,
+    consultationNumber: cons.consultationNumber,
+    diagnosis: cons.diagnosis,
     title: `${cons.diagnosis} notes`,
     detail: `${cons.doctorName} · ${cons.patientName}`,
     meta: `${cons.date} · Ready`,
     tone: 'coral',
     initials: 'RM',
     action: 'Open notes',
+    status: cons.status,
+    date: cons.date,
+    symptoms: cons.symptoms,
+    observations: cons.observations,
+    treatmentPlan: cons.treatmentPlan,
+    doctorNotes: cons.doctorNotes,
+    aiPredictionReviewed: cons.aiPredictionReviewed,
   })),
-  Prescriptions: prescriptions.map(rx => ({
+  Prescriptions: prescriptions.filter(rx => rx.patientId?.startsWith('MEM-001-') || rx.patientName?.includes('Kapoor')).map(rx => ({
+    id: rx.id,
+    patientId: rx.patientId,
+    patientName: rx.patientName,
+    doctorName: rx.doctorName,
+    prescriptionNumber: rx.prescriptionNumber,
+    diagnosis: rx.diagnosis,
     title: rx.medications[0]?.name || 'Prescription',
     detail: `For ${rx.patientName} · ${rx.medications[0]?.dosage || ''}`,
     meta: `Prescribed on ${rx.date}`,
     tone: 'coral',
     initials: 'Rx',
     action: 'View instructions',
+    status: rx.status,
+    date: rx.date,
+    medications: rx.medications,
+    remarks: rx.remarks,
+    corrections: rx.corrections,
   })),
 };
 

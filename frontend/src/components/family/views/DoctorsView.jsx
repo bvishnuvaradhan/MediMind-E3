@@ -14,19 +14,41 @@ export function DoctorsView({
   const [selectedDepartment, setSelectedDepartment] = useState('All Departments');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Extract unique departments dynamically
+  // Extract unique departments dynamically based on selected hospital
   const departmentOptions = useMemo(() => {
     const depts = new Set();
     allDoctors.forEach((d) => {
-      const deptName = d.department || (d.detail ? d.detail.split(' · ')[0] : '');
-      if (deptName) depts.add(deptName);
+      const docHosp = d.hospital || (d.detail ? d.detail.split(' · ')[1] : '');
+      if (selectedHospital === 'All Hospitals' || docHosp.toLowerCase() === selectedHospital.toLowerCase()) {
+        const deptName = d.department || (d.detail ? d.detail.split(' · ')[0] : '');
+        if (deptName) depts.add(deptName);
+      }
     });
     return ['All Departments', ...Array.from(depts).sort()];
-  }, []);
+  }, [selectedHospital]);
 
   const hospitalOptions = useMemo(() => {
     return ['All Hospitals', ...hospitals.map((h) => h.name)];
   }, []);
+
+  const handleHospitalSelect = (hosp) => {
+    setSelectedHospital(hosp);
+    if (hosp !== 'All Hospitals') {
+      // Find departments for this new hospital
+      const validDepts = new Set();
+      allDoctors.forEach((d) => {
+        const docHosp = d.hospital || (d.detail ? d.detail.split(' · ')[1] : '');
+        if (docHosp.toLowerCase() === hosp.toLowerCase()) {
+          const deptName = d.department || (d.detail ? d.detail.split(' · ')[0] : '');
+          if (deptName) validDepts.add(deptName);
+        }
+      });
+      if (selectedDepartment !== 'All Departments' && !validDepts.has(selectedDepartment)) {
+        setSelectedDepartment('All Departments');
+      }
+    }
+    if (announce) announce(`Filtered by ${hosp}`);
+  };
 
   const filteredDoctors = useMemo(() => {
     return allDoctors.filter((doc) => {
@@ -110,10 +132,7 @@ export function DoctorsView({
                   key={hosp}
                   type="button"
                   className={`filter ${selectedHospital === hosp ? 'active' : ''}`}
-                  onClick={() => {
-                    setSelectedHospital(hosp);
-                    if (announce) announce(`Filtered by ${hosp}`);
-                  }}
+                  onClick={() => handleHospitalSelect(hosp)}
                   style={{ fontSize: '12px', padding: '5px 12px' }}
                 >
                   {hosp}

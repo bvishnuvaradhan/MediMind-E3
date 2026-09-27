@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Sparkles, Activity, HeartPulse, ShieldCheck, ArrowUpRight, History, FileText, Stethoscope, Users, ChevronDown, ChevronUp } from 'lucide-react';
+import { matchesFamilyMember } from '../../../data/medimindData';
 import { PredictionInputModal } from '../components/PredictionInputModal';
 
 export function AiPredictionsView({
@@ -20,6 +21,7 @@ export function AiPredictionsView({
   const defaultHistory = [
     {
       id: 'pred-1',
+      memberId: 'MEM-001-01',
       memberName: 'Rohan Kapoor',
       memberRelation: 'Father',
       title: 'Heart Health & Cardiovascular Risk',
@@ -49,6 +51,7 @@ export function AiPredictionsView({
     },
     {
       id: 'pred-2',
+      memberId: 'MEM-001-02',
       memberName: 'Priya Kapoor',
       memberRelation: 'Mother',
       title: 'Diabetes 3-Year Risk Forecaster',
@@ -78,6 +81,7 @@ export function AiPredictionsView({
     },
     {
       id: 'pred-3',
+      memberId: 'MEM-001-03',
       memberName: 'Arjun Kapoor',
       memberRelation: 'Son',
       title: 'Fracture Detection Radiograph AI',
@@ -107,6 +111,7 @@ export function AiPredictionsView({
     },
     {
       id: 'pred-4',
+      memberId: 'MEM-001-04',
       memberName: 'Ananya Kapoor',
       memberRelation: 'Daughter',
       title: 'General Health Biometric Index',
@@ -138,13 +143,14 @@ export function AiPredictionsView({
 
   const allHistory = [...predictionHistory, ...defaultHistory];
 
+  const selectedMemberObj = familyMembers.find(
+    (m) => m.name === selectedMemberFilter || m.fullName === selectedMemberFilter || m.id === selectedMemberFilter
+  );
+
   // Filter history by member
   const filteredHistory = allHistory.filter((item) => {
     if (selectedMemberFilter === 'All') return true;
-    const target = selectedMemberFilter.toLowerCase();
-    const itemMember = (item.memberName || '').toLowerCase();
-    const itemRelation = (item.memberRelation || '').toLowerCase();
-    return itemMember.includes(target) || itemRelation.includes(target) || target.includes(itemMember);
+    return matchesFamilyMember(item, selectedMemberObj);
   });
 
   const displayedHistory = showAllHistory ? filteredHistory : filteredHistory.slice(0, 3);
@@ -264,11 +270,7 @@ export function AiPredictionsView({
                 {familyMembers.map((m) => {
                   const mName = m.fullName || m.name;
                   const mRel = m.relationship || m.relation || 'Member';
-                  const count = allHistory.filter((item) => {
-                    const itemMember = (item.memberName || '').toLowerCase();
-                    const itemRel = (item.memberRelation || '').toLowerCase();
-                    return itemMember.includes(mName.toLowerCase()) || itemRel.includes(mRel.toLowerCase()) || mName.toLowerCase().includes(itemMember);
-                  }).length;
+                  const count = allHistory.filter((item) => matchesFamilyMember(item, m)).length;
                   return (
                     <option key={m.id || m.name} value={m.name}>
                       {mName} — {mRel} ({count})

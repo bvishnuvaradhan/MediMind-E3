@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FileText, Upload, Users } from 'lucide-react';
-import { initialRecords } from '../../../data/medimindData';
+import { initialRecords, matchesFamilyMember } from '../../../data/medimindData';
 import { RecordRow } from '../components/RecordRow';
 import { UploadRecordModal } from '../components/UploadRecordModal';
 import { DeleteRecordModal } from '../components/DeleteRecordModal';
@@ -22,12 +22,14 @@ export function MedicalRecordsView({
 
   const filters = ['All', 'Reports', 'Tests', 'X-Rays', 'Prescriptions', 'Consultations', 'AI Reports'];
 
+  const selectedMemberObj = familyMembers.find(
+    (m) => m.name === selectedMemberFilter || m.fullName === selectedMemberFilter || m.id === selectedMemberFilter
+  );
+
   // 1. Filter by Member
   const memberFilteredRecords = records.filter((record) => {
     if (selectedMemberFilter === 'All') return true;
-    const patient = (record.patient || record.patientName || '').toLowerCase();
-    const target = selectedMemberFilter.toLowerCase();
-    return patient === target || patient.includes(target) || target.includes(patient);
+    return matchesFamilyMember(record, selectedMemberObj);
   });
 
   // 2. Filter by Category
@@ -84,10 +86,7 @@ export function MedicalRecordsView({
               {familyMembers.map((m) => {
                 const mName = m.fullName || m.name;
                 const mRel = m.relationship || m.relation || 'Member';
-                const count = records.filter((r) => {
-                  const patient = (r.patient || r.patientName || '').toLowerCase();
-                  return patient.includes(m.name.toLowerCase()) || (m.fullName && patient.includes(m.fullName.toLowerCase()));
-                }).length;
+                const count = records.filter((r) => matchesFamilyMember(r, m)).length;
                 return (
                   <option key={m.id || m.name} value={m.name}>
                     {mName} — {mRel} ({count} doc{count !== 1 ? 's' : ''})

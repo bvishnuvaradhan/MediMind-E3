@@ -56,7 +56,7 @@
 
 ## 4. Security & Authorization Boundaries
 
-- **Department & Hospital Scope**: Dr. Rahul Mehta operates under Orthopedics (`DEP-H1-ORTHO`) at MediMind Central Hospital (`HOSP-001`). Cannot edit other doctors' schedules, alter department capacities, or view unauthorized patient accounts.
+- **Department & Hospital Scope**: Dr. Rahul Mehta operates under Orthopedics (`DEP-H1-ORTHO`) at MediMind Central Hospital (`HOSP-001`). Department and Hospital are strictly scope-locked in profile/settings, ensuring clinicians cannot select invalid hospital-department combinations.
 - **Clinical Immutability**: Finalized consultations and prescriptions cannot be deleted; modifications require structured amendments/corrections preserving the original clinical record.
 
 ---
