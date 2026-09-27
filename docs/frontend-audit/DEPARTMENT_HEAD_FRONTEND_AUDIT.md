@@ -49,11 +49,13 @@
 - AI Analytics displays ONE single department-relevant radar for Fracture Detection AI (`ResNet-50 CNN`), avoiding multi-model / cross-department clutter.
 - Reuses verified model metrics: Accuracy `98.4%`, Sensitivity `98.1%`, Specificity `98.8%`, Precision `97.5%`, Uptime `99.9%`.
 
-### 5. Knowledge & Publication Reviewer Workflow
+### 5. Knowledge & Publication Reviewer Workflow & Draft Privacy Isolation
 - Clearly visible in sidebar navigation with active review count badge.
 - Dashboard highlights pending manuscripts with 1-click review action.
 - Department Head can open Review Protocol, read full text, Approve & Publish, or Request Changes with mandatory written feedback.
 - Changes Requested articles display reviewer feedback to the author; Published articles are read-only.
+- **Draft Privacy & Article Ownership Rule**: Draft manuscripts are strictly private to their individual author and excluded from the Department Head review queue, `All` protocols listing, category counts, and global search unless authored by the Department Head.
+- **Peer-Review Scrolling & Viewport Resilience**: The Peer Review modal and reader modal feature fixed header/footer containers with a smooth, vertically scrollable content body (`flex: 1 1 auto; overflow-y: auto; max-height: calc(90vh - 140px);`), fully responsive and accessible without overflow or clipping across all viewports down to 320px.
 
 ### 6. Strict Clinical Privacy Boundaries
 - Zero leakage of private patient medical records, raw probability distributions, or confidential prescription drugs in Department Head view.

@@ -385,7 +385,7 @@ export function KnowledgeView({
               </button>
             </div>
 
-            <div className="dh-modal-body" style={{ maxHeight: '60vh', lineHeight: 1.6, fontSize: '14px', color: 'var(--dh-text-secondary)', whiteSpace: 'pre-line' }}>
+            <div className="dh-modal-body" style={{ lineHeight: 1.6, fontSize: '14px', color: 'var(--dh-text-secondary)', whiteSpace: 'pre-line' }}>
               {/* Reviewer / Meta */}
               <div style={{ padding: '12px 16px', backgroundColor: 'var(--dh-bg)', borderRadius: '8px', border: '1px solid var(--dh-border)', marginBottom: '16px', fontSize: '12.5px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px' }}>
@@ -467,7 +467,7 @@ export function KnowledgeView({
               </button>
             </div>
 
-            <div className="dh-modal-body" style={{ maxHeight: '55vh', overflowY: 'auto' }}>
+            <div className="dh-modal-body">
               {feedbackError && (
                 <div style={{ padding: '10px 14px', borderRadius: '8px', backgroundColor: 'var(--dh-error-bg)', color: 'var(--dh-error)', fontSize: '13px' }}>
                   {feedbackError}

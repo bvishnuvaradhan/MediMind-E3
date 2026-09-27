@@ -403,7 +403,16 @@ export const doctorService = {
 
   // --- Knowledge Articles ---
   async getArticles(filters = {}) {
-    let list = [...articlesState];
+    let list = articlesState.filter((a) => {
+      // Drafts are strictly private to their author
+      if (a.status === 'Draft') {
+        return (
+          (a.authorId && a.authorId === profileState.id) ||
+          (a.author && a.author.trim().toLowerCase() === (profileState.name || '').trim().toLowerCase())
+        );
+      }
+      return true;
+    });
     if (filters.status && filters.status !== 'All') {
       list = list.filter((a) => a.status === filters.status);
     }

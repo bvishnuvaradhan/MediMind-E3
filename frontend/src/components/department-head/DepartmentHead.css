@@ -863,11 +863,13 @@
   inset: 0;
   background-color: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(4px);
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 1000;
   padding: 20px;
   animation: dhFadeIn 0.15s ease;
+  overflow-y: auto;
 }
 
 .dh-modal-box {
@@ -882,6 +884,7 @@
   box-shadow: var(--dh-shadow-lg);
   animation: dhSlideUp 0.2s ease;
   overflow: hidden;
+  margin: auto;
 }
 
 .dh-modal-box.lg {
@@ -894,6 +897,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
 }
 
 .dh-modal-title {
@@ -907,7 +911,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  flex: 1;
+  flex: 1 1 auto;
   overflow: hidden;
 }
 
@@ -918,7 +922,8 @@
   flex-direction: column;
   gap: 16px;
   min-height: 0;
-  flex: 1;
+  flex: 1 1 auto;
+  max-height: calc(90vh - 140px);
 }
 
 .dh-modal-footer {
@@ -929,6 +934,7 @@
   justify-content: flex-end;
   gap: 10px;
   background-color: var(--dh-bg);
+  flex-shrink: 0;
 }
 
 /* Form Controls */
@@ -1153,5 +1159,27 @@
   }
   .dh-form-row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .dh-modal-overlay {
+    padding: 8px;
+  }
+  .dh-modal-box {
+    border-radius: 10px;
+    max-height: 94vh;
+  }
+  .dh-modal-header {
+    padding: 12px 14px;
+  }
+  .dh-modal-body {
+    padding: 14px;
+    gap: 12px;
+    max-height: calc(94vh - 100px);
+  }
+  .dh-modal-footer {
+    padding: 10px 14px;
+    gap: 6px;
   }
 }
