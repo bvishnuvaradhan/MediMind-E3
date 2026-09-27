@@ -187,7 +187,8 @@ export function DashboardView({
                   <button
                     className="doctor-btn doctor-btn-primary doctor-btn-sm"
                     onClick={() => {
-                      onSelectPatient(apt.patientId);
+                      const targetId = apt.patientId || apt.memberId || patients.find((p) => p.name === apt.patientName)?.id;
+                      if (targetId) onSelectPatient(targetId);
                     }}
                   >
                     Open Record

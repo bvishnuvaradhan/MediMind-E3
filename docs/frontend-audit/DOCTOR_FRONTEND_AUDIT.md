@@ -42,9 +42,14 @@
    - Prescriptions support `DRAFT` $\rightarrow$ `FINAL` $\rightarrow$ `CORRECTED` with structured medications, dosage frequencies, and visible audit chains displaying previous prescription number, correction reason, and clinician identity.
 4. **Outpatient Appointments & AI Pre-Screen Resolution**:
    - **Normal Booked Appointments**: Every standard booked appointment resolves to its patient record and linked AI pre-screen prediction (`aiPredictionId`, `moduleId`, or primary prediction). The AI pre-screen badge (`🔍 <Finding> (<Confidence>%)`) and active `"View AI Analysis"` button are interactive and directly open the linked AI telemetry and Grad-CAM diagnostics modal.
-   - **Walk-in Appointments**: Walk-ins are explicitly identified as the sole exception with `"Walk-in (AI Not Required)"` indicator and a non-clickable `"AI Not Required"` pill in Actions.
-   - **Simplified Walk-in Registration Flow**:
+   - **Walk-in Appointments (3 Mock Baseline Examples)**:
+     - `apt_017` (`W-101`, Priya Kapoor, `Today (27 Sep 2026)`, Status: `In Progress`, Type: `Walk-in`)
+     - `apt_018` (`W-102`, Rohan Kapoor, `Today (27 Sep 2026)`, Status: `Confirmed`, Type: `Walk-in`)
+     - `apt_019` (`W-103`, Kabir Kapoor, `22 Sep 2026`, Status: `Completed`, Type: `Walk-in`)
+     - Walk-ins are explicitly identified as the sole exception with `"Walk-in (AI Not Required)"` indicator and a non-clickable `"AI Not Required"` pill in Actions. Filter tabs (`Today`, `Upcoming`, `Completed`, `All`) seamlessly index both scheduled visits and walk-in arrivals.
+   - **Simplified Walk-in Registration Flow & Scrolling Controls**:
      - Accessed via `+ Add Walk-in` triggers on Outpatient Appointments, Dashboard, and Patients directory.
+     - **Modal Scrolling & Viewport Invariants**: Enforces `max-height: calc(100vh - 32px)`, locked header, fixed footer, dedicated scrollable body container with zero horizontal overflow, and document body scroll-locking (`document.body.style.overflow = 'hidden'`) preventing background scroll leakages. Form rows collapse to 1 column on screens $\le 580\text{px}$, fully verified from 1440px down to 320px width.
      - **Patient Identification**: Two clear modalities: `Option A — Select Existing Patient` (uses clinician's patient scope with clear `Select Patient` label) or `Option B — + Add New Patient` (registers basic patient identity for encounter without forcing pre-created authorization records).
      - **Encounter Details**: Captures date, arrival time, encounter modality, and chief presenting complaint.
      - **Explicit Exclusions**: Completely removes `Clinical Diagnosis & ICD-10 Code` (formulated later during consultation), `AI Diagnostic Decision Support Note` (no fake AI data created), and `Linked Appointment Slot` (walk-ins are unscheduled).

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function WalkInForm({
   patients = [],
@@ -110,10 +110,19 @@ function WalkInForm({
   };
 
   return (
-    <div className="doctor-modal-box lg" onClick={(e) => e.stopPropagation()}>
-      <div className="doctor-modal-header">
+    <div
+      className="doctor-modal-box lg"
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        maxHeight: 'calc(100vh - 32px)',
+        overflow: 'hidden',
+      }}
+    >
+      <div className="doctor-modal-header" style={{ flexShrink: 0 }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
             <span
               className="doctor-badge"
               style={{
@@ -141,8 +150,26 @@ function WalkInForm({
         </button>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="doctor-modal-body">
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
+          margin: 0,
+        }}
+      >
+        <div
+          className="doctor-modal-body"
+          style={{
+            overflowY: 'auto',
+            flex: 1,
+            minHeight: 0,
+            overflowX: 'hidden',
+          }}
+        >
           {error && (
             <div
               style={{
@@ -167,7 +194,7 @@ function WalkInForm({
               <button
                 type="button"
                 className={`doctor-btn ${patientMode === 'existing' ? 'doctor-btn-primary' : 'doctor-btn-outline'}`}
-                style={{ flex: 1, minWidth: '180px', justifyContent: 'center' }}
+                style={{ flex: 1, minWidth: '160px', justifyContent: 'center' }}
                 onClick={() => setPatientMode('existing')}
               >
                 <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -178,7 +205,7 @@ function WalkInForm({
               <button
                 type="button"
                 className={`doctor-btn ${patientMode === 'new' ? 'doctor-btn-primary' : 'doctor-btn-outline'}`}
-                style={{ flex: 1, minWidth: '180px', justifyContent: 'center' }}
+                style={{ flex: 1, minWidth: '160px', justifyContent: 'center' }}
                 onClick={() => setPatientMode('new')}
               >
                 <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -222,7 +249,7 @@ function WalkInForm({
                     fontSize: '12.5px',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
                     <strong>{selectedPatient.name}</strong>
                     <span className="doctor-badge doctor-badge-active" style={{ fontSize: '11px' }}>
                       {selectedPatient.accessStatus || 'Active'} Access
@@ -248,7 +275,7 @@ function WalkInForm({
             /* Option B: Add New Patient */
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ padding: '10px 14px', backgroundColor: 'var(--doctor-soft-teal)', borderRadius: '8px', fontSize: '12.5px', color: 'var(--doctor-text-primary)' }}>
-                ℹ <strong>New Walk-in Patient Registration:</strong> Registers a temporary clinical encounter profile for this visit. Consent boundaries remain protected for historical records.
+                ℹ <strong>New Walk-in Patient Registration:</strong> Registers an encounter clinical profile for this visit. Consent boundaries remain protected for historical records.
               </div>
 
               <div className="doctor-form-row">
@@ -409,7 +436,7 @@ function WalkInForm({
           </div>
         </div>
 
-        <div className="doctor-modal-footer">
+        <div className="doctor-modal-footer" style={{ flexShrink: 0 }}>
           <button type="button" className="doctor-btn doctor-btn-outline" onClick={onClose}>
             Cancel
           </button>
@@ -433,6 +460,17 @@ export function CreateWalkInModal({
   onCreateWalkIn,
   onClose,
 }) {
+  // Prevent background scrolling when modal is active
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (

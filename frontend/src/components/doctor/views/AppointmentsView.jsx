@@ -147,6 +147,7 @@ export function AppointmentsView({
                   const patient = resolvePatientForAppointment(apt, patients);
                   const prediction = resolvePredictionForAppointment(apt, patient);
                   const isWalkIn =
+                    Boolean(apt.isWalkIn) ||
                     apt.type?.toLowerCase().includes('walk-in') ||
                     apt.type === 'Walk-in' ||
                     apt.purpose?.toLowerCase().includes('walk-in');
