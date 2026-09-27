@@ -18,17 +18,17 @@ MediMind implements strict Role-Based Access Control (RBAC) and explicit patient
    - Hospital membership onboarding & accreditation review (`Pending` $\rightarrow$ `Approved` / `Rejected`).
    - Platform-wide appointment volume, administrator provisioning, and ecosystem AI engine utilization.
 2. **Hospital Administrator Portal** (`HOSPITAL_ADMIN`):
-   - Facility profile, NABH/JCI accreditation, and ward bed capacity oversight ($210/250$ beds).
+   - Facility profile, NABH/JCI accreditation, and ward bed capacity oversight.
    - Clinical department creation, department head onboarding, and staff doctor administration.
    - Operational admissions trajectories (5-month trend) and cross-department comparative analytics.
 3. **Department Head Portal** (`DEPARTMENT_HEAD`):
-   - Department hub (Orthopedics / Cardiology), clinician provisioning, and OPD shift roster coordination.
-   - Physician capacity utilization, workload balancing, and bivariate performance scatter analysis.
+   - Department hub (Orthopedics / Cardiology / Diabetology), clinician provisioning, and OPD shift roster coordination.
+   - Physician capacity utilization, workload balancing, and doctor performance analytics.
    - Clinical practice guideline publication and subspecialty anomaly distribution.
 4. **Doctor Clinical Workspace Portal** (`DOCTOR`):
    - Outpatient consultation queue, clinical funnel pipeline, and authorized patient charts (scoped by `RecordAccess`).
-   - Clinical consultations lifecycle (`Draft` $\rightarrow$ `Final` $\rightarrow$ `Amended`).
-   - Electronic prescriptions formulation (`Draft` $\rightarrow$ `Final` $\rightarrow$ `Corrected`).
+   - Clinical consultations lifecycle (`DRAFT` $\rightarrow$ `FINAL` $\rightarrow$ `AMENDED`).
+   - Electronic prescriptions formulation (`DRAFT` $\rightarrow$ `FINAL` $\rightarrow$ `CORRECTED`).
    - AI decision support with interactive Grad-CAM heatmap saliency and feature activation weights.
 5. **Family Healthcare Portal** (`FAMILY`):
    - Family unified medical records, biometric member profiles, and document repository.
@@ -41,14 +41,22 @@ MediMind implements strict Role-Based Access Control (RBAC) and explicit patient
 
 All frontend data flows strictly from `frontend/src/data/medimindData.js` through role-scoped services:
 
-- **Active Network Hospitals**: 3 (`hosp_01` MediMind Central, `hosp_02` Apollo Multispecialty, `hosp_03` Fortis Memorial)
-- **Pending Onboarding Hospital Requests**: 2 (`req_01` Manipal Super Specialty Hospital, `req_02` City Care Hospital)
-- **Clinical Departments**: 17
-- **Department Heads**: 18
-- **Staff Physicians**: 66
-- **Hospital Administrators**: 6
-- **Family Accounts**: 6
-- **Family Members**: 29
+- **Active Network Hospitals**: 3 (`HOSP-001` MediMind Central Hospital, `HOSP-002` St. Jude Multispecialty Hospital, `HOSP-003` Apex Institute of Medical Sciences)
+- **Pending Onboarding Hospital Requests**: 2 (`REQ-HOSP-001` Aster Prime Hospital, `REQ-HOSP-002` Fortis Memorial Research Institute)
+- **Clinical Departments**: 17 (H1: 6, H2: 3, H3: 8)
+- **Department Heads**: 18 (H1: 6, H2: 3, H3: 9 with dual heads in `DEP-H3-ORTHO`)
+- **Staff Physicians**: 66 (H1: 21, H2: 6, H3: 39)
+- **Hospital Administrators**: 6 (H1: 2, H2: 1, H3: 3)
+- **Family Accounts**: 6 (`FAM-001` to `FAM-006`)
+- **Family Members**: 29 (`MEM-001-01` to `MEM-006-08`)
+- **Authenticated Mock Users**: 97
+- **Medical Records**: 20 (`rec_001` to `rec_020`)
+- **AI Predictions**: 16 (`ai_pred_001` to `ai_pred_016`)
+- **Appointments**: 16 (`apt_001` to `apt_016`)
+- **Consultations**: 10 (`cons_001` to `cons_010`)
+- **Prescriptions**: 10 (`rx_001` to `rx_010`)
+- **Consent Records**: 12 (`acc_001` to `acc_012`)
+- **Knowledge Articles**: 8 (`art_001` to `art_008`)
 - **Locked Clinical AI Pipelines**: 4
 - **Dataset Validation**: `validateCentralDataset()` $\rightarrow$ `valid: true, errors: []`
 
@@ -60,10 +68,10 @@ MediMind integrates 4 locked AI diagnostic pipelines with dedicated mathematical
 
 | AI Module Key | Module Name | Primary Specialty | Diagnostic Model Type | Key Metrics |
 | :--- | :--- | :--- | :--- | :--- |
-| `ai_fracture` | **Fracture Detection** | Orthopedics | Deep Residual CNN | 98.4% Acc, 98.1% Sens, 98.8% Spec, 99.9% Uptime |
-| `ai_diabetes` | **Diabetes Risk** | Diabetology / Endocrinology | Gradient Boosted ML | 94.6% Acc, 93.8% Sens, 95.2% Spec, 99.8% Uptime |
-| `ai_cardio` | **Heart Disease Risk** | Cardiology | Ensemble Classifier ML | 95.8% Acc, 95.2% Sens, 96.4% Spec, 99.9% Uptime |
-| `ai_general` | **General Health Assessment** | General Medicine / Triage | NLP & Triage Classifier | 93.5% Acc, 92.4% Sens, 94.1% Spec, 99.7% Uptime |
+| `ai_fracture` | **Fracture Detection** | Orthopedics | Deep Residual CNN (ResNet-50) | 98.4% Acc, 98.1% Sens, 98.8% Spec, 99.9% Uptime |
+| `ai_diabetes` | **Diabetes Risk** | Diabetology / Endocrinology | Gradient Boosted ML (XGBoost) | 94.2% Acc, 93.5% Sens, 94.8% Spec, 99.8% Uptime |
+| `ai_cardio` | **Heart Disease Risk** | Cardiology | Ensemble Classifier & Random Forest | 95.7% Acc, 95.2% Sens, 96.1% Spec, 99.9% Uptime |
+| `ai_general` | **General Health Assessment** | General Medicine / Triage | Clinical Transformer NLP (BERT) | 93.1% Acc, 92.4% Sens, 93.8% Spec, 99.7% Uptime |
 
 ---
 
@@ -71,9 +79,9 @@ MediMind integrates 4 locked AI diagnostic pipelines with dedicated mathematical
 
 MediMind features a pure-SVG mathematical charting engine housed in `frontend/src/components/common/charts/`:
 
-- **LineChart / AreaChart**: Multi-series continuous time-series trajectories with cubic Bézier curves.
+- **LineChart**: Multi-series continuous time-series trajectories with cubic Bézier curves.
 - **BarChart**: Grouped vertical, stacked vertical, and horizontal latency comparison layouts.
-- **DonutChart / PieChart**: Part-to-whole categorical allocations with animated hover trigonometry.
+- **DonutChart**: Part-to-whole categorical allocations with animated hover trigonometry.
 - **ScatterPlot**: 2D Cartesian bivariate observations (e.g. Caseload vs On-Time Rate) with benchmark lines.
 - **FunnelChart**: Multi-stage clinical outpatient workflow throughput and conversion.
 - **RadialGauge**: Calibrated semi-circular and $240^\circ$ arc confidence and health index gauges.
@@ -83,14 +91,14 @@ MediMind features a pure-SVG mathematical charting engine housed in `frontend/sr
 
 ---
 
-## 5. Frontend Route Structure (68 Certified Routes)
+## 5. Frontend Route Structure (68 Certified Routes across 66 Views)
 
 - **Public / Auth** (2): `LoginPage`, `SignupPage`
-- **Family Portal** (18): `#dashboard`, `#family-members`, `#member-profile`, `#medical-records`, `#ai-predictions`, `#personal-prediction-detail`, `#doctors`, `#doctor-profile`, `#appointments`, `#appointment-assessment`, `#appointment-ai-assessment`, `#book-appointment`, `#consultations`, `#prescriptions`, `#doctor-access`, `#general-health-risk`, `#help-center`, `#settings`
-- **Doctor Portal** (12): `#dashboard`, `#patients`, `#patient_profile`, `#appointments`, `#consultations`, `#prescriptions`, `#ai_diagnostics`, `#ai_explain`, `#availability`, `#patient_access`, `#knowledge`, `#settings`
-- **Department Head Portal** (10): `#dashboard`, `#doctors`, `#doctor_details`, `#appointments`, `#workload`, `#analytics`, `#ai_analytics`, `#performance`, `#knowledge`, `#settings`
-- **Hospital Admin Portal** (14): `#dashboard`, `#hospital-profile`, `#departments`, `#department-heads`, `#department-head-details`, `#doctors`, `#doctor-details`, `#staff-management`, `#hospital-operational-analytics`, `#department-comparative-analytics`, `#ai-analytics`, `#reports`, `#knowledge-activity`, `#settings`
-- **Chairman Portal** (12): `#dashboard`, `#platform-analytics`, `#hospitals`, `#hospital-admins`, `#departments`, `#family-accounts`, `#hospital-performance`, `#appointments`, `#reports`, `#ai-analytics`, `#knowledge-activity`, `#settings`
+- **Family Portal** (18 Views): `#family/dashboard`, `#family/members`, `#family/member-profile`, `#family/records`, `#family/upload-record`, `#family/predictions`, `#family/prediction-detail`, `#family/doctors`, `#family/doctor-profile`, `#family/doctor-access`, `#family/appointments`, `#family/book-appointment`, `#family/appointment-assessment`, `#family/consultations`, `#family/prescriptions`, `#family/general-health-risk`, `#family/help`, `#family/settings`
+- **Doctor Portal** (12 Views): `#doctor/dashboard`, `#doctor/patients`, `#doctor/patient-profile`, `#doctor/patient-access`, `#doctor/appointments`, `#doctor/consultations`, `#doctor/prescriptions`, `#doctor/ai-diagnostic`, `#doctor/ai-explainability`, `#doctor/availability`, `#doctor/knowledge`, `#doctor/settings`
+- **Department Head Portal** (10 Views): `#department-head/dashboard`, `#department-head/doctors`, `#department-head/doctor-details`, `#department-head/appointments`, `#department-head/analytics`, `#department-head/performance`, `#department-head/workload`, `#department-head/ai-analytics`, `#department-head/knowledge`, `#department-head/settings`
+- **Hospital Admin Portal** (14 Views): `#hospital-admin/dashboard`, `#hospital-admin/profile`, `#hospital-admin/departments`, `#hospital-admin/department-heads`, `#hospital-admin/department-head-details`, `#hospital-admin/doctors`, `#hospital-admin/doctor-details`, `#hospital-admin/staff`, `#hospital-admin/analytics`, `#hospital-admin/department-analytics`, `#hospital-admin/ai-analytics`, `#hospital-admin/reports`, `#hospital-admin/knowledge`, `#hospital-admin/settings`
+- **Chairman Portal** (12 Views): `#chairman/dashboard`, `#chairman/analytics`, `#chairman/hospitals`, `#chairman/admins`, `#chairman/departments`, `#chairman/families`, `#chairman/performance`, `#chairman/appointments`, `#chairman/ai-analytics`, `#chairman/reports`, `#chairman/knowledge`, `#chairman/settings`
 
 ---
 

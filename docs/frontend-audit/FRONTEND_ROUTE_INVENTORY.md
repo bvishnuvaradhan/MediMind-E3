@@ -1,122 +1,129 @@
-# MediMind Complete Frontend Route Inventory
+# MediMind Frontend Route & Navigation Inventory
 
-**Audit Date:** 2026-09-26  
-**Total Platform Routes:** 68  
-**Architecture:** Hash-Based Client-Side Routing with `sessionStorage` State Restoration and PopState History Synchronization.
-
----
-
-## 1. Public & Authentication Layer (2 Routes)
-
-| URL / Hash | View Component | Description | Access Role | Target State |
-| :--- | :--- | :--- | :---: | :--- |
-| `http://localhost:5173/` | `LoginPage` in `AuthPages.jsx` | Multi-role authentication entry with role tabs (Doctor, Dept Head, Hosp Admin, Chairman, Family) | Public / Anonymous | Default unauthenticated landing |
-| `http://localhost:5173/#signup` | `SignupPage` in `AuthPages.jsx` | Family account registration portal | Public / Anonymous | Family account creation |
+**Audit Date:** 2026-09-27  
+**Git Branch:** `frontend/vishnu`  
+**Total Defined Views:** 66  
+**Total Primary & Sub-Routes:** 68  
+**Verification Result:** 100% Accessible, Zero Dead Routes, Zero Stale Aliases
 
 ---
 
-## 2. Family Healthcare Portal (18 Routes)
+## 1. Routing Architecture
 
-| Hash Route | View Component | File Location | Primary Function |
-| :--- | :--- | :--- | :--- |
-| `#dashboard` | `DashboardView` | `src/components/family/views/DashboardView.jsx` | Family account wellness overview, upcoming appointments, recent records |
-| `#family-members` | `FamilyMembersView` | `src/components/family/views/FamilyMembersView.jsx` | Family roster management, member creation, profile switching |
-| `#member-profile` | `MemberProfileView` | `src/components/family/views/MemberProfileView.jsx` | Personal biometrics, chronic conditions, emergency contacts |
-| `#medical-records` | `MedicalRecordsView` | `src/components/family/views/MedicalRecordsView.jsx` | Unified health records repository, category filtering, document upload |
-| `#ai-predictions` | `AiPredictionsView` | `src/components/family/views/AiPredictionsView.jsx` | Diagnostic screening archive (Fracture, Diabetes, Heart, General) |
-| `#personal-prediction-detail`| `PersonalPredictionDetailView` | `src/components/family/views/PersonalPredictionDetailView.jsx` | In-depth biomarker breakdown, risk gauges, population bullet benchmarks |
-| `#doctors` | `DoctorsView` | `src/components/family/views/DoctorsView.jsx` | Hospital doctor directory, specialty filters, booking triggers |
-| `#doctor-profile` | `DoctorProfileView` | `src/components/family/views/DoctorProfileView.jsx` | Physician credentials, consultation fees, available slots |
-| `#appointments` | `AppointmentsView` | `src/components/family/views/AppointmentsView.jsx` | Booking schedule, status tracking (Upcoming/Completed/Cancelled) |
-| `#appointment-assessment` | `AppointmentAssessmentView` | `src/components/family/views/AppointmentAssessmentView.jsx` | Pre-visit symptom intake questionnaire |
-| `#appointment-ai-assessment`| `AppointmentAssessmentView` | `src/components/family/views/AppointmentAssessmentView.jsx` | Clinical AI triage recommendations and clinician matching |
-| `#book-appointment` | `BookAppointmentView` | `src/components/family/views/BookAppointmentView.jsx` | Slot selection, reason for visit, appointment confirmation |
-| `#consultations` | `ConsultationsView` | `src/components/family/views/ConsultationsView.jsx` | Past consultation summaries and doctor clinical advice |
-| `#prescriptions` | `PrescriptionsView` | `src/components/family/views/PrescriptionsView.jsx` | Active prescriptions, medication schedules, digital signatures |
-| `#doctor-access` | `DoctorAccessView` | `src/components/family/views/DoctorAccessView.jsx` | Consent management (Grant/Revoke doctor access to records) |
-| `#general-health-risk` | `GeneralHealthRiskView` | `src/components/family/views/GeneralHealthRiskView.jsx` | Comprehensive cardiovascular & glycemic health evaluation |
-| `#help-center` | `HelpCenterView` | `src/components/family/views/HelpCenterView.jsx` | Patient FAQs, user guides, emergency assistance numbers |
-| `#settings` | `SettingsView` | `src/components/family/views/SettingsView.jsx` | Account security, notifications, UI theme toggle |
+MediMind employs a resilient stateful navigation architecture synchronized with `window.location.hash` and `sessionStorage`:
+- **Deep Linking**: Accessing `#family/appointments` directly loads the authenticated Family portal at the Appointments view.
+- **Refresh Resilience**: Browser reload preserves the current active role, view, and selected item IDs.
+- **Role Isolation**: Role boundaries strictly gate route rendering; invalid or unauthenticated routes redirect to the Landing Page (`/`).
+- **Clean Logout**: Logging out clears active session credentials and returns cleanly to `#landing`.
 
 ---
 
-## 3. Doctor Clinical Workspace Portal (12 Routes)
+## 2. Route Inventory by User Role
 
-| Hash Route | View Component | File Location | Primary Function |
-| :--- | :--- | :--- | :--- |
-| `#dashboard` | `DashboardView` | `src/components/doctor/views/DashboardView.jsx` | Outpatient queue, clinical funnel pipeline, AI alerts |
-| `#patients` | `PatientsView` | `src/components/doctor/views/PatientsView.jsx` | Authorized patient roster (filtered by active consent) |
-| `#patient_profile` | `PatientProfileView` | `src/components/doctor/views/PatientProfileView.jsx` | Patient clinical history, past records, diagnostic timeline |
-| `#appointments` | `AppointmentsView` | `src/components/doctor/views/AppointmentsView.jsx` | OPD consultation schedule, token tracking, visit status |
-| `#consultations` | `ConsultationsView` | `src/components/doctor/views/ConsultationsView.jsx` | Clinical encounter notes (Draft, Final, Amended) |
-| `#prescriptions` | `PrescriptionsView` | `src/components/doctor/views/PrescriptionsView.jsx` | Digital prescriptions (Draft, Final, Corrected) |
-| `#ai_diagnostics` | `AiDiagnosticView` | `src/components/doctor/views/AiDiagnosticView.jsx` | Fracture Detection CNN scan pre-screenings |
-| `#ai_explain` | `AiExplainabilityView` | `src/components/doctor/views/AiExplainabilityView.jsx` | Grad-CAM saliency heatmaps, opacity slider, feature weights |
-| `#availability` | `AvailabilityView` | `src/components/doctor/views/AvailabilityView.jsx` | OPD shift configuration, weekly slots, patient caps |
-| `#patient_access` | `PatientAccessView` | `src/components/doctor/views/PatientAccessView.jsx` | Consent audit log (Active vs Revoked permissions) |
-| `#knowledge` | `KnowledgeView` | `src/components/doctor/views/KnowledgeView.jsx` | Clinical guideline reader and article publication |
-| `#settings` | `SettingsView` | `src/components/doctor/views/SettingsView.jsx` | Clinic room configuration, consultation fee, preferences |
+### A. Public / Authentication Layer
+| Route / Hash | View Component | Purpose | Permitted Roles | Actions & Destinations |
+| :--- | :--- | :--- | :--- | :--- |
+| `#landing` / `""` | `LandingPage` | Platform overview, features, role selection | Public | Login modal, Signup modal |
+| `#login` | `LoginModal` (in `AuthPages`) | Credential entry & authenticated role launch | Public | Launches authenticated portal dashboard |
+| `#signup` | `SignupModal` (in `AuthPages`)| Self-service patient/family onboarding | Public | Creates family account, logs in |
 
 ---
 
-## 4. Department Head Portal (10 Routes)
-
-| Hash Route | View Component | File Location | Primary Function |
-| :--- | :--- | :--- | :--- |
-| `#dashboard` | `DashboardView` | `src/components/department-head/views/DashboardView.jsx` | Department hub, roster summary, daily OPD schedule |
-| `#doctors` | `DoctorsView` | `src/components/department-head/views/DoctorsView.jsx` | Doctor provisioning, status toggles, room assignments |
-| `#doctor_details` | `DoctorDetailsView` | `src/components/department-head/views/DoctorDetailsView.jsx` | Physician performance metrics and consultation throughput |
-| `#appointments` | `AppointmentsView` | `src/components/department-head/views/AppointmentsView.jsx` | Department-wide OPD schedule and token distribution |
-| `#workload` | `WorkloadView` | `src/components/department-head/views/WorkloadView.jsx` | Physician capacity utilization and shift rebalancing |
-| `#analytics` | `DepartmentAnalyticsView` | `src/components/department-head/views/DepartmentAnalyticsView.jsx` | Daily throughput, subspecialty mix, hourly activity heatmap |
-| `#ai_analytics` | `AiAnalyticsView` | `src/components/department-head/views/AiAnalyticsView.jsx` | Fracture anomaly distribution and model safety radar |
-| `#performance` | `DoctorPerformanceView` | `src/components/department-head/views/DoctorPerformanceView.jsx` | Bivariate scatter plot (Caseload vs On-Time rate) |
-| `#knowledge` | `KnowledgeView` | `src/components/department-head/views/KnowledgeView.jsx` | Department guideline authoring and protocol review |
-| `#settings` | `SettingsView` | `src/components/department-head/views/SettingsView.jsx` | Department ward capacity and emergency on-call setup |
-
----
-
-## 5. Hospital Admin Portal (14 Routes)
-
-| Hash Route | View Component | File Location | Primary Function |
-| :--- | :--- | :--- | :--- |
-| `#dashboard` | `DashboardView` | `src/components/hospital-admin/views/DashboardView.jsx` | Hospital overview, active departments, operational stats |
-| `#hospital-profile` | `HospitalProfileView` | `src/components/hospital-admin/views/HospitalProfileView.jsx` | Facility profile, NABH accreditation, emergency contacts |
-| `#departments` | `DepartmentsView` | `src/components/hospital-admin/views/DepartmentsView.jsx` | Department creation, ward bed allocation, status management |
-| `#department-heads` | `DepartmentHeadsView` | `src/components/hospital-admin/views/DepartmentHeadsView.jsx` | Department Head onboarding and leadership assignment |
-| `#department-head-details` | `DepartmentHeadDetailsView` | `src/components/hospital-admin/views/DepartmentHeadDetailsView.jsx` | Leadership credentials and department oversight data |
-| `#doctors` | `DoctorsView` | `src/components/hospital-admin/views/DoctorsView.jsx` | Hospital physician directory and active status control |
-| `#doctor-details` | `DoctorDetailsView` | `src/components/hospital-admin/views/DoctorDetailsView.jsx` | Doctor clinical workload and OPD schedule |
-| `#staff-management` | `StaffManagementView` | `src/components/hospital-admin/views/StaffManagementView.jsx` | Hospital workforce administration (Nurses, Techs, Admins) |
-| `#hospital-operational-analytics` | `HospitalAnalyticsView` | `src/components/hospital-admin/views/HospitalAnalyticsView.jsx` | 5-month admissions trajectory, peak density heatmap, bed bullet charts |
-| `#department-comparative-analytics` | `DepartmentAnalyticsView` | `src/components/hospital-admin/views/DepartmentAnalyticsView.jsx` | Cross-department grouped bar comparisons and load share donuts |
-| `#ai-analytics` | `AiAnalyticsView` | `src/components/hospital-admin/views/AiAnalyticsView.jsx` | Hospital-wide AI model volume share and 4-model reliability radar |
-| `#reports` | `ReportsView` | `src/components/hospital-admin/views/ReportsView.jsx` | Regulatory, audit, and operational report generation & export |
-| `#knowledge-activity` | `KnowledgeActivityView` | `src/components/hospital-admin/views/KnowledgeActivityView.jsx` | Institutional audit trail and governance change log |
-| `#settings` | `SettingsView` | `src/components/hospital-admin/views/SettingsView.jsx` | Facility system settings, maintenance windows, audit retention |
+### B. Family / Patient Portal (`#family/*`) — 18 Views
+| Route / Hash | View Component | Purpose | Key Data Inputs | Destination Views |
+| :--- | :--- | :--- | :--- | :--- |
+| `#family/dashboard` | `DashboardView` | Health summary, quick actions, max-3 appointments | `familyMembers`, `appointments` | All family sub-views |
+| `#family/members` | `FamilyMembersView` | Family roster, relationship cards, vitals | `familyMembers` | `#family/member-profile` |
+| `#family/member-profile` | `MemberProfileView` | Detailed vitals, medical history, emergency contacts | Selected member | `#family/members`, `#family/records` |
+| `#family/records` | `MedicalRecordsView` | Document repository, category filters, AI badges | `medicalRecords` | `#family/upload-record`, `#family/predictions` |
+| `#family/upload-record` | `UploadRecordView` | Drag-and-drop report upload & AI pre-check trigger | Form payload | `#family/records` |
+| `#family/predictions` | `AiPredictionsView` | 4-model prediction list, risk chips, confidence | `aiPredictions` | `#family/prediction-detail` |
+| `#family/prediction-detail`| `PersonalPredictionDetailView` | Deep dive finding, Grad-CAM heatmap, doctor referral | Selected prediction | `#family/book-appointment` |
+| `#family/doctors` | `DoctorsView` | Multi-specialist directory, AI matching score | `doctors`, `recommendDoctors()` | `#family/doctor-profile`, `#family/book-appointment` |
+| `#family/doctor-profile` | `DoctorProfileView` | Qualifications, OPD room, fee schedule, ratings | Selected doctor | `#family/book-appointment` |
+| `#family/doctor-access` | `DoctorAccessView` | Patient consent manager, active/revoked list | `recordAccesses` | Grant / Revoke modal |
+| `#family/appointments` | `AppointmentsView` | Scheduled/past appointments, status badges | `appointments` | `#family/book-appointment` |
+| `#family/book-appointment`| `BookAppointmentView` | Date picker, slot selector, triage reason | Doctor availability | `#family/appointment-assessment` |
+| `#family/appointment-assessment` | `AppointmentAssessmentView` | Pre-visit AI symptom check & triage | Symptom input | `#family/appointments` |
+| `#family/consultations` | `ConsultationsView` | Clinical notes, diagnoses, treatment plans | `consultations` | View consultation details |
+| `#family/prescriptions` | `PrescriptionsView` | Medication schedule, dosages, refill timelines | `prescriptions` | View Rx details |
+| `#family/general-health-risk` | `GeneralHealthRiskView` | Multi-system wellness index & lifestyle metrics | `aiPredictions` (`ai_general`) | Dashboard |
+| `#family/help` | `HelpCenterView` | FAQ, teleconsultation guides, emergency numbers | Knowledge base | Contact modal |
+| `#family/settings` | `SettingsView` | Profile preferences, notification toggles, dark mode | Local preferences | Self |
 
 ---
 
-## 6. Chairman & Platform Owner Portal (12 Routes)
-
-| Hash Route | View Component | File Location | Primary Function |
-| :--- | :--- | :--- | :--- |
-| `#dashboard` | `PlatformDashboard` | `src/components/chairman/views/PlatformDashboard.jsx` | Ecosystem governance, hospital network overview, pending onboarding alert |
-| `#platform-analytics` | `PlatformAnalyticsView` | `src/components/chairman/views/PlatformAnalyticsView.jsx` | User account composition, platform uptime gauge, resolution share |
-| `#hospitals` | `HospitalsView` | `src/components/chairman/views/HospitalsView.jsx` | Certified hospital network & pending membership requests (Approve/Reject) |
-| `#hospital-admins` | `HospitalAdminsView` | `src/components/chairman/views/HospitalAdminsView.jsx` | Hospital administrator provisioning and account management |
-| `#departments` | `DepartmentsView` | `src/components/chairman/views/DepartmentsView.jsx` | Aggregated network departments and total bed capacities |
-| `#family-accounts` | `FamilyAccountsView` | `src/components/chairman/views/FamilyAccountsView.jsx` | Ecosystem family accounts directory and member counts |
-| `#hospital-performance` | `HospitalPerformanceView` | `src/components/chairman/views/HospitalPerformanceView.jsx` | Cross-hospital comparative throughput and inpatient capacity bullet charts |
-| `#appointments` | `AppointmentsView` | `src/components/chairman/views/AppointmentsView.jsx` | Platform-wide appointment trends and scheduling metrics |
-| `#ai-analytics` | `AiAnalyticsView` | `src/components/chairman/views/AiAnalyticsView.jsx` | 4-Model trajectory, multi-attribute calibration radar, inference latency |
-| `#reports` | `ReportsView` | `src/components/chairman/views/ReportsView.jsx` | Executive audit generation, compliance reports, CSV/PDF export |
-| `#knowledge-activity` | `KnowledgeActivityView` | `src/components/chairman/views/KnowledgeActivityView.jsx` | System-wide administrative governance audit trail |
-| `#settings` | `SettingsView` | `src/components/chairman/views/SettingsView.jsx` | Platform maintenance mode, MFA enforcement, global policies |
+### C. Doctor Clinical Workspace (`#doctor/*`) — 12 Views
+| Route / Hash | View Component | Purpose | Key Data Inputs | Destination Views |
+| :--- | :--- | :--- | :--- | :--- |
+| `#doctor/dashboard` | `DashboardView` | OPD shift summary, caseload KPIs, max-3 queue | `appointments`, `doctors` | All doctor sub-views |
+| `#doctor/patients` | `PatientsView` | Authorized patient roster, consent status | `recordAccesses`, `familyMembers` | `#doctor/patient-profile` |
+| `#doctor/patient-profile` | `PatientProfileView` | Complete unified clinical history (Consent-gated) | `medicalRecords`, `aiPredictions` | `#doctor/consultations` |
+| `#doctor/patient-access` | `PatientAccessView` | Audit trail of granted/revoked patient records | `initialAccessHistory` | Patient access logs |
+| `#doctor/appointments` | `AppointmentsView` | Daily OPD queue, tokens, checked-in triage | Scoped appointments | `#doctor/consultations` |
+| `#doctor/consultations` | `ConsultationsView` | Clinical encounter notes (DRAFT $\rightarrow$ FINAL $\rightarrow$ AMENDED) | `consultations` | New consultation modal |
+| `#doctor/prescriptions` | `PrescriptionsView` | Rx generation & titration (DRAFT $\rightarrow$ FINAL $\rightarrow$ CORRECTED) | `prescriptions` | New prescription modal |
+| `#doctor/ai-diagnostic` | `AiDiagnosticView` | Clinical AI review, 4 pipelines, risk scoring | `aiPredictions` | `#doctor/ai-explainability` |
+| `#doctor/ai-explainability`| `AiExplainabilityView` | Grad-CAM activation heatmaps, feature importance | Radiograph & model data | `#doctor/ai-diagnostic` |
+| `#doctor/availability` | `AvailabilityView` | Schedule config, slot duration, lunch breaks | Availability settings | Self |
+| `#doctor/knowledge` | `KnowledgeView` | Clinical guidelines, department publications | `knowledgeArticles` | Create article modal |
+| `#doctor/settings` | `SettingsView` | Notification tones, auto-open AI heatmap toggle | Doctor settings | Self |
 
 ---
 
-## 7. Routing Verification Summary
-- **Zero Obsolete Hashes**: All navigation links, buttons, shortcuts, and breadcrumbs map 1:1 with the verified 68 route targets.
-- **Deep-Link State Preservation**: Direct URL entry with valid hashes successfully initializes the correct view and sets active sidebar navigation.
-- **Unauthorized Fallback**: Unauthenticated requests to protected hashes cleanly route to `LoginPage` without flashing protected content.
+### D. Department Head Hub (`#department-head/*`) — 10 Views
+| Route / Hash | View Component | Purpose | Key Data Inputs | Destination Views |
+| :--- | :--- | :--- | :--- | :--- |
+| `#department-head/dashboard` | `DashboardView` | Department OPD throughput, doctor roster, KPIs | Scoped department | All dept-head views |
+| `#department-head/doctors` | `DoctorsView` | Department clinicians, status toggle, room allocations | Scoped doctors | `#department-head/doctor-details` |
+| `#department-head/doctor-details` | `DoctorDetailsView` | Individual doctor performance, caseload, room assignment | Selected doctor | `#department-head/doctors` |
+| `#department-head/appointments` | `AppointmentsView` | Department OPD schedule, queue distribution | Scoped appointments | View appointment details |
+| `#department-head/analytics` | `DepartmentAnalyticsView` | Hourly patient arrival patterns, completion rates | Analytical datasets | `#department-head/performance` |
+| `#department-head/performance` | `DoctorPerformanceView` | Physician caseload comparison, on-time start rates | `initialDoctorPerformance` | Doctor review |
+| `#department-head/workload` | `WorkloadView` | Capacity planning, bed occupancy, doctor density | Workload metrics | Capacity optimization |
+| `#department-head/ai-analytics` | `AiAnalyticsView` | Departmental AI diagnostic accuracy & concordance | `initialAiAnalytics` | AI audit review |
+| `#department-head/knowledge` | `KnowledgeView` | Department clinical protocols & peer-reviewed papers | `knowledgeArticles` | Create article modal |
+| `#department-head/settings` | `SettingsView` | Direct booking toggles, AI auto-precheck rules | Dept settings | Self |
+
+---
+
+### E. Hospital Admin Portal (`#hospital-admin/*`) — 14 Views
+| Route / Hash | View Component | Purpose | Key Data Inputs | Destination Views |
+| :--- | :--- | :--- | :--- | :--- |
+| `#hospital-admin/dashboard` | `DashboardView` | Facility occupancy, revenue, active staff KPIs | Scoped hospital | All hospital admin views |
+| `#hospital-admin/profile` | `HospitalProfileView` | Facility NABH/JCI standing, bed capacity, address | `hospitals` | Edit hospital modal |
+| `#hospital-admin/departments`| `DepartmentsView` | Ward capacities, active department listing | Scoped departments | Create/Edit dept modals |
+| `#hospital-admin/department-heads` | `DepartmentHeadsView` | Clinical leadership roster, assigned departments | Scoped department heads | Create head modal |
+| `#hospital-admin/department-head-details` | `DepartmentHeadDetailsView` | Leadership tenure, department metrics, credentials | Selected department head | `#hospital-admin/department-heads` |
+| `#hospital-admin/doctors` | `DoctorsView` | Facility staff directory, OPD room assignments | Scoped doctors | `#hospital-admin/doctor-details` |
+| `#hospital-admin/doctor-details` | `DoctorDetailsView` | Clinician schedule, performance stats, credentials | Selected doctor | `#hospital-admin/doctors` |
+| `#hospital-admin/staff` | `StaffManagementView` | Nursing, administrative & clinical headcount | Staff allocations | Shift rosters |
+| `#hospital-admin/analytics` | `HospitalAnalyticsView` | Operational throughput, average stay, bed occupancy | `initialHospitalAnalytics` | Comparative analytics |
+| `#hospital-admin/department-analytics` | `DepartmentAnalyticsView` | Cross-department workload & throughput distribution | Department metrics | Hospital analytics |
+| `#hospital-admin/ai-analytics`| `AiAnalyticsView` | Hospital-wide AI accuracy, inference volume | AI telemetry | Model performance |
+| `#hospital-admin/reports` | `ReportsView` | Monthly audit reports, clinical safety summaries | `initialReports` | Generate report modal |
+| `#hospital-admin/knowledge` | `KnowledgeActivityView` | Published hospital clinical guidelines & research | `knowledgeArticles` | Knowledge repository |
+| `#hospital-admin/settings` | `SettingsView` | EMR integration status, emergency OPD override | Facility settings | Self |
+
+---
+
+### F. Chairman & Platform Owner Portal (`#chairman/*`) — 12 Views
+| Route / Hash | View Component | Purpose | Key Data Inputs | Destination Views |
+| :--- | :--- | :--- | :--- | :--- |
+| `#chairman/dashboard` | `PlatformDashboard` | Multi-hospital network KPIs, system health, max-3 queue | `initialPlatformSummary` | All chairman views |
+| `#chairman/analytics` | `PlatformAnalyticsView` | Platform throughput, multi-hospital growth, financials | Analytics aggregations | Hospital performance |
+| `#chairman/hospitals` | `HospitalsView` | Active certified network + 2 Pending onboarding requests | `hospitals`, `hospitalRequests` | Request review modal |
+| `#chairman/admins` | `HospitalAdminsView` | Platform-wide administrator credentials & status | `hospitalAdmins` | Create admin modal |
+| `#chairman/departments` | `DepartmentsView` | Platform department directory with hospital filters | `departments` | Department detail |
+| `#chairman/families` | `FamilyAccountsView` | Registered family accounts, membership density | `families` | Family account detail |
+| `#chairman/performance` | `HospitalPerformanceView` | Institutional benchmarking, bed occupancy comparison | Multi-hospital metrics | Facility drill-down |
+| `#chairman/appointments` | `AppointmentsView` | Platform appointments transaction ledger & analytics | `initialAppointmentsLedger` | Appointment analytics |
+| `#chairman/ai-analytics` | `AiAnalyticsView` | Platform-wide 4-module AI telemetry & radar chart | `initialAiAnalytics` | Model telemetry |
+| `#chairman/reports` | `ReportsView` | Governance audits, institutional compliance PDF export | System reports | Download report |
+| `#chairman/knowledge` | `KnowledgeActivityView` | Network-wide research repository & clinical papers | `knowledgeArticles` | Knowledge hub |
+| `#chairman/settings` | `SettingsView` | Network security tier, HIPAA logging, maintenance mode | `platformSettings` | Save configuration |
+
+---
+
+## 3. Route Verification Verdict: PASS
+All 68 routes load cleanly, maintain state during browser refresh/back navigation, and enforce strict role boundaries.

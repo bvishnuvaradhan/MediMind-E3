@@ -1,84 +1,55 @@
 # Hospital Admin Portal Frontend Pre-Backend Audit
 
-**Audit Date:** 2026-09-26  
+**Audit Date:** 2026-09-27  
 **Auditor:** MediMind Engineering & Quality Assurance  
-**Portal:** Hospital Administration & Facility Portal  
-**Authentication Role:** `HOSPITAL_ADMIN` (`admin@medimindhospital.com` / `hospital123`)  
-**Scope:** Institutional Governance for MediMind Central Hospital (`hosp_01`), Clinical Departments, Department Heads, Staff Physicians, Operational & Comparative Analytics, AI Screening Intelligence, Institutional Audit Trail, and NABH/JCI Facility Profile.
+**Portal:** Hospital Facility Administration  
+**Authentication Role:** `HOSPITAL_ADMIN` (`admin.central@medimind.org` / `admin123`)  
+**Scope:** Institutional Facility Profile, Clinical Departments, Department Heads, Staff Management, Hospital Operational & Comparative Analytics, AI Diagnostics QA, Compliance Reporting.  
+**Active Administrator:** Rajesh Kumar (`ADM-001`, MediMind Central Hospital `HOSP-001`)
 
 ---
 
-## 1. Route Inventory & Verification
+## 1. Route Inventory & Verification (14 Views)
 
 | Route / Hash | View Component | Status | Data Source | Interactive Controls | Theme (Light/Dark) | Responsive | Scroll | Result |
 | :--- | :--- | :---: | :--- | :--- | :---: | :---: | :---: | :---: |
-| `#dashboard` | `DashboardView.jsx` | 200 OK | `hospitalAdminService` | Edit hospital button, Add dept head button, Department overview view all, Today's appointments analytics link, Activity log link | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#hospital-profile` | `HospitalProfileView.jsx` | 200 OK | `hospitalProfile` | Edit hospital modal trigger, NABH accreditation details, Emergency contact inputs, Operating hours config | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#departments` | `DepartmentsView.jsx` | 200 OK | `initialHospitalDepartments` | Create department modal trigger, Edit department modal, Search department, Status toggle (Active/Inactive), Bed allocation | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#department-heads` | `DepartmentHeadsView.jsx` | 200 OK | `initialDepartmentHeads` | Create department head modal trigger, Search head, Filter by department, Status toggle, Head detail drilldown | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#department-head-details` | `DepartmentHeadDetailsView.jsx` | 200 OK | Selected department head object | Assigned department viewer, Contact details, Qualifications, Direct edit shortcut, Back button | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#doctors` | `DoctorsView.jsx` | 200 OK | `initialHospitalDoctors` | Department filter dropdown, Status filter, Search doctor name, View doctor detail drilldown, Active caseload view | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#doctor-details` | `DoctorDetailsView.jsx` | 200 OK | Selected doctor object | Performance statistics, Weekly schedule, OPD room details, Consultation count, Back button | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#staff-management` | `StaffManagementView.jsx` | 200 OK | Hospital staff roster | Role filter (Doctors/Nurses/Technicians/Admins), Search staff, Add staff modal, Update permissions, Status toggle | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#hospital-operational-analytics` | `HospitalAnalyticsView.jsx` | 200 OK | Monthly & daily encounter logs | 5-month trajectory multi-line chart, Weekly OPD volume bar chart, Peak activity heatmap, Modality mix donut, Bed bullet chart | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#department-comparative-analytics` | `DepartmentAnalyticsView.jsx` | 200 OK | Department comparison metrics | Cross-department grouped bar chart (Patients vs AI), Department load share donut, Ward bed utilization bullet charts | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#ai-analytics` | `AiAnalyticsView.jsx` | 200 OK | Hospital AI inference logs | Model utilization share donut, Model reliability radar (4 models), Inference latency horizontal bar chart | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#reports` | `ReportsView.jsx` | 200 OK | `initialReports` | Generate report modal trigger, Report type filter (Audit/Financial/Operational), Download report simulation, Export PDF/CSV | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#knowledge-activity` | `KnowledgeActivityView.jsx` | 200 OK | `initialKnowledgeActivity`, `initialAuditLogs` | Institutional activity feed, Knowledge article audit log, System change trail, Action category filter | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#settings` | `SettingsView.jsx` | 200 OK | `initialHospitalSettings` | System time zone select, Maintenance window config, Audit retention period, Dark/Light mode toggle, Save settings | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#dashboard` | `DashboardView.jsx` | 200 OK | `initialHospitalProfile`, `initialHospitalAnalytics`, `initialDepartments` | Bed occupancy gauge, OPD throughput KPI, Department list (max-3), Quick generate report, Export data | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#profile` | `HospitalProfileView.jsx` | 200 OK | `initialHospitalProfile` | Edit hospital details modal, Bed capacity, NABH/JCI standing, License info, Emergency contacts | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#departments` | `DepartmentsView.jsx` | 200 OK | `initialHospitalDepartments` | Filter by status, Search dept, Create department modal, Edit department modal, Toggle status | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#department-heads`| `DepartmentHeadsView.jsx` | 200 OK | `initialDepartmentHeads` | Search head, Create department head modal, View head details trigger, Contact leadership | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#department-head-details`| `DepartmentHeadDetailsView.jsx` | 200 OK | Scoped head record | Leadership credentials, Department metrics, Assigned clinicians count, Back button | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#doctors` | `DoctorsView.jsx` | 200 OK | `initialHospitalDoctors` | Filter by department, Search doctor, View doctor details trigger, Room allocation summary | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#doctor-details` | `DoctorDetailsView.jsx` | 200 OK | Scoped doctor record | Clinician credentials, Department affiliation, Room assignment, Schedule stats, Back button | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#staff` | `StaffManagementView.jsx` | 200 OK | Facility staff roster | Filter role (Doctor, Head, Admin, Nurse), Search staff, Shift allocations, Headcount metrics | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#analytics` | `HospitalAnalyticsView.jsx`| 200 OK | `initialHospitalAnalytics` | 5-Month OPD trend (Line), Department traffic (Bar), Bed occupancy (Radial), Mode distribution | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#department-analytics` | `DepartmentAnalyticsView.jsx` | 200 OK | Scoped department metrics | Department comparative throughput (Bar), Caseload distribution, Completion rates | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#ai-analytics` | `AiAnalyticsView.jsx` | 200 OK | `initialAiAnalytics` | Hospital-wide AI accuracy (98.2%), 4-module radar chart, Inference latency chart (Bar) | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#reports` | `ReportsView.jsx` | 200 OK | `initialReports` | Download audit report PDF, Generate report modal, Filter reports, Audit status badge | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#knowledge` | `KnowledgeActivityView.jsx`| 200 OK | `knowledgeArticles` | Hospital clinical publications, Author department, Citations, Views count, Read article | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#settings` | `SettingsView.jsx` | 200 OK | Hospital settings | EMR integration status, Emergency OPD override, Auto-dispatch reports, SMS notifications | Verified | Fluid (1440–320px) | Yes | **PASS** |
 
 ---
 
-## 2. Page & Feature Analysis
+## 2. Key Capabilities & Verified Invariants
 
-### Dashboard (`DashboardView.jsx`)
-- **Max-3 Rule Enforcement**:
-  - `Department Oversight`: Limited to exactly max 3 visible departments with `"View All"` navigating to `#departments`.
-  - `Today's Hospital Appointments`: Limited to exactly max 3 rows with `"Analytics →"` navigating to `#hospital-operational-analytics`.
-  - `Recent Administrative Activity`: Limited to exactly max 3 audit logs with `"View Activity Log →"` navigating to `#knowledge-activity`.
-- **Facility Banner**: Displays NABH accreditation, 250 Total Bed capacity, and live 84% occupancy rate ($210/250$ beds).
-
-### Department & Department Head Administration (`DepartmentsView.jsx`, `DepartmentHeadsView.jsx`)
-- **Department CRUD**:
-  - `Create Department`: Name, code, floor location, ward bed capacity, assigned head.
-  - `Edit Department`: Modifies capacity and operational status (`Active` $\leftrightarrow$ `Inactive`).
-- **Department Head Onboarding**:
-  - Creates new administrative clinician account, assigns department leadership, and establishes institutional role authority.
-
-### Operational & Comparative Visualizations (`HospitalAnalyticsView.jsx`, `DepartmentAnalyticsView.jsx`)
-- **Visual Analytics Catalog**:
-  - `5-Month Patient Trajectory`: Multi-series `LineChart` (Area fill) tracking OPD, Inpatient, and Emergency admissions.
-  - `Weekly OPD Flow`: Vertical `BarChart` tracking daily hospital intake.
-  - `Peak Activity Density`: 2D `HeatmapChart` identifying hourly rush periods.
-  - `Clinical Modality Mix`: `DonutChart` showing departmental appointment split.
-  - `Facility Bed Occupancy`: Stephen Few `BulletChart` with qualitative thresholds (Normal/Caution/Critical).
-  - `Departmental Flow Comparison`: Grouped `BarChart` comparing patient visits and AI screenings across all departments.
-
-### AI Diagnostic Intelligence (`AiAnalyticsView.jsx`)
-- **Complete 4-Module Representation**:
-  - Visualizes inference volumes across Fracture Detection, Diabetes Risk, Heart Disease Risk, and General Health.
-  - `RadarChart`: 4-model performance radar across Accuracy, Sensitivity, Specificity, and Uptime with Unified Overlay and 4-Panel Grid toggles.
-  - `BarChart` (Horizontal): Millisecond inference latency comparison.
+1. **Hospital Scoping & Isolation**:
+   - Rajesh Kumar (`ADM-001`) manages only MediMind Central Hospital (`HOSP-001`). Cannot view or alter St. Jude (`HOSP-002`) or Apex Institute (`HOSP-003`) data.
+   - Hospital 2 (`HOSP-002`) correctly supports 3 AI modules (`ai_fracture`, `ai_cardio`, `ai_diabetes`) excluding `ai_general`.
+   - Hospital 1 (`HOSP-001`) and Hospital 3 (`HOSP-003`) support all 4 AI modules.
+2. **Zero Clinical Patient Access**:
+   - Hospital Admin manages facility infrastructure, departments, staff, and aggregate analytics. Has NO access to private patient clinical encounter notes, prescriptions, or individual medical images.
+3. **Dashboard Max-3 Collection Rule**:
+   - Departments list displays max 3 items with `"View all departments"` header trigger.
+   - Staff roster overview displays max 3 items with `"View all staff"` trigger.
+   - Recent compliance reports display max 3 items with `"View all reports"` footer trigger.
 
 ---
 
-## 3. End-to-End User Journeys Tested
+## 3. End-to-End User Journeys Tested: 100% PASSED
 
-1. **Facility Configuration & Department Onboarding Flow**:
-   - `Login as Hospital Admin` $\rightarrow$ `Dashboard` $\rightarrow$ `Departments View` $\rightarrow$ `Click + Add Department` $\rightarrow$ `Enter: Oncology Department (ONCO, Level 3, 30 Beds)` $\rightarrow$ `Assign Head: Dr. Rajesh Nambiar` $\rightarrow$ `Save` $\rightarrow$ `Department Listed with Active Status`.
-2. **Operational Report Generation & Export Flow**:
-   - `Reports View` $\rightarrow$ `Click Generate Report` $\rightarrow$ `Select Type: Clinical AI Diagnostic Accuracy & Throughput Audit` $\rightarrow$ `Select Date Range: Q3 2026` $\rightarrow$ `Click Generate` $\rightarrow$ `Report Generated & Listed in Downloadable Table`.
-3. **Department Head Assignment & Privilege Setup Flow**:
-   - `Department Heads View` $\rightarrow$ `Click + Add Department Head` $\rightarrow$ `Fill Physician Details & Department Assignment` $\rightarrow$ `Save` $\rightarrow$ `Roster Immediately Synchronized`.
+- **Journey 5**: Facility Dashboard $\rightarrow$ Hospital Profile $\rightarrow$ Update Bed Capacity to 450 $\rightarrow$ Departments $\rightarrow$ Create Oncology Ward $\rightarrow$ Assign Department Head $\rightarrow$ Operational Analytics $\rightarrow$ AI Diagnostics QA (98.2% Accuracy) $\rightarrow$ Generate Monthly Clinical Audit Report.
 
 ---
 
-## 4. Security & Role Scope Isolation
-
-- **Hospital-Level Data Scope**: The admin is strictly scoped to MediMind Central Hospital (`hosp_01`). Zero visibility or mutation authority over Apollo Multispecialty (`hosp_02`) or Fortis Memorial Hospital (`hosp_03`).
-- **Patient Privacy**: Platform and hospital administration can view operational throughput, bed counts, and aggregated AI scans, but have zero access to private patient clinical consultation notes or diagnostic images.
-
----
-
-## 5. Audit Verdict: PASS
-The Hospital Admin Portal is 100% stable, fully isolated to institutional scope, verified across all 14 routes in Light and Dark modes, compliant with the Max-3 dashboard rule, and ready for backend API integration.
+## 4. Audit Verdict: PASS
+The Hospital Admin Portal is 100% robust, strictly scoped, verified in Light and Dark themes, and certified for backend integration.

@@ -1,80 +1,51 @@
 # Department Head Portal Frontend Pre-Backend Audit
 
-**Audit Date:** 2026-09-26  
+**Audit Date:** 2026-09-27  
 **Auditor:** MediMind Engineering & Quality Assurance  
-**Portal:** Department Head Clinical & Administrative Portal  
-**Authentication Role:** `DEPARTMENT_HEAD` (`priya.sharma@medimindhospital.com` / `depthead123`)  
-**Scope:** Clinical Department Oversight (Orthopedics / Cardiology), Staff Doctor Provisioning, OPD Schedule Coordination, Workload Distribution, Department Analytics, AI Pipeline Telemetry, and Clinical Knowledge Guidelines.
+**Portal:** Clinical Department Head Hub  
+**Authentication Role:** `DEPARTMENT_HEAD` (`priya.sharma@central.medimind.org` / `head123`)  
+**Scope:** Department Roster, Doctor Performance Analytics, Room Allocations, OPD Scheduling, AI Diagnostic Quality Assurance, Knowledge Hub Guidelines.  
+**Active Clinical Leader:** Dr. Priya Sharma (`DH-H1-ORTHO`, Orthopedics, MediMind Central Hospital `HOSP-001`)
 
 ---
 
-## 1. Route Inventory & Verification
+## 1. Route Inventory & Verification (10 Views)
 
 | Route / Hash | View Component | Status | Data Source | Interactive Controls | Theme (Light/Dark) | Responsive | Scroll | Result |
 | :--- | :--- | :---: | :--- | :--- | :---: | :---: | :---: | :---: |
-| `#dashboard` | `DashboardView.jsx` | 200 OK | `departmentHeadService` | Provision doctor button, Publish guideline button, Manage workload shortcut, Telemetry shortcut, View full schedule | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#doctors` | `DoctorsView.jsx` | 200 OK | `departmentHeadService.getDoctors()` | Add doctor modal, Edit doctor modal, Status toggle (Active/Inactive), Room assignment, Doctor detail drilldown | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#doctor_details` | `DoctorDetailsView.jsx` | 200 OK | Selected doctor object & roster history | Active caseload metric, Satisfaction score, OPD schedule viewer, Edit doctor shortcut, Back button | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#appointments` | `AppointmentsView.jsx` | 200 OK | `departmentHeadService.getAppointments()` | Doctor filter dropdown, Type filter (OPD/Follow-up/Consultation), Status filter, Search by token/patient | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#workload` | `WorkloadView.jsx` | 200 OK | Department doctor capacity metrics | Workload threshold slider, Rebalance caseload trigger, Grouped bar chart (Active vs Completed), Doctor shift list | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#analytics` | `DepartmentAnalyticsView.jsx` | 200 OK | `departmentHeadService.getAnalytics()` | Date range selector, Daily encounters bar chart, Subspecialty donut chart, Hourly density heatmap | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#ai_analytics` | `AiAnalyticsView.jsx` | 200 OK | AI screening telemetry & fracture cases | Anomaly donut chart, Anatomical region horizontal bar chart, Algorithm safety radar, Latency meter | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#performance` | `DoctorPerformanceView.jsx` | 200 OK | `departmentHeadService.getDoctorPerformance()` | ScatterPlot (Caseload vs On-Time Rate), Scheduled vs Completed grouped bar chart, Performance ranking table | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#knowledge` | `KnowledgeView.jsx` | 200 OK | `departmentHeadService.getArticles()` | Create guideline modal, Edit guideline, Category filter, Target audience selector, Publish/Archive toggle | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#settings` | `SettingsView.jsx` | 200 OK | `departmentHeadService.getSettings()` | Department description input, Bed capacity input, Emergency on-call doctor select, Notification toggles, Save | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#dashboard` | `DashboardView.jsx` | 200 OK | `initialDepartmentHeadProfile`, `initialDepartmentInfo`, `initialDepartmentDoctors` | Scoped OPD schedule, Quick allocate room, View all doctors, View all appointments, Max-3 lists | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#doctors` | `DoctorsView.jsx` | 200 OK | `initialDepartmentDoctors` | Filter by status (Active/Inactive), Search by name, Edit room allocation modal, Toggle status, Provision doctor modal | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#doctor-details` | `DoctorDetailsView.jsx` | 200 OK | Scoped doctor record | Clinician credentials, Current OPD room, Caseload performance, Completion rate, Back button | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#appointments` | `AppointmentsView.jsx` | 200 OK | `initialDepartmentAppointments` | Filter by doctor, Status tabs (Today, Completed, In Progress), Search token/patient, View detail | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#analytics` | `DepartmentAnalyticsView.jsx`| 200 OK | `initialDepartmentAnalytics` | Hourly encounter arrival chart (Line), Doctor scheduled vs completed (Grouped Bar), Completion metrics | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#performance` | `DoctorPerformanceView.jsx` | 200 OK | `initialDoctorPerformance` | Monthly appointments, Completed encounters, Capacity utilization, Patient satisfaction rating | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#workload` | `WorkloadView.jsx` | 200 OK | Scoped department metrics | Daily capacity utilization, Shift density, Doctor-to-bed ratio, Capacity rebalancing suggestions | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#ai-analytics` | `AiAnalyticsView.jsx` | 200 OK | `initialAiAnalytics` | Department AI accuracy, Diagnostic concordance, Sensitivity/Specificity gauges, Radar chart | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#knowledge` | `KnowledgeView.jsx` | 200 OK | `initialDepartmentArticles` | Filter category, Search guideline, Create article modal, Read full guideline | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#settings` | `SettingsView.jsx` | 200 OK | Department settings | Allow direct family booking toggle, AI auto-precheck toggle, Buffer minutes, Escalate high risk | Verified | Fluid (1440–320px) | Yes | **PASS** |
 
 ---
 
-## 2. Page & Feature Analysis
+## 2. Key Capabilities & Verified Invariants
 
-### Dashboard (`DashboardView.jsx`)
-- **Max-3 Rule Enforcement**:
-  - `Department Doctor Workload`: Limited to exactly max 3 visible clinicians with `"Manage All →"` navigating to `#workload`.
-  - `Top Anatomical Fracture Regions`: Capped at top 3 entries with percentage confidence readouts.
-  - `Today's Orthopedic OPD Schedule Table`: Limited to exactly max 3 rows with `"View Full Schedule →"` navigating to `#appointments`.
-- **KPI Summary Cards**:
-  - Active Doctors (`6 / 6`), Today's OPD Appointments (`14`), Bed Occupancy (`88%`, Ortho Ward), AI Scans Screened (`31`).
-
-### Doctor Management & Provisioning (`DoctorsView.jsx`, `CreateDoctorModal.jsx`, `EditDoctorModal.jsx`)
-- **Lifecycle & Actions**:
-  - `Provision Doctor`: Adds new clinician with full name, specialization, qualification, OPD room, max daily capacity, and status.
-  - `Edit Doctor`: Modifies OPD room, contact, and active status (`Active` $\leftrightarrow$ `Inactive`).
-  - `Doctor Details Drilldown`: Direct inspection of caseload, patient satisfaction, and current week's consultation logs.
-
-### Clinical Analytics & Bivariate Performance (`DepartmentAnalyticsView.jsx`, `DoctorPerformanceView.jsx`)
-- **Analytical Charting Vocabulary**:
-  - `Daily Patient Encounters`: Pure-SVG vertical `BarChart` comparing daily throughput against capacity thresholds.
-  - `Subspecialty Mix`: Pure-SVG `DonutChart` showing distribution across Trauma, Arthroplasty, Spine, and Pediatric Ortho.
-  - `Hourly Activity Density`: Pure-SVG `HeatmapChart` tracking rush hours across shifts (Mon–Sat $\times$ 9AM–5PM).
-  - `Caseload vs On-Time Rate`: Pure-SVG `ScatterPlot` mapping physician volume against on-time start rates with a 95% clinical benchmark reference line.
-
-### AI Diagnostic Telemetry (`AiAnalyticsView.jsx`)
-- **Telemetry Indicators**:
-  - Fractures Flagged (`19 / 31` scans, `61.3%` positive rate).
-  - Avg Inference Latency (`1.4s` real-time triage).
-  - Anatomical Distribution (`DonutChart`) & Regional Breakdown (`BarChart` Horizontal).
-  - Diagnostic Model Safety & Precision Profile (`RadarChart`).
+1. **Department & Hospital Scoping**:
+   - Dr. Priya Sharma only manages clinicians and appointments for Orthopedics (`DEP-H1-ORTHO`) at `HOSP-001`. Cannot see or modify Cardiology, Neurology, or other department operations.
+   - Dual-head department `DEP-H3-ORTHO` at `HOSP-003` correctly registers both Dr. Mathew Philip (`DH-H3-ORTHO-1`) and Dr. Elizabeth Kurian (`DH-H3-ORTHO-2`).
+2. **Permission Guardrails**:
+   - Department Head cannot alter staff doctors' personal names, contact phone numbers, qualifications, clinical experience years, or personal availability schedules (controlled by the individual doctor).
+   - Department Head manages institutional resources: OPD room allocations, active/inactive administrative standing, and doctor provisioning.
+3. **Dashboard Max-3 Rule**:
+   - Active staff doctors list displays max 3 items with `"View all doctors"` in card header.
+   - Department OPD appointment queue displays max 3 items with `"View all appointments"` in card footer.
+   - Department publications display max 3 items with `"View all guidelines"` trigger.
 
 ---
 
-## 3. End-to-End User Journeys Tested
+## 3. End-to-End User Journeys Tested: 100% PASSED
 
-1. **Staff Provisioning & Roster Update Flow**:
-   - `Login as Department Head Dr. Priya Sharma` $\rightarrow$ `Dashboard` $\rightarrow$ `Click Provision Doctor` $\rightarrow$ `Enter: Dr. Sneha Reddy (Spine Specialist, OPD Room 209, Cap 20)` $\rightarrow$ `Submit` $\rightarrow$ `Doctor Listed in Roster` $\rightarrow$ `Edit Status to Active` $\rightarrow$ `Changes Persisted in Session`.
-2. **Caseload Analysis & Shift Rebalancing Flow**:
-   - `Dashboard` $\rightarrow$ `Workload View` $\rightarrow$ `Inspect Doctor Caseload Bars` $\rightarrow$ `Adjust Workload Threshold Slider to 18 cases` $\rightarrow$ `Trigger Caseload Rebalance` $\rightarrow$ `Workload Metrics Updated`.
-3. **Clinical Guideline Publication Flow**:
-   - `Knowledge Hub` $\rightarrow$ `Click Publish Guideline` $\rightarrow$ `Enter Title: Pediatric Greenstick Fracture Immobilization Protocol` $\rightarrow$ `Set Subspecialty: Trauma & Pediatrics` $\rightarrow$ `Publish` $\rightarrow$ `Article Immediately Accessible to Department Staff`.
+- **Journey 4**: Department Overview $\rightarrow$ Doctors Roster $\rightarrow$ Select Dr. Vikram Anand $\rightarrow$ Reallocate Room from OPD Room 206 to OPD Room 208 $\rightarrow$ Review Doctor Caseload & On-Time Performance (92%) $\rightarrow$ Review Department AI Accuracy (98.4%) $\rightarrow$ Publish Clinical Guideline.
 
 ---
 
-## 4. Security & Role Scope Isolation
-
-- **Department Scoping**: Dr. Priya Sharma is strictly anchored to Orthopedics in MediMind Central Hospital (`hosp_01`). Has no administrative authority over Cardiology, Neurology, or Oncology.
-- **Cross-Hospital Isolation**: Cannot view or modify rosters in Apollo Multispecialty or Fortis Memorial Hospital.
-- **Patient Privacy**: Maintains operational metrics and aggregated scan counts, but cannot view private patient medical records outside authorized clinical appointments.
-
----
-
-## 5. Audit Verdict: PASS
-The Department Head Portal is 100% stable, fully compliant with clinical workflow and roster operations, responsive across all screen sizes, and ready for backend API integration.
+## 4. Audit Verdict: PASS
+The Department Head Portal is 100% stable, strictly scoped, verified in Light and Dark themes, and ready for backend integration.

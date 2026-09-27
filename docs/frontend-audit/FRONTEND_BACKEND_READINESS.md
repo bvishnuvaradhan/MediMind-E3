@@ -1,6 +1,6 @@
 # MediMind Frontend Backend-Readiness Contract
 
-**Audit Date:** 2026-09-26  
+**Audit Date:** 2026-09-27  
 **Auditor:** MediMind Systems & Backend Integration Architecture  
 **Status:** **100% READY FOR BACKEND IMPLEMENTATION**  
 **Purpose:** Primary architectural specification bridging the certified frontend contracts to the future backend RESTful services, database schemas, authentication middleware, and AI microservice integration.
@@ -60,13 +60,13 @@
 ---
 
 ### B. Chairman Platform Governance (`/api/v1/chairman`)
-- `GET /api/v1/chairman/summary`: Platform-wide executive KPIs (Hospitals, Doctors, Families, Appointments, AI predictions).
-- `GET /api/v1/chairman/hospitals`: Active certified hospital network list.
-- `GET /api/v1/chairman/hospital-requests?status={status}`: Filterable list of onboarding membership requests (`Pending`, `Approved`, `Rejected`).
+- `GET /api/v1/chairman/summary`: Platform-wide executive KPIs (3 Hospitals, 17 Depts, 66 Doctors, 6 Families, 29 Members, 2 Requests).
+- `GET /api/v1/chairman/hospitals`: Active certified hospital network list (`HOSP-001`, `HOSP-002`, `HOSP-003`).
+- `GET /api/v1/chairman/hospital-requests?status={status}`: Filterable list of onboarding membership requests (`REQ-HOSP-001`, `REQ-HOSP-002`).
 - `POST /api/v1/chairman/hospital-requests/{id}/review`:
   - **Payload**: `{ status: 'APPROVED' | 'REJECTED', reason?: string }`
   - **Action**: On `APPROVED`, provisions hospital entry, creates initial departments, and generates default administrator account.
-- `GET /api/v1/chairman/admins`: Hospital administrator accounts across all facilities.
+- `GET /api/v1/chairman/admins`: Hospital administrator accounts across all facilities (6 Admins).
 - `POST /api/v1/chairman/admins`: Provision new hospital administrator.
 - `GET /api/v1/chairman/ai-analytics`: 4-Model telemetry aggregate (Accuracy, Sensitivity, Specificity, Uptime, Latency, Volume).
 
@@ -100,7 +100,7 @@
 
 ### E. Doctor Clinical Operations (`/api/v1/doctor`)
 - `GET /api/v1/doctor/profile`: Clinician credentials, assigned OPD room, and consultation fee.
-- `GET /api/v1/doctor/patients`: Patients with explicit `ACTIVE` consent via `RecordAccess`.
+- `GET /api/v1/doctor/patients`: Patients with explicit `Active` consent via `RecordAccess`.
 - `GET /api/v1/doctor/appointments`: Clinician daily OPD queue.
 - `GET /api/v1/doctor/consultations`: Scoped clinical consultation records.
 - `POST /api/v1/doctor/consultations`: Create consultation (`patientId`, `chiefComplaint`, `examinationFindings`, `diagnosis`, `status: DRAFT | FINAL`).
@@ -177,7 +177,7 @@ CREATE TABLE record_access (
     id VARCHAR(64) PRIMARY KEY,
     family_member_id VARCHAR(64) REFERENCES family_members(id),
     doctor_id VARCHAR(64) REFERENCES users(id),
-    status VARCHAR(20) DEFAULT 'ACTIVE', -- 'ACTIVE', 'REVOKED'
+    status VARCHAR(20) DEFAULT 'Active', -- 'Active', 'Revoked'
     granted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     revoked_at TIMESTAMP
 );
@@ -190,7 +190,7 @@ CREATE TABLE appointments (
     family_member_id VARCHAR(64) REFERENCES family_members(id),
     slot_time VARCHAR(50) NOT NULL,
     date DATE NOT NULL,
-    status VARCHAR(20) DEFAULT 'Scheduled', -- 'Scheduled', 'Completed', 'Cancelled'
+    status VARCHAR(20) DEFAULT 'Scheduled', -- 'Scheduled', 'Confirmed', 'Checked In', 'In Progress', 'Completed', 'Cancelled', 'Rescheduled'
     type VARCHAR(50) DEFAULT 'OPD Consultation'
 );
 
