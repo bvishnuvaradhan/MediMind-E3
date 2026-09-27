@@ -66,7 +66,7 @@ export function AiAnalyticsView() {
       </div>
 
       {/* Aggregate Model KPIs for all 4 Modules */}
-      <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+      <div className="stats-grid cols-5">
         <div className="stat-card">
           <p>Total Model Inferences</p>
           <h3 style={{ marginTop: '8px' }}>{totalPredictions || 540}</h3>
@@ -301,35 +301,61 @@ export function AiAnalyticsView() {
         </div>
       </div>
 
-      {/* Visual Analytics Grid: Monthly Trajectory, Multi-Attribute Radar, and Dedicated Latency Horizontal Bar */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '22px', marginTop: '24px' }}>
-        {/* Multi-series Area / Line Chart with all 4 models */}
-        <div className="table-card" style={{ padding: '20px' }}>
-          <div style={{ marginBottom: '14px' }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: '15px', fontFamily: 'Plus Jakarta Sans' }}>
-              Monthly Clinical Prediction Volume Trajectory
-            </h3>
-            <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
-              Five-month progression across all 4 clinical AI modules (May – Sep 2026)
-            </p>
+      {/* Visual Analytics 2-Column Balanced Layout */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '22px', marginTop: '24px' }}>
+        {/* Left Column: Monthly Volume Line Chart + Inference Latency Bar Chart */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+          {/* Multi-series Area / Line Chart with all 4 models */}
+          <div className="table-card" style={{ padding: '20px' }}>
+            <div style={{ marginBottom: '14px' }}>
+              <h3 style={{ margin: '0 0 4px', fontSize: '15px', fontFamily: 'Plus Jakarta Sans' }}>
+                Monthly Clinical Prediction Volume Trajectory
+              </h3>
+              <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
+                Five-month progression across all 4 clinical AI modules (May – Sep 2026)
+              </p>
+            </div>
+
+            <LineChart
+              data={monthlyVolume || []}
+              xKey="month"
+              height={220}
+              yAxisLabel="Inferences"
+              series={[
+                { key: 'fracture', name: 'Fracture CNN', color: '#2563eb', area: true, fillOpacity: 0.2 },
+                { key: 'diabetes', name: 'Diabetes ML', color: '#0f766e', area: true, fillOpacity: 0.15 },
+                { key: 'heart', name: 'Heart ML', color: '#7c3aed', area: true, fillOpacity: 0.12 },
+                { key: 'general', name: 'General Health NLP', color: '#d97706', area: true, fillOpacity: 0.1 },
+              ]}
+            />
           </div>
 
-          <LineChart
-            data={monthlyVolume || []}
-            xKey="month"
-            height={200}
-            yAxisLabel="Inferences"
-            series={[
-              { key: 'fracture', name: 'Fracture CNN', color: '#2563eb', area: true, fillOpacity: 0.2 },
-              { key: 'diabetes', name: 'Diabetes ML', color: '#0f766e', area: true, fillOpacity: 0.15 },
-              { key: 'heart', name: 'Heart ML', color: '#7c3aed', area: true, fillOpacity: 0.12 },
-              { key: 'general', name: 'General Health NLP', color: '#d97706', area: true, fillOpacity: 0.1 },
-            ]}
-          />
+          {/* Dedicated Horizontal Bar Chart for Latency */}
+          <div className="table-card" style={{ padding: '20px' }}>
+            <div style={{ marginBottom: '14px' }}>
+              <h3 style={{ margin: '0 0 4px', fontSize: '15px', fontFamily: 'Plus Jakarta Sans' }}>
+                Inference Latency by AI Module (ms)
+              </h3>
+              <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
+                Average response time per inference (milliseconds)
+              </p>
+            </div>
+
+            <BarChart
+              data={latencyBarData}
+              layout="horizontal"
+              xKey="module"
+              height={180}
+              yMax={50}
+              series={[
+                { key: 'latency', name: 'Latency (ms)', color: '#0f766e' },
+              ]}
+            />
+          </div>
         </div>
 
-        {/* Model Clinical Capability Radar Comparison (Accuracy / Sensitivity / Specificity / Uptime) + Calibration Table */}
-        <div className="table-card" style={{ padding: '20px' }}>
+        {/* Right Column: Model Clinical Capability Radar Comparison + Calibration Table */}
+        <div className="table-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ marginBottom: '12px' }}>
             <h3 style={{ margin: '0 0 4px', fontSize: '15px', fontFamily: 'Plus Jakarta Sans' }}>
               Multidimensional Diagnostic Calibration Radar
@@ -348,7 +374,7 @@ export function AiAnalyticsView() {
           />
 
           {/* Compact 4-Model Clinical Calibration Benchmark Table */}
-          <div style={{ marginTop: '16px', borderTop: '1px solid var(--chair-border, #e2e8f0)', paddingTop: '12px' }}>
+          <div style={{ marginTop: 'auto', borderTop: '1px solid var(--chair-border, #e2e8f0)', paddingTop: '16px' }}>
             <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ color: 'var(--chair-muted, #64748b)', textAlign: 'left', borderBottom: '1px solid var(--chair-border, #e2e8f0)' }}>
@@ -375,29 +401,6 @@ export function AiAnalyticsView() {
               </tbody>
             </table>
           </div>
-        </div>
-
-        {/* Dedicated Horizontal Bar Chart for Latency */}
-        <div className="table-card" style={{ padding: '20px' }}>
-          <div style={{ marginBottom: '14px' }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: '15px', fontFamily: 'Plus Jakarta Sans' }}>
-              Inference Latency by AI Module (ms)
-            </h3>
-            <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
-              Average response time per inference (milliseconds)
-            </p>
-          </div>
-
-          <BarChart
-            data={latencyBarData}
-            layout="horizontal"
-            xKey="module"
-            height={200}
-            yMax={50}
-            series={[
-              { key: 'latency', name: 'Latency (ms)', color: '#0f766e' },
-            ]}
-          />
         </div>
       </div>
 

@@ -408,6 +408,48 @@
   margin-bottom: 28px;
 }
 
+/* Balanced responsive layouts for 5-item and 4-item grids */
+.ha-stat-grid.cols-5,
+.ha-stat-grid:has(> :nth-child(5):last-child) {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.ha-stat-grid.cols-4,
+.ha-stat-grid:has(> :nth-child(4):last-child) {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1200px) {
+  .ha-stat-grid.cols-5,
+  .ha-stat-grid:has(> :nth-child(5):last-child) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .ha-stat-grid.cols-4,
+  .ha-stat-grid:has(> :nth-child(4):last-child) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 840px) {
+  .ha-stat-grid.cols-5,
+  .ha-stat-grid:has(> :nth-child(5):last-child),
+  .ha-stat-grid.cols-4,
+  .ha-stat-grid:has(> :nth-child(4):last-child),
+  .ha-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 540px) {
+  .ha-stat-grid.cols-5,
+  .ha-stat-grid:has(> :nth-child(5):last-child),
+  .ha-stat-grid.cols-4,
+  .ha-stat-grid:has(> :nth-child(4):last-child),
+  .ha-stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .ha-stat-card {
   background-color: var(--ha-card);
   border: 1px solid var(--ha-border);

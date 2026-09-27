@@ -465,6 +465,35 @@
   margin-bottom: 28px;
 }
 
+/* Balanced responsive layouts for 5-item grids */
+.stats-grid.cols-5,
+.stats-grid:has(> :nth-child(5):last-child) {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+@media (max-width: 1200px) {
+  .stats-grid.cols-5,
+  .stats-grid:has(> :nth-child(5):last-child) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 840px) {
+  .stats-grid.cols-5,
+  .stats-grid:has(> :nth-child(5):last-child),
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 540px) {
+  .stats-grid.cols-5,
+  .stats-grid:has(> :nth-child(5):last-child),
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .stat-card {
   padding: 20px;
   border: 1px solid var(--chair-border);

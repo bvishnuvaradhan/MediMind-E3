@@ -492,6 +492,48 @@
   gap: 16px;
 }
 
+/* Balanced responsive layouts for 5-item and 4-item grids */
+.dh-stat-grid.cols-5,
+.dh-stat-grid:has(> :nth-child(5):last-child) {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.dh-stat-grid.cols-4,
+.dh-stat-grid:has(> :nth-child(4):last-child) {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1200px) {
+  .dh-stat-grid.cols-5,
+  .dh-stat-grid:has(> :nth-child(5):last-child) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .dh-stat-grid.cols-4,
+  .dh-stat-grid:has(> :nth-child(4):last-child) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 840px) {
+  .dh-stat-grid.cols-5,
+  .dh-stat-grid:has(> :nth-child(5):last-child),
+  .dh-stat-grid.cols-4,
+  .dh-stat-grid:has(> :nth-child(4):last-child),
+  .dh-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 540px) {
+  .dh-stat-grid.cols-5,
+  .dh-stat-grid:has(> :nth-child(5):last-child),
+  .dh-stat-grid.cols-4,
+  .dh-stat-grid:has(> :nth-child(4):last-child),
+  .dh-stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .dh-stat-card {
   background-color: var(--dh-card);
   border: 1px solid var(--dh-border);

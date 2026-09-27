@@ -93,29 +93,53 @@ export function AiAnalyticsView({ analytics = {}, hospital = null }) {
         />
       </div>
 
-      {/* Visual Telemetry: AI Distribution Donut, Capability Radar & Latency Bar */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-        {/* Model Volume Share Donut */}
-        <div className="ha-card-panel" style={{ margin: 0 }}>
-          <div className="ha-card-panel-header">
-            <div>
-              <h3>Diagnostic Model Volume Share</h3>
-              <p>Inference load distribution across active clinical screening pipelines</p>
+      {/* Visual Telemetry: Balanced 2-Column Layout */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px', marginBottom: '24px' }}>
+        {/* Left Column: Donut + Latency Bar */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Model Volume Share Donut */}
+          <div className="ha-card-panel" style={{ margin: 0 }}>
+            <div className="ha-card-panel-header">
+              <div>
+                <h3>Diagnostic Model Volume Share</h3>
+                <p>Inference load distribution across active clinical screening pipelines</p>
+              </div>
             </div>
+
+            <DonutChart
+              data={aiDonutData}
+              size={160}
+              innerRadius={45}
+              outerRadius={70}
+              centerValue={totalRuns}
+              centerLabel="Inferences"
+            />
           </div>
 
-          <DonutChart
-            data={aiDonutData}
-            size={160}
-            innerRadius={45}
-            outerRadius={70}
-            centerValue={totalRuns}
-            centerLabel="Inferences"
-          />
+          {/* Dedicated Latency Horizontal Bar */}
+          <div className="ha-card-panel" style={{ margin: 0 }}>
+            <div className="ha-card-panel-header">
+              <div>
+                <h3>Inference Latency by Module (ms)</h3>
+                <p>Average turnaround processing time per inference</p>
+              </div>
+            </div>
+
+            <BarChart
+              data={latencyBarData}
+              layout="horizontal"
+              xKey="module"
+              height={180}
+              yMax={50}
+              series={[
+                { key: 'latency', name: 'Latency (ms)', color: '#0f766e' },
+              ]}
+            />
+          </div>
         </div>
 
-        {/* Model Clinical Capability Radar & Calibration Benchmark Table */}
-        <div className="ha-card-panel" style={{ margin: 0 }}>
+        {/* Right Column: Model Clinical Capability Radar & Calibration Benchmark Table */}
+        <div className="ha-card-panel" style={{ margin: 0, display: 'flex', flexDirection: 'column' }}>
           <div className="ha-card-panel-header">
             <div>
               <h3>AI Reliability & Accuracy Radar</h3>
@@ -132,7 +156,7 @@ export function AiAnalyticsView({ analytics = {}, hospital = null }) {
           />
 
           {/* Compact 4-Model Clinical Calibration Benchmark Table */}
-          <div style={{ marginTop: '14px', borderTop: '1px solid var(--ha-border, #e2e8f0)', paddingTop: '10px' }}>
+          <div style={{ marginTop: 'auto', borderTop: '1px solid var(--ha-border, #e2e8f0)', paddingTop: '14px' }}>
             <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ color: 'var(--ha-text-muted, #64748b)', textAlign: 'left', borderBottom: '1px solid var(--ha-border, #e2e8f0)' }}>
@@ -159,27 +183,6 @@ export function AiAnalyticsView({ analytics = {}, hospital = null }) {
               </tbody>
             </table>
           </div>
-        </div>
-
-        {/* Dedicated Latency Horizontal Bar */}
-        <div className="ha-card-panel" style={{ margin: 0 }}>
-          <div className="ha-card-panel-header">
-            <div>
-              <h3>Inference Latency by Module (ms)</h3>
-              <p>Average turnaround processing time per inference</p>
-            </div>
-          </div>
-
-          <BarChart
-            data={latencyBarData}
-            layout="horizontal"
-            xKey="module"
-            height={200}
-            yMax={50}
-            series={[
-              { key: 'latency', name: 'Latency (ms)', color: '#0f766e' },
-            ]}
-          />
         </div>
       </div>
 
