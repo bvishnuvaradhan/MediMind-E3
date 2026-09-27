@@ -9,34 +9,35 @@ import {
 import { StatCard } from '../components/StatCard';
 import { DonutChart, BarChart, RadarChart } from '../../common/charts';
 
-export function AiAnalyticsView({ analytics = {} }) {
+export function AiAnalyticsView({ analytics = {}, hospital = null }) {
+  const isHosp002 = hospital?.id === 'HOSP-002';
   const ai = analytics?.aiAggregateMetrics || analytics || {};
 
   const fRuns = ai.fracturePredictions || 48;
   const dRuns = ai.diabetesPredictions || 36;
   const hRuns = ai.heartPredictions || ai.heartDiseasePredictions || 42;
-  const gRuns = ai.generalHealthScreenings || 32;
+  const gRuns = isHosp002 ? 0 : (ai.generalHealthScreenings || 32);
   const totalRuns = fRuns + dRuns + hRuns + gRuns;
 
   const aiDonutData = [
     { label: 'Fracture Detection (CNN)', value: fRuns, color: '#2563eb' },
     { label: 'Diabetes Risk (ML)', value: dRuns, color: '#0f766e' },
     { label: 'Heart Disease Risk (ML)', value: hRuns, color: '#7c3aed' },
-    { label: 'General Health (NLP)', value: gRuns, color: '#d97706' },
+    ...(isHosp002 ? [] : [{ label: 'General Health (NLP)', value: gRuns, color: '#d97706' }]),
   ];
 
   const radarData = [
     { name: 'Fracture Detection', values: [98.4, 98.1, 98.8, 99.9], color: '#2563eb' },
     { name: 'Diabetes Risk', values: [94.2, 93.5, 94.8, 99.8], color: '#0f766e' },
     { name: 'Heart Disease Risk', values: [95.7, 95.2, 96.1, 99.9], color: '#7c3aed' },
-    { name: 'General Health Assessment', values: [93.1, 92.4, 93.8, 99.7], color: '#d97706' },
+    ...(isHosp002 ? [] : [{ name: 'General Health Assessment', values: [93.1, 92.4, 93.8, 99.7], color: '#d97706' }]),
   ];
 
   const latencyBarData = [
     { module: 'Fracture Detection', latency: 34, color: '#2563eb' },
     { module: 'Diabetes Risk', latency: 12, color: '#0f766e' },
     { module: 'Heart Disease Risk', latency: 18, color: '#7c3aed' },
-    { module: 'General Health Assessment', latency: 42, color: '#d97706' },
+    ...(isHosp002 ? [] : [{ module: 'General Health Assessment', latency: 42, color: '#d97706' }]),
   ];
 
   return (
@@ -284,7 +285,7 @@ export function AiAnalyticsView({ analytics = {} }) {
         </div>
 
         {/* General Health Assessment */}
-        <div className="ha-card-panel" style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div className="ha-card-panel" style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: '14px', opacity: isHosp002 ? 0.75 : 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: '#fef3c7', color: '#d97706', display: 'grid', placeItems: 'center' }}>
@@ -297,22 +298,34 @@ export function AiAnalyticsView({ analytics = {} }) {
                 <span style={{ fontSize: '11px', color: '#d97706', fontWeight: 600 }}>General Medicine & Triage</span>
               </div>
             </div>
-            <span className="ha-badge info">{gRuns} Inferences</span>
+            <span className={`ha-badge ${isHosp002 ? 'warning' : 'info'}`}>
+              {isHosp002 ? 'Not Deployed' : `${gRuns} Inferences`}
+            </span>
           </div>
 
           <p style={{ margin: 0, fontSize: '12px', color: 'var(--ha-text-secondary)' }}>
-            Clinical NLP transformer analyzing intake symptom narratives, routine vitals, and holistic triage factors.
+            {isHosp002
+              ? 'Clinical NLP transformer pipeline is currently not provisioned for City Care Hospital.'
+              : 'Clinical NLP transformer analyzing intake symptom narratives, routine vitals, and holistic triage factors.'}
           </p>
 
           <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-              <span style={{ color: 'var(--ha-text-muted)' }}>Standard / Routine Cases:</span>
-              <strong style={{ color: 'var(--ha-success)' }}>19 (59.4%)</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-              <span style={{ color: 'var(--ha-text-muted)' }}>Priority Specialty Referrals:</span>
-              <strong style={{ color: 'var(--ha-warning)' }}>13 (40.6%)</strong>
-            </div>
+            {isHosp002 ? (
+              <div style={{ fontSize: '12px', color: 'var(--ha-text-muted)', textAlign: 'center', padding: '4px 0' }}>
+                Module provisioning pending Chairman authorization.
+              </div>
+            ) : (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                  <span style={{ color: 'var(--ha-text-muted)' }}>Standard / Routine Cases:</span>
+                  <strong style={{ color: 'var(--ha-success)' }}>19 (59.4%)</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                  <span style={{ color: 'var(--ha-text-muted)' }}>Priority Specialty Referrals:</span>
+                  <strong style={{ color: 'var(--ha-warning)' }}>13 (40.6%)</strong>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

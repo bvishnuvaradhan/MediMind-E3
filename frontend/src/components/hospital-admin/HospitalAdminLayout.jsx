@@ -197,6 +197,24 @@ export function HospitalAdminLayout({ dark, setDark }) {
   const [showGenerateReportModal, setShowGenerateReportModal] = useState(false);
   const [confirmModal, setConfirmModal] = useState(null);
 
+  const isAnyModalOpen =
+    showEditHospitalModal ||
+    showCreateDeptModal ||
+    showEditDeptModal ||
+    showCreateHeadModal ||
+    showGenerateReportModal ||
+    Boolean(confirmModal);
+
+  useEffect(() => {
+    if (isAnyModalOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isAnyModalOpen]);
+
   // Data States
   const [hospital, setHospital] = useState(initialHospitalProfile);
   const [departments, setDepartments] = useState(initialHospitalDepartments);
@@ -478,6 +496,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
       return (
         <AiAnalyticsView
           analytics={analytics}
+          hospital={hospital}
         />
       );
     }

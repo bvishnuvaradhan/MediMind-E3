@@ -695,13 +695,14 @@
 .ha-modal-backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.6);
+  background-color: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(4px);
-  z-index: 50;
-  display: grid;
-  place-items: center;
-  padding: 20px;
-  overflow-y: auto;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
 }
 
 .ha-modal {
@@ -710,11 +711,17 @@
   border-radius: 14px;
   width: 100%;
   max-width: 580px;
+  max-height: min(90vh, 860px);
   box-shadow: var(--ha-shadow-lg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: haModalFadeIn 0.2s ease-out;
+  margin: auto;
+}
+
+.ha-modal.lg {
+  max-width: 780px;
 }
 
 @keyframes haModalFadeIn {
@@ -728,6 +735,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
 }
 
 .ha-modal-header h3 {
@@ -755,7 +763,27 @@
 .ha-modal-body {
   padding: 24px;
   overflow-y: auto;
-  max-height: calc(85vh - 140px);
+  flex: 1 1 auto;
+  min-height: 0;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ha-modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ha-modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ha-modal-body::-webkit-scrollbar-thumb {
+  background: var(--ha-border);
+  border-radius: 9999px;
+}
+
+.ha-modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--ha-text-muted);
 }
 
 .ha-modal-footer {
@@ -766,6 +794,7 @@
   justify-content: flex-end;
   gap: 12px;
   background-color: var(--ha-bg);
+  flex-shrink: 0;
 }
 
 /* Forms */
@@ -947,6 +976,29 @@
   }
   .ha-form-row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .ha-modal-backdrop {
+    padding: 8px;
+  }
+
+  .ha-modal {
+    max-height: 94vh;
+    border-radius: 10px;
+  }
+
+  .ha-modal-header {
+    padding: 14px 16px;
+  }
+
+  .ha-modal-body {
+    padding: 16px;
+  }
+
+  .ha-modal-footer {
+    padding: 12px 16px;
   }
 }
 
