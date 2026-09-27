@@ -14,7 +14,7 @@
 | Route / Hash | View Component | Status | Data Source | Interactive Controls | Theme (Light/Dark) | Responsive | Scroll | Result |
 | :--- | :--- | :---: | :--- | :--- | :---: | :---: | :---: | :---: |
 | `#dashboard` | `PlatformDashboard.jsx` | 200 OK | `initialPlatformSummary`, `initialHospitalRequests`, `initialAiAnalytics` | Network KPIs, Review onboarding requests alert, Hospital network cards (max-3), AI utilization donut, Shortcut matrix | Verified | Fluid (1440–320px) | Yes | **PASS** |
-| `#platform-analytics` | `PlatformAnalyticsView.jsx`| 200 OK | `initialPlatformSummary`, `initialAppointmentAnalytics` | Platform user directory distribution (Donut), Appointment resolution (Donut), Microservices health | Verified | Fluid (1440–320px) | Yes | **PASS** |
+| `#platform-analytics` | `PlatformAnalyticsView.jsx`| 200 OK | `initialPlatformSummary`, `initialAppointmentAnalytics` | Platform user directory distribution (Donut), Appointment resolution (Donut), Multi-hospital growth metrics | Verified | Fluid (1440–320px) | Yes | **PASS** |
 | `#hospitals` | `HospitalsView.jsx` | 200 OK | `initialHospitals`, `initialHospitalRequests` | Active network list, Search & status filter, Register hospital modal, Onboarding request review modal (Approve / Reject workflow with confirmation), Hospital -> Dept -> Doctor hierarchical drilldown | Verified | Fluid (1440–320px) | Yes | **PASS** |
 | `#hospital-admins` | `HospitalAdminsView.jsx` | 200 OK | `initialHospitalAdmins`, `initialHospitals` | Admin directory, Search by name/email/hospital, Create Hospital Admin modal, Toggle active/inactive status | Verified | Fluid (1440–320px) | Yes | **PASS** |
 | `#departments` | `DepartmentsView.jsx` | 200 OK | `initialDepartments`, `initialHospitals` | Hospital filter dropdown, Search department/head, Specialty icons & theming, Doctor workforce drilldown | Verified | Fluid (1440–320px) | Yes | **PASS** |
@@ -61,6 +61,9 @@
 5. **Modal Architecture & Responsive Usability**:
    - Modals use flexbox column layout with fixed headers/footers and vertical scrolling in `.modal-body` / `.modal-dialog > form`.
    - Verified down to 320px width/height without clipped action buttons, horizontal overflow, or nested scroll traps.
+
+6. **Platform Microservices Health Scope**:
+   - The Platform Microservices Health graph and widget have been intentionally excluded from the Chairman portal view hierarchy to focus executive governance strictly on clinical network operations, multi-hospital workforce, appointment throughput, and diagnostic AI reliability.
 
 ---
 

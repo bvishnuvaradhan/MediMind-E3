@@ -6,12 +6,11 @@ import {
   TrendingUp,
   UsersRound,
   CalendarDays,
-  Server,
   CheckCircle,
   Clock,
 } from 'lucide-react';
 import { chairmanService } from '../../../services/chairmanService';
-import { DonutChart, RadialGauge } from '../../common/charts';
+import { DonutChart } from '../../common/charts';
 
 export function PlatformAnalyticsView() {
   const [summary, setSummary] = useState(null);
@@ -62,13 +61,13 @@ export function PlatformAnalyticsView() {
               Executive Metrics
             </p>
             <h1>Platform Usage & Growth Analytics</h1>
-            <p>Comprehensive statistical breakdown across users, appointments, system health, and clinical throughput.</p>
+            <p>Comprehensive statistical breakdown across users, appointments, and clinical throughput.</p>
           </div>
         </div>
       </div>
 
-      {/* Grid: 3 Pillars of Analytics with Data Visualizations */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '22px', marginBottom: '28px' }}>
+      {/* Grid: 2 Pillars of Platform Analytics */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '22px', marginBottom: '28px' }}>
         {/* Pillar 1: User Analytics with Donut Visualization */}
         <div className="table-card" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
@@ -138,44 +137,9 @@ export function PlatformAnalyticsView() {
             </div>
           </div>
         </div>
-
-        {/* Pillar 3: System Health & Radial Gauge */}
-        <div className="table-card" style={{ padding: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-            <div style={{ display: 'grid', placeItems: 'center', width: '38px', height: '38px', borderRadius: '10px', background: '#e0e7ff', color: '#4338ca' }}>
-              <Server size={20} />
-            </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>Platform Microservices</h3>
-              <small style={{ color: 'var(--chair-muted)' }}>Infrastructure health & network telemetry</small>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0' }}>
-            <RadialGauge
-              value={99.98}
-              min={95}
-              max={100}
-              unit="%"
-              label="Uptime"
-              subtext="5 Microservice Nodes Healthy"
-              size={150}
-              color="#16a34a"
-            />
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', paddingTop: '10px', borderTop: '1px solid var(--chair-border)', fontSize: '12px' }}>
-            <div style={{ padding: '8px', background: 'var(--chair-bg)', borderRadius: '6px' }}>
-              <span style={{ color: 'var(--chair-muted)', fontSize: '11px' }}>Throughput</span>
-              <div style={{ fontWeight: 700, marginTop: '2px' }}>{summary.apiThroughput || '1,420 req/min'}</div>
-            </div>
-            <div style={{ padding: '8px', background: 'var(--chair-bg)', borderRadius: '6px' }}>
-              <span style={{ color: 'var(--chair-muted)', fontSize: '11px' }}>Avg Latency</span>
-              <div style={{ fontWeight: 700, marginTop: '2px' }}>{summary.avgResponseTime || '142ms'}</div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
 }
+
+export default PlatformAnalyticsView;
