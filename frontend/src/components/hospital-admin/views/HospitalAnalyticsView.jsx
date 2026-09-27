@@ -20,33 +20,104 @@ import {
 export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
   const [period, setPeriod] = useState('CURRENT_MONTH');
 
-  const kpis = analytics.kpis || {};
+  const totalBeds = Number(hospital.totalBeds) || 250;
+
+  // Period-based dynamic calculation
+  const periodData = {
+    CURRENT_MONTH: {
+      label: 'Current Month (Sep 2026)',
+      totalAppts: 128,
+      completedAppts: 104,
+      scheduledAppts: 18,
+      cancelledAppts: 6,
+      subtextDelta: 'Monthly volume (+4.9% vs Aug)',
+      occupiedBeds: 210,
+      inPerson: 100,
+      video: 28,
+      weeklyData: [
+        { day: 'Mon', scheduled: 24, completed: 22, cancelled: 1 },
+        { day: 'Tue', scheduled: 26, completed: 23, cancelled: 1 },
+        { day: 'Wed', scheduled: 22, completed: 19, cancelled: 2 },
+        { day: 'Thu', scheduled: 25, completed: 21, cancelled: 1 },
+        { day: 'Fri', scheduled: 20, completed: 14, cancelled: 1 },
+        { day: 'Sat', scheduled: 11, completed: 5, cancelled: 0 },
+      ],
+    },
+    LAST_MONTH: {
+      label: 'Last Month (Aug 2026)',
+      totalAppts: 122,
+      completedAppts: 101,
+      scheduledAppts: 16,
+      cancelledAppts: 5,
+      subtextDelta: 'Monthly volume (+6.1% vs Jul)',
+      occupiedBeds: 202,
+      inPerson: 96,
+      video: 26,
+      weeklyData: [
+        { day: 'Mon', scheduled: 23, completed: 21, cancelled: 1 },
+        { day: 'Tue', scheduled: 25, completed: 22, cancelled: 1 },
+        { day: 'Wed', scheduled: 21, completed: 18, cancelled: 1 },
+        { day: 'Thu', scheduled: 24, completed: 20, cancelled: 1 },
+        { day: 'Fri', scheduled: 19, completed: 15, cancelled: 1 },
+        { day: 'Sat', scheduled: 10, completed: 5, cancelled: 0 },
+      ],
+    },
+    Q3: {
+      label: 'Q3 2026 (Jul – Sep)',
+      totalAppts: 365,
+      completedAppts: 301,
+      scheduledAppts: 48,
+      cancelledAppts: 16,
+      subtextDelta: 'Quarterly aggregate volume (+18.2% vs Q2)',
+      occupiedBeds: 208,
+      inPerson: 287,
+      video: 78,
+      weeklyData: [
+        { day: 'Mon', scheduled: 70, completed: 64, cancelled: 3 },
+        { day: 'Tue', scheduled: 75, completed: 67, cancelled: 3 },
+        { day: 'Wed', scheduled: 64, completed: 56, cancelled: 4 },
+        { day: 'Thu', scheduled: 72, completed: 62, cancelled: 3 },
+        { day: 'Fri', scheduled: 58, completed: 44, cancelled: 3 },
+        { day: 'Sat', scheduled: 31, completed: 15, cancelled: 0 },
+      ],
+    },
+    YTD: {
+      label: 'Year-to-Date 2026',
+      totalAppts: 980,
+      completedAppts: 824,
+      scheduledAppts: 112,
+      cancelledAppts: 44,
+      subtextDelta: '9-Month operational throughput',
+      occupiedBeds: 205,
+      inPerson: 774,
+      video: 206,
+      weeklyData: [
+        { day: 'Mon', scheduled: 185, completed: 170, cancelled: 8 },
+        { day: 'Tue', scheduled: 198, completed: 178, cancelled: 9 },
+        { day: 'Wed', scheduled: 172, completed: 150, cancelled: 10 },
+        { day: 'Thu', scheduled: 190, completed: 165, cancelled: 8 },
+        { day: 'Fri', scheduled: 155, completed: 120, cancelled: 7 },
+        { day: 'Sat', scheduled: 80, completed: 41, cancelled: 2 },
+      ],
+    },
+  };
+
+  const currentMetrics = periodData[period] || periodData.CURRENT_MONTH;
+  const totalAppts = currentMetrics.totalAppts;
+  const completedAppts = currentMetrics.completedAppts;
+  const scheduledAppts = currentMetrics.scheduledAppts;
+  const cancelledAppts = currentMetrics.cancelledAppts;
+  const occupiedBeds = currentMetrics.occupiedBeds;
+  const completionRate = Math.round((completedAppts / totalAppts) * 100);
+  const noShowRate = ((cancelledAppts / totalAppts) * 100).toFixed(1);
+  const weeklyData = currentMetrics.weeklyData;
+
   const monthlyTrends = analytics.monthlyTrends || [
     { month: 'May 2026', appointments: 92, completed: 78, cancelled: 4, aiUsage: 64 },
     { month: 'Jun 2026', appointments: 104, completed: 88, cancelled: 5, aiUsage: 73 },
     { month: 'Jul 2026', appointments: 115, completed: 96, cancelled: 6, aiUsage: 81 },
     { month: 'Aug 2026', appointments: 122, completed: 101, cancelled: 5, aiUsage: 86 },
     { month: 'Sep 2026', appointments: 128, completed: 104, cancelled: 6, aiUsage: 91 },
-  ];
-
-  const totalBeds = Number(hospital.totalBeds) || 250;
-  const occupiedBeds = Number(hospital.occupiedBeds) || 210;
-
-  const totalAppts = kpis.totalAppointments || 128;
-  const completedAppts = kpis.completedConsultations || 104;
-  const scheduledAppts = 18;
-  const cancelledAppts = 6;
-  const completionRate = Math.round((completedAppts / totalAppts) * 100);
-  const noShowRate = ((cancelledAppts / totalAppts) * 100).toFixed(1);
-
-  // Weekly operational volume distribution (Mon - Sat)
-  const weeklyData = [
-    { day: 'Mon', scheduled: 24, completed: 22, cancelled: 1 },
-    { day: 'Tue', scheduled: 26, completed: 23, cancelled: 1 },
-    { day: 'Wed', scheduled: 22, completed: 19, cancelled: 2 },
-    { day: 'Thu', scheduled: 25, completed: 21, cancelled: 1 },
-    { day: 'Fri', scheduled: 20, completed: 14, cancelled: 1 },
-    { day: 'Sat', scheduled: 11, completed: 5, cancelled: 0 },
   ];
 
   return (
@@ -240,13 +311,13 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', flexWrap: 'wrap', gap: '16px' }}>
             <DonutChart
               data={[
-                { label: 'In-Person OPD', value: 100, color: '#2563eb' },
-                { label: 'Telehealth Video', value: 28, color: '#0f766e' },
+                { label: 'In-Person OPD', value: currentMetrics.inPerson, color: '#2563eb' },
+                { label: 'Telehealth Video', value: currentMetrics.video, color: '#0f766e' },
               ]}
               size={140}
               innerRadius={38}
               outerRadius={58}
-              centerValue="128"
+              centerValue={`${totalAppts}`}
               centerLabel="Total Visits"
             />
 

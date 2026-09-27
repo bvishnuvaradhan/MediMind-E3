@@ -36,17 +36,23 @@
 
 ## 2. Key Capabilities & Verified Invariants
 
-1. **Dashboard Max-3 Collection Rule**:
+1. **Dashboard Member-Scoping & Max-3 Collection Rule**:
    - Family members selector strip displays max 3 items with `"View all"` linking to `#family-members`.
+   - Selecting any family member updates all member-scoped dashboard metrics, records, appointments, and telemetry gauges specifically for that member.
    - Recent appointments section displays max 3 items with `"View all appointments"` in card footer.
    - Recent medical records panel displays max 3 items with `"View all"` in section heading.
-2. **Multi-Modality Record Handling**:
+2. **Explicit Naming Convention**:
+   - All member selectors, headers, and badge indicators follow the explicit `{fullName || name} — {relationship || relation}` format.
+3. **Dynamic Member Filters Across All Family Views**:
+   - `AiPredictionsView`, `MedicalRecordsView`, `AppointmentsView`, `ConsultationsView`, `PrescriptionsView`, and `DoctorAccessView` each provide a member selector dropdown allowing individual member filtering or full family view.
+   - `MemberProfileView` provides an in-situ profile switcher to change member views seamlessly.
+4. **Multi-Modality Record Handling**:
    - Accurately categorizes X-Rays (`rec_002`, `rec_005`), Blood tests (`rec_001`, `rec_004`), and ECGs (`rec_003`).
    - Links records directly to clinical AI inference results with instant access to diagnostic finding details.
-3. **Clinical AI Flow**:
+5. **Clinical AI Flow**:
    - All 4 locked models accessible: Fracture Detection (`ai_fracture`), Diabetes Risk (`ai_diabetes`), Heart Disease Risk (`ai_cardio`), General Health Assessment (`ai_general`).
    - Personal prediction details feature pure-SVG `RadialGauge` and `BulletChart` visual indicators with clear AI safety disclaimer.
-4. **Consent Protocol (`DoctorAccessView.jsx`)**:
+6. **Consent Protocol (`DoctorAccessView.jsx`)**:
    - Patient grants or revokes physician access with real-time state synchronization.
    - Revoking consent for Aarav (`acc_010`) instantly prevents physician access to private records.
 

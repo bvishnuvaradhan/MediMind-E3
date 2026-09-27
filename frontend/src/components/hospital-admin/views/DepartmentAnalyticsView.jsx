@@ -3,14 +3,14 @@ import {
   BarChart3,
   Stethoscope,
   Sparkles,
-  Search,
   ShieldCheck,
   Star,
+  Layers,
 } from 'lucide-react';
 import { BarChart, DonutChart, BulletChart } from '../../common/charts';
 
 export function DepartmentAnalyticsView({ analytics = {} }) {
-  const [search, setSearch] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('ALL');
   const [selectedMetric, setSelectedMetric] = useState('ALL');
 
   const comparison = analytics.departmentComparison || [
@@ -74,12 +74,8 @@ export function DepartmentAnalyticsView({ analytics = {} }) {
   ];
 
   const filteredComparison = comparison.filter((dept) => {
-    const matchesSearch =
-      !search ||
-      dept.department.toLowerCase().includes(search.toLowerCase()) ||
-      (dept.code && dept.code.toLowerCase().includes(search.toLowerCase())) ||
-      (dept.headName && dept.headName.toLowerCase().includes(search.toLowerCase()));
-    return matchesSearch;
+    if (selectedDepartment === 'ALL') return true;
+    return dept.code === selectedDepartment || dept.id === selectedDepartment || dept.department.toLowerCase().includes(selectedDepartment.toLowerCase());
   });
 
   return (
@@ -102,15 +98,35 @@ export function DepartmentAnalyticsView({ analytics = {} }) {
         </div>
       </div>
 
-      {/* Filter and Metric Focus Bar */}
-      <div className="ha-filter-bar" style={{ marginBottom: '20px' }}>
-        <div className="ha-search-box" style={{ width: '280px' }}>
-          <Search size={15} style={{ color: 'var(--ha-text-muted)' }} />
-          <input
-            placeholder="Search department, code, head..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+      {/* Filter and Metric Focus Bar (Search removed, Department Dropdown added) */}
+      <div className="ha-filter-bar" style={{ marginBottom: '20px', flexWrap: 'wrap', gap: '14px', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ha-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Layers size={16} /> Department:
+          </span>
+          <select
+            className="ha-select"
+            value={selectedDepartment}
+            onChange={(e) => setSelectedDepartment(e.target.value)}
+            style={{
+              padding: '7px 14px',
+              borderRadius: '8px',
+              border: '1px solid var(--ha-border)',
+              backgroundColor: 'var(--ha-card)',
+              color: 'var(--ha-text-primary)',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              minWidth: '220px',
+            }}
+          >
+            <option value="ALL">All Departments (Comparative View)</option>
+            {comparison.map((d) => (
+              <option key={d.id || d.code} value={d.code}>
+                {d.department} ({d.code})
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="ha-filter-pills">

@@ -15,6 +15,14 @@ export function DoctorAccessView({
   const members = familyMembers.length > 0 ? familyMembers : (propMembers || [{ name: 'Father' }]);
   const [isGrantOpen, setIsGrantOpen] = useState(false);
   const [accessToRevoke, setAccessToRevoke] = useState(null);
+  const [selectedMemberFilter, setSelectedMemberFilter] = useState('All');
+
+  const filteredAccess = doctorAccess.filter((entry) => {
+    if (selectedMemberFilter === 'All') return true;
+    const target = selectedMemberFilter.toLowerCase();
+    const memberName = (entry.member || '').toLowerCase();
+    return memberName.includes(target) || target.includes(memberName);
+  });
 
   const handleConfirmRevoke = (entry) => {
     if (onRevoke) {
@@ -50,8 +58,45 @@ export function DoctorAccessView({
           </span>
         </div>
 
+        {/* Member Filter Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px', marginBottom: '18px', paddingBottom: '16px', borderBottom: '1px solid var(--family-border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--family-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center' }}>
+              Member:
+            </span>
+            <select
+              className="feature-input"
+              value={selectedMemberFilter}
+              onChange={(e) => {
+                setSelectedMemberFilter(e.target.value);
+                announce(e.target.value === 'All' ? 'Viewing doctor access for all family members.' : `Filtered doctor access for ${e.target.value}.`);
+              }}
+              style={{ padding: '6px 12px', fontSize: '13px', minWidth: '200px', fontWeight: '600' }}
+            >
+              <option value="All">All Family Members ({doctorAccess.length})</option>
+              {members.map((m) => {
+                const mName = m.fullName || m.name;
+                const mRel = m.relationship || m.relation || 'Member';
+                const count = doctorAccess.filter((entry) => {
+                  const entryMember = (entry.member || '').toLowerCase();
+                  return entryMember.includes(m.name.toLowerCase()) || (m.fullName && entryMember.includes(m.fullName.toLowerCase()));
+                }).length;
+                return (
+                  <option key={m.id || m.name} value={m.name}>
+                    {mName} — {mRel} ({count})
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
+          <div style={{ fontSize: '12.5px', color: 'var(--family-muted)' }}>
+            Showing <strong>{filteredAccess.length}</strong> active authorizations
+          </div>
+        </div>
+
         <div className="feature-list">
-          {doctorAccess.length === 0 ? (
+          {filteredAccess.length === 0 ? (
             <div className="empty-feature" style={{ padding: '36px 16px', textAlign: 'center' }}>
               <div className="empty-art" style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'var(--family-soft)', display: 'grid', placeItems: 'center', margin: '0 auto 12px' }}>
                 <LockKeyhole size={24} style={{ color: 'var(--family-primary)' }} />
@@ -65,7 +110,7 @@ export function DoctorAccessView({
               </button>
             </div>
           ) : (
-            doctorAccess.map((entry, idx) => (
+            filteredAccess.map((entry, idx) => (
               <article
                 className="feature-card"
                 key={`${entry.member}-${entry.doctor}-${idx}`}

@@ -17,6 +17,9 @@ import { EditMemberModal } from '../components/EditMemberModal';
 
 export function MemberProfileView({
   member,
+  familyMembers = [],
+  memberIndex = 0,
+  setMemberIndex,
   records = initialRecords,
   navigate,
   announce,
@@ -27,8 +30,15 @@ export function MemberProfileView({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const memberName = member?.fullName || member?.name || 'Rohan Kapoor';
+  const memberRelation = member?.relationship || member?.relation || 'Father';
+  const memberShortName = member?.name || 'Rohan';
+
   const memberRecords = records.filter(
-    (r) => !r.patient || r.patient.toLowerCase() === member.name.toLowerCase()
+    (r) => {
+      const patient = (r.patient || r.patientName || '').toLowerCase();
+      return patient.includes(memberShortName.toLowerCase()) || patient.includes(memberName.toLowerCase());
+    }
   );
 
   const handleConfirmDelete = () => {
@@ -41,20 +51,45 @@ export function MemberProfileView({
 
   return (
     <section className="feature-view">
-      {/* 1. Header with Actions */}
-      <div className="feature-heading" style={{ marginBottom: '20px' }}>
+      {/* 1. Header with Member Switcher & Actions */}
+      <div className="feature-heading" style={{ marginBottom: '16px', flexWrap: 'wrap', gap: '14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <span className={`avatar avatar-${member.tone || 'coral'}`} style={{ width: '48px', height: '48px', fontSize: '18px' }}>
-            {member.initials}
+          <span className={`avatar avatar-${member?.tone || 'coral'}`} style={{ width: '48px', height: '48px', fontSize: '18px' }}>
+            {member?.initials}
           </span>
           <div>
             <p className="eyebrow" style={{ margin: '0 0 2px 0' }}>Family Member Profile</p>
-            <h1 style={{ margin: 0, fontSize: '22px' }}>{member.name}'s Profile</h1>
+            <h1 style={{ margin: 0, fontSize: '22px' }}>{memberName}</h1>
             <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: 'var(--family-muted)' }}>
-              {member.relation} · Comprehensive health overview and clinical activity.
+              <strong>{memberName} — {memberRelation}</strong> · Comprehensive health overview and clinical activity.
             </p>
           </div>
         </div>
+
+        {/* Member Profile Switcher Selector */}
+        {familyMembers.length > 1 && setMemberIndex && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--family-muted)', textTransform: 'uppercase' }}>
+              Switch:
+            </span>
+            <select
+              className="feature-input"
+              value={memberIndex}
+              onChange={(e) => {
+                const idx = parseInt(e.target.value, 10);
+                setMemberIndex(idx);
+                announce(`Viewing profile for ${familyMembers[idx]?.fullName || familyMembers[idx]?.name}`);
+              }}
+              style={{ padding: '6px 12px', fontSize: '13px', fontWeight: '600', minWidth: '180px' }}
+            >
+              {familyMembers.map((m, idx) => (
+                <option key={m.id || m.name} value={idx}>
+                  {m.fullName || m.name} — {m.relationship || m.relation}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
           <button

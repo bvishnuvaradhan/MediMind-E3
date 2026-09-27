@@ -139,15 +139,19 @@ export function AppointmentsView({
                         <div style={{ fontSize: '11.5px', color: 'var(--doctor-text-muted)' }}>{apt.purpose}</div>
                       </td>
                       <td>
-                        {prediction && onOpenAiExplain ? (
+                        {apt.type?.toLowerCase().includes('walk-in') || apt.type === 'Walk-in' ? (
+                          <span className="doctor-badge" style={{ fontSize: '11px', backgroundColor: '#f1f5f9', color: '#64748b', fontWeight: 600 }}>
+                            Walk-in (AI Not Required)
+                          </span>
+                        ) : prediction && onOpenAiExplain ? (
                           <button
                             type="button"
                             className="doctor-badge doctor-badge-completed"
-                            style={{ fontSize: '11px', cursor: 'pointer', border: 'none', textAlign: 'left' }}
+                            style={{ fontSize: '11px', cursor: 'pointer', border: 'none', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '4px' }}
                             onClick={() => onOpenAiExplain(prediction, apt.patientName)}
                             title="Click to view concise AI Pre-Screen summary"
                           >
-                            🔍 {apt.aiPreCheck || prediction.finding || 'Screened'}
+                            🔍 {apt.aiPreCheck || prediction.finding || 'AI Screened (Optimal)'}
                           </button>
                         ) : apt.aiPreCheck ? (
                           <span className="doctor-badge doctor-badge-completed" style={{ fontSize: '11px' }}>
@@ -167,7 +171,20 @@ export function AppointmentsView({
                       <td>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
                           {/* AI Actions: AI Pre-Screen + View Full AI Analysis */}
-                          {prediction && onOpenFullAiAnalysis ? (
+                          {apt.type?.toLowerCase().includes('walk-in') || apt.type === 'Walk-in' ? (
+                            <span
+                              style={{
+                                fontSize: '11px',
+                                padding: '4px 8px',
+                                color: 'var(--doctor-text-muted)',
+                                backgroundColor: 'var(--doctor-bg, #f8fafc)',
+                                borderRadius: '4px',
+                                border: '1px solid var(--doctor-border, #e2e8f0)',
+                              }}
+                            >
+                              Walk-in (No AI)
+                            </span>
+                          ) : prediction && onOpenFullAiAnalysis ? (
                             <button
                               type="button"
                               className="doctor-btn doctor-btn-sm doctor-btn-outline"

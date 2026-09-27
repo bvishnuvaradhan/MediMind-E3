@@ -165,14 +165,18 @@ export function PrescriptionsView({
               )}
 
               {/* Linked Corrections */}
-              {rx.corrections && rx.corrections.length > 0 && (
+              {rx.corrections && rx.corrections.length > 0 ? (
                 <div style={{ padding: '12px 14px', backgroundColor: 'var(--doctor-soft-coral)', borderRadius: '8px', borderLeft: '4px solid var(--doctor-coral)', fontSize: '12.5px' }}>
-                  <strong style={{ color: 'var(--doctor-coral)' }}>Linked Prescription Corrections:</strong>
-                  {rx.corrections.map((c) => (
-                    <div key={c.id} style={{ marginTop: '6px', color: 'var(--doctor-text-primary)' }}>
-                      <strong>{c.correctionNumber}</strong> ({c.date}) — <em>{c.reasonForCorrection}</em>
+                  <strong style={{ color: 'var(--doctor-coral)' }}>Linked Prescription Corrections ({rx.corrections.length}):</strong>
+                  {rx.corrections.map((c, cIdx) => (
+                    <div key={c.id || cIdx} style={{ marginTop: '6px', color: 'var(--doctor-text-primary)' }}>
+                      <strong>{c.correctionNumber || c.previousRxNumber || `Correction #${cIdx + 1}`}</strong> ({c.date || c.correctedAt || rx.date}) — <em>{c.reasonForCorrection || c.reason || 'Clinical and dosage adjustment'}</em>{c.correctedBy ? ` by ${c.correctedBy}` : ''}
                     </div>
                   ))}
+                </div>
+              ) : (
+                <div style={{ fontSize: '12px', color: 'var(--doctor-text-muted)', fontStyle: 'italic' }}>
+                  No linked corrections (Original immutable prescription)
                 </div>
               )}
 

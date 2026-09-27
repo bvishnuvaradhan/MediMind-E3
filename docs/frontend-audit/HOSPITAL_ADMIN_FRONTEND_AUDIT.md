@@ -36,9 +36,10 @@
    - Rajesh Kumar (`ADM-001`) manages only MediMind Central Hospital (`HOSP-001`). Cannot view or alter St. Jude (`HOSP-002`) or Apex Institute (`HOSP-003`) data.
    - Hospital 2 (`HOSP-002`) correctly supports 3 AI modules (`ai_fracture`, `ai_cardio`, `ai_diabetes`) excluding `ai_general`.
    - Hospital 1 (`HOSP-001`) and Hospital 3 (`HOSP-003`) support all 4 AI modules.
-2. **Zero Clinical Patient Access**:
-   - Hospital Admin manages facility infrastructure, departments, staff, and aggregate analytics. Has NO access to private patient clinical encounter notes, prescriptions, or individual medical images.
-3. **Dashboard Max-3 Collection Rule**:
+3. **Dynamic Operational & Department Analytics**:
+   - `HospitalAnalyticsView` supports interactive period filters (`Current Month`, `Last Month`, `Q3`, `YTD`) that recompute KPI cards, weekly volume lines, and modality donut distributions in real time.
+   - `DepartmentAnalyticsView` features a clean department selector dropdown to dynamically benchmark department-level throughput, caseload distribution, and completion rates without clutter.
+4. **Dashboard Max-3 Collection Rule**:
    - Departments list displays max 3 items with `"View all departments"` header trigger.
    - Staff roster overview displays max 3 items with `"View all staff"` trigger.
    - Recent compliance reports display max 3 items with `"View all reports"` footer trigger.

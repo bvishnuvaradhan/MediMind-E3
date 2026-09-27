@@ -25,8 +25,9 @@ export function MedicalRecordsView({
   // 1. Filter by Member
   const memberFilteredRecords = records.filter((record) => {
     if (selectedMemberFilter === 'All') return true;
-    if (!record.patient) return true;
-    return record.patient.toLowerCase() === selectedMemberFilter.toLowerCase();
+    const patient = (record.patient || record.patientName || '').toLowerCase();
+    const target = selectedMemberFilter.toLowerCase();
+    return patient === target || patient.includes(target) || target.includes(patient);
   });
 
   // 2. Filter by Category
@@ -77,16 +78,19 @@ export function MedicalRecordsView({
                 setSelectedMemberFilter(e.target.value);
                 announce(e.target.value === 'All' ? 'Viewing records for all family members.' : `Filtered records for ${e.target.value}.`);
               }}
-              style={{ padding: '6px 12px', fontSize: '13px', minWidth: '180px', fontWeight: '600' }}
+              style={{ padding: '6px 12px', fontSize: '13px', minWidth: '200px', fontWeight: '600' }}
             >
               <option value="All">All Family Members ({records.length})</option>
               {familyMembers.map((m) => {
-                const count = records.filter(
-                  (r) => !r.patient || r.patient.toLowerCase() === m.name.toLowerCase()
-                ).length;
+                const mName = m.fullName || m.name;
+                const mRel = m.relationship || m.relation || 'Member';
+                const count = records.filter((r) => {
+                  const patient = (r.patient || r.patientName || '').toLowerCase();
+                  return patient.includes(m.name.toLowerCase()) || (m.fullName && patient.includes(m.fullName.toLowerCase()));
+                }).length;
                 return (
-                  <option key={m.name} value={m.name}>
-                    {m.name} ({m.relation}) — {count} record{count !== 1 ? 's' : ''}
+                  <option key={m.id || m.name} value={m.name}>
+                    {mName} — {mRel} ({count} doc{count !== 1 ? 's' : ''})
                   </option>
                 );
               })}

@@ -407,6 +407,9 @@ export function FamilyLayout({ dark, setDark }) {
       return (
         <MemberProfileView
           member={member}
+          familyMembers={familyMembers}
+          memberIndex={memberIndex}
+          setMemberIndex={handleSelectMemberIndex}
           records={records}
           navigate={navigate}
           announce={announce}
@@ -447,6 +450,7 @@ export function FamilyLayout({ dark, setDark }) {
       return (
         <AiPredictionsView
           member={member}
+          familyMembers={familyMembers}
           records={records}
           predictionHistory={predictionHistory}
           navigate={navigate}
@@ -493,6 +497,8 @@ export function FamilyLayout({ dark, setDark }) {
           setAppointmentStatuses={setAppointmentStatuses}
           onCancelAppointment={handleCancelAppointment}
           onRescheduleAppointment={handleRescheduleAppointment}
+          familyMembers={familyMembers}
+          activeMember={member}
           setReturnTo={setReturnTo}
           navigate={navigate}
           announce={announce}
@@ -503,6 +509,8 @@ export function FamilyLayout({ dark, setDark }) {
     if (page === 'Consultations') {
       return (
         <ConsultationsView
+          familyMembers={familyMembers}
+          activeMember={member}
           openFeatureModal={openFeatureModal}
           announce={announce}
         />
@@ -511,6 +519,8 @@ export function FamilyLayout({ dark, setDark }) {
     if (page === 'Prescriptions') {
       return (
         <PrescriptionsView
+          familyMembers={familyMembers}
+          activeMember={member}
           openFeatureModal={openFeatureModal}
           announce={announce}
         />

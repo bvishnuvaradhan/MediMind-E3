@@ -40,7 +40,9 @@
 3. **Multi-Model AI Radar Analytics**:
    - Features all 4 AI pipelines: Fracture Detection (`ai_fracture`), Diabetes Risk (`ai_diabetes`), Heart Disease Risk (`ai_cardio`), General Health Assessment (`ai_general`).
    - Radar chart supports Unified Overlay and 4-Panel Grid modes without overlap confusion. Latency displayed separately in dedicated millisecond bar chart.
-4. **Zero Individual Clinical Patient Records**:
+4. **Appointments Governance & Telemetry Visualizations**:
+   - The platform appointments view features live interactive SVG charts: a 5-month historical volume `LineChart`, a department throughput `BarChart`, a modality distribution `DonutChart`, and KPI stat cards alongside the comprehensive transaction ledger.
+5. **Zero Individual Clinical Patient Records**:
    - Chairman has complete macro-level network and workforce visibility. Cannot access private patient clinical documents, encounter notes, or prescriptions.
 
 ---

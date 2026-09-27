@@ -39,8 +39,10 @@
    - Attempting to view a revoked patient (`Aarav Kapoor`, `acc_010`) displays an explicit Access Restricted warning screen.
 3. **Consultation & Prescription Lifecycles**:
    - Consultations support `DRAFT` $\rightarrow$ `FINAL` $\rightarrow$ `AMENDED` with tracked amendment reason and timestamps.
-   - Prescriptions support `DRAFT` $\rightarrow$ `FINAL` $\rightarrow$ `CORRECTED` with structured medications and dosage frequencies.
-4. **AI Explainability & Diagnostics**:
+   - Prescriptions support `DRAFT` $\rightarrow$ `FINAL` $\rightarrow$ `CORRECTED` with structured medications, dosage frequencies, and visible audit chains displaying previous prescription number, correction reason, and clinician identity.
+4. **Appointment Modality & AI Triage Badging**:
+   - Distinct badges clearly identify appointments requiring AI Pre-Screening (`AI Pre-Screened` with quick view modal) versus direct walk-in encounters (`Walk-in (AI Not Required)`).
+5. **AI Explainability & Diagnostics**:
    - Covers all 4 pipelines: Fracture Detection (`ai_fracture`), Diabetes Risk (`ai_diabetes`), Heart Disease Risk (`ai_cardio`), General Health Assessment (`ai_general`).
    - Grad-CAM heatmap overlays on actual radiographs (`rec_002` right knee) with region highlighting and confidence telemetry.
 

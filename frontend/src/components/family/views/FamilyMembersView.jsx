@@ -47,49 +47,53 @@ export function FamilyMembersView({
 
       <div className="feature-panel">
         <div className="feature-list">
-          {familyMembers.map((item, index) => (
-            <article className="feature-card" key={`${item.name}-${index}`}>
-              <div className={`avatar avatar-${item.tone}`}>{item.initials}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <h3 style={{ margin: '0 0 2px 0' }}>{item.name}</h3>
-                <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--family-muted)' }}>
-                  {item.relation} · {item.records || 0} records · {item.predictions || 0} predictions · Age {item.age || 'N/A'}
-                </p>
-              </div>
+          {familyMembers.map((item, index) => {
+            const displayName = item.fullName || item.name;
+            const relationship = item.relationship || item.relation || 'Family member';
+            return (
+              <article className="feature-card" key={`${item.id || item.name}-${index}`}>
+                <div className={`avatar avatar-${item.tone}`}>{item.initials}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h3 style={{ margin: '0 0 2px 0' }}>{displayName}</h3>
+                  <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--family-muted)' }}>
+                    <strong>{displayName} — {relationship}</strong> · {item.records || 0} records · {item.predictions || 0} predictions · Age {item.age || 'N/A'}
+                  </p>
+                </div>
 
-              {/* Action buttons aligned right */}
-              <div className="feature-actions" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <button
-                  className="text-button"
-                  onClick={() => {
-                    setMemberIndex(index);
-                    navigate('Member profile');
-                    announce(`Opening ${item.name}'s profile.`);
-                  }}
-                >
-                  View profile <ArrowUpRight size={14} />
-                </button>
-                <button
-                  type="button"
-                  className="delete-member-button"
-                  onClick={() => confirmDelete(index, item)}
-                  aria-label={`Delete ${item.name}`}
-                  title={`Delete ${item.name}`}
-                  style={{
-                    color: '#dc2626',
-                    padding: '6px 8px',
-                    borderRadius: '6px',
-                    border: '1px solid transparent',
-                    display: 'grid',
-                    placeItems: 'center',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </article>
-          ))}
+                {/* Action buttons aligned right */}
+                <div className="feature-actions" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    className="text-button"
+                    onClick={() => {
+                      setMemberIndex(index);
+                      navigate('Member profile');
+                      announce(`Opening ${displayName}'s profile.`);
+                    }}
+                  >
+                    View profile <ArrowUpRight size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    className="delete-member-button"
+                    onClick={() => confirmDelete(index, item)}
+                    aria-label={`Delete ${displayName}`}
+                    title={`Delete ${displayName}`}
+                    style={{
+                      color: '#dc2626',
+                      padding: '6px 8px',
+                      borderRadius: '6px',
+                      border: '1px solid transparent',
+                      display: 'grid',
+                      placeItems: 'center',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
 
         {/* Add Member Modal */}
