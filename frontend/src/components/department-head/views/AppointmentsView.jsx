@@ -135,9 +135,15 @@ export function AppointmentsView({
                         <span className="dh-badge dh-badge-draft">{apt.type}</span>
                       </td>
                       <td>
-                        <span className="dh-badge dh-badge-completed" style={{ fontSize: '11px' }}>
-                          {apt.aiScreening || (apt.aiTriaged ? 'AI Triage Complete' : 'Manual Triage')}
-                        </span>
+                        {apt.isWalkIn || apt.type === 'Walk-in' ? (
+                          <span className="dh-badge dh-badge-draft" style={{ fontSize: '11px' }}>
+                            Walk-in (AI Not Required)
+                          </span>
+                        ) : (
+                          <span className="dh-badge dh-badge-completed" style={{ fontSize: '11px' }}>
+                            {apt.aiPreScreen || apt.aiScreening || 'Screened (Low Risk, 94.8%)'}
+                          </span>
+                        )}
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         <span className={`dh-badge dh-badge-${statusClass}`}>

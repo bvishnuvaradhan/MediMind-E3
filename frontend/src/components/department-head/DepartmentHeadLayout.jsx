@@ -189,6 +189,16 @@ export function DepartmentHeadLayout({ dark, setDark }) {
     showToast(`Published guideline: "${newArt.title}"`);
   };
 
+  const handleReviewArticle = async (articleId, reviewDecision) => {
+    const updated = await departmentHeadService.reviewArticle(articleId, reviewDecision);
+    setArticles((prev) => prev.map((a) => (a.id === articleId ? updated : a)));
+    if (reviewDecision.decision === 'Approve' || reviewDecision.decision === 'Published') {
+      showToast(`Guideline "${updated.title}" approved and published.`);
+    } else {
+      showToast(`Revision feedback submitted for "${updated.title}".`);
+    }
+  };
+
   const handleSaveProfile = async (profileData) => {
     const updated = await departmentHeadService.updateProfile(profileData);
     setProfile(updated);
@@ -572,7 +582,9 @@ export function DepartmentHeadLayout({ dark, setDark }) {
           {activeTab === 'knowledge' && (
             <KnowledgeView
               articles={articles}
+              profile={profile}
               onOpenCreateArticle={() => setIsCreateArticleOpen(true)}
+              onReviewArticle={handleReviewArticle}
             />
           )}
 

@@ -171,9 +171,12 @@ export const departmentHeadService = {
     return [...performanceState];
   },
 
-  // --- Knowledge Articles ---
+  // --- Knowledge Articles & Reviewer ---
   async getArticles(filters = {}) {
     let list = [...articlesState];
+    if (filters.status && filters.status !== 'All') {
+      list = list.filter((a) => a.status === filters.status);
+    }
     if (filters.category && filters.category !== 'All') {
       list = list.filter((a) => a.category === filters.category);
     }
@@ -182,7 +185,9 @@ export const departmentHeadService = {
       list = list.filter(
         (a) =>
           a.title.toLowerCase().includes(q) ||
-          a.summary.toLowerCase().includes(q) ||
+          (a.summary && a.summary.toLowerCase().includes(q)) ||
+          (a.author && a.author.toLowerCase().includes(q)) ||
+          (a.category && a.category.toLowerCase().includes(q)) ||
           (a.tags && a.tags.some((t) => t.toLowerCase().includes(q)))
       );
     }
@@ -190,17 +195,62 @@ export const departmentHeadService = {
   },
 
   async createArticle(articleData) {
+    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const isPublished = articleData.status === 'Published';
     const newArticle = {
       id: `art_dept_${Date.now()}`,
       author: profileState.name,
-      role: `Head of ${profileState.departmentName}`,
-      publishedDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-      status: 'Published',
-      reads: 0,
+      authorId: profileState.id || 'DH-H1-ORTHO',
+      authorRole: profileState.title || profileState.role || 'Department Head',
+      department: profileState.departmentName || 'Orthopedics',
+      departmentId: profileState.departmentId || 'DEP-H1-ORTHO',
+      hospital: profileState.hospitalName || 'MediMind Central Hospital',
+      hospitalId: profileState.hospitalId || 'HOSP-001',
+      date: today,
+      createdDate: today,
+      publishedDate: isPublished ? today : null,
+      reviewedDate: isPublished ? today : null,
+      reviewerId: isPublished ? (profileState.id || 'DH-H1-ORTHO') : null,
+      reviewerName: isPublished ? (profileState.name || 'Dr. Priya Sharma') : null,
+      reviewerRole: isPublished ? (profileState.title || profileState.role || 'Head of Orthopedics & Musculoskeletal Sciences') : null,
+      status: articleData.status || 'Published',
+      views: 0,
+      citations: 0,
       ...articleData,
     };
     articlesState = [newArticle, ...articlesState];
     return newArticle;
+  },
+
+  async reviewArticle(articleId, { decision, feedback = '' }) {
+    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    articlesState = articlesState.map((art) => {
+      if (art.id === articleId) {
+        if (decision === 'Approve' || decision === 'Published') {
+          return {
+            ...art,
+            status: 'Published',
+            publishedDate: today,
+            reviewedDate: today,
+            reviewerId: profileState.id || 'DH-H1-ORTHO',
+            reviewerName: profileState.name || 'Dr. Priya Sharma',
+            reviewerRole: profileState.title || profileState.role || 'Head of Orthopedics & Musculoskeletal Sciences',
+          };
+        } else if (decision === 'Changes Requested') {
+          return {
+            ...art,
+            status: 'Changes Requested',
+            reviewedDate: today,
+            reviewerFeedback: feedback || 'Please update the clinical citations and revise protocol steps before resubmission.',
+            reviewerId: profileState.id || 'DH-H1-ORTHO',
+            reviewerName: profileState.name || 'Dr. Priya Sharma',
+            reviewerRole: profileState.title || profileState.role || 'Head of Orthopedics & Musculoskeletal Sciences',
+          };
+        }
+      }
+      return art;
+    });
+    return articlesState.find((a) => a.id === articleId);
   },
 
   // --- Settings ---

@@ -7040,7 +7040,7 @@ export const initialDoctorPerformance = doctors
     onTimeRate: '96%',
   }));
 
-export const initialDepartmentArticles = knowledgeArticles.filter(a => a.department === 'Orthopedics');
+export const initialDepartmentArticles = knowledgeArticles.filter(a => a.departmentId === 'DEP-H1-ORTHO' || (a.hospitalId === 'HOSP-001' && a.department === 'Orthopedics'));
 export const initialDepartmentSettings = {
   allowDirectFamilyBooking: true,
   aiAutoPreCheck: true,
