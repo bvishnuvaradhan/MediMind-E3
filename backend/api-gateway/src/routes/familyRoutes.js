@@ -6,7 +6,11 @@ import { forwardRequest } from '../utils/proxy.js';
 const router = Router();
 const proxyFamily = forwardRequest(serviceUrls.family);
 
-// All family routes require authentication (except future registration if needed)
+// Public routes
+router.post('/', proxyFamily);
+router.get('/health', proxyFamily);
+
+// Protected routes (require JWT)
 router.use(verifyJwt, proxyFamily);
 
 export default router;

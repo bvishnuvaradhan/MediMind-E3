@@ -1,6 +1,6 @@
-# MediMind — Backend Foundation (Phase 1: API Gateway + Auth Service)
+# MediMind — Backend Architecture & Services
 
-This document covers the **API Gateway** and **Auth Service** implementation in accordance with the specifications in `Documents/Backend/`.
+This document covers the **API Gateway**, **Auth Service** (Phase 1), and **Family Service** (Phase 2) implementations in accordance with the locked specifications in `Documents/Backend/`.
 
 ---
 
@@ -15,20 +15,17 @@ React Client (Frontend)
 │   API Gateway    │  Port 5000
 └────────┬─────────┘
          │
-         │ Internal HTTP + Trusted Headers + Correlation ID
-         ▼
-┌──────────────────┐
-│   Auth Service   │  Port 5001
-└────────┬─────────┘
+         ├─── Internal HTTP + Trusted Headers + Correlation ID ───► Auth Service   (Port 5001) ──► MongoDB (`medimind_auth`)
+         │                                                                                            └── `users`
          │
-         ▼
-  MongoDB Atlas (`medimind_auth`)
-    └── `users` collection
+         └─── Internal HTTP + Trusted Headers + Correlation ID ───► Family Service (Port 5002) ──► MongoDB (`medimind_family`)
+                                                                                                      ├── `families`
+                                                                                                      └── `family_members`
 ```
 
 - **API Gateway:** `http://localhost:5000`
-- **Auth Service:** `http://localhost:5001`
-- **Database:** `mongodb://127.0.0.1:27017/medimind_auth`
+- **Auth Service:** `http://localhost:5001` (`medimind_auth`)
+- **Family Service:** `http://localhost:5002` (`medimind_family`)
 
 ---
 
@@ -59,37 +56,67 @@ backend/
 │   │   └── app.js
 │   ├── tests/
 │   │   └── gateway.test.js
-│   ├── .env
 │   ├── .env.example
 │   ├── .gitignore
 │   ├── package.json
 │   └── server.js
 │
-└── auth-service/
+├── auth-service/
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── db.js
+│   │   ├── controllers/
+│   │   │   └── authController.js
+│   │   ├── middleware/
+│   │   │   ├── authMiddleware.js
+│   │   │   └── errorMiddleware.js
+│   │   ├── models/
+│   │   │   └── User.js
+│   │   ├── routes/
+│   │   │   └── authRoutes.js
+│   │   ├── services/
+│   │   │   └── authService.js
+│   │   ├── utils/
+│   │   │   ├── jwt.js
+│   │   │   └── password.js
+│   │   └── app.js
+│   ├── tests/
+│   │   └── auth.test.js
+│   ├── scripts/
+│   │   └── verify-phase1.mjs
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── package.json
+│   └── server.js
+│
+└── family-service/
     ├── src/
     │   ├── config/
     │   │   └── db.js
     │   ├── controllers/
-    │   │   └── authController.js
+    │   │   ├── familyController.js
+    │   │   └── familyMemberController.js
     │   ├── middleware/
     │   │   ├── authMiddleware.js
     │   │   └── errorMiddleware.js
     │   ├── models/
-    │   │   └── User.js
+    │   │   ├── Family.js
+    │   │   └── FamilyMember.js
     │   ├── routes/
-    │   │   └── authRoutes.js
+    │   │   ├── familyRoutes.js
+    │   │   └── familyMemberRoutes.js
     │   ├── services/
-    │   │   └── authService.js
+    │   │   ├── familyService.js
+    │   │   └── familyMemberService.js
     │   ├── utils/
-    │   │   ├── jwt.js
-    │   │   └── password.js
+    │   │   └── responseEnvelope.js
     │   └── app.js
     ├── tests/
-    │   └── auth.test.js
+    │   ├── family.test.js
+    │   └── familyMember.test.js
     ├── scripts/
-    │   └── verify-phase1.mjs
-    ├── .env
-    │── .env.example
+    │   └── verify-phase2.mjs
+    ├── .env.example
     ├── .gitignore
     ├── package.json
     └── server.js
@@ -99,7 +126,7 @@ backend/
 
 ## 3. Environment Variables
 
-### 3.1 API Gateway (`backend/api-gateway/.env`)
+### 3.1 API Gateway (`backend/api-gateway/.env.example`)
 ```env
 PORT=5000
 NODE_ENV=development
@@ -117,7 +144,7 @@ AI_SERVICE_URL=http://localhost:5007
 KNOWLEDGE_SERVICE_URL=http://localhost:5008
 ```
 
-### 3.2 Auth Service (`backend/auth-service/.env`)
+### 3.2 Auth Service (`backend/auth-service/.env.example`)
 ```env
 PORT=5001
 NODE_ENV=development
@@ -128,83 +155,80 @@ INTERNAL_SERVICE_SECRET=medimind_internal_service_secret_2026
 CORS_ORIGIN=http://localhost:5173,http://localhost:5000
 ```
 
+### 3.3 Family Service (`backend/family-service/.env.example`)
+```env
+PORT=5002
+NODE_ENV=development
+MONGO_URI=mongodb://127.0.0.1:27017/medimind_family
+JWT_SECRET=medimind_jwt_secret_development_key_change_in_production
+INTERNAL_SERVICE_SECRET=medimind_internal_service_secret_2026
+CORS_ORIGIN=http://localhost:5173,http://localhost:5000
+```
+
 ---
 
-## 4. Authentication, Security & Routing Flows
+## 4. Family Service API Contracts & Scoping Rules
 
-### 4.1 Login Flow
-1. Client sends `POST /api/auth/login` with `{ email, password }` to API Gateway.
-2. Gateway applies rate limiting (`authRateLimiter`) and forwards request to Auth Service.
-3. Auth Service finds user in `medimind_auth.users`, verifies password hash via `bcryptjs`, and checks `status === 'ACTIVE'`.
-4. Auth Service generates a signed JWT containing `{ userId, role, referenceId }`.
-5. Client receives standard envelope:
-   ```json
-   {
-     "success": true,
-     "message": "Login successful",
-     "data": {
-       "token": "<JWT_TOKEN>",
-       "user": {
-         "userId": "...",
-         "email": "...",
-         "role": "DOCTOR",
-         "accountType": "DOCTOR_ACCOUNT",
-         "referenceId": "..."
-       }
-     }
-   }
-   ```
+### 4.1 Endpoints
+| Method | Path | Auth Required | Role | Description |
+|---|---|---|---|---|
+| `POST` | `/api/families` | No (Public) | — | Create new family account |
+| `GET` | `/api/families/me` | Yes (JWT) | `FAMILY` | Get authenticated family profile |
+| `PUT` | `/api/families/me` | Yes (JWT) | `FAMILY` | Update authenticated family profile (creator only) |
+| `POST` | `/api/families/members` | Yes (JWT) | `FAMILY` | Add new family member |
+| `GET` | `/api/families/members` | Yes (JWT) | `FAMILY` | List active members of caller family |
+| `GET` | `/api/families/members/:memberId` | Yes (JWT) | `FAMILY` | Get single member by ID (scoped to caller family) |
+| `PUT` | `/api/families/members/:memberId` | Yes (JWT) | `FAMILY` | Update single member by ID (scoped to caller family) |
+| `DELETE` | `/api/families/members/:memberId` | Yes (JWT) | `FAMILY` | Soft-delete member (creator only) |
+| `GET` | `/health` | No | — | Service health check |
 
-### 4.2 Protected Routing & Anti-Spoofing
-1. For protected routes (`/me`, `/change-password`, or any domain microservice), client sends `Authorization: Bearer <token>`.
-2. Gateway verifies token validity using `JWT_SECRET`. If missing/expired/invalid, Gateway immediately rejects with 401.
-3. Anti-Spoofing Sanitization: Gateway removes any client-supplied `x-user-id`, `x-user-role`, `x-user-reference-id`, or `x-internal-service-secret`.
-4. Trusted Identity Injection: Gateway extracts decoded claims and injects verified trusted headers:
-   - `x-user-id`: `decoded.userId`
-   - `x-user-role`: `decoded.role`
-   - `x-user-reference-id`: `decoded.referenceId`
-   - `x-internal-service-secret`: shared secret between Gateway and services
-   - `x-request-id`: generated or preserved correlation ID
-5. Downstream microservice receives verified headers directly from Gateway.
+### 4.2 Security & Scoping Invariants
+1. **Family Isolation**: A family user can only view, update, and manage members belonging to their own `family_id`. Attempting to access another family's member ID returns `403 Forbidden`.
+2. **Creator-Only Operations**: Updating the family account profile and soft-deleting members is restricted to the family creator (`creator_user_id === req.user.userId`).
+3. **Soft Deletion**: `DELETE /api/families/members/:memberId` marks the member status as `REMOVED` and populates `deleted_at`. Active member listings exclude removed members.
+4. **Anti-Spoofing**: Identity headers (`x-user-id`, `x-user-role`, `x-user-reference-id`) passed across the Gateway are stripped from the external client and reconstructed from verified JWT claims.
 
 ---
 
 ## 5. Execution & Testing Instructions
 
-### 5.1 Starting Auth Service
+### 5.1 Starting Microservices
 ```bash
-cd backend/auth-service
-npm install
-npm start
-```
-Auth Service starts on port 5001. Health check: `GET http://localhost:5001/health`.
+# 1. Start Auth Service (Port 5001)
+cd backend/auth-service && npm start
 
-### 5.2 Starting API Gateway
-```bash
-cd backend/api-gateway
-npm install
-npm start
-```
-API Gateway starts on port 5000. Health check: `GET http://localhost:5000/health`.
+# 2. Start Family Service (Port 5002)
+cd backend/family-service && npm start
 
-### 5.3 Running Automated Tests
-- **Auth Service Unit & Integration Tests:**
+# 3. Start API Gateway (Port 5000)
+cd backend/api-gateway && npm start
+```
+
+### 5.2 Running Automated Test Suites
+- **Auth Service Tests (23 tests):**
   ```bash
   cd backend/auth-service
   npm test
   ```
-  Executes 23 tests covering password utilities, JWT generation/validation, user models for all 5 roles, login/logout, password changing, and error conditions.
-
-- **API Gateway Tests:**
+- **API Gateway Tests (13 tests):**
   ```bash
   cd backend/api-gateway
   npm test
   ```
-  Executes 13 tests covering public/protected routing, JWT verification, token forwarding, anti-spoofing header protection, internal service authentication, role middleware, and 503/404 error handling.
+- **Family Service Tests (22 tests):**
+  ```bash
+  cd backend/family-service
+  npm test
+  ```
 
-- **End-to-End Live Integration Check:**
+### 5.3 Running Live Integration Verification
+- **Phase 1 Verification (Gateway + Auth Service):**
   ```bash
   cd backend/auth-service
   node scripts/verify-phase1.mjs
   ```
-  Spins up live Gateway and Auth Service instances connected to MongoDB, executes complete authentication, token verification, anti-spoofing, and logout journeys.
+- **Phase 2 Verification (Gateway + Auth Service + Family Service):**
+  ```bash
+  cd backend/family-service
+  node scripts/verify-phase2.mjs
+  ```
