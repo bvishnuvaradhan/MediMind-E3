@@ -1,15 +1,13 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
+import '../load-env.js';
 import app from './src/app.js';
 import { connectDB } from './src/config/db.js';
 
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.PORT || process.env.FAMILY_SERVICE_PORT || 5002;
 
 const startServer = async () => {
   try {
     await connectDB();
-    console.log(`[family-service] Connected to MongoDB database: medimind_family`);
+    console.log(`[family-service] Connected to MongoDB database: ${process.env.FAMILY_DB_NAME || 'medimind_family'}`);
 
     const server = app.listen(PORT, () => {
       console.log(`[family-service] Running on port ${PORT}`);

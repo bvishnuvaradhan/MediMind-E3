@@ -1,10 +1,12 @@
+import '../../load-env.js';
 import mongoose from 'mongoose';
 import authApp from '../src/app.js';
 import gatewayApp from '../../api-gateway/src/app.js';
 import User from '../src/models/User.js';
 import { hashPassword } from '../src/utils/password.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/medimind_auth';
+const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017';
+const DB_NAME = process.env.AUTH_DB_NAME || 'medimind_auth';
 
 async function runLiveVerification() {
   console.log('================================================================');
@@ -13,8 +15,18 @@ async function runLiveVerification() {
 
   // 1. Connect to MongoDB
   console.log('\n1. Connecting to MongoDB...');
-  await mongoose.connect(MONGO_URI);
-  console.log('   Connected to', MONGO_URI);
+  try {
+    await mongoose.connect(MONGO_URI, { dbName: DB_NAME });
+    console.log('   Connected to database:', DB_NAME);
+  } catch (err) {
+    if (MONGO_URI.includes('mongodb+srv')) {
+      console.log('   (Atlas connection failed. Falling back to local MongoDB)');
+      await mongoose.connect(`mongodb://127.0.0.1:27017/${DB_NAME}`);
+      console.log('   Connected to local database:', DB_NAME);
+    } else {
+      throw err;
+    }
+  }
 
   // 2. Seed Test User
   console.log('\n2. Seeding Test User...');

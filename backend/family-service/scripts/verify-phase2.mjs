@@ -1,3 +1,4 @@
+import '../../load-env.js';
 import { spawn } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -112,8 +113,23 @@ async function runLiveVerification() {
     console.log('   Gateway Health:', gwHealth.data.status, '| Request ID:', gwHealth.data.requestId);
 
     // Direct DB connections for seeding auth accounts & teardown
-    authConn = await mongoose.createConnection('mongodb://127.0.0.1:27017/medimind_auth').asPromise();
-    familyConn = await mongoose.createConnection('mongodb://127.0.0.1:27017/medimind_family').asPromise();
+    const authDbName = process.env.AUTH_DB_NAME || 'medimind_auth';
+    const familyDbName = process.env.FAMILY_DB_NAME || 'medimind_family';
+    const mongoBase = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
+
+    const connectWithFallback = async (dbName) => {
+      try {
+        return await mongoose.createConnection(mongoBase, { dbName }).asPromise();
+      } catch (err) {
+        if (mongoBase.includes('mongodb+srv')) {
+          return await mongoose.createConnection(`mongodb://127.0.0.1:27017/${dbName}`).asPromise();
+        }
+        throw err;
+      }
+    };
+
+    authConn = await connectWithFallback(authDbName);
+    familyConn = await connectWithFallback(familyDbName);
 
     // 3. Register Family A via Gateway (Public POST /api/families)
     console.log('\n3. Registering Family A through Gateway (POST /api/families)...');

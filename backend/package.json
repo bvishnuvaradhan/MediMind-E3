@@ -1,0 +1,39 @@
+{
+  "name": "medimind-backend",
+  "version": "1.0.0",
+  "description": "MediMind Backend Microservices Workspace",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "api-gateway",
+    "auth-service",
+    "family-service"
+  ],
+  "scripts": {
+    "gateway": "node api-gateway/server.js",
+    "auth": "node auth-service/server.js",
+    "family": "node family-service/server.js",
+    "dev": "node scripts/start-dev.mjs",
+    "test": "npm run test:gateway && npm run test:auth && npm run test:family",
+    "test:gateway": "npm --prefix api-gateway test",
+    "test:auth": "npm --prefix auth-service test",
+    "test:family": "npm --prefix family-service test",
+    "verify:phase1": "node auth-service/scripts/verify-phase1.mjs",
+    "verify:phase2": "node family-service/scripts/verify-phase2.mjs",
+    "lint": "npx oxlint"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "http-proxy-middleware": "^3.0.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}

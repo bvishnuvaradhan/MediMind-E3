@@ -1,3 +1,4 @@
+import '../../load-env.js';
 import express from 'express';
 import cors from 'cors';
 import familyRoutes from './routes/familyRoutes.js';

@@ -1,15 +1,13 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
+import '../load-env.js';
 import app from './src/app.js';
 import { connectDB } from './src/config/db.js';
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || process.env.AUTH_SERVICE_PORT || 5001;
 
 const startServer = async () => {
   try {
     await connectDB();
-    console.log(`[auth-service] Connected to MongoDB at ${process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/medimind_auth'}`);
+    console.log(`[auth-service] Connected to MongoDB database: ${process.env.AUTH_DB_NAME || 'medimind_auth'}`);
 
     const server = app.listen(PORT, () => {
       console.log(`[auth-service] Running on port ${PORT}`);
