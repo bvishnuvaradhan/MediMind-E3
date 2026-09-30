@@ -624,7 +624,15 @@ export function FamilyLayout({ dark, setDark }) {
       />
 
       <aside className={`sidebar ${mobileMenuOpen ? 'open' : ''}`}>
-        <div className="brand">
+        <div
+          className="brand"
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate('Dashboard')}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') navigate('Dashboard');
+          }}
+        >
           <div className="brand-mark">
             <HeartPulse size={20} />
           </div>

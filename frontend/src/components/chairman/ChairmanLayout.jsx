@@ -182,7 +182,15 @@ export function ChairmanLayout({ dark, setDark }) {
 
       {/* Sidebar Navigation */}
       <aside className={`chairman-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
-        <div className="chairman-brand">
+        <div
+          className="chairman-brand"
+          role="button"
+          tabIndex={0}
+          onClick={() => navigateTo('Platform Dashboard')}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') navigateTo('Platform Dashboard');
+          }}
+        >
           <div className="chairman-brand-mark">
             <HeartPulse size={22} />
           </div>
