@@ -547,7 +547,15 @@ export function DoctorLayout({ dark, setDark }) {
 
       {/* Sidebar */}
       <aside className={`doctor-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
-        <div className="doctor-brand">
+        <div
+          className="doctor-brand"
+          role="button"
+          tabIndex={0}
+          onClick={() => handleNavigate('dashboard')}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') handleNavigate('dashboard');
+          }}
+        >
           <div className="doctor-brand-mark">
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />

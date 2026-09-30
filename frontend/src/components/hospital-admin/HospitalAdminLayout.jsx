@@ -546,7 +546,15 @@ export function HospitalAdminLayout({ dark, setDark }) {
       {/* Sidebar */}
       <aside className={`ha-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className="ha-brand">
+          <div
+            className="ha-brand"
+            role="button"
+            tabIndex={0}
+            onClick={() => navigate('Dashboard')}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') navigate('Dashboard');
+            }}
+          >
             <div className="ha-brand-mark">
               <HeartPulse size={20} />
             </div>

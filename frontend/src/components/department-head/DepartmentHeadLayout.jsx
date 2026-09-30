@@ -283,7 +283,15 @@ export function DepartmentHeadLayout({ dark, setDark }) {
 
       {/* Sidebar */}
       <aside className={`dh-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
-        <div className="dh-brand">
+        <div
+          className="dh-brand"
+          role="button"
+          tabIndex={0}
+          onClick={() => handleNavigate('dashboard')}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') handleNavigate('dashboard');
+          }}
+        >
           <div className="dh-brand-mark">
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
