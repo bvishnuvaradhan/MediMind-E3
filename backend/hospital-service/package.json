@@ -1,0 +1,12 @@
+{
+  "name": "medimind-hospital-service",
+  "version": "1.0.0",
+  "description": "MediMind Hospital & Department Management Microservice",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --experimental-vm-modules ../node_modules/jest/bin/jest.js --runInBand --detectOpenHandles"
+  }
+}

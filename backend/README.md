@@ -1,6 +1,6 @@
 # MediMind — Backend Architecture & Monorepo Workspace
 
-This document covers the **MediMind Backend Monorepo Workspace**, including the **API Gateway**, **Auth Service** (Phase 1), and **Family Service** (Phase 2), with global environment configuration, unified dependencies, and database segregation across microservices.
+This document covers the **MediMind Backend Monorepo Workspace**, including the **API Gateway**, **Auth Service** (Phase 1), **Family Service** (Phase 2), and **Hospital Service** (Phase 3), with global environment configuration, unified dependencies, and database segregation across microservices.
 
 Cumulative implementation status is tracked in [BACKEND_PROGRESS.md](./BACKEND_PROGRESS.md).
 
@@ -29,7 +29,7 @@ React Client (Frontend)
 - **API Gateway:** `http://localhost:5000`
 - **Auth Service:** `http://localhost:5001`
 - **Family Service:** `http://localhost:5002`
-- **Hospital Service:** `http://localhost:5003` *(Phase 3)*
+- **Hospital Service:** `http://localhost:5003`
 - **Doctor Service:** `http://localhost:5004` *(Phase 4)*
 - **Appointment Service:** `http://localhost:5005` *(Phase 5)*
 - **Medical Record Service:** `http://localhost:5006` *(Phase 6)*
@@ -76,8 +76,14 @@ backend/
 │   │   └── verify-phase2.mjs  # Live verification script for Gateway + Auth + Family
 │   ├── jest.config.js
 │   ├── package.json
+├── hospital-service/          # Hospital & Department Management microservice (Port 5003)
+│   ├── src/
+│   ├── tests/
+│   ├── scripts/
+│   │   └── verify-phase3.mjs  # Live verification script for Gateway + Auth + Hospital
+│   ├── jest.config.js
+│   ├── package.json
 │   └── server.js
-├── hospital-service/          # Hospital Service placeholder (Phase 3)
 ├── doctor-service/            # Doctor Service placeholder (Phase 4)
 ├── appointment-service/       # Appointment Service placeholder (Phase 5)
 ├── medical-record-service/    # Medical Record Service placeholder (Phase 6)

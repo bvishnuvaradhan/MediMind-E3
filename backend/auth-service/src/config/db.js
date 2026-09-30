@@ -3,13 +3,14 @@ import mongoose from 'mongoose';
 export const connectDB = async (uri) => {
   const baseUri = uri || process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017';
   const dbName = process.env.AUTH_DB_NAME || 'medimind_auth';
+  const timeoutMs = parseInt(process.env.MONGO_TIMEOUT_MS || '2500', 10);
   try {
-    const conn = await mongoose.connect(baseUri, { dbName });
+    const conn = await mongoose.connect(baseUri, { dbName, serverSelectionTimeoutMS: timeoutMs });
     return conn;
   } catch (error) {
-    if (baseUri.includes('mongodb+srv') && (error.code === 8000 || error.message.includes('auth') || error.message.includes('querySrv') || error.message.includes('ETIMEDOUT'))) {
-      console.warn(`[auth-service] Remote Atlas connection failed. Falling back to local MongoDB at mongodb://127.0.0.1:27017/${dbName}`);
-      const fallbackConn = await mongoose.connect(`mongodb://127.0.0.1:27017/${dbName}`);
+    if (baseUri.includes('mongodb+srv') || baseUri.includes('@')) {
+      console.warn(`[auth-service] Remote Atlas connection failed (${error.name}). Falling back to local MongoDB at mongodb://127.0.0.1:27017/${dbName}`);
+      const fallbackConn = await mongoose.connect(`mongodb://127.0.0.1:27017/${dbName}`, { serverSelectionTimeoutMS: 5000 });
       return fallbackConn;
     }
     console.error(`[auth-service] MongoDB Connection Error: ${error.message}`);

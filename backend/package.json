@@ -7,19 +7,23 @@
   "workspaces": [
     "api-gateway",
     "auth-service",
-    "family-service"
+    "family-service",
+    "hospital-service"
   ],
   "scripts": {
     "gateway": "node api-gateway/server.js",
     "auth": "node auth-service/server.js",
     "family": "node family-service/server.js",
+    "hospital": "node hospital-service/server.js",
     "dev": "node scripts/start-dev.mjs",
-    "test": "npm run test:gateway && npm run test:auth && npm run test:family",
+    "test": "npm run test:gateway && npm run test:auth && npm run test:family && npm run test:hospital",
     "test:gateway": "npm --prefix api-gateway test",
     "test:auth": "npm --prefix auth-service test",
     "test:family": "npm --prefix family-service test",
+    "test:hospital": "npm --prefix hospital-service test",
     "verify:phase1": "node auth-service/scripts/verify-phase1.mjs",
     "verify:phase2": "node family-service/scripts/verify-phase2.mjs",
+    "verify:phase3": "node hospital-service/scripts/verify-phase3.mjs",
     "lint": "npx oxlint"
   },
   "dependencies": {

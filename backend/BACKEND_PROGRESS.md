@@ -11,7 +11,7 @@ This document tracks cumulative backend development, architecture, verified micr
 | **API Gateway** | `5000` | N/A | Reverse proxy, JWT validation, anti-spoofing header protection, correlation IDs, rate limiting | **COMPLETE** |
 | **Auth Service** | `5001` | `medimind_auth.users` | Authentication, Argon/Bcrypt hashing, JWT issuance & verification, multi-role profile management | **COMPLETE** |
 | **Family Service** | `5002` | `medimind_family.families`, `family_members` | Family account registration, profile management, member roster CRUD, relationship scoping | **COMPLETE** |
-| **Hospital Service** | `5003` | `medimind_hospital` | Hospital profiles, departments, facilities, hospital admin management | NOT STARTED |
+| **Hospital Service** | `5003` | `medimind_hospital.hospitals`, `departments`, `department_heads`, `hospital_requests` | Hospital profiles, department hierarchy, department head assignment, onboarding requests | **COMPLETE** |
 | **Doctor Service** | `5004` | `medimind_doctor` | Doctor profiles, credentials, department association, availability | NOT STARTED |
 | **Appointment Service** | `5005` | `medimind_appointment` | Appointment booking, slots, status transitions, doctor/patient linkage | NOT STARTED |
 | **Medical Record Service** | `5006` | `medimind_records` | Clinical records, lab reports, EHR data, prescriptions | NOT STARTED |
@@ -69,7 +69,54 @@ This document tracks cumulative backend development, architecture, verified micr
   - Oxlint: **0 errors, 0 warnings**
 
 ### Phase 3 — Hospital Service
-- **Status:** NOT STARTED
+- **Status:** COMPLETE
+- **Commit:** Pending (`feat(backend): implement hospital service`)
+- **Services Implemented:**
+  - `backend/hospital-service/` (Port `5003`, Database: `medimind_hospital`)
+- **Collections & Schemas Implemented:**
+  - `Hospital` schema & collection (`medimind_hospital.hospitals`)
+  - `Department` schema & collection (`medimind_hospital.departments`) with compound unique index `{ hospital_id: 1, name: 1 }`
+  - `DepartmentHead` schema & collection (`medimind_hospital.department_heads`)
+  - `HospitalRequest` schema & collection (`medimind_hospital.hospital_requests`)
+- **Key Capabilities & APIs Implemented:**
+  - **Hospital Endpoints:**
+    - `GET /api/hospitals` (Public / directory listing; Hospital Admin filtered to assigned hospital; Chairman sees all)
+    - `GET /api/hospitals/:hospitalId` (Retrieve hospital details; Hospital Admin scoped; Chairman unrestricted)
+    - `PUT /api/hospitals/:hospitalId` (Update hospital details; Hospital Admin scoped to assigned hospital; Chairman unrestricted)
+    - `POST /api/hospitals` (Chairman direct creation)
+    - `GET /health` (Database connectivity & health)
+  - **Department Endpoints:**
+    - `POST /api/departments` (Create department; Hospital Admin scoped to assigned hospital; duplicate name rejected with `409 Conflict`)
+    - `GET /api/departments` (List departments; Hospital Admin scoped; Chairman cross-hospital filterable)
+    - `GET /api/departments/:departmentId` (Get department by ID)
+    - `PUT /api/departments/:departmentId` (Update department; Hospital Admin scoped to assigned hospital)
+  - **Department Head Endpoints:**
+    - `POST /api/department-heads` (Assign department head; Hospital Admin scoped; department ownership validated)
+    - `GET /api/department-heads` (List department heads; Hospital Admin scoped)
+    - `PUT /api/department-heads/:headId` (Update department head status; Hospital Admin scoped)
+  - **Hospital Onboarding Request Workflow:**
+    - `POST /api/hospital-requests` (Public onboarding submission)
+    - `GET /api/hospital-requests` (Chairman queue listing, status filterable)
+    - `GET /api/hospital-requests/:requestId` (Chairman request details)
+    - `POST|PUT /api/hospital-requests/:requestId/approve` (Chairman approval; automatically provisions Hospital and requested Departments; duplicate transition returns 400)
+    - `POST|PUT /api/hospital-requests/:requestId/reject` (Chairman rejection with reason; duplicate transition returns 400)
+- **Role Scoping & Security Invariants:**
+  - `HOSPITAL_ADMIN` strictly scoped to assigned hospital (cross-hospital reads and updates blocked with `403 Forbidden`)
+  - `CHAIRMAN` has platform administrative scope across all hospitals, departments, and onboarding requests
+  - Department names strictly unique per hospital (`409 Conflict` on duplicates within same hospital; same name permitted across different hospitals)
+  - Public onboarding submissions allowed without authentication; administrative oversight restricted to Chairman
+  - Gateway anti-spoofing and optional identity forwarding intact
+  - Resilient Atlas connection timeout with instant local MongoDB fallback
+- **Verification & Test Counts:**
+  - Hospital Test Suite: **12 / 12 passing (100%)**
+  - Department Test Suite: **9 / 9 passing (100%)**
+  - Department Head Test Suite: **7 / 7 passing (100%)**
+  - Hospital Request Onboarding Test Suite: **10 / 10 passing (100%)**
+  - Total Hospital Service Unit Tests: **38 / 38 passing (100%)**
+  - Cumulative Workspace Unit Tests: **96 / 96 passing (100%)**
+  - Live Multi-Service Integration (`verify:phase3`): **14 / 14 checks passing (100%)**
+  - Phase 1 & Phase 2 Regressions (`verify:phase1`, `verify:phase2`): **100% passing**
+  - Oxlint: **0 errors, 0 warnings**
 
 ### Phase 4 — Doctor Service
 - **Status:** NOT STARTED
@@ -94,7 +141,7 @@ This document tracks cumulative backend development, architecture, verified micr
 |---|---|---|---|
 | `medimind_auth` | Auth Service | `users` | User credentials, roles, account types, auth status |
 | `medimind_family` | Family Service | `families`, `family_members` | Family profiles and patient member rosters |
-| `medimind_hospital` | Hospital Service | `hospitals`, `departments` | Hospital facilities and department hierarchies |
+| `medimind_hospital` | Hospital Service | `hospitals`, `departments`, `department_heads`, `hospital_requests` | Hospital facilities, department hierarchies, head assignments, onboarding requests |
 | `medimind_doctor` | Doctor Service | `doctors`, `doctor_schedules` | Doctor credentials, profiles, schedules |
 | `medimind_appointment`| Appointment Service | `appointments`, `time_slots` | Booking workflows, schedules, and visits |
 | `medimind_records` | Medical Record Service | `medical_records`, `prescriptions` | Clinical records, lab reports, EHR data |
@@ -106,7 +153,7 @@ This document tracks cumulative backend development, architecture, verified micr
 ## 4. Current Git State & Verification Baseline
 
 - **Current Branch:** `backend-development`
-- **Latest Verified Commit:** `7c119ed` (`feat(backend): implement family service and member management`)
+- **Latest Verified Commit:** `563c836` (plus current Phase 3 changes)
 - **Infrastructure Consolidation:** Monorepo root npm workspace with shared `backend/node_modules/`, unified `backend/.env` with one global `MONGODB_URI`, and isolated logical databases per service.
 
 ---

@@ -9,6 +9,7 @@ const rootDir = path.resolve(__dirname, '..');
 const services = [
   { name: 'Auth Service', path: 'auth-service', port: 5001, color: '\x1b[34m' },
   { name: 'Family Service', path: 'family-service', port: 5002, color: '\x1b[32m' },
+  { name: 'Hospital Service', path: 'hospital-service', port: 5003, color: '\x1b[35m' },
   { name: 'API Gateway', path: 'api-gateway', port: 5000, color: '\x1b[36m' },
 ];
 

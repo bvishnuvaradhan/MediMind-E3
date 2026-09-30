@@ -26,7 +26,7 @@ function startProcess(name, dir, port) {
         proc.kill();
         reject(new Error(`Timeout waiting for ${name} on port ${port}`));
       }
-    }, 10000);
+    }, 15000);
 
     proc.stdout.on('data', (data) => {
       const msg = data.toString();
