@@ -1,6 +1,6 @@
 # MediMind — Backend Architecture & Monorepo Workspace
 
-This document covers the **MediMind Backend Monorepo Workspace**, including the **API Gateway**, **Auth Service** (Phase 1), **Family Service** (Phase 2), **Hospital Service** (Phase 3), and **Doctor Service** (Phase 4), with global environment configuration, unified dependencies, and database segregation across microservices.
+This document covers the **MediMind Backend Monorepo Workspace**, including the **API Gateway**, **Auth Service** (Phase 1), **Family Service** (Phase 2), **Hospital Service** (Phase 3), **Doctor Service** (Phase 4), and **Appointment Service** (Phase 5), with global environment configuration, unified dependencies, and database segregation across microservices.
 
 Cumulative implementation status is tracked in [BACKEND_PROGRESS.md](./BACKEND_PROGRESS.md).
 
@@ -17,12 +17,11 @@ React Client (Frontend)
 │   API Gateway    │  Port 5000 (Reverse Proxy, JWT Verification, Anti-Spoofing, Rate Limiting)
 └────────┬─────────┘
          │
-         ├─── Internal HTTP + Trusted Headers ───► Auth Service   (Port 5001) ──► MongoDB (`medimind_auth`)
-         │                                                                            └── `users`
-         │
-         └─── Internal HTTP + Trusted Headers ───► Family Service (Port 5002) ──► MongoDB (`medimind_family`)
-                                                                                      ├── `families`
-                                                                                      └── `family_members`
+         ├─── Internal HTTP + Trusted Headers ───► Auth Service        (Port 5001) ──► MongoDB (`medimind_auth`)
+         ├─── Internal HTTP + Trusted Headers ───► Family Service      (Port 5002) ──► MongoDB (`medimind_family`)
+         ├─── Internal HTTP + Trusted Headers ───► Hospital Service    (Port 5003) ──► MongoDB (`medimind_hospital`)
+         ├─── Internal HTTP + Trusted Headers ───► Doctor Service      (Port 5004) ──► MongoDB (`medimind_doctor`)
+         └─── Internal HTTP + Trusted Headers ───► Appointment Service (Port 5005) ──► MongoDB (`medimind_appointment`)
 ```
 
 ### Port Mappings
@@ -31,7 +30,7 @@ React Client (Frontend)
 - **Family Service:** `http://localhost:5002`
 - **Hospital Service:** `http://localhost:5003`
 - **Doctor Service:** `http://localhost:5004`
-- **Appointment Service:** `http://localhost:5005` *(Phase 5)*
+- **Appointment Service:** `http://localhost:5005`
 - **Medical Record Service:** `http://localhost:5006` *(Phase 6)*
 - **AI Service:** `http://localhost:5007` / `8000` *(Phase 7)*
 - **Knowledge Service:** `http://localhost:5008` *(Phase 8)*
@@ -56,42 +55,18 @@ backend/
 ├── scripts/
 │   └── start-dev.mjs          # Development runner for active microservices
 ├── api-gateway/               # API Gateway microservice (Port 5000)
-│   ├── src/
-│   ├── tests/
-│   ├── jest.config.js
-│   ├── package.json
-│   └── server.js
 ├── auth-service/              # Authentication & Identity microservice (Port 5001)
-│   ├── src/
-│   ├── tests/
-│   ├── scripts/
-│   │   └── verify-phase1.mjs  # Live verification script for Gateway + Auth
-│   ├── jest.config.js
-│   ├── package.json
-│   └── server.js
 ├── family-service/            # Family & Member Management microservice (Port 5002)
-│   ├── src/
-│   ├── tests/
-│   ├── scripts/
-│   │   └── verify-phase2.mjs  # Live verification script for Gateway + Auth + Family
-│   ├── jest.config.js
-│   ├── package.json
 ├── hospital-service/          # Hospital & Department Management microservice (Port 5003)
-│   ├── src/
-│   ├── tests/
-│   ├── scripts/
-│   │   └── verify-phase3.mjs  # Live verification script for Gateway + Auth + Hospital
-│   ├── jest.config.js
-│   ├── package.json
 ├── doctor-service/            # Doctor Profile & Availability Management microservice (Port 5004)
+├── appointment-service/       # Appointment Booking & Lifecycle microservice (Port 5005)
 │   ├── src/
 │   ├── tests/
 │   ├── scripts/
-│   │   └── verify-phase4.mjs  # Live verification script for Gateway + Auth + Hospital + Doctor
+│   │   └── verify-phase5.mjs  # Live verification script for Gateway + Microservices + Appt
 │   ├── jest.config.js
 │   ├── package.json
 │   └── server.js
-├── appointment-service/       # Appointment Service placeholder (Phase 5)
 ├── medical-record-service/    # Medical Record Service placeholder (Phase 6)
 └── knowledge-service/         # Knowledge Service placeholder (Phase 7)
 ```

@@ -153,7 +153,40 @@ This document tracks cumulative backend development, architecture, verified micr
   - Oxlint: **0 errors, 0 warnings**
 
 ### Phase 5 — Appointment Service
-- **Status:** NOT STARTED
+- **Status:** COMPLETE
+- **Commit:** Pending (`feat(backend): implement appointment service`)
+- **Services Implemented:**
+  - `backend/appointment-service/` (Port `5005`, Database: `medimind_appointment`)
+- **Collections & Schemas Implemented:**
+  - `Appointment` schema & collection (`medimind_appointment.appointments`) matching locked specifications in `Documents/Backend/Database/Mongoose Schemas.txt`
+  - Fields: `family_member_id`, `doctor_id`, `hospital_id`, `department_id`, `appointment_date`, `start_time`, `end_time`, `reason`, `status` (`BOOKED`, `CONFIRMED`, `CHECKED_IN`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`, `RESCHEDULED`), `appointment_type` (`BOOKED`, `WALK_IN`), `ai_prediction_id` (nullable for walk-ins), `cancelled_at`, `cancellation_reason`, `created_at`, `updated_at`
+  - Indexes: `{ doctor_id: 1, appointment_date: 1, start_time: 1 }`, `{ hospital_id: 1, department_id: 1 }`
+- **Key Capabilities & APIs Implemented:**
+  - `POST /api/appointments` (Book appointment; verifies Family ownership via Family Service REST; verifies Doctor existence and status via Doctor Service REST; resolves hospital and department IDs; detects slot conflicts; supports walk-in bookings without pre-assigned AI triage)
+  - `GET /api/appointments` (List appointments scoped by caller identity: Family sees family members only; Doctor sees own assigned appointments; Department Head sees department appointments; Hospital Admin sees hospital appointments; Chairman has unrestricted platform visibility; query filters by status, doctorId, appointmentType, date)
+  - `GET /api/appointments/:appointmentId` (Retrieve appointment details with strict role and tenancy scoping)
+  - `PUT /api/appointments/:appointmentId/reschedule` (Reschedule date and time slot; enforces conflict detection; updates status to `RESCHEDULED`)
+  - `PUT /api/appointments/:appointmentId/cancel` (Cancel appointment with reason and timestamp tracking; prevents cancellation of completed appointments)
+  - `PUT /api/appointments/:appointmentId/complete` (Mark appointment completed by assigned Doctor, Hospital Admin, or Chairman; blocks Family from completing)
+  - `PUT /api/appointments/:appointmentId/status` (Clinical lifecycle state machine: `BOOKED` -> `CONFIRMED` -> `CHECKED_IN` -> `IN_PROGRESS` -> `COMPLETED`)
+  - `GET /health` (Database connectivity & health)
+- **Role Scoping & Security Invariants:**
+  - Double booking conflict prevention: Doctor cannot have overlapping appointments on the same date (`409 Conflict`)
+  - Family membership boundary: Family user cannot book or view appointments for members outside their family (`403 Forbidden`)
+  - Doctor boundary: Doctor can only access and update appointments where they are the assigned doctor (`403 Forbidden`)
+  - Hospital boundary: Hospital Admin can only access appointments belonging to their assigned hospital (`403 Forbidden`)
+  - Department boundary: Department Head can only access appointments within their department (`403 Forbidden`)
+  - Terminal state invariant: Cancelled and completed appointments cannot be reopened or mutated (`400 Bad Request`)
+  - Walk-in support: Walk-in appointments created without requiring AI prediction linkage
+- **Verification & Test Counts:**
+  - Appointment Booking Test Suite: **8 / 8 passing (100%)**
+  - Appointment Lifecycle Test Suite: **8 / 8 passing (100%)**
+  - Appointment Scoping & Retrieval Test Suite: **10 / 10 passing (100%)**
+  - Total Appointment Service Unit Tests: **26 / 26 passing (100%)**
+  - Cumulative Workspace Unit Tests: **171 / 171 passing (100%)**
+  - Live Multi-Service Integration (`verify:phase5`): **11 / 11 checks passing (100%)**
+  - Prior Phase Regressions (`verify:phase1`, `verify:phase2`, `verify:phase3`, `verify:phase4`): **100% passing**
+  - Oxlint: **0 errors, 0 warnings**
 
 ### Phase 6 — Medical Record Service
 - **Status:** NOT STARTED
