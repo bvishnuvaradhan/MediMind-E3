@@ -24,11 +24,13 @@ app.get('/api/records/health', medicalRecordController.health);
 app.use('/api/records', medicalRecordRoutes);
 app.use('/api/consultations', consultationRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
+app.use('/api/record-access', medicalRecordRoutes);
 
 // Mount Direct Routes (supports direct forwarding without path rewrite)
 app.use('/records', medicalRecordRoutes);
 app.use('/consultations', consultationRoutes);
 app.use('/prescriptions', prescriptionRoutes);
+app.use('/record-access', medicalRecordRoutes);
 
 // Centralized Error Handling
 app.use(notFoundHandler);

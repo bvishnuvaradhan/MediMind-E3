@@ -40,6 +40,7 @@
     "verify:phase5": "node appointment-service/scripts/verify-phase5.mjs",
     "verify:phase6": "node medical-record-service/scripts/verify-phase6.mjs",
     "verify:phase7": "node knowledge-service/scripts/verify-phase7.mjs",
+    "verify:phase8": "node scripts/verify-phase8.mjs",
     "lint": "npx oxlint"
   },
   "dependencies": {

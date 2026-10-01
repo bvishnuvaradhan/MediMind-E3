@@ -1,6 +1,6 @@
 # MediMind — Backend Architecture & Monorepo Workspace
 
-This document covers the **MediMind Backend Monorepo Workspace**, including the **API Gateway**, **Auth Service** (Phase 1), **Family Service** (Phase 2), **Hospital Service** (Phase 3), **Doctor Service** (Phase 4), **Appointment Service** (Phase 5), **Medical Record Service** (Phase 6), and **Knowledge Service** (Phase 7), with global environment configuration, unified dependencies, and database segregation across microservices.
+This document covers the **MediMind Backend Monorepo Workspace**, including the **API Gateway**, **Auth Service** (Phase 1), **Family Service** (Phase 2), **Hospital Service** (Phase 3), **Doctor Service** (Phase 4), **Appointment Service** (Phase 5), **Medical Record Service** (Phase 6), **Knowledge Service** (Phase 7), and **Final System Integration** (Phase 8), with global environment configuration, unified dependencies, and database segregation across microservices.
 
 Cumulative implementation status is tracked in [BACKEND_PROGRESS.md](./BACKEND_PROGRESS.md).
 
@@ -176,6 +176,7 @@ All backend workflows are managed through standard root commands in `backend/`:
 | `npm run verify:phase5` | Executes live end-to-end Phase 5 verification (Appointment + Gateway) |
 | `npm run verify:phase6` | Executes live end-to-end Phase 6 verification (Records + Gateway) |
 | `npm run verify:phase7` | Executes live end-to-end Phase 7 verification (Knowledge + Gateway) |
+| `npm run verify:phase8` | Executes live end-to-end Phase 8 final system integration (All services + Gateway + 17 negatives) |
 | `npm run lint` | Runs `oxlint` static code analysis across the entire backend |
 
 ---
