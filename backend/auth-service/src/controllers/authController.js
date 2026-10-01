@@ -72,6 +72,37 @@ export const authController = {
     }
   },
 
+  async createInternalUser(req, res, next) {
+    try {
+      const internalSecret = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+      const providedSecret = req.headers['x-internal-service-secret'];
+      if (!providedSecret || providedSecret !== internalSecret) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access forbidden: internal service authentication required',
+        });
+      }
+
+      const { email, password, role, accountType, account_type, referenceId, reference_id, status } = req.body;
+      const user = await authService.createUser({
+        email,
+        password,
+        role,
+        accountType: accountType || account_type,
+        referenceId: referenceId || reference_id,
+        status,
+      });
+
+      res.status(201).json({
+        success: true,
+        message: 'Internal user created successfully',
+        data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async health(req, res) {
     const dbState = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
     res.status(200).json({

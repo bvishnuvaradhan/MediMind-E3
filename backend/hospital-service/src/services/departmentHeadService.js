@@ -148,6 +148,20 @@ export const departmentHeadService = {
       }
     }
 
+    if (query.user_id || query.userId) {
+      const uId = query.user_id || query.userId;
+      if (mongoose.Types.ObjectId.isValid(uId)) {
+        filter.user_id = new mongoose.Types.ObjectId(uId);
+      }
+    }
+
+    if (query.head_id || query.headId || query.referenceId || query.reference_id) {
+      const hId = query.head_id || query.headId || query.referenceId || query.reference_id;
+      if (mongoose.Types.ObjectId.isValid(hId)) {
+        filter._id = new mongoose.Types.ObjectId(hId);
+      }
+    }
+
     if (query.status && query.status !== 'All') {
       filter.status = query.status.toUpperCase();
     }

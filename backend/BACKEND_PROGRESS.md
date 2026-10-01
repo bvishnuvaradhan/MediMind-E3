@@ -12,7 +12,7 @@ This document tracks cumulative backend development, architecture, verified micr
 | **Auth Service** | `5001` | `medimind_auth.users` | Authentication, Argon/Bcrypt hashing, JWT issuance & verification, multi-role profile management | **COMPLETE** |
 | **Family Service** | `5002` | `medimind_family.families`, `family_members` | Family account registration, profile management, member roster CRUD, relationship scoping | **COMPLETE** |
 | **Hospital Service** | `5003` | `medimind_hospital.hospitals`, `departments`, `department_heads`, `hospital_requests` | Hospital profiles, department hierarchy, department head assignment, onboarding requests | **COMPLETE** |
-| **Doctor Service** | `5004` | `medimind_doctor` | Doctor profiles, credentials, department association, availability | NOT STARTED |
+| **Doctor Service** | `5004` | `medimind_doctor.doctors` | Doctor profiles, credentials, department association, availability | **COMPLETE** |
 | **Appointment Service** | `5005` | `medimind_appointment` | Appointment booking, slots, status transitions, doctor/patient linkage | NOT STARTED |
 | **Medical Record Service** | `5006` | `medimind_records` | Clinical records, lab reports, EHR data, prescriptions | NOT STARTED |
 | **AI Service** | `5007` / `8000` | `medimind_ai` | AI disease risk predictions, explainability metrics, audit logs | NOT STARTED |
@@ -119,7 +119,38 @@ This document tracks cumulative backend development, architecture, verified micr
   - Oxlint: **0 errors, 0 warnings**
 
 ### Phase 4 — Doctor Service
-- **Status:** NOT STARTED
+- **Status:** COMPLETE
+- **Commit:** Pending (`feat(backend): implement doctor service`)
+- **Services Implemented:**
+  - `backend/doctor-service/` (Port `5004`, Database: `medimind_doctor`)
+- **Collections & Schemas Implemented:**
+  - `Doctor` schema & collection (`medimind_doctor.doctors`) matching specifications in `Documents/Backend/Database/Doctor Schema.txt`
+  - Fields: `user_id`, `hospital_id`, `department_id`, `full_name`, `email`, `mobile`, `specialization`, `qualifications`, `experience_years`, `professional_description`, `availability` (weekly slots with `day`, `start_time`, `end_time`), `status` (`ACTIVE`/`INACTIVE`), `profile_picture`
+- **Key Capabilities & APIs Implemented:**
+  - `GET /api/doctors` (Public directory listing; search by name/email/specialization; filter by specialization, hospitalId, departmentId; scoped for Hospital Admin and Department Head; Chairman unrestricted)
+  - `GET /api/doctors/:doctorId` (Doctor profile details; scoped for Hospital Admin and Department Head)
+  - `POST /api/doctors` (Doctor account provisioning by Department Head, Hospital Admin, or Chairman; cross-service provisioning to Auth Service via internal REST `POST /api/auth/internal/users` with `x-internal-service-secret`)
+  - `PUT /api/doctors/:doctorId` (Doctor profile updates; Doctor can update own profile only; Department Head and Hospital Admin scoped; Chairman unrestricted; status changes restricted to administrative roles)
+  - `GET /api/doctors/:doctorId/availability` (Public schedule retrieval)
+  - `PUT /api/doctors/:doctorId/availability` (Doctor updates own weekly availability; Department Head / Admin scoped)
+  - `GET /health` (Database connectivity & health)
+- **Role Scoping & Security Invariants:**
+  - `DOCTOR`: own profile and availability management only; blocked from modifying other doctors (`403 Forbidden`)
+  - `DEPARTMENT_HEAD`: creates doctors within assigned department; updates doctors and schedules in assigned department; cross-department updates blocked (`403 Forbidden`)
+  - `HOSPITAL_ADMIN`: creates and manages doctors within assigned hospital; cross-hospital updates blocked (`403 Forbidden`)
+  - `CHAIRMAN`: platform-wide visibility and administrative authority across all hospitals and departments
+  - `FAMILY` / Public: directory browsing and availability viewing only; administrative management blocked (`403 Forbidden`)
+  - Cross-service credential provisioning: Doctor Service coordinates via internal REST with Auth Service without directly manipulating `medimind_auth`
+- **Verification & Test Counts:**
+  - Doctor Retrieval & Scoping Test Suite: **12 / 12 passing (100%)**
+  - Doctor Creation & Provisioning Test Suite: **11 / 11 passing (100%)**
+  - Doctor Update & Permissions Test Suite: **12 / 12 passing (100%)**
+  - Doctor Availability Test Suite: **14 / 14 passing (100%)**
+  - Total Doctor Service Unit Tests: **49 / 49 passing (100%)**
+  - Cumulative Workspace Unit Tests: **145 / 145 passing (100%)**
+  - Live Multi-Service Integration (`verify:phase4`): **11 / 11 checks passing (100%)**
+  - Prior Phase Regressions (`verify:phase1`, `verify:phase2`, `verify:phase3`): **100% passing**
+  - Oxlint: **0 errors, 0 warnings**
 
 ### Phase 5 — Appointment Service
 - **Status:** NOT STARTED
@@ -142,7 +173,7 @@ This document tracks cumulative backend development, architecture, verified micr
 | `medimind_auth` | Auth Service | `users` | User credentials, roles, account types, auth status |
 | `medimind_family` | Family Service | `families`, `family_members` | Family profiles and patient member rosters |
 | `medimind_hospital` | Hospital Service | `hospitals`, `departments`, `department_heads`, `hospital_requests` | Hospital facilities, department hierarchies, head assignments, onboarding requests |
-| `medimind_doctor` | Doctor Service | `doctors`, `doctor_schedules` | Doctor credentials, profiles, schedules |
+| `medimind_doctor` | Doctor Service | `doctors` | Doctor profiles, credentials, department association, schedules |
 | `medimind_appointment`| Appointment Service | `appointments`, `time_slots` | Booking workflows, schedules, and visits |
 | `medimind_records` | Medical Record Service | `medical_records`, `prescriptions` | Clinical records, lab reports, EHR data |
 | `medimind_ai` | AI Service | `ai_predictions`, `ai_audit_logs` | Risk predictions, explanations, telemetry |
@@ -153,7 +184,7 @@ This document tracks cumulative backend development, architecture, verified micr
 ## 4. Current Git State & Verification Baseline
 
 - **Current Branch:** `backend-development`
-- **Latest Verified Commit:** `563c836` (plus current Phase 3 changes)
+- **Latest Verified Commit:** `563c836` (plus completed Phase 3 and Phase 4 changes)
 - **Infrastructure Consolidation:** Monorepo root npm workspace with shared `backend/node_modules/`, unified `backend/.env` with one global `MONGODB_URI`, and isolated logical databases per service.
 
 ---
@@ -172,8 +203,8 @@ This document tracks cumulative backend development, architecture, verified micr
 
 - [x] Phase 1: API Gateway & Auth Service
 - [x] Phase 2: Family Service
-- [ ] Phase 3: Hospital Service (`backend/hospital-service/`, port 5003, `medimind_hospital`)
-- [ ] Phase 4: Doctor Service (`backend/doctor-service/`, port 5004, `medimind_doctor`)
+- [x] Phase 3: Hospital Service (`backend/hospital-service/`, port 5003, `medimind_hospital`)
+- [x] Phase 4: Doctor Service (`backend/doctor-service/`, port 5004, `medimind_doctor`)
 - [ ] Phase 5: Appointment Service (`backend/appointment-service/`, port 5005, `medimind_appointment`)
 - [ ] Phase 6: Medical Record Service (`backend/medical-record-service/`, port 5006, `medimind_records`)
 - [ ] Phase 7: Knowledge Service (`backend/knowledge-service/`, port 5008, `medimind_knowledge`)
