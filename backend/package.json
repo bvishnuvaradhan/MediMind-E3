@@ -10,7 +10,8 @@
     "family-service",
     "hospital-service",
     "doctor-service",
-    "appointment-service"
+    "appointment-service",
+    "medical-record-service"
   ],
   "scripts": {
     "gateway": "node api-gateway/server.js",
@@ -19,19 +20,22 @@
     "hospital": "node hospital-service/server.js",
     "doctor": "node doctor-service/server.js",
     "appointment": "node appointment-service/server.js",
+    "records": "node medical-record-service/server.js",
     "dev": "node scripts/start-dev.mjs",
-    "test": "npm run test:gateway && npm run test:auth && npm run test:family && npm run test:hospital && npm run test:doctor && npm run test:appointment",
+    "test": "npm run test:gateway && npm run test:auth && npm run test:family && npm run test:hospital && npm run test:doctor && npm run test:appointment && npm run test:records",
     "test:gateway": "npm --prefix api-gateway test",
     "test:auth": "npm --prefix auth-service test",
     "test:family": "npm --prefix family-service test",
     "test:hospital": "npm --prefix hospital-service test",
     "test:doctor": "npm --prefix doctor-service test",
     "test:appointment": "npm --prefix appointment-service test",
+    "test:records": "npm --prefix medical-record-service test",
     "verify:phase1": "node auth-service/scripts/verify-phase1.mjs",
     "verify:phase2": "node family-service/scripts/verify-phase2.mjs",
     "verify:phase3": "node hospital-service/scripts/verify-phase3.mjs",
     "verify:phase4": "node doctor-service/scripts/verify-phase4.mjs",
     "verify:phase5": "node appointment-service/scripts/verify-phase5.mjs",
+    "verify:phase6": "node medical-record-service/scripts/verify-phase6.mjs",
     "lint": "npx oxlint"
   },
   "dependencies": {

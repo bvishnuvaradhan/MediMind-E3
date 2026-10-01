@@ -31,7 +31,7 @@ React Client (Frontend)
 - **Hospital Service:** `http://localhost:5003`
 - **Doctor Service:** `http://localhost:5004`
 - **Appointment Service:** `http://localhost:5005`
-- **Medical Record Service:** `http://localhost:5006` *(Phase 6)*
+- **Medical Record Service:** `http://localhost:5006` *(Complete)*
 - **AI Service:** `http://localhost:5007` / `8000` *(Phase 7)*
 - **Knowledge Service:** `http://localhost:5008` *(Phase 8)*
 
@@ -66,8 +66,14 @@ backend/
 │   │   └── verify-phase5.mjs  # Live verification script for Gateway + Microservices + Appt
 │   ├── jest.config.js
 │   ├── package.json
+├── medical-record-service/    # Medical Record Service (Port 5006, medimind_records)
+│   ├── src/
+│   ├── tests/
+│   ├── scripts/
+│   │   └── verify-phase6.mjs  # Live verification script for Gateway + Microservices + Records
+│   ├── jest.config.js
+│   ├── package.json
 │   └── server.js
-├── medical-record-service/    # Medical Record Service placeholder (Phase 6)
 └── knowledge-service/         # Knowledge Service placeholder (Phase 7)
 ```
 

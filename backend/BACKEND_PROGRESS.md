@@ -13,8 +13,8 @@ This document tracks cumulative backend development, architecture, verified micr
 | **Family Service** | `5002` | `medimind_family.families`, `family_members` | Family account registration, profile management, member roster CRUD, relationship scoping | **COMPLETE** |
 | **Hospital Service** | `5003` | `medimind_hospital.hospitals`, `departments`, `department_heads`, `hospital_requests` | Hospital profiles, department hierarchy, department head assignment, onboarding requests | **COMPLETE** |
 | **Doctor Service** | `5004` | `medimind_doctor.doctors` | Doctor profiles, credentials, department association, availability | **COMPLETE** |
-| **Appointment Service** | `5005` | `medimind_appointment` | Appointment booking, slots, status transitions, doctor/patient linkage | NOT STARTED |
-| **Medical Record Service** | `5006` | `medimind_records` | Clinical records, lab reports, EHR data, prescriptions | NOT STARTED |
+| **Appointment Service** | `5005` | `medimind_appointment.appointments` | Appointment booking, slots, status transitions, doctor/patient linkage | **COMPLETE** |
+| **Medical Record Service** | `5006` | `medimind_records.medical_records`, `consultations`, `prescriptions`, `record_access` | Clinical records, consultations, prescriptions, doctor access control | **COMPLETE** |
 | **AI Service** | `5007` / `8000` | `medimind_ai` | AI disease risk predictions, explainability metrics, audit logs | NOT STARTED |
 | **Knowledge Service** | `5008` | `medimind_knowledge` | Medical knowledge articles, clinical protocols, review workflows | NOT STARTED |
 
@@ -189,7 +189,62 @@ This document tracks cumulative backend development, architecture, verified micr
   - Oxlint: **0 errors, 0 warnings**
 
 ### Phase 6 — Medical Record Service
-- **Status:** NOT STARTED
+- **Status:** COMPLETE
+- **Commit:** Pending (`feat(backend): implement medical record service`)
+- **Services Implemented:**
+  - `backend/medical-record-service/` (Port `5006`, Database: `medimind_records`)
+- **Collections & Schemas Implemented:**
+  - `MedicalRecord` schema & collection (`medimind_records.medical_records`)
+    - Fields: `family_member_id`, `record_type` (`REPORT`, `TEST`, `XRAY`, `SCAN`, `ECG`, `PRESCRIPTION_DOCUMENT`, `OTHER`), `file_name`, `file_url`, `description`, `record_date`, `uploaded_by`, `source` (`FAMILY`, `DOCTOR`), `status` (`ACTIVE`, `DELETED`), timestamps
+  - `RecordAccess` schema & collection (`medimind_records.record_access`)
+    - Fields: `family_member_id`, `doctor_id`, `granted_by`, `granted_at`, `revoked_at`, `status` (`ACTIVE`, `REVOKED`), timestamps
+  - `Consultation` schema & collection (`medimind_records.consultations`)
+    - Fields: `family_member_id`, `doctor_id`, `appointment_id`, `symptoms`, `observations`, `clinical_assessment`, `treatment_plan`, `ai_prediction_ids`, `notes`, `status` (`DRAFT`, `FINAL`, `AMENDED`), `finalized_at`, `amendment_of`, timestamps
+  - `Prescription` schema & collection (`medimind_records.prescriptions`)
+    - Fields: `family_member_id`, `doctor_id`, `consultation_id`, `medicines` (`[{ name, dosage, frequency, duration, instructions }]`), `general_instructions`, `status` (`DRAFT`, `FINAL`, `CORRECTED`), `finalized_at`, `correction_of`, timestamps
+- **Key Capabilities & APIs Implemented:**
+  - **Medical Records:**
+    - `POST /api/records` & `POST /api/records/upload` (Upload medical record metadata by Family or Doctor)
+    - `GET /api/records/member/:memberId` (Unified patient clinical records; scoped to Family owner and authorized Doctors)
+    - `GET /api/records/:recordId` (Single record retrieval)
+    - `PUT /api/records/:recordId` (Update record description)
+    - `DELETE /api/records/:recordId` (Soft-delete record, status `DELETED`)
+  - **Doctor Record Access Control:**
+    - `POST /api/records/access` (Family grants Doctor full record access for member; status `ACTIVE`)
+    - `GET /api/records/access/member/:memberId` (Active authorized doctors for family member)
+    - `PUT /api/records/access/:accessId/revoke` (Family revokes Doctor access; transitions to `REVOKED`)
+    - `GET /api/records/access/doctor/me` (Doctor retrieves own access grant history)
+  - **Consultation Lifecycle:**
+    - `POST /api/consultations` (Doctor creates consultation in `DRAFT` status; validates appointment ownership)
+    - `GET /api/consultations/member/:memberId` (List member consultations)
+    - `GET /api/consultations/:consultationId` (Get consultation details)
+    - `PUT /api/consultations/:consultationId` (Doctor updates `DRAFT` consultation)
+    - `PUT /api/consultations/:consultationId/finalize` (Transitions `DRAFT` -> `FINAL`, sets `finalized_at`)
+    - `POST /api/consultations/:consultationId/amend` (Creates linked `AMENDED` consultation via `amendment_of`)
+  - **Prescription Lifecycle:**
+    - `POST /api/prescriptions` (Doctor creates prescription in `DRAFT` status linked to consultation)
+    - `GET /api/prescriptions/member/:memberId` (List member prescriptions)
+    - `GET /api/prescriptions/:prescriptionId` (Get prescription details)
+    - `PUT /api/prescriptions/:prescriptionId` (Doctor updates `DRAFT` prescription)
+    - `PUT /api/prescriptions/:prescriptionId/finalize` (Transitions `DRAFT` -> `FINAL`, sets `finalized_at`)
+    - `POST /api/prescriptions/:prescriptionId/correct` (Creates linked `CORRECTED` prescription via `correction_of`)
+  - **Health Check:**
+    - `GET /health` & `GET /api/records/health` (Database state and UP status)
+- **Role Scoping & Security Invariants:**
+  - **Explicit RecordAccess Requirement:** A doctor with an appointment alone does NOT get record access; explicit `RecordAccess` state must be `ACTIVE` (`403 Forbidden` if missing or revoked).
+  - **Administrative Boundary Isolation:** Hospital Admin, Department Head, and Chairman cannot access private patient clinical records, consultations, or prescriptions (`403 Forbidden`).
+  - **Family Boundary Isolation:** Cross-family access to records, consultations, or prescriptions is blocked (`403 Forbidden`).
+  - **Immutability of Finalized Clinical Data:** Direct modification of `FINAL` consultations or prescriptions is prohibited (`400 Bad Request`). Changes must follow the audited `amend` and `correct` creation workflows.
+- **Verification & Test Counts:**
+  - Medical Record Test Suite: **10 / 10 passing (100%)**
+  - Record Access Test Suite: **12 / 12 passing (100%)**
+  - Consultation Lifecycle Test Suite: **9 / 9 passing (100%)**
+  - Prescription Lifecycle Test Suite: **9 / 9 passing (100%)**
+  - Total Medical Record Service Unit Tests: **40 / 40 passing (100%)**
+  - Cumulative Workspace Unit Tests: **211 / 211 passing (100%)**
+  - Live Multi-Service Integration (`verify:phase6`): **13 / 13 checks passing (100%)**
+  - Prior Phase Regressions (`verify:phase1` through `verify:phase5`): **100% passing**
+  - Oxlint: **0 errors, 0 warnings**
 
 ### Phase 7 — Knowledge Service
 - **Status:** NOT STARTED
@@ -208,7 +263,7 @@ This document tracks cumulative backend development, architecture, verified micr
 | `medimind_hospital` | Hospital Service | `hospitals`, `departments`, `department_heads`, `hospital_requests` | Hospital facilities, department hierarchies, head assignments, onboarding requests |
 | `medimind_doctor` | Doctor Service | `doctors` | Doctor profiles, credentials, department association, schedules |
 | `medimind_appointment`| Appointment Service | `appointments`, `time_slots` | Booking workflows, schedules, and visits |
-| `medimind_records` | Medical Record Service | `medical_records`, `prescriptions` | Clinical records, lab reports, EHR data |
+| `medimind_records` | Medical Record Service | `medical_records`, `consultations`, `prescriptions`, `record_access` | Clinical records, consultations, prescriptions, doctor access grants |
 | `medimind_ai` | AI Service | `ai_predictions`, `ai_audit_logs` | Risk predictions, explanations, telemetry |
 | `medimind_knowledge` | Knowledge Service | `articles`, `protocols` | Clinical articles, protocols, peer reviews |
 
@@ -217,7 +272,7 @@ This document tracks cumulative backend development, architecture, verified micr
 ## 4. Current Git State & Verification Baseline
 
 - **Current Branch:** `backend-development`
-- **Latest Verified Commit:** `563c836` (plus completed Phase 3 and Phase 4 changes)
+- **Latest Verified Commit:** `8ac4aa1` (plus Phase 6 Medical Record Service implementation)
 - **Infrastructure Consolidation:** Monorepo root npm workspace with shared `backend/node_modules/`, unified `backend/.env` with one global `MONGODB_URI`, and isolated logical databases per service.
 
 ---
@@ -238,7 +293,7 @@ This document tracks cumulative backend development, architecture, verified micr
 - [x] Phase 2: Family Service
 - [x] Phase 3: Hospital Service (`backend/hospital-service/`, port 5003, `medimind_hospital`)
 - [x] Phase 4: Doctor Service (`backend/doctor-service/`, port 5004, `medimind_doctor`)
-- [ ] Phase 5: Appointment Service (`backend/appointment-service/`, port 5005, `medimind_appointment`)
-- [ ] Phase 6: Medical Record Service (`backend/medical-record-service/`, port 5006, `medimind_records`)
+- [x] Phase 5: Appointment Service (`backend/appointment-service/`, port 5005, `medimind_appointment`)
+- [x] Phase 6: Medical Record Service (`backend/medical-record-service/`, port 5006, `medimind_records`)
 - [ ] Phase 7: Knowledge Service (`backend/knowledge-service/`, port 5008, `medimind_knowledge`)
 - [ ] Phase 8: End-to-End System Integration & Gateway Certification
