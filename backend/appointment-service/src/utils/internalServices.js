@@ -90,7 +90,7 @@ export const internalServices = {
       if (!response.ok || !data.success || !data.data) {
         return [];
       }
-      return data.data.map((m) => m._id || m.id);
+      return data.data.map((m) => m.memberId || m.id || m._id);
     } catch {
       return [];
     }

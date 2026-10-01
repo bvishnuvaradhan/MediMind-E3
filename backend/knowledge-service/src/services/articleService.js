@@ -561,6 +561,19 @@ export const articleService = {
         err.statusCode = 403;
         throw err;
       }
+
+      // Cannot publish own article without independent peer review
+      const reviewerDoctorId = user.doctorId;
+      if (reviewerDoctorId && article.author_doctor_id.toString() === reviewerDoctorId.toString()) {
+        const err = new Error('Access forbidden: clinicians cannot publish their own articles without independent peer review');
+        err.statusCode = 403;
+        throw err;
+      }
+      if (user.referenceId && article.author_doctor_id.toString() === user.referenceId.toString()) {
+        const err = new Error('Access forbidden: clinicians cannot publish their own articles without independent peer review');
+        err.statusCode = 403;
+        throw err;
+      }
     }
 
     if (article.status === 'PUBLISHED') {

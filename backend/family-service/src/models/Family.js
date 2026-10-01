@@ -53,6 +53,7 @@ const familySchema = new mongoose.Schema(
 
 familySchema.methods.toPublicJSON = function () {
   return {
+    id: this._id.toString(),
     familyId: this._id.toString(),
     familyName: this.family_name,
     creatorUserId: this.creator_user_id ? this.creator_user_id.toString() : null,

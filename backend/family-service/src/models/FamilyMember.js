@@ -119,6 +119,7 @@ const familyMemberSchema = new mongoose.Schema(
 
 familyMemberSchema.methods.toPublicJSON = function () {
   return {
+    id: this._id.toString(),
     memberId: this._id.toString(),
     familyId: this.family_id ? this.family_id.toString() : null,
     fullName: this.full_name,
