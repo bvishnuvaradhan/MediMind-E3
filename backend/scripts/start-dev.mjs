@@ -13,6 +13,7 @@ const services = [
   { name: 'Doctor Service', path: 'doctor-service', port: 5004, color: '\x1b[33m' },
   { name: 'Appointment Service', path: 'appointment-service', port: 5005, color: '\x1b[32m' },
   { name: 'Medical Record Service', path: 'medical-record-service', port: 5006, color: '\x1b[35m' },
+  { name: 'Knowledge Service', path: 'knowledge-service', port: 5008, color: '\x1b[34m' },
   { name: 'API Gateway', path: 'api-gateway', port: 5000, color: '\x1b[36m' },
 ];
 

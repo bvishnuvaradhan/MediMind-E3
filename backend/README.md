@@ -1,6 +1,6 @@
 # MediMind — Backend Architecture & Monorepo Workspace
 
-This document covers the **MediMind Backend Monorepo Workspace**, including the **API Gateway**, **Auth Service** (Phase 1), **Family Service** (Phase 2), **Hospital Service** (Phase 3), **Doctor Service** (Phase 4), and **Appointment Service** (Phase 5), with global environment configuration, unified dependencies, and database segregation across microservices.
+This document covers the **MediMind Backend Monorepo Workspace**, including the **API Gateway**, **Auth Service** (Phase 1), **Family Service** (Phase 2), **Hospital Service** (Phase 3), **Doctor Service** (Phase 4), **Appointment Service** (Phase 5), **Medical Record Service** (Phase 6), and **Knowledge Service** (Phase 7), with global environment configuration, unified dependencies, and database segregation across microservices.
 
 Cumulative implementation status is tracked in [BACKEND_PROGRESS.md](./BACKEND_PROGRESS.md).
 
@@ -17,11 +17,13 @@ React Client (Frontend)
 │   API Gateway    │  Port 5000 (Reverse Proxy, JWT Verification, Anti-Spoofing, Rate Limiting)
 └────────┬─────────┘
          │
-         ├─── Internal HTTP + Trusted Headers ───► Auth Service        (Port 5001) ──► MongoDB (`medimind_auth`)
-         ├─── Internal HTTP + Trusted Headers ───► Family Service      (Port 5002) ──► MongoDB (`medimind_family`)
-         ├─── Internal HTTP + Trusted Headers ───► Hospital Service    (Port 5003) ──► MongoDB (`medimind_hospital`)
-         ├─── Internal HTTP + Trusted Headers ───► Doctor Service      (Port 5004) ──► MongoDB (`medimind_doctor`)
-         └─── Internal HTTP + Trusted Headers ───► Appointment Service (Port 5005) ──► MongoDB (`medimind_appointment`)
+         ├─── Internal HTTP + Trusted Headers ───► Auth Service           (Port 5001) ──► MongoDB (`medimind_auth`)
+         ├─── Internal HTTP + Trusted Headers ───► Family Service         (Port 5002) ──► MongoDB (`medimind_family`)
+         ├─── Internal HTTP + Trusted Headers ───► Hospital Service       (Port 5003) ──► MongoDB (`medimind_hospital`)
+         ├─── Internal HTTP + Trusted Headers ───► Doctor Service         (Port 5004) ──► MongoDB (`medimind_doctor`)
+         ├─── Internal HTTP + Trusted Headers ───► Appointment Service    (Port 5005) ──► MongoDB (`medimind_appointment`)
+         ├─── Internal HTTP + Trusted Headers ───► Medical Record Service (Port 5006) ──► MongoDB (`medimind_records`)
+         └─── Internal HTTP + Trusted Headers ───► Knowledge Service      (Port 5008) ──► MongoDB (`medimind_knowledge`)
 ```
 
 ### Port Mappings
@@ -31,9 +33,9 @@ React Client (Frontend)
 - **Hospital Service:** `http://localhost:5003`
 - **Doctor Service:** `http://localhost:5004`
 - **Appointment Service:** `http://localhost:5005`
-- **Medical Record Service:** `http://localhost:5006` *(Complete)*
-- **AI Service:** `http://localhost:5007` / `8000` *(Phase 7)*
-- **Knowledge Service:** `http://localhost:5008` *(Phase 8)*
+- **Medical Record Service:** `http://localhost:5006`
+- **Knowledge Service:** `http://localhost:5008`
+- **AI Service:** `http://localhost:5007` / `8000` *(External / Frozen)*
 
 ---
 
@@ -74,7 +76,14 @@ backend/
 │   ├── jest.config.js
 │   ├── package.json
 │   └── server.js
-└── knowledge-service/         # Knowledge Service placeholder (Phase 7)
+└── knowledge-service/         # Knowledge Service (Port 5008, medimind_knowledge)
+    ├── src/
+    ├── tests/
+    ├── scripts/
+    │   └── verify-phase7.mjs  # Live verification script for Gateway + Microservices + Knowledge
+    ├── jest.config.js
+    ├── package.json
+    └── server.js
 ```
 
 ---
@@ -142,16 +151,31 @@ All backend workflows are managed through standard root commands in `backend/`:
 
 | Command | Action |
 |---|---|
-| `npm run dev` | Concurrently starts all implemented backend services (Gateway, Auth, Family) |
+| `npm run dev` | Concurrently starts all implemented backend services |
 | `npm run gateway` | Starts API Gateway standalone on port `5000` |
 | `npm run auth` | Starts Auth Service standalone on port `5001` |
 | `npm run family` | Starts Family Service standalone on port `5002` |
-| `npm test` | Runs the full automated test suite across all services |
+| `npm run hospital` | Starts Hospital Service standalone on port `5003` |
+| `npm run doctor` | Starts Doctor Service standalone on port `5004` |
+| `npm run appointment` | Starts Appointment Service standalone on port `5005` |
+| `npm run records` | Starts Medical Record Service standalone on port `5006` |
+| `npm run knowledge` | Starts Knowledge Service standalone on port `5008` |
+| `npm test` | Runs the full automated test suite across all 8 microservices (244 tests) |
 | `npm run test:gateway` | Runs API Gateway unit & integration tests (13 tests) |
 | `npm run test:auth` | Runs Auth Service unit & integration tests (23 tests) |
 | `npm run test:family` | Runs Family Service unit & integration tests (22 tests) |
-| `npm run verify:phase1` | Executes live end-to-end Phase 1 verification |
-| `npm run verify:phase2` | Executes live end-to-end Phase 2 verification |
+| `npm run test:hospital` | Runs Hospital Service unit & integration tests (38 tests) |
+| `npm run test:doctor` | Runs Doctor Service unit & integration tests (49 tests) |
+| `npm run test:appointment` | Runs Appointment Service unit & integration tests (26 tests) |
+| `npm run test:records` | Runs Medical Record Service unit & integration tests (40 tests) |
+| `npm run test:knowledge` | Runs Knowledge Service unit & integration tests (35 tests) |
+| `npm run verify:phase1` | Executes live end-to-end Phase 1 verification (Auth + Gateway) |
+| `npm run verify:phase2` | Executes live end-to-end Phase 2 verification (Family + Gateway) |
+| `npm run verify:phase3` | Executes live end-to-end Phase 3 verification (Hospital + Gateway) |
+| `npm run verify:phase4` | Executes live end-to-end Phase 4 verification (Doctor + Gateway) |
+| `npm run verify:phase5` | Executes live end-to-end Phase 5 verification (Appointment + Gateway) |
+| `npm run verify:phase6` | Executes live end-to-end Phase 6 verification (Records + Gateway) |
+| `npm run verify:phase7` | Executes live end-to-end Phase 7 verification (Knowledge + Gateway) |
 | `npm run lint` | Runs `oxlint` static code analysis across the entire backend |
 
 ---

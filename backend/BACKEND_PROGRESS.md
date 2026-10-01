@@ -16,7 +16,7 @@ This document tracks cumulative backend development, architecture, verified micr
 | **Appointment Service** | `5005` | `medimind_appointment.appointments` | Appointment booking, slots, status transitions, doctor/patient linkage | **COMPLETE** |
 | **Medical Record Service** | `5006` | `medimind_records.medical_records`, `consultations`, `prescriptions`, `record_access` | Clinical records, consultations, prescriptions, doctor access control | **COMPLETE** |
 | **AI Service** | `5007` / `8000` | `medimind_ai` | AI disease risk predictions, explainability metrics, audit logs | NOT STARTED |
-| **Knowledge Service** | `5008` | `medimind_knowledge` | Medical knowledge articles, clinical protocols, review workflows | NOT STARTED |
+| **Knowledge Service** | `5008` | `medimind_knowledge.articles` | Medical knowledge articles, clinical protocols, review workflows | **COMPLETE** |
 
 ---
 
@@ -247,7 +247,45 @@ This document tracks cumulative backend development, architecture, verified micr
   - Oxlint: **0 errors, 0 warnings**
 
 ### Phase 7 — Knowledge Service
-- **Status:** NOT STARTED
+- **Status:** COMPLETE
+- **Commit:** Pending (`feat(backend): implement knowledge service`)
+- **Services Implemented:**
+  - `backend/knowledge-service/` (Port `5008`, Database: `medimind_knowledge`)
+- **Collections & Schemas Implemented:**
+  - `Article` schema & collection (`medimind_knowledge.articles`) with comprehensive indexing:
+    - `{ author_doctor_id: 1, status: 1 }`
+    - `{ department_id: 1, status: 1 }`
+    - `{ hospital_id: 1, status: 1 }`
+    - `{ status: 1, published_at: -1 }`
+- **Key Capabilities & APIs Implemented:**
+  - **Article CRUD & Draft Privacy:**
+    - `POST /api/knowledge/articles` (Doctor / Clinician author creates DRAFT or direct SUBMITTED article)
+    - `GET /api/knowledge/articles` (Role-scoped article listing with multi-parameter filtering: status, department, author, hospital, category, keyword search, date range)
+    - `GET /api/knowledge/articles/:articleId` (Single article retrieval with strict privacy: DRAFTs private to author; published articles public; review statuses scoped)
+    - `PUT /api/knowledge/articles/:articleId` (Author updates draft / changes-requested article, optional resubmit)
+    - `DELETE /api/knowledge/articles/:articleId` (Author deletes draft article only)
+    - `GET /health` (Database connectivity & health)
+  - **Review & Publishing Lifecycle Workflow:**
+    - `POST /api/knowledge/articles/:articleId/submit` (Author transitions DRAFT / CHANGES_REQUESTED -> UNDER_REVIEW)
+    - `POST /api/knowledge/articles/:articleId/review` (Department Head peer-review with mandatory written feedback on `CHANGES_REQUESTED` / `REJECT`, or `APPROVE`)
+    - `POST /api/knowledge/articles/:articleId/publish` (Department Head publishes approved article -> PUBLISHED)
+  - **Security Invariants & Role Scoping:**
+    - **Draft Privacy:** Drafts are strictly private to authoring doctor (other clinicians, hospital admins, public received `403 Forbidden` / `401 Unauthorized`).
+    - **Department Scoping:** Department Head can only review and publish articles within their assigned department (`403 Forbidden` for cross-department).
+    - **Peer-Review Conflict Prohibition:** Clinicians cannot peer-review their own authored articles (`403 Forbidden`).
+    - **Mandatory Feedback:** Requesting changes without written clinical feedback is rejected (`400 Bad Request`).
+    - **Hospital Admin Oversight:** Hospital Admin has read-only oversight of non-draft articles within their assigned hospital; cannot view private drafts (`403 Forbidden`) or cross-hospital articles (`403 Forbidden`); cannot review/publish (`403 Forbidden`).
+    - **Chairman Oversight:** Unrestricted platform-wide read-only oversight across all hospitals (private drafts excluded).
+    - **Public / Family Access:** Can view published articles only without authentication.
+- **Verification & Test Counts:**
+  - Article Creation & Author Lifecycle Suite: **11 / 11 passing (100%)**
+  - Article Review & Publishing Lifecycle Suite: **12 / 12 passing (100%)**
+  - Article Scoping & Role Oversight Suite: **12 / 12 passing (100%)**
+  - Total Knowledge Service Unit Tests: **35 / 35 passing (100%)**
+  - Cumulative Workspace Unit Tests: **244 / 244 passing (100%)**
+  - Live Multi-Service Integration (`verify:phase7`): **All checks passing (100%)**
+  - Prior Phase Regressions (`verify:phase1` through `verify:phase6`): **100% passing**
+  - Oxlint: **0 errors, 0 warnings**
 
 ### Phase 8 — Backend Integration & Final Verification
 - **Status:** NOT STARTED
@@ -265,14 +303,14 @@ This document tracks cumulative backend development, architecture, verified micr
 | `medimind_appointment`| Appointment Service | `appointments`, `time_slots` | Booking workflows, schedules, and visits |
 | `medimind_records` | Medical Record Service | `medical_records`, `consultations`, `prescriptions`, `record_access` | Clinical records, consultations, prescriptions, doctor access grants |
 | `medimind_ai` | AI Service | `ai_predictions`, `ai_audit_logs` | Risk predictions, explanations, telemetry |
-| `medimind_knowledge` | Knowledge Service | `articles`, `protocols` | Clinical articles, protocols, peer reviews |
+| `medimind_knowledge` | Knowledge Service | `articles` | Clinical articles, protocols, peer reviews |
 
 ---
 
 ## 4. Current Git State & Verification Baseline
 
 - **Current Branch:** `backend-development`
-- **Latest Verified Commit:** `8ac4aa1` (plus Phase 6 Medical Record Service implementation)
+- **Latest Verified Commit:** `83fc738` (plus Phase 7 Knowledge Service implementation)
 - **Infrastructure Consolidation:** Monorepo root npm workspace with shared `backend/node_modules/`, unified `backend/.env` with one global `MONGODB_URI`, and isolated logical databases per service.
 
 ---
@@ -295,5 +333,5 @@ This document tracks cumulative backend development, architecture, verified micr
 - [x] Phase 4: Doctor Service (`backend/doctor-service/`, port 5004, `medimind_doctor`)
 - [x] Phase 5: Appointment Service (`backend/appointment-service/`, port 5005, `medimind_appointment`)
 - [x] Phase 6: Medical Record Service (`backend/medical-record-service/`, port 5006, `medimind_records`)
-- [ ] Phase 7: Knowledge Service (`backend/knowledge-service/`, port 5008, `medimind_knowledge`)
+- [x] Phase 7: Knowledge Service (`backend/knowledge-service/`, port 5008, `medimind_knowledge`)
 - [ ] Phase 8: End-to-End System Integration & Gateway Certification
