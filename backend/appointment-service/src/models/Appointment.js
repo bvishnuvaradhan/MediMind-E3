@@ -73,7 +73,7 @@ const appointmentSchema = new mongoose.Schema(
     },
 
     ai_prediction_id: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.Mixed,
       default: null,
       index: true,
     },

@@ -314,6 +314,31 @@ This document tracks cumulative backend development, architecture, verified micr
   - Phase 8 Comprehensive Live Integration (`verify:phase8`): **All checks & 17 negatives passing (100%)**
   - Oxlint: **0 errors, 0 warnings**
 
+### Phase 9 — AI Production Workflow Integration
+- **Status:** COMPLETE
+- **Commit:** Pending (`feat(backend): integrate ai prediction workflows`)
+- **Key Capabilities Verified:**
+  - AI Service reverse proxying via Gateway (`/api/ai/*`) forwarding to independent microservice (:5007 / :8000).
+  - Four AI Diagnostic Modules verified end-to-end:
+    1. **General Health / NLP Triage** (`POST /api/ai/general-health` -> General Medicine triage recommendation).
+    2. **Cardiovascular Risk Assessment** (`POST /api/ai/heart-disease` -> Cardiology risk prediction `PRED-HD-...`).
+    3. **Diabetes Metabolic Risk** (`POST /api/ai/diabetes` -> Diabetology & Endocrinology assessment `PRED-DB-...`).
+    4. **Fracture Radiograph Detection** (`POST /api/ai/fracture` -> Orthopedics image analysis `PRED-FR-...`).
+  - Prediction retrieval & history query (`GET /api/ai/member/:memberId`, `GET /api/ai/:predictionId`).
+  - Appointment workflow linking: booked appointments persist and associate `ai_prediction_id`.
+  - Clinical Consultation linking: Doctor consultations associate `ai_prediction_ids`.
+  - Security & Role Isolation Matrix:
+    - `FAMILY` and `DOCTOR` have authorized access.
+    - `HOSPITAL_ADMIN`, `DEPARTMENT_HEAD`, `CHAIRMAN` blocked with `403 Forbidden` from private clinical predictions.
+    - Missing, invalid, or tampered JWTs blocked with `401 Unauthorized`.
+    - Direct microservice invocations without internal key blocked with `401 Unauthorized`.
+  - Resiliency & Graceful Degradation: Offline AI service returns `503 Service Unavailable` with friendly message and auto-recovers.
+- **Verification & Test Counts:**
+  - API Gateway AI Integration Suite: **25 / 25 passing (100%)**
+  - Total Unit Tests Across Workspace: **249 / 249 passing (100%)**
+  - Phase 9 Live Verification (`verify:phase9`): **10 / 10 verification steps passing (100%)**
+  - Oxlint: **0 errors, 0 warnings**
+
 ---
 
 ## 3. Database Ownership Matrix
@@ -334,7 +359,7 @@ This document tracks cumulative backend development, architecture, verified micr
 ## 4. Current Git State & Verification Baseline
 
 - **Current Branch:** `backend-development`
-- **Latest Verified Commit:** `544e447` (Phase 7 Knowledge Service) + Phase 8 Final System Integration
+- **Latest Verified Commit:** Phase 9 AI Production Workflow Integration
 - **Infrastructure Consolidation:** Monorepo root npm workspace with shared `backend/node_modules/`, unified `backend/.env` with one global `MONGODB_URI`, and isolated logical databases per service.
 
 ---
@@ -359,3 +384,4 @@ This document tracks cumulative backend development, architecture, verified micr
 - [x] Phase 6: Medical Record Service (`backend/medical-record-service/`, port 5006, `medimind_records`)
 - [x] Phase 7: Knowledge Service (`backend/knowledge-service/`, port 5008, `medimind_knowledge`)
 - [x] Phase 8: End-to-End System Integration & Gateway Certification
+- [x] Phase 9: AI Production Workflow Integration

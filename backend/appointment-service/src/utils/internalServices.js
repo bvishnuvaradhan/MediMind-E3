@@ -122,4 +122,29 @@ export const internalServices = {
       return null;
     }
   },
+
+  /**
+   * Fetch AI prediction details from AI Prediction Service
+   */
+  async getAiPrediction(predictionId) {
+    const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:5007';
+    const url = `${AI_SERVICE_URL}/api/ai/${predictionId}`;
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'x-internal-service-secret': INTERNAL_SECRET,
+          'X-Internal-Service-Key': process.env.INTERNAL_SERVICE_KEY || INTERNAL_SECRET,
+          'x-user-id': 'internal_appointment_service',
+          'x-user-role': 'CHAIRMAN',
+        },
+        signal: AbortSignal.timeout(5000),
+      });
+
+      if (!response.ok) return null;
+      return await response.json();
+    } catch {
+      return null;
+    }
+  },
 };

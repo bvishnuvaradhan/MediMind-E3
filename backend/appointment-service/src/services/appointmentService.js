@@ -55,7 +55,7 @@ export const appointmentService = {
       throw err;
     }
 
-    if (aiPredictionId && !mongoose.Types.ObjectId.isValid(aiPredictionId)) {
+    if (aiPredictionId && typeof aiPredictionId !== 'string' && !mongoose.Types.ObjectId.isValid(aiPredictionId)) {
       const err = new Error('Invalid aiPredictionId format');
       err.statusCode = 400;
       throw err;

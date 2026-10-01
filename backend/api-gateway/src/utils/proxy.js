@@ -13,7 +13,10 @@ export const forwardRequest = (targetServiceUrl) => {
       }
 
       // Ensure internal secret is forwarded
-      headers['x-internal-service-secret'] = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+      const internalSecret = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+      const internalKey = process.env.INTERNAL_SERVICE_KEY || internalSecret;
+      headers['x-internal-service-secret'] = internalSecret;
+      headers['X-Internal-Service-Key'] = internalKey;
 
       // Forward trusted identity if authenticated
       if (req.user) {
@@ -28,9 +31,16 @@ export const forwardRequest = (targetServiceUrl) => {
         signal: AbortSignal.timeout(10000), // 10 second timeout
       };
 
-      if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) && req.body && Object.keys(req.body).length > 0) {
-        options.body = JSON.stringify(req.body);
-        headers['content-type'] = 'application/json';
+      if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+        if (req.headers['content-type']?.includes('application/json') && req.body && Object.keys(req.body).length > 0) {
+          options.body = JSON.stringify(req.body);
+          headers['content-type'] = 'application/json';
+        } else if (req.headers['content-type']?.includes('multipart/form-data')) {
+          options.body = req;
+          options.duplex = 'half';
+        } else if (req.body && typeof req.body === 'object' && Object.keys(req.body).length > 0) {
+          options.body = JSON.stringify(req.body);
+        }
       }
 
       const response = await fetch(url, options);
@@ -61,7 +71,8 @@ export const forwardRequest = (targetServiceUrl) => {
         error.cause?.code === 'ECONNREFUSED' ||
         error.code === 'ECONNREFUSED' ||
         error.cause?.code === 'ENOTFOUND' ||
-        error.code === 'ENOTFOUND'
+        error.code === 'ENOTFOUND' ||
+        error.message?.includes('fetch failed')
       ) {
         return res.status(503).json({
           success: false,

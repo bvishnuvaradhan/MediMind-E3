@@ -45,7 +45,7 @@ const consultationSchema = new mongoose.Schema(
     },
 
     ai_prediction_ids: {
-      type: [mongoose.Schema.Types.ObjectId],
+      type: [mongoose.Schema.Types.Mixed],
       default: [],
     },
 
