@@ -156,33 +156,6 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-.auth-quick-pills {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 4px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: #f8fafc;
-  border: 1px dashed #cbd5e1;
-  font-size: 11px;
-  color: #64748b;
-}
-
-.quick-fill-btn {
-  background: transparent;
-  color: #2563eb;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.quick-fill-btn:hover {
-  background: #eff6ff;
-}
 
 .auth-footer {
   display: flex;

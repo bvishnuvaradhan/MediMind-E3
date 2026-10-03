@@ -20,9 +20,9 @@ import './Auth.css';
 
 export function LoginPage({ onSwitchToSignup }) {
   const { login, error, clearError } = useAuth();
-  const [selectedRole, setSelectedRole] = useState('DOCTOR'); // Default to Doctor for active testing
-  const [email, setEmail] = useState('rahul.mehta@medimindhospital.com');
-  const [password, setPassword] = useState('doctor123');
+  const [selectedRole, setSelectedRole] = useState('DOCTOR');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [validationError, setValidationError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -30,22 +30,6 @@ export function LoginPage({ onSwitchToSignup }) {
     setSelectedRole(role);
     clearError();
     setValidationError('');
-    if (role === 'DOCTOR') {
-      setEmail('rahul.mehta@medimindhospital.com');
-      setPassword('doctor123');
-    } else if (role === 'DEPARTMENT_HEAD') {
-      setEmail('priya.sharma@medimindhospital.com');
-      setPassword('depthead123');
-    } else if (role === 'HOSPITAL_ADMIN') {
-      setEmail('admin@medimindhospital.com');
-      setPassword('hospital123');
-    } else if (role === 'CHAIRMAN') {
-      setEmail('chairman@medimind.com');
-      setPassword('chairman123');
-    } else {
-      setEmail('rohan.kapoor@example.com');
-      setPassword('family123');
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -169,17 +153,7 @@ export function LoginPage({ onSwitchToSignup }) {
               <Mail size={16} className="auth-icon" />
               <input
                 type="email"
-                placeholder={
-                  selectedRole === 'DOCTOR'
-                    ? 'rahul.mehta@medimindhospital.com'
-                    : selectedRole === 'DEPARTMENT_HEAD'
-                    ? 'priya.sharma@medimindhospital.com'
-                    : selectedRole === 'HOSPITAL_ADMIN'
-                    ? 'admin@medimindhospital.com'
-                    : selectedRole === 'CHAIRMAN'
-                    ? 'chairman@medimind.com'
-                    : 'rohan.kapoor@example.com'
-                }
+                placeholder="name@example.com"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -207,47 +181,6 @@ export function LoginPage({ onSwitchToSignup }) {
               />
             </div>
           </label>
-
-          <div className="auth-quick-pills">
-            <span>Quick demo accounts:</span>
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
-              <button
-                type="button"
-                className="quick-fill-btn"
-                onClick={() => handleRoleTabChange('DOCTOR')}
-              >
-                Doctor (Rahul Mehta)
-              </button>
-              <button
-                type="button"
-                className="quick-fill-btn"
-                onClick={() => handleRoleTabChange('DEPARTMENT_HEAD')}
-              >
-                Dept Head
-              </button>
-              <button
-                type="button"
-                className="quick-fill-btn"
-                onClick={() => handleRoleTabChange('HOSPITAL_ADMIN')}
-              >
-                Hospital Admin
-              </button>
-              <button
-                type="button"
-                className="quick-fill-btn"
-                onClick={() => handleRoleTabChange('CHAIRMAN')}
-              >
-                Chairman
-              </button>
-              <button
-                type="button"
-                className="quick-fill-btn"
-                onClick={() => handleRoleTabChange('FAMILY')}
-              >
-                Family
-              </button>
-            </div>
-          </div>
 
           <button
             type="submit"
