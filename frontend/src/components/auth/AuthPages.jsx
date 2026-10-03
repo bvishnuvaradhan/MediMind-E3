@@ -9,28 +9,16 @@ import {
   AlertCircle,
   ArrowRight,
   ShieldCheck,
-  Crown,
-  Building2,
-  UsersRound,
-  Stethoscope,
-  Activity,
 } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
 import './Auth.css';
 
 export function LoginPage({ onSwitchToSignup }) {
   const { login, error, clearError } = useAuth();
-  const [selectedRole, setSelectedRole] = useState('DOCTOR');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [validationError, setValidationError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-
-  const handleRoleTabChange = (role) => {
-    setSelectedRole(role);
-    clearError();
-    setValidationError('');
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,7 +40,7 @@ export function LoginPage({ onSwitchToSignup }) {
     }
 
     setSubmitting(true);
-    await login(cleanEmail, password, selectedRole);
+    await login(cleanEmail, password);
     setSubmitting(false);
   };
 
@@ -71,72 +59,12 @@ export function LoginPage({ onSwitchToSignup }) {
             </span>
           </div>
           <p className="eyebrow" style={{ marginTop: '12px', textAlign: 'center' }}>
-            {selectedRole === 'DOCTOR'
-              ? 'Doctor Clinical Workspace Portal'
-              : selectedRole === 'DEPARTMENT_HEAD'
-              ? 'Department Head Clinical Portal'
-              : selectedRole === 'HOSPITAL_ADMIN'
-              ? 'Hospital Administration Portal'
-              : selectedRole === 'CHAIRMAN'
-              ? 'Platform Administration Portal'
-              : 'Family Healthcare Portal'}
+            Unified Healthcare Platform
           </p>
           <h2>Welcome back</h2>
           <p className="auth-subheading">
-            {selectedRole === 'DOCTOR'
-              ? 'Sign in to access authorized patient health records, conduct consultations, issue prescriptions, and review AI decision support.'
-              : selectedRole === 'DEPARTMENT_HEAD'
-              ? 'Sign in to manage department doctors, OPD duty rosters, capacity workloads, and aggregate AI diagnostics.'
-              : selectedRole === 'HOSPITAL_ADMIN'
-              ? 'Sign in to manage hospital departments, clinical staff, operational schedules, and aggregate AI screening.'
-              : selectedRole === 'CHAIRMAN'
-              ? 'Sign in to access platform governance, hospital network oversight, and AI service metrics.'
-              : 'Sign in to access your family unified health records, appointments, and AI screening.'}
+            Sign in to access your clinical workspace, family health portal, or administrative center.
           </p>
-        </div>
-
-        {/* Role switcher tabs */}
-        <div className="auth-role-tabs" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
-          <button
-            type="button"
-            className={`auth-role-tab ${selectedRole === 'DOCTOR' ? 'active' : ''}`}
-            onClick={() => handleRoleTabChange('DOCTOR')}
-          >
-            <Activity size={14} />
-            <span>Doctor</span>
-          </button>
-          <button
-            type="button"
-            className={`auth-role-tab ${selectedRole === 'DEPARTMENT_HEAD' ? 'active' : ''}`}
-            onClick={() => handleRoleTabChange('DEPARTMENT_HEAD')}
-          >
-            <Stethoscope size={14} />
-            <span>Dept Head</span>
-          </button>
-          <button
-            type="button"
-            className={`auth-role-tab ${selectedRole === 'HOSPITAL_ADMIN' ? 'active' : ''}`}
-            onClick={() => handleRoleTabChange('HOSPITAL_ADMIN')}
-          >
-            <Building2 size={14} />
-            <span>Hosp Admin</span>
-          </button>
-          <button
-            type="button"
-            className={`auth-role-tab chairman ${selectedRole === 'CHAIRMAN' ? 'active' : ''}`}
-            onClick={() => handleRoleTabChange('CHAIRMAN')}
-          >
-            <Crown size={14} />
-            <span>Chairman</span>
-          </button>
-          <button
-            type="button"
-            className={`auth-role-tab ${selectedRole === 'FAMILY' ? 'active' : ''}`}
-            onClick={() => handleRoleTabChange('FAMILY')}
-          >
-            <UsersRound size={14} />
-            <span>Family</span>
-          </button>
         </div>
 
         {displayError && (
@@ -188,54 +116,28 @@ export function LoginPage({ onSwitchToSignup }) {
             disabled={submitting}
             style={{ width: '100%', justifyContent: 'center', marginTop: '6px', height: '44px' }}
           >
-            {submitting
-              ? 'Signing in...'
-              : `Sign in as ${
-                  selectedRole === 'DOCTOR'
-                    ? 'Doctor (Clinician)'
-                    : selectedRole === 'DEPARTMENT_HEAD'
-                    ? 'Department Head'
-                    : selectedRole === 'HOSPITAL_ADMIN'
-                    ? 'Hospital Admin'
-                    : selectedRole === 'CHAIRMAN'
-                    ? 'Chairman'
-                    : 'Family'
-                }`}
+            {submitting ? 'Signing in...' : 'Sign In'}
             {!submitting && <ArrowRight size={16} />}
           </button>
         </form>
 
         <div className="auth-footer">
-          {selectedRole === 'FAMILY' ? (
-            <>
-              <span>Don't have a family account yet?</span>
-              <button
-                type="button"
-                className="text-button"
-                onClick={() => {
-                  clearError();
-                  onSwitchToSignup();
-                }}
-              >
-                Create Family Account
-              </button>
-            </>
-          ) : (
-            <span style={{ fontSize: '11px', color: '#64748b' }}>
-              {selectedRole === 'DOCTOR'
-                ? 'Authorized Clinical Practitioner Access · Patient Consent Protected'
-                : selectedRole === 'DEPARTMENT_HEAD'
-                ? 'Clinical Department Head Access · Scoped Authority'
-                : selectedRole === 'HOSPITAL_ADMIN'
-                ? 'Hospital Administrative Access · NABH/JCI Verified'
-                : 'Root Platform Owner Access · Multi-Factor Authentication enabled'}
-            </span>
-          )}
+          <span>Don't have a family account yet?</span>
+          <button
+            type="button"
+            className="text-button"
+            onClick={() => {
+              clearError();
+              onSwitchToSignup();
+            }}
+          >
+            Create Family Account
+          </button>
         </div>
 
         <div className="auth-security-note">
           <ShieldCheck size={14} />
-          <span>Role-isolated authorization: Administrative authority does not equal medical-record authority.</span>
+          <span>AES-256 encrypted session · Role-isolated clinical authority and ABDM compliant.</span>
         </div>
       </div>
     </div>

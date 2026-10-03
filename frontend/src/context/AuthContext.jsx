@@ -87,7 +87,7 @@ export function AuthProvider({ children }) {
   const [loading] = useState(false);
   const [error, setError] = useState(null);
 
-  const login = async (email, _password, roleHint = null) => {
+  const login = async (email, _password) => {
     setError(null);
     if (typeof window !== 'undefined') {
       try {
@@ -101,30 +101,19 @@ export function AuthProvider({ children }) {
     }
     const cleanEmail = (email || '').trim().toLowerCase();
 
-    // Check credentials or roleHint for Doctor
-    if (roleHint === 'DOCTOR' || cleanEmail.includes('rahul') || cleanEmail.includes('doctor') || cleanEmail.includes('doc_')) {
-      const docUser = {
-        ...DEFAULT_DOCTOR,
-        email: cleanEmail || DEFAULT_DOCTOR.email,
+    // Check credentials for Chairman
+    if (cleanEmail.includes('chairman') || cleanEmail.includes('owner') || cleanEmail === 'admin@medimind.com') {
+      const chairmanUser = {
+        ...DEFAULT_CHAIRMAN,
+        email: cleanEmail || DEFAULT_CHAIRMAN.email,
       };
-      setUser(docUser);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(docUser));
-      return { success: true, user: docUser };
+      setUser(chairmanUser);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(chairmanUser));
+      return { success: true, user: chairmanUser };
     }
 
-    // Check credentials or roleHint for Department Head
-    if (roleHint === 'DEPARTMENT_HEAD' || cleanEmail.includes('priya') || cleanEmail.includes('depthead') || cleanEmail.includes('ortho')) {
-      const dhUser = {
-        ...DEFAULT_DEPARTMENT_HEAD,
-        email: cleanEmail || DEFAULT_DEPARTMENT_HEAD.email,
-      };
-      setUser(dhUser);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(dhUser));
-      return { success: true, user: dhUser };
-    }
-
-    // Check credentials or roleHint for Hospital Admin
-    if (roleHint === 'HOSPITAL_ADMIN' || cleanEmail.includes('hospital') || cleanEmail === 'admin@medimindhospital.com' || cleanEmail.includes('hadmin')) {
+    // Check credentials for Hospital Admin
+    if (cleanEmail.includes('hospital') || cleanEmail === 'admin@medimindhospital.com' || cleanEmail.includes('hadmin') || cleanEmail.includes('admin@apexmetro') || cleanEmail.includes('admin@stjude')) {
       const hospitalAdminUser = {
         ...DEFAULT_HOSPITAL_ADMIN,
         email: cleanEmail || DEFAULT_HOSPITAL_ADMIN.email,
@@ -134,15 +123,26 @@ export function AuthProvider({ children }) {
       return { success: true, user: hospitalAdminUser };
     }
 
-    // Check credentials or roleHint for Chairman
-    if (roleHint === 'CHAIRMAN' || cleanEmail.includes('chairman') || cleanEmail.includes('owner') || cleanEmail === 'admin@medimind.com') {
-      const chairmanUser = {
-        ...DEFAULT_CHAIRMAN,
-        email: cleanEmail || DEFAULT_CHAIRMAN.email,
+    // Check credentials for Department Head
+    if (cleanEmail.includes('priya') || cleanEmail.includes('depthead') || cleanEmail.includes('head.') || cleanEmail.includes('suresh.iyer') || cleanEmail.includes('rajesh.nair') || cleanEmail.includes('amit.verma') || cleanEmail.includes('sunita.kulkarni') || cleanEmail.includes('vikram.deshmukh') || cleanEmail.includes('harish.rao') || cleanEmail.includes('meera.reddy') || cleanEmail.includes('sanjay.gupta')) {
+      const dhUser = {
+        ...DEFAULT_DEPARTMENT_HEAD,
+        email: cleanEmail || DEFAULT_DEPARTMENT_HEAD.email,
       };
-      setUser(chairmanUser);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(chairmanUser));
-      return { success: true, user: chairmanUser };
+      setUser(dhUser);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dhUser));
+      return { success: true, user: dhUser };
+    }
+
+    // Check credentials for Doctor
+    if (cleanEmail.includes('rahul') || cleanEmail.includes('doctor') || cleanEmail.includes('doc_') || cleanEmail.includes('dr.') || cleanEmail.includes('vikram.anand') || cleanEmail.includes('sneha.reddy') || cleanEmail.includes('ananya.roy') || cleanEmail.includes('arjun.patel') || cleanEmail.includes('deepak.verma') || cleanEmail.includes('@medimindhospital.com')) {
+      const docUser = {
+        ...DEFAULT_DOCTOR,
+        email: cleanEmail || DEFAULT_DOCTOR.email,
+      };
+      setUser(docUser);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(docUser));
+      return { success: true, user: docUser };
     }
 
     // Default to Family account login
