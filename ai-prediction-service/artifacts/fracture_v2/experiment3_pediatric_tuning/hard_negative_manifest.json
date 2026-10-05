@@ -1,0 +1,65 @@
+{
+  "total_training_samples": 6366,
+  "total_pediatric_negatives": 1192,
+  "hard_pediatric_negatives": 1192,
+  "hard_negative_threshold": 0.4,
+  "sample_weight_distribution": {
+    "fracatlas_pos_weight": 2.5,
+    "fracatlas_neg_weight": 1.0,
+    "graz_pos_weight": 1.0,
+    "graz_neg_easy_weight": 2.0,
+    "graz_neg_hard_weight": 4.0
+  },
+  "sample_hard_negatives": [
+    {
+      "image_id": "0646_0958450226_04_WRI-L1_F010.png",
+      "patient_id": "PAT_GRAZ_646",
+      "base_prob": 0.7096619009971619
+    },
+    {
+      "image_id": "0082_0625809140_01_WRI-R2_M001.png",
+      "patient_id": "PAT_GRAZ_82",
+      "base_prob": 0.7374823689460754
+    },
+    {
+      "image_id": "0145_0320973152_01_WRI-L1_M017.png",
+      "patient_id": "PAT_GRAZ_145",
+      "base_prob": 0.7069903612136841
+    },
+    {
+      "image_id": "0291_0396313675_01_WRI-L2_M005.png",
+      "patient_id": "PAT_GRAZ_291",
+      "base_prob": 0.6422547698020935
+    },
+    {
+      "image_id": "0884_0727958390_01_WRI-L2_F014.png",
+      "patient_id": "PAT_GRAZ_884",
+      "base_prob": 0.6778973937034607
+    },
+    {
+      "image_id": "0302_0978288279_02_WRI-L2_F013.png",
+      "patient_id": "PAT_GRAZ_302",
+      "base_prob": 0.699026882648468
+    },
+    {
+      "image_id": "1406_0723205792_03_WRI-L1_F009.png",
+      "patient_id": "PAT_GRAZ_1406",
+      "base_prob": 0.6404260396957397
+    },
+    {
+      "image_id": "0507_1135296571_02_WRI-L1_M015.png",
+      "patient_id": "PAT_GRAZ_507",
+      "base_prob": 0.6781322360038757
+    },
+    {
+      "image_id": "1307_0978253167_02_WRI-R2_M017.png",
+      "patient_id": "PAT_GRAZ_1307",
+      "base_prob": 0.9767603278160095
+    },
+    {
+      "image_id": "0119_0919548936_01_WRI-L1_M011.png",
+      "patient_id": "PAT_GRAZ_119",
+      "base_prob": 0.7867676615715027
+    }
+  ]
+}

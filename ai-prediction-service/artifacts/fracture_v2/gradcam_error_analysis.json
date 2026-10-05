@@ -1,0 +1,50 @@
+{
+  "TP": {
+    "image_id": "IMG0000025.jpg",
+    "patient_id": "PAT_FA_00012",
+    "anatomy": "hand",
+    "true_label": 1,
+    "predicted_label": 1,
+    "model_probability": 0.8697,
+    "threshold": 0.26,
+    "central_bone_focus_ratio": 0.4492,
+    "artifact_focus_detected": false,
+    "clinical_interpretation": "High focal activation localized to cortical fracture zone."
+  },
+  "TN": {
+    "image_id": "IMG0000008.jpg",
+    "patient_id": "PAT_FA_00004",
+    "anatomy": "leg",
+    "true_label": 0,
+    "predicted_label": 0,
+    "model_probability": 0.0413,
+    "threshold": 0.26,
+    "central_bone_focus_ratio": 0.1334,
+    "artifact_focus_detected": true,
+    "clinical_interpretation": "Diffuse low-intensity activation indicating intact bone margins."
+  },
+  "FP": {
+    "image_id": "IMG0000016.jpg",
+    "patient_id": "PAT_FA_00008",
+    "anatomy": "hand",
+    "true_label": 0,
+    "predicted_label": 1,
+    "model_probability": 0.9828,
+    "threshold": 0.26,
+    "central_bone_focus_ratio": 0.176,
+    "artifact_focus_detected": true,
+    "clinical_interpretation": "Subtle cortical step irregularity or osteopenia artifact triggered elevated probability."
+  },
+  "FN": {
+    "image_id": "IMG0000207.jpg",
+    "patient_id": "PAT_FA_00103",
+    "anatomy": "hand",
+    "true_label": 1,
+    "predicted_label": 0,
+    "model_probability": 0.1207,
+    "threshold": 0.26,
+    "central_bone_focus_ratio": 0.0,
+    "artifact_focus_detected": true,
+    "clinical_interpretation": "Non-displaced hairline fissure missed due to minimal trabecular impaction."
+  }
+}

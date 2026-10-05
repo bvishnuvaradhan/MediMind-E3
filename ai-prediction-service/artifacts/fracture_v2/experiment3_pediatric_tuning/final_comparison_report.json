@@ -1,0 +1,56 @@
+{
+  "models_benchmarked": {
+    "1_old_mura_production": {
+      "recall": 0.9626,
+      "specificity": 0.6364,
+      "precision": 0.3589,
+      "npv": 0.9877,
+      "f1": 0.5228,
+      "roc_auc": 0.9244,
+      "threshold": 0.18
+    },
+    "2_exp2_fracatlas_only": {
+      "recall": 0.8655,
+      "specificity": 0.7374,
+      "precision": 0.4421,
+      "npv": 0.958,
+      "f1": 0.5852,
+      "roc_auc": 0.8751,
+      "threshold": 0.26
+    },
+    "3_exp2_graz_only": {
+      "recall": 0.9942,
+      "specificity": 0.008,
+      "precision": 0.6741,
+      "npv": 0.4,
+      "f1": 0.8034,
+      "roc_auc": 0.6152,
+      "threshold": 0.51
+    },
+    "4_exp2_combined_base": {
+      "recall": 0.9466,
+      "specificity": 0.5992,
+      "precision": 0.6685,
+      "npv": 0.9293,
+      "f1": 0.7836,
+      "roc_auc": 0.8396,
+      "threshold": 0.37
+    },
+    "5_exp3_targeted_tuned": {
+      "recall": 0.9733,
+      "specificity": 0.5067,
+      "precision": 0.6275,
+      "npv": 0.957,
+      "f1": 0.7631,
+      "roc_auc": 0.8111,
+      "pr_auc": 0.754,
+      "brier_score": 0.2162,
+      "expected_calibration_error": 0.1817,
+      "threshold": 0.1,
+      "adult_recall": 0.8571,
+      "adult_specificity": 0.7616,
+      "pediatric_recall": 1.0,
+      "pediatric_specificity": 0.004
+    }
+  }
+}

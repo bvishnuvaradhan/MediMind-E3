@@ -1,0 +1,47 @@
+{
+  "dataset_name": "Combined (FracAtlas + GRAZPEDWRI-DX)",
+  "fracatlas_images": 4068,
+  "graz_images": 5031,
+  "total_images": 9099,
+  "total_unique_patients": 3602,
+  "class_distribution": {
+    "fractured_count": 4049,
+    "non_fractured_count": 5050,
+    "fracture_percentage": 44.4993955379712
+  },
+  "splits": {
+    "train": {
+      "total_images": 6366,
+      "unique_patients": 2521,
+      "fractured": 2824,
+      "non_fractured": 3542,
+      "fracture_percentage": 44.360666038328624,
+      "fracatlas_count": 2844,
+      "graz_count": 3522
+    },
+    "validation": {
+      "total_images": 1350,
+      "unique_patients": 540,
+      "fractured": 588,
+      "non_fractured": 762,
+      "fracture_percentage": 43.55555555555555,
+      "fracatlas_count": 610,
+      "graz_count": 740
+    },
+    "test": {
+      "total_images": 1383,
+      "unique_patients": 541,
+      "fractured": 637,
+      "non_fractured": 746,
+      "fracture_percentage": 46.05929139551699,
+      "fracatlas_count": 614,
+      "graz_count": 769
+    }
+  },
+  "patient_leakage_check": {
+    "train_val_overlap": 0,
+    "train_test_overlap": 0,
+    "val_test_overlap": 0,
+    "leakage_detected": false
+  }
+}

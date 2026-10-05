@@ -1,0 +1,305 @@
+{
+  "model_name": "fracture_resnet18_combined",
+  "experiment": "Combined FracAtlas + GRAZPEDWRI-DX",
+  "model_version": "2.2.0",
+  "architecture": "ImageNet-pretrained ResNet-18 (Combined Training)",
+  "calibrated_threshold": 0.37,
+  "pos_weight": 1.2542492917847026,
+  "dataset_statistics": {
+    "dataset_name": "Combined (FracAtlas + GRAZPEDWRI-DX)",
+    "fracatlas_images": 4068,
+    "graz_images": 5031,
+    "total_images": 9099,
+    "total_unique_patients": 3602,
+    "class_distribution": {
+      "fractured_count": 4049,
+      "non_fractured_count": 5050,
+      "fracture_percentage": 44.4993955379712
+    },
+    "splits": {
+      "train": {
+        "total_images": 6366,
+        "unique_patients": 2521,
+        "fractured": 2824,
+        "non_fractured": 3542,
+        "fracture_percentage": 44.360666038328624,
+        "fracatlas_count": 2844,
+        "graz_count": 3522
+      },
+      "validation": {
+        "total_images": 1350,
+        "unique_patients": 540,
+        "fractured": 588,
+        "non_fractured": 762,
+        "fracture_percentage": 43.55555555555555,
+        "fracatlas_count": 610,
+        "graz_count": 740
+      },
+      "test": {
+        "total_images": 1383,
+        "unique_patients": 541,
+        "fractured": 637,
+        "non_fractured": 746,
+        "fracture_percentage": 46.05929139551699,
+        "fracatlas_count": 614,
+        "graz_count": 769
+      }
+    },
+    "patient_leakage_check": {
+      "train_val_overlap": 0,
+      "train_test_overlap": 0,
+      "val_test_overlap": 0,
+      "leakage_detected": false
+    }
+  },
+  "training_history": [
+    {
+      "stage": 1,
+      "epoch": 1,
+      "train_loss": 0.648,
+      "val_loss": 0.5997,
+      "val_roc_auc": 0.7931,
+      "val_pr_auc": 0.7039
+    },
+    {
+      "stage": 1,
+      "epoch": 2,
+      "train_loss": 0.6196,
+      "val_loss": 0.5866,
+      "val_roc_auc": 0.7981,
+      "val_pr_auc": 0.7036
+    },
+    {
+      "stage": 1,
+      "epoch": 3,
+      "train_loss": 0.6132,
+      "val_loss": 0.5824,
+      "val_roc_auc": 0.8025,
+      "val_pr_auc": 0.7143
+    },
+    {
+      "stage": 2,
+      "epoch": 4,
+      "train_loss": 0.5834,
+      "val_loss": 0.5582,
+      "val_roc_auc": 0.8144,
+      "val_pr_auc": 0.7443
+    },
+    {
+      "stage": 2,
+      "epoch": 5,
+      "train_loss": 0.5398,
+      "val_loss": 0.535,
+      "val_roc_auc": 0.8254,
+      "val_pr_auc": 0.7536
+    },
+    {
+      "stage": 2,
+      "epoch": 6,
+      "train_loss": 0.5119,
+      "val_loss": 0.5173,
+      "val_roc_auc": 0.828,
+      "val_pr_auc": 0.7525
+    },
+    {
+      "stage": 2,
+      "epoch": 7,
+      "train_loss": 0.4925,
+      "val_loss": 0.5253,
+      "val_roc_auc": 0.8242,
+      "val_pr_auc": 0.7516
+    },
+    {
+      "stage": 2,
+      "epoch": 8,
+      "train_loss": 0.4776,
+      "val_loss": 0.5137,
+      "val_roc_auc": 0.8355,
+      "val_pr_auc": 0.7619
+    },
+    {
+      "stage": 2,
+      "epoch": 9,
+      "train_loss": 0.456,
+      "val_loss": 0.5134,
+      "val_roc_auc": 0.834,
+      "val_pr_auc": 0.7639
+    }
+  ],
+  "validation_metrics": {
+    "accuracy": 0.7681,
+    "recall": 0.9507,
+    "sensitivity": 0.9507,
+    "specificity": 0.6273,
+    "precision": 0.6631,
+    "ppv": 0.6631,
+    "npv": 0.9428,
+    "f1_score": 0.7813,
+    "roc_auc": 0.8355,
+    "pr_auc": 0.7619,
+    "brier_score": 0.1556,
+    "expected_calibration_error": 0.0508
+  },
+  "combined_test_metrics": {
+    "accuracy": 0.7592,
+    "recall": 0.9466,
+    "sensitivity": 0.9466,
+    "specificity": 0.5992,
+    "precision": 0.6685,
+    "ppv": 0.6685,
+    "npv": 0.9293,
+    "f1_score": 0.7836,
+    "roc_auc": 0.8396,
+    "pr_auc": 0.8017,
+    "brier_score": 0.1556,
+    "expected_calibration_error": 0.0479
+  },
+  "fracatlas_test_subset_metrics": {
+    "accuracy": 0.8664,
+    "recall": 0.7143,
+    "sensitivity": 0.7143,
+    "specificity": 0.903,
+    "precision": 0.6391,
+    "ppv": 0.6391,
+    "npv": 0.9293,
+    "f1_score": 0.6746,
+    "roc_auc": 0.893,
+    "pr_auc": 0.7361,
+    "brier_score": 0.0921,
+    "expected_calibration_error": 0.046
+  },
+  "graz_test_subset_metrics": {
+    "accuracy": 0.6736,
+    "recall": 1.0,
+    "sensitivity": 1.0,
+    "specificity": 0.0,
+    "precision": 0.6736,
+    "ppv": 0.6736,
+    "npv": 0.0,
+    "f1_score": 0.805,
+    "roc_auc": 0.6415,
+    "pr_auc": 0.8156,
+    "brier_score": 0.2063,
+    "expected_calibration_error": 0.0527
+  },
+  "confusion_matrix": {
+    "true_positives": 603,
+    "false_positives": 299,
+    "true_negatives": 447,
+    "false_negatives": 34
+  },
+  "subgroups": {
+    "anatomy_hand": {
+      "count": 252,
+      "fractured_count": 73,
+      "recall": 0.7534,
+      "roc_auc": 0.8716
+    },
+    "anatomy_leg": {
+      "count": 312,
+      "fractured_count": 44,
+      "recall": 0.6591,
+      "roc_auc": 0.8668
+    },
+    "anatomy_hip": {
+      "count": 30,
+      "fractured_count": 1,
+      "recall": 1.0,
+      "roc_auc": 1.0
+    },
+    "anatomy_shoulder": {
+      "count": 20,
+      "fractured_count": 1,
+      "recall": 0.0,
+      "roc_auc": 1.0
+    },
+    "without_hardware": {
+      "count": 1344,
+      "fractured_count": 601,
+      "recall": 0.9468
+    },
+    "with_hardware": {
+      "count": 39,
+      "fractured_count": 36,
+      "recall": 0.9444
+    },
+    "subset_fracatlas": {
+      "accuracy": 0.8664,
+      "recall": 0.7143,
+      "sensitivity": 0.7143,
+      "specificity": 0.903,
+      "precision": 0.6391,
+      "ppv": 0.6391,
+      "npv": 0.9293,
+      "f1_score": 0.6746,
+      "roc_auc": 0.893,
+      "pr_auc": 0.7361,
+      "brier_score": 0.0921,
+      "expected_calibration_error": 0.046
+    },
+    "subset_grazpedwri_dx": {
+      "accuracy": 0.6736,
+      "recall": 1.0,
+      "sensitivity": 1.0,
+      "specificity": 0.0,
+      "precision": 0.6736,
+      "ppv": 0.6736,
+      "npv": 0.0,
+      "f1_score": 0.805,
+      "roc_auc": 0.6415,
+      "pr_auc": 0.8156,
+      "brier_score": 0.2063,
+      "expected_calibration_error": 0.0527
+    }
+  },
+  "gradcam_analysis": {
+    "TP": {
+      "image_id": "0640_0245536357_01_WRI-L2_F005.png",
+      "patient_id": "PAT_GRAZ_640",
+      "anatomy": "wrist",
+      "true_label": 1,
+      "predicted_label": 1,
+      "model_probability": 0.6761,
+      "threshold": 0.37,
+      "central_bone_focus_ratio": 0.6491,
+      "artifact_focus_detected": false,
+      "clinical_interpretation": "High focal activation localized to cortical fracture zone."
+    },
+    "TN": {
+      "image_id": "IMG0001755.jpg",
+      "patient_id": "PAT_FA_00877",
+      "anatomy": "leg",
+      "true_label": 0,
+      "predicted_label": 0,
+      "model_probability": 0.0148,
+      "threshold": 0.37,
+      "central_bone_focus_ratio": 0.0,
+      "artifact_focus_detected": true,
+      "clinical_interpretation": "Diffuse low-intensity activation indicating intact bone margins."
+    },
+    "FP": {
+      "image_id": "0747_1244101285_01_WRI-R2_M012.png",
+      "patient_id": "PAT_GRAZ_747",
+      "anatomy": "wrist",
+      "true_label": 0,
+      "predicted_label": 1,
+      "model_probability": 0.6548,
+      "threshold": 0.37,
+      "central_bone_focus_ratio": 0.587,
+      "artifact_focus_detected": false,
+      "clinical_interpretation": "Subtle cortical step irregularity or osteopenia artifact triggered elevated probability."
+    },
+    "FN": {
+      "image_id": "IMG0001730.jpg",
+      "patient_id": "PAT_FA_00865",
+      "anatomy": "hand",
+      "true_label": 1,
+      "predicted_label": 0,
+      "model_probability": 0.3594,
+      "threshold": 0.37,
+      "central_bone_focus_ratio": 0.3697,
+      "artifact_focus_detected": false,
+      "clinical_interpretation": "Non-displaced hairline fissure missed due to minimal trabecular impaction."
+    }
+  }
+}

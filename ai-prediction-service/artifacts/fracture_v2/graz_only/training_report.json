@@ -1,0 +1,206 @@
+{
+  "model_name": "fracture_resnet18_graz_only",
+  "experiment": "GRAZPEDWRI-DX Only",
+  "model_version": "2.1.0",
+  "architecture": "ImageNet-pretrained ResNet-18 (GRAZPEDWRI-DX Only)",
+  "calibrated_threshold": 0.51,
+  "pos_weight": 0.511587982832618,
+  "dataset_statistics": {
+    "dataset_name": "GRAZPEDWRI-DX",
+    "source_root": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX",
+    "total_raw_rows": 20327,
+    "total_valid_images": 5031,
+    "total_unique_patients": 1499,
+    "excluded_duplicates": 0,
+    "excluded_corrupted": 0,
+    "excluded_unextracted": 15296,
+    "class_distribution_overall": {
+      "fractured_count": 3334,
+      "non_fractured_count": 1697,
+      "fracture_percentage": 66.26913138541045
+    },
+    "splits": {
+      "train": {
+        "total_images": 3522,
+        "unique_patients": 1049,
+        "fractured": 2330,
+        "non_fractured": 1192,
+        "fracture_percentage": 66.15559341283361
+      },
+      "validation": {
+        "total_images": 740,
+        "unique_patients": 225,
+        "fractured": 486,
+        "non_fractured": 254,
+        "fracture_percentage": 65.67567567567568
+      },
+      "test": {
+        "total_images": 769,
+        "unique_patients": 225,
+        "fractured": 518,
+        "non_fractured": 251,
+        "fracture_percentage": 67.36020806241872
+      }
+    },
+    "patient_leakage_check": {
+      "train_val_overlap": 0,
+      "train_test_overlap": 0,
+      "val_test_overlap": 0,
+      "leakage_detected": false
+    }
+  },
+  "training_history": [
+    {
+      "stage": 1,
+      "epoch": 1,
+      "train_loss": 0.4817,
+      "val_loss": 0.4581,
+      "val_roc_auc": 0.5945,
+      "val_pr_auc": 0.7464
+    },
+    {
+      "stage": 1,
+      "epoch": 2,
+      "train_loss": 0.4718,
+      "val_loss": 0.499,
+      "val_roc_auc": 0.5994,
+      "val_pr_auc": 0.7524
+    },
+    {
+      "stage": 1,
+      "epoch": 3,
+      "train_loss": 0.4677,
+      "val_loss": 0.4617,
+      "val_roc_auc": 0.583,
+      "val_pr_auc": 0.7392
+    },
+    {
+      "stage": 2,
+      "epoch": 4,
+      "train_loss": 0.4748,
+      "val_loss": 0.4716,
+      "val_roc_auc": 0.5739,
+      "val_pr_auc": 0.744
+    },
+    {
+      "stage": 2,
+      "epoch": 5,
+      "train_loss": 0.466,
+      "val_loss": 0.4595,
+      "val_roc_auc": 0.5796,
+      "val_pr_auc": 0.746
+    },
+    {
+      "stage": 2,
+      "epoch": 6,
+      "train_loss": 0.4572,
+      "val_loss": 0.4645,
+      "val_roc_auc": 0.5878,
+      "val_pr_auc": 0.7528
+    },
+    {
+      "stage": 2,
+      "epoch": 7,
+      "train_loss": 0.4542,
+      "val_loss": 0.4632,
+      "val_roc_auc": 0.5736,
+      "val_pr_auc": 0.7446
+    }
+  ],
+  "validation_metrics": {
+    "accuracy": 0.6622,
+    "recall": 1.0,
+    "sensitivity": 1.0,
+    "specificity": 0.0157,
+    "precision": 0.6603,
+    "ppv": 0.6603,
+    "npv": 1.0,
+    "f1_score": 0.7954,
+    "roc_auc": 0.5994,
+    "pr_auc": 0.7524,
+    "brier_score": 0.2179,
+    "expected_calibration_error": 0.0231
+  },
+  "test_metrics": {
+    "accuracy": 0.6723,
+    "recall": 0.9942,
+    "sensitivity": 0.9942,
+    "specificity": 0.008,
+    "precision": 0.6741,
+    "ppv": 0.6741,
+    "npv": 0.4,
+    "f1_score": 0.8034,
+    "roc_auc": 0.6152,
+    "pr_auc": 0.796,
+    "brier_score": 0.209,
+    "expected_calibration_error": 0.0498
+  },
+  "confusion_matrix": {
+    "true_positives": 515,
+    "false_positives": 249,
+    "true_negatives": 2,
+    "false_negatives": 3
+  },
+  "subgroups": {
+    "without_hardware": {
+      "count": 755,
+      "fractured_count": 506,
+      "recall": 0.9941
+    },
+    "with_hardware": {
+      "count": 14,
+      "fractured_count": 12,
+      "recall": 1.0
+    }
+  },
+  "gradcam_analysis": {
+    "TP": {
+      "image_id": "0017_1043285078_01_WRI-L2_F001.png",
+      "patient_id": "PAT_GRAZ_17",
+      "anatomy": "wrist",
+      "true_label": 1,
+      "predicted_label": 1,
+      "model_probability": 0.8063,
+      "threshold": 0.51,
+      "central_bone_focus_ratio": 0.462,
+      "artifact_focus_detected": false,
+      "clinical_interpretation": "High focal activation localized to cortical fracture zone."
+    },
+    "TN": {
+      "image_id": "0176_0797491507_01_WRI-L2_F008.png",
+      "patient_id": "PAT_GRAZ_176",
+      "anatomy": "wrist",
+      "true_label": 0,
+      "predicted_label": 0,
+      "model_probability": 0.4936,
+      "threshold": 0.51,
+      "central_bone_focus_ratio": 0.0,
+      "artifact_focus_detected": true,
+      "clinical_interpretation": "Diffuse low-intensity activation indicating intact bone margins."
+    },
+    "FP": {
+      "image_id": "0017_1043285040_01_WRI-L1_F001.png",
+      "patient_id": "PAT_GRAZ_17",
+      "anatomy": "wrist",
+      "true_label": 0,
+      "predicted_label": 1,
+      "model_probability": 0.6709,
+      "threshold": 0.51,
+      "central_bone_focus_ratio": 0.4006,
+      "artifact_focus_detected": false,
+      "clinical_interpretation": "Subtle cortical step irregularity or osteopenia artifact triggered elevated probability."
+    },
+    "FN": {
+      "image_id": "0111_1221479442_01_WRI-R2_M012.png",
+      "patient_id": "PAT_GRAZ_111",
+      "anatomy": "wrist",
+      "true_label": 1,
+      "predicted_label": 0,
+      "model_probability": 0.4939,
+      "threshold": 0.51,
+      "central_bone_focus_ratio": 0.0,
+      "artifact_focus_detected": true,
+      "clinical_interpretation": "Non-displaced hairline fissure missed due to minimal trabecular impaction."
+    }
+  }
+}

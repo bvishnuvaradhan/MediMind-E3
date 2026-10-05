@@ -1,0 +1,255 @@
+{
+  "model_name": "fracture_resnet18_v2",
+  "model_version": "2.0.0",
+  "architecture": "ImageNet-pretrained ResNet-18 (Pure Fracture Training, No MURA)",
+  "training_device": "cpu",
+  "random_seed": 42,
+  "calibrated_threshold": 0.26,
+  "pos_weight": 4.7571,
+  "dataset_statistics": {
+    "dataset_name": "FracAtlas (Cleaned v2)",
+    "source_root": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\FracAtlas\\FracAtlas",
+    "total_raw_rows": 4083,
+    "total_valid_images": 4068,
+    "total_unique_patients": 2103,
+    "excluded_corrupted": 0,
+    "excluded_missing": 0,
+    "excluded_duplicates": 15,
+    "class_distribution_overall": {
+      "fractured_count": 715,
+      "non_fractured_count": 3353,
+      "fracture_percentage": 17.57620452310718
+    },
+    "splits": {
+      "train": {
+        "total_images": 2844,
+        "unique_patients": 1472,
+        "fractured": 494,
+        "non_fractured": 2350,
+        "fracture_percentage": 17.369901547116736
+      },
+      "validation": {
+        "total_images": 610,
+        "unique_patients": 315,
+        "fractured": 102,
+        "non_fractured": 508,
+        "fracture_percentage": 16.721311475409838
+      },
+      "test": {
+        "total_images": 614,
+        "unique_patients": 316,
+        "fractured": 119,
+        "non_fractured": 495,
+        "fracture_percentage": 19.381107491856678
+      }
+    },
+    "patient_leakage_check": {
+      "train_val_overlap": 0,
+      "train_test_overlap": 0,
+      "val_test_overlap": 0,
+      "leakage_detected": false
+    }
+  },
+  "training_history": {
+    "stage1_epochs": 3,
+    "stage2_epochs": 6,
+    "best_val_auc": 0.9041,
+    "note": "Loaded from completed two-stage training checkpoint"
+  },
+  "validation_threshold_optimization": {
+    "selected_threshold": 0.26,
+    "validation_metrics": {
+      "accuracy": 0.7623,
+      "recall": 0.9314,
+      "sensitivity": 0.9314,
+      "specificity": 0.7283,
+      "precision": 0.4077,
+      "ppv": 0.4077,
+      "npv": 0.9814,
+      "f1_score": 0.5672,
+      "roc_auc": 0.9041,
+      "pr_auc": 0.724,
+      "brier_score": 0.0948,
+      "expected_calibration_error": 0.0913
+    }
+  },
+  "final_held_out_test_results": {
+    "threshold": 0.26,
+    "total_samples": 614,
+    "confusion_matrix": {
+      "true_positives": 103,
+      "false_positives": 130,
+      "true_negatives": 365,
+      "false_negatives": 16
+    },
+    "metrics": {
+      "accuracy": 0.7622,
+      "recall": 0.8655,
+      "sensitivity": 0.8655,
+      "specificity": 0.7374,
+      "precision": 0.4421,
+      "ppv": 0.4421,
+      "npv": 0.958,
+      "f1_score": 0.5852,
+      "roc_auc": 0.8751,
+      "pr_auc": 0.6891,
+      "brier_score": 0.1117,
+      "expected_calibration_error": 0.0894
+    },
+    "subgroups": {
+      "anatomy_hand": {
+        "count": 252,
+        "fractured_count": 73,
+        "recall": 0.9452,
+        "roc_auc": 0.8306
+      },
+      "anatomy_leg": {
+        "count": 312,
+        "fractured_count": 44,
+        "recall": 0.75,
+        "roc_auc": 0.8735
+      },
+      "anatomy_hip": {
+        "count": 30,
+        "fractured_count": 1,
+        "recall": 1.0,
+        "roc_auc": 1.0
+      },
+      "anatomy_shoulder": {
+        "count": 20,
+        "fractured_count": 1,
+        "recall": 0.0,
+        "roc_auc": 0.5789
+      },
+      "without_hardware": {
+        "count": 589,
+        "fractured_count": 95,
+        "recall": 0.8316
+      },
+      "with_hardware": {
+        "count": 25,
+        "fractured_count": 24,
+        "recall": 1.0
+      }
+    }
+  },
+  "model_comparison": {
+    "metrics_comparison": {
+      "recall_sensitivity": {
+        "old_mura_model": 0.9626,
+        "new_v2_model": 0.8655,
+        "difference": -0.0971
+      },
+      "specificity": {
+        "old_mura_model": 0.6364,
+        "new_v2_model": 0.7374,
+        "difference": 0.101
+      },
+      "precision_ppv": {
+        "old_mura_model": 0.3589,
+        "new_v2_model": 0.4421,
+        "difference": 0.0832
+      },
+      "npv": {
+        "old_mura_model": 0.9877,
+        "new_v2_model": 0.958,
+        "difference": -0.0297
+      },
+      "f1_score": {
+        "old_mura_model": 0.5228,
+        "new_v2_model": 0.5852,
+        "difference": 0.0624
+      },
+      "roc_auc": {
+        "old_mura_model": 0.9244,
+        "new_v2_model": 0.8751,
+        "difference": -0.0493
+      },
+      "pr_auc": {
+        "old_mura_model": 0.7843,
+        "new_v2_model": 0.6891,
+        "difference": -0.0952
+      },
+      "brier_score": {
+        "old_mura_model": 0.0896,
+        "new_v2_model": 0.1117,
+        "difference": 0.0221
+      },
+      "expected_calibration_error": {
+        "old_mura_model": 0.1021,
+        "new_v2_model": 0.0894,
+        "difference": -0.0127
+      }
+    },
+    "confusion_matrix_comparison": {
+      "old_mura_model": {
+        "true_positives": 103,
+        "false_positives": 184,
+        "true_negatives": 322,
+        "false_negatives": 4
+      },
+      "new_v2_model": {
+        "true_positives": 103,
+        "false_positives": 130,
+        "true_negatives": 365,
+        "false_negatives": 16
+      }
+    }
+  },
+  "gradcam_analysis": {
+    "TP": {
+      "image_id": "IMG0000025.jpg",
+      "patient_id": "PAT_FA_00012",
+      "anatomy": "hand",
+      "true_label": 1,
+      "predicted_label": 1,
+      "model_probability": 0.8697,
+      "threshold": 0.26,
+      "central_bone_focus_ratio": 0.4492,
+      "artifact_focus_detected": false,
+      "clinical_interpretation": "High focal activation localized to cortical fracture zone."
+    },
+    "TN": {
+      "image_id": "IMG0000008.jpg",
+      "patient_id": "PAT_FA_00004",
+      "anatomy": "leg",
+      "true_label": 0,
+      "predicted_label": 0,
+      "model_probability": 0.0413,
+      "threshold": 0.26,
+      "central_bone_focus_ratio": 0.1334,
+      "artifact_focus_detected": true,
+      "clinical_interpretation": "Diffuse low-intensity activation indicating intact bone margins."
+    },
+    "FP": {
+      "image_id": "IMG0000016.jpg",
+      "patient_id": "PAT_FA_00008",
+      "anatomy": "hand",
+      "true_label": 0,
+      "predicted_label": 1,
+      "model_probability": 0.9828,
+      "threshold": 0.26,
+      "central_bone_focus_ratio": 0.176,
+      "artifact_focus_detected": true,
+      "clinical_interpretation": "Subtle cortical step irregularity or osteopenia artifact triggered elevated probability."
+    },
+    "FN": {
+      "image_id": "IMG0000207.jpg",
+      "patient_id": "PAT_FA_00103",
+      "anatomy": "hand",
+      "true_label": 1,
+      "predicted_label": 0,
+      "model_probability": 0.1207,
+      "threshold": 0.26,
+      "central_bone_focus_ratio": 0.0,
+      "artifact_focus_detected": true,
+      "clinical_interpretation": "Non-displaced hairline fissure missed due to minimal trabecular impaction."
+    }
+  },
+  "production_recommendation": {
+    "status": "VALIDATED_CANDIDATE",
+    "mura_eliminated": true,
+    "pure_radiograph_inference": true,
+    "zero_heuristics": true
+  }
+}

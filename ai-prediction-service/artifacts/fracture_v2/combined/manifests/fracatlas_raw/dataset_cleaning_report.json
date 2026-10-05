@@ -1,0 +1,44 @@
+{
+  "dataset_name": "FracAtlas (Cleaned v2)",
+  "source_root": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\FracAtlas\\FracAtlas",
+  "total_raw_rows": 4083,
+  "total_valid_images": 4068,
+  "total_unique_patients": 2103,
+  "excluded_corrupted": 0,
+  "excluded_missing": 0,
+  "excluded_duplicates": 15,
+  "class_distribution_overall": {
+    "fractured_count": 715,
+    "non_fractured_count": 3353,
+    "fracture_percentage": 17.57620452310718
+  },
+  "splits": {
+    "train": {
+      "total_images": 2844,
+      "unique_patients": 1472,
+      "fractured": 494,
+      "non_fractured": 2350,
+      "fracture_percentage": 17.369901547116736
+    },
+    "validation": {
+      "total_images": 610,
+      "unique_patients": 315,
+      "fractured": 102,
+      "non_fractured": 508,
+      "fracture_percentage": 16.721311475409838
+    },
+    "test": {
+      "total_images": 614,
+      "unique_patients": 316,
+      "fractured": 119,
+      "non_fractured": 495,
+      "fracture_percentage": 19.381107491856678
+    }
+  },
+  "patient_leakage_check": {
+    "train_val_overlap": 0,
+    "train_test_overlap": 0,
+    "val_test_overlap": 0,
+    "leakage_detected": false
+  }
+}

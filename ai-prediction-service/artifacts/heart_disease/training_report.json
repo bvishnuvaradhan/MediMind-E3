@@ -1,0 +1,773 @@
+{
+  "model_name": "heart_disease_risk",
+  "model_version": "0.2.0",
+  "random_state": 42,
+  "feature_columns": [
+    "AGE",
+    "GENDER",
+    "HEIGHT",
+    "WEIGHT",
+    "AP_HIGH",
+    "AP_LOW",
+    "CHOLESTEROL",
+    "GLUCOSE",
+    "SMOKE",
+    "ALCOHOL",
+    "PHYSICAL_ACTIVITY"
+  ],
+  "split_ratios": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "split_sizes": {
+    "x_train": 45474,
+    "x_validation": 9744,
+    "x_test": 9745
+  },
+  "class_balance": {
+    "train": {
+      "0": 22337,
+      "1": 23137
+    },
+    "validation": {
+      "0": 4786,
+      "1": 4958
+    },
+    "test": {
+      "0": 4787,
+      "1": 4958
+    }
+  },
+  "preparation": {
+    "rows_before": 68783,
+    "rows_before_deduplication": 68783,
+    "rows_after": 64963,
+    "duplicates_removed": 3820,
+    "duplicate_groups": 2602,
+    "raw_class_balance": {
+      "0": 34742,
+      "1": 34041
+    },
+    "deduplicated_class_balance": {
+      "0": 31910,
+      "1": 33053
+    },
+    "removed_duplicate_class_balance": {
+      "0": 2832,
+      "1": 988
+    }
+  },
+  "eda": {
+    "distributions": {
+      "AGE": {
+        "min": 30.0,
+        "max": 65.0,
+        "mean": 53.353154872773736,
+        "median": 54.0,
+        "q1": 48.0,
+        "q3": 59.0,
+        "iqr_outlier_count": 4
+      },
+      "GENDER": {
+        "min": 1.0,
+        "max": 2.0,
+        "mean": 1.3565106291273494,
+        "median": 1.0,
+        "q1": 1.0,
+        "q3": 2.0,
+        "iqr_outlier_count": 0
+      },
+      "HEIGHT": {
+        "min": 55.0,
+        "max": 250.0,
+        "mean": 164.34725920908826,
+        "median": 165.0,
+        "q1": 159.0,
+        "q3": 170.0,
+        "iqr_outlier_count": 506
+      },
+      "WEIGHT": {
+        "min": 11.0,
+        "max": 200.0,
+        "mean": 74.49725228206826,
+        "median": 72.0,
+        "q1": 65.0,
+        "q3": 82.5,
+        "iqr_outlier_count": 1588
+      },
+      "AP_HIGH": {
+        "min": 60.0,
+        "max": 240.0,
+        "mean": 126.97998860890046,
+        "median": 120.0,
+        "q1": 120.0,
+        "q3": 140.0,
+        "iqr_outlier_count": 1068
+      },
+      "AP_LOW": {
+        "min": 40.0,
+        "max": 190.0,
+        "mean": 81.48076597447778,
+        "median": 80.0,
+        "q1": 80.0,
+        "q3": 90.0,
+        "iqr_outlier_count": 3578
+      },
+      "CHOLESTEROL": {
+        "min": 1.0,
+        "max": 3.0,
+        "mean": 1.3840801687114204,
+        "median": 1.0,
+        "q1": 1.0,
+        "q3": 2.0,
+        "iqr_outlier_count": 0
+      },
+      "GLUCOSE": {
+        "min": 1.0,
+        "max": 3.0,
+        "mean": 1.2379046534180995,
+        "median": 1.0,
+        "q1": 1.0,
+        "q3": 1.0,
+        "iqr_outlier_count": 10264
+      },
+      "SMOKE": {
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.09271431430198729,
+        "median": 0.0,
+        "q1": 0.0,
+        "q3": 0.0,
+        "iqr_outlier_count": 6023
+      },
+      "ALCOHOL": {
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.05666302356726136,
+        "median": 0.0,
+        "q1": 0.0,
+        "q3": 0.0,
+        "iqr_outlier_count": 3681
+      },
+      "PHYSICAL_ACTIVITY": {
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.7971152810061112,
+        "median": 1.0,
+        "q1": 1.0,
+        "q3": 1.0,
+        "iqr_outlier_count": 13180
+      }
+    },
+    "feature_target_relationships": {
+      "AGE": {
+        "mean_target_0": 51.71958633657161,
+        "mean_target_1": 54.93023326173116
+      },
+      "GENDER": {
+        "mean_target_0": 1.3562519586336572,
+        "mean_target_1": 1.3567603545820348
+      },
+      "HEIGHT": {
+        "mean_target_0": 164.42519586336573,
+        "mean_target_1": 164.27201766859287
+      },
+      "WEIGHT": {
+        "mean_target_0": 71.94061422751489,
+        "mean_target_1": 76.96547968414365
+      },
+      "AP_HIGH": {
+        "mean_target_0": 119.60263240363523,
+        "mean_target_1": 134.10222975221615
+      },
+      "AP_LOW": {
+        "mean_target_0": 78.09686618614855,
+        "mean_target_1": 84.74764771730251
+      },
+      "CHOLESTEROL": {
+        "mean_target_0": 1.2338765277342525,
+        "mean_target_1": 1.529089643905243
+      },
+      "GLUCOSE": {
+        "mean_target_0": 1.1895643998746475,
+        "mean_target_1": 1.2845732611260703
+      },
+      "SMOKE": {
+        "mean_target_0": 0.09993732372297086,
+        "mean_target_1": 0.08574108250385744
+      },
+      "ALCOHOL": {
+        "mean_target_0": 0.060231902225007836,
+        "mean_target_1": 0.05321755967688258
+      },
+      "PHYSICAL_ACTIVITY": {
+        "mean_target_0": 0.808868693199624,
+        "mean_target_1": 0.7857683114997126
+      }
+    }
+  },
+  "models": {
+    "logistic_regression": {
+      "validation": {
+        "threshold": 0.5,
+        "recall": 0.682533279548205,
+        "specificity": 0.7611784371082323,
+        "precision": 0.7475149105367793,
+        "f1": 0.7135477069056405,
+        "roc_auc": 0.7882368603330239,
+        "pr_auc": 0.7758761622902703,
+        "brier_score": 0.18846513479244753,
+        "confusion_matrix": [
+          [
+            3643,
+            1143
+          ],
+          [
+            1574,
+            3384
+          ]
+        ]
+      },
+      "test": {
+        "threshold": 0.5,
+        "recall": 0.6879790237999194,
+        "specificity": 0.7603927303112596,
+        "precision": 0.748354541465555,
+        "f1": 0.7168978562421185,
+        "roc_auc": 0.7865578694752234,
+        "pr_auc": 0.7732097416810138,
+        "brier_score": 0.1890683401334658,
+        "confusion_matrix": [
+          [
+            3640,
+            1147
+          ],
+          [
+            1547,
+            3411
+          ]
+        ]
+      }
+    },
+    "random_forest": {
+      "validation": {
+        "threshold": 0.5,
+        "recall": 0.6920129084308189,
+        "specificity": 0.7668198913497701,
+        "precision": 0.7545634484275346,
+        "f1": 0.7219358232509205,
+        "roc_auc": 0.794411839223822,
+        "pr_auc": 0.7792986057947288,
+        "brier_score": 0.18381171993790363,
+        "confusion_matrix": [
+          [
+            3670,
+            1116
+          ],
+          [
+            1527,
+            3431
+          ]
+        ]
+      },
+      "test": {
+        "threshold": 0.5,
+        "recall": 0.6950383219039935,
+        "specificity": 0.7639440150407353,
+        "precision": 0.7530594405594405,
+        "f1": 0.7228865114327669,
+        "roc_auc": 0.796064653555713,
+        "pr_auc": 0.7834800667710461,
+        "brier_score": 0.1828821618755912,
+        "confusion_matrix": [
+          [
+            3657,
+            1130
+          ],
+          [
+            1512,
+            3446
+          ]
+        ]
+      },
+      "tuned_validation": {
+        "threshold": 0.4,
+        "recall": 0.7938684953610327,
+        "specificity": 0.6395737567906393,
+        "precision": 0.6952835188129306,
+        "f1": 0.7413127413127413,
+        "roc_auc": 0.794411839223822,
+        "pr_auc": 0.7792986057947288,
+        "brier_score": 0.18381171993790363,
+        "confusion_matrix": [
+          [
+            3061,
+            1725
+          ],
+          [
+            1022,
+            3936
+          ]
+        ]
+      },
+      "tuned_test": {
+        "threshold": 0.4,
+        "recall": 0.800121016538927,
+        "specificity": 0.6340087737622728,
+        "precision": 0.6936527364923938,
+        "f1": 0.7430926290156411,
+        "roc_auc": 0.796064653555713,
+        "pr_auc": 0.7834800667710461,
+        "brier_score": 0.1828821618755912,
+        "confusion_matrix": [
+          [
+            3035,
+            1752
+          ],
+          [
+            991,
+            3967
+          ]
+        ]
+      }
+    },
+    "mlp": {
+      "validation": {
+        "threshold": 0.5,
+        "recall": 0.7029043969342477,
+        "specificity": 0.7465524446301713,
+        "precision": 0.7418050234142188,
+        "f1": 0.721830985915493,
+        "roc_auc": 0.7919230268058629,
+        "pr_auc": 0.7777203430939775,
+        "brier_score": 0.18509897083285257,
+        "confusion_matrix": [
+          [
+            3573,
+            1213
+          ],
+          [
+            1473,
+            3485
+          ]
+        ]
+      },
+      "test": {
+        "threshold": 0.5,
+        "recall": 0.7083501411859621,
+        "specificity": 0.7472320869020264,
+        "precision": 0.7437526471833968,
+        "f1": 0.7256198347107438,
+        "roc_auc": 0.7956301493228306,
+        "pr_auc": 0.7867909067471026,
+        "brier_score": 0.18349030755493068,
+        "confusion_matrix": [
+          [
+            3577,
+            1210
+          ],
+          [
+            1446,
+            3512
+          ]
+        ]
+      }
+    }
+  },
+  "training_diagnostics": {
+    "logistic_regression": {
+      "status": "completed",
+      "duration_seconds": 0.12
+    },
+    "random_forest": {
+      "status": "completed",
+      "duration_seconds": 1.124,
+      "estimators_trained": 200,
+      "maximum_depth": 12
+    },
+    "mlp": {
+      "status": "completed",
+      "duration_seconds": 5.413,
+      "iterations_completed": 63,
+      "maximum_iterations": 300,
+      "stopped_early": true,
+      "early_stopping_enabled": true,
+      "final_loss": 0.5381077663071926
+    }
+  },
+  "selected_model": "random_forest",
+  "selected_threshold": 0.4,
+  "calibration": {
+    "expected_calibration_error": 0.007958415487719212,
+    "bins": [
+      {
+        "bin": 0,
+        "count": 379,
+        "mean_probability": 0.0989192589649987,
+        "observed_rate": 0.0712401055408971
+      },
+      {
+        "bin": 1,
+        "count": 1016,
+        "mean_probability": 0.1735694523789066,
+        "observed_rate": 0.17125984251968504
+      },
+      {
+        "bin": 2,
+        "count": 1335,
+        "mean_probability": 0.2631675057929844,
+        "observed_rate": 0.26292134831460673
+      },
+      {
+        "bin": 3,
+        "count": 1218,
+        "mean_probability": 0.3475858536389169,
+        "observed_rate": 0.34236453201970446
+      },
+      {
+        "bin": 4,
+        "count": 1039,
+        "mean_probability": 0.4342550483247843,
+        "observed_rate": 0.43695861405197306
+      },
+      {
+        "bin": 5,
+        "count": 869,
+        "mean_probability": 0.5230201872652868,
+        "observed_rate": 0.5143843498273878
+      },
+      {
+        "bin": 6,
+        "count": 606,
+        "mean_probability": 0.6154603890589806,
+        "observed_rate": 0.6237623762376238
+      },
+      {
+        "bin": 7,
+        "count": 480,
+        "mean_probability": 0.7085510761234864,
+        "observed_rate": 0.7479166666666667
+      },
+      {
+        "bin": 8,
+        "count": 1521,
+        "mean_probability": 0.8057879525315327,
+        "observed_rate": 0.8185404339250493
+      },
+      {
+        "bin": 9,
+        "count": 1282,
+        "mean_probability": 0.866141222139375,
+        "observed_rate": 0.8627145085803433
+      }
+    ]
+  },
+  "error_analysis": {
+    "threshold": 0.4,
+    "false_positive_count": 1752,
+    "false_negative_count": 991,
+    "error_count": 2743,
+    "false_positive_rate": 0.3659912262377272,
+    "false_negative_rate": 0.19987898346107302
+  },
+  "subgroups": {
+    "GENDER": {
+      "1": {
+        "threshold": 0.4,
+        "recall": 0.8070939639079029,
+        "specificity": 0.6288759689922481,
+        "precision": 0.693026983702912,
+        "f1": 0.7457237314934598,
+        "roc_auc": 0.7985103126020044,
+        "pr_auc": 0.7868743834989338,
+        "brier_score": 0.1817906900146634,
+        "confusion_matrix": [
+          [
+            1947,
+            1149
+          ],
+          [
+            620,
+            2594
+          ]
+        ],
+        "count": 6310,
+        "prevalence": 0.5093502377179081,
+        "expected_calibration_error": 0.009651463741793384
+      },
+      "2": {
+        "threshold": 0.4,
+        "recall": 0.7872706422018348,
+        "specificity": 0.6434062684801892,
+        "precision": 0.694838056680162,
+        "f1": 0.7381720430107527,
+        "roc_auc": 0.7914361446730938,
+        "pr_auc": 0.7777945342198079,
+        "brier_score": 0.18488716549784862,
+        "confusion_matrix": [
+          [
+            1088,
+            603
+          ],
+          [
+            371,
+            1373
+          ]
+        ],
+        "count": 3435,
+        "prevalence": 0.5077147016011645,
+        "expected_calibration_error": 0.01076521508884781
+      }
+    },
+    "AGE_BAND": {
+      "30-44": {
+        "threshold": 0.4,
+        "recall": 0.6186046511627907,
+        "specificity": 0.9070010449320794,
+        "precision": 0.7492957746478873,
+        "f1": 0.6777070063694267,
+        "roc_auc": 0.8361996063279142,
+        "pr_auc": 0.7473088106552402,
+        "brier_score": 0.13518903599897897,
+        "confusion_matrix": [
+          [
+            868,
+            89
+          ],
+          [
+            164,
+            266
+          ]
+        ],
+        "count": 1387,
+        "prevalence": 0.31002162941600575,
+        "expected_calibration_error": 0.028417191808589086
+      },
+      "45-54": {
+        "threshold": 0.4,
+        "recall": 0.6839176405119644,
+        "specificity": 0.7751564756860857,
+        "precision": 0.7246462264150944,
+        "f1": 0.7036931004866877,
+        "roc_auc": 0.7867667961018859,
+        "pr_auc": 0.7627190866196103,
+        "brier_score": 0.18051153932228498,
+        "confusion_matrix": [
+          [
+            1610,
+            467
+          ],
+          [
+            568,
+            1229
+          ]
+        ],
+        "count": 3874,
+        "prevalence": 0.4638616417139907,
+        "expected_calibration_error": 0.01773186161190755
+      },
+      "55-64": {
+        "threshold": 0.4,
+        "recall": 0.9038247307835128,
+        "specificity": 0.3206678180771445,
+        "precision": 0.673491975650249,
+        "f1": 0.7718408117964167,
+        "roc_auc": 0.7349652321494499,
+        "pr_auc": 0.7926465343502899,
+        "brier_score": 0.19983501208472873,
+        "confusion_matrix": [
+          [
+            557,
+            1180
+          ],
+          [
+            259,
+            2434
+          ]
+        ],
+        "count": 4430,
+        "prevalence": 0.6079006772009029,
+        "expected_calibration_error": 0.014622075842003302
+      },
+      "65+": {
+        "threshold": 0.4,
+        "recall": 1.0,
+        "specificity": 0.0,
+        "precision": 0.7037037037037037,
+        "f1": 0.8260869565217391,
+        "roc_auc": 0.7023026315789473,
+        "pr_auc": 0.8259948586068212,
+        "brier_score": 0.1871975495772624,
+        "confusion_matrix": [
+          [
+            0,
+            16
+          ],
+          [
+            0,
+            38
+          ]
+        ],
+        "count": 54,
+        "prevalence": 0.7037037037037037,
+        "expected_calibration_error": 0.11578296997484619
+      }
+    },
+    "CHOLESTEROL": {
+      "1": {
+        "threshold": 0.4,
+        "recall": 0.7337723424270931,
+        "specificity": 0.6899873257287706,
+        "precision": 0.6567499298344092,
+        "f1": 0.693127962085308,
+        "roc_auc": 0.785960373129909,
+        "pr_auc": 0.749337355211215,
+        "brier_score": 0.18466809024928132,
+        "confusion_matrix": [
+          [
+            2722,
+            1223
+          ],
+          [
+            849,
+            2340
+          ]
+        ],
+        "count": 7134,
+        "prevalence": 0.44701429772918416,
+        "expected_calibration_error": 0.0102343316892969
+      },
+      "2": {
+        "threshold": 0.4,
+        "recall": 0.8389423076923077,
+        "specificity": 0.5123239436619719,
+        "precision": 0.7158974358974359,
+        "f1": 0.7725511898173769,
+        "roc_auc": 0.7642326313651138,
+        "pr_auc": 0.7972915332485722,
+        "brier_score": 0.1904026538685704,
+        "confusion_matrix": [
+          [
+            291,
+            277
+          ],
+          [
+            134,
+            698
+          ]
+        ],
+        "count": 1400,
+        "prevalence": 0.5942857142857143,
+        "expected_calibration_error": 0.020999432361301758
+      },
+      "3": {
+        "threshold": 0.4,
+        "recall": 0.991462113127001,
+        "specificity": 0.08029197080291971,
+        "precision": 0.7866215071972904,
+        "f1": 0.8772426817752597,
+        "roc_auc": 0.6503030326636494,
+        "pr_auc": 0.8392353211686038,
+        "brier_score": 0.16366704890443,
+        "confusion_matrix": [
+          [
+            22,
+            252
+          ],
+          [
+            8,
+            929
+          ]
+        ],
+        "count": 1211,
+        "prevalence": 0.7737407101568952,
+        "expected_calibration_error": 0.036031448053165646
+      }
+    },
+    "GLUCOSE": {
+      "1": {
+        "threshold": 0.4,
+        "recall": 0.7801453998495863,
+        "specificity": 0.6656398104265403,
+        "precision": 0.6880389122263985,
+        "f1": 0.731203007518797,
+        "roc_auc": 0.7993909198162246,
+        "pr_auc": 0.7779386283615686,
+        "brier_score": 0.18084028486673828,
+        "confusion_matrix": [
+          [
+            2809,
+            1411
+          ],
+          [
+            877,
+            3112
+          ]
+        ],
+        "count": 8209,
+        "prevalence": 0.4859300767450359,
+        "expected_calibration_error": 0.00891406952490599
+      },
+      "2": {
+        "threshold": 0.4,
+        "recall": 0.81859410430839,
+        "specificity": 0.468013468013468,
+        "precision": 0.6955684007707129,
+        "f1": 0.7520833333333333,
+        "roc_auc": 0.7337700512303688,
+        "pr_auc": 0.7777033115183382,
+        "brier_score": 0.20243223221863904,
+        "confusion_matrix": [
+          [
+            139,
+            158
+          ],
+          [
+            80,
+            361
+          ]
+        ],
+        "count": 738,
+        "prevalence": 0.5975609756097561,
+        "expected_calibration_error": 0.040302840247406345
+      },
+      "3": {
+        "threshold": 0.4,
+        "recall": 0.9356060606060606,
+        "specificity": 0.32222222222222224,
+        "precision": 0.7296898079763663,
+        "f1": 0.8199170124481328,
+        "roc_auc": 0.7410388608305275,
+        "pr_auc": 0.814754613894694,
+        "brier_score": 0.18580674389627302,
+        "confusion_matrix": [
+          [
+            87,
+            183
+          ],
+          [
+            34,
+            494
+          ]
+        ],
+        "count": 798,
+        "prevalence": 0.6616541353383458,
+        "expected_calibration_error": 0.05342669805960424
+      }
+    }
+  },
+  "threshold_provenance": {
+    "source_partition": "validation",
+    "selection_metric": "recall",
+    "tie_breaker": "f1",
+    "minimum_specificity": 0.6,
+    "candidate_thresholds": "0.05 to 0.95 in 0.05 steps",
+    "test_partition_usage": "evaluation only; never used to select the threshold"
+  },
+  "model_card": {
+    "output_interpretation": "Estimated cardiovascular risk probability and risk category.",
+    "not_a_diagnosis": "This model does not diagnose heart disease.",
+    "clinical_use": "Results require qualified clinician review and must not replace clinical judgment."
+  }
+}

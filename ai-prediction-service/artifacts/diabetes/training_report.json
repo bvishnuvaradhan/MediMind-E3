@@ -1,0 +1,607 @@
+{
+  "model_name": "diabetes_risk",
+  "model_version": "0.1.0",
+  "random_state": 42,
+  "feature_columns": [
+    "Pregnancies",
+    "Glucose",
+    "BloodPressure",
+    "SkinThickness",
+    "Insulin",
+    "BMI",
+    "DiabetesPedigreeFunction",
+    "Age"
+  ],
+  "biological_zero_columns": [
+    "Glucose",
+    "BloodPressure",
+    "SkinThickness",
+    "Insulin",
+    "BMI"
+  ],
+  "training_imputation_medians": {
+    "Glucose": 117.0,
+    "BloodPressure": 72.0,
+    "SkinThickness": 29.0,
+    "Insulin": 126.0,
+    "BMI": 32.4
+  },
+  "split_ratios": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "split_sizes": {
+    "x_train": 537,
+    "x_validation": 115,
+    "x_test": 116
+  },
+  "class_balance": {
+    "train": {
+      "0": 350,
+      "1": 187
+    },
+    "validation": {
+      "0": 75,
+      "1": 40
+    },
+    "test": {
+      "0": 75,
+      "1": 41
+    }
+  },
+  "preparation": {
+    "rows_before": 768,
+    "rows_before_deduplication": 768,
+    "rows_after": 768,
+    "duplicates_removed": 0,
+    "raw_class_balance": {
+      "0": 500,
+      "1": 268
+    },
+    "biological_zeros_before_imputation": {
+      "Glucose": 5,
+      "BloodPressure": 35,
+      "SkinThickness": 227,
+      "Insulin": 374,
+      "BMI": 11
+    }
+  },
+  "eda": {
+    "distributions": {
+      "Pregnancies": {
+        "min": 0.0,
+        "max": 17.0,
+        "mean": 3.88268156424581,
+        "median": 3.0,
+        "q1": 1.0,
+        "q3": 6.0,
+        "iqr_outlier_count": 2
+      },
+      "Glucose": {
+        "min": 57.0,
+        "max": 198.0,
+        "mean": 121.56424581005587,
+        "median": 117.0,
+        "q1": 99.0,
+        "q3": 141.0,
+        "iqr_outlier_count": 0
+      },
+      "BloodPressure": {
+        "min": 24.0,
+        "max": 122.0,
+        "mean": 72.22718808193669,
+        "median": 72.0,
+        "q1": 64.0,
+        "q3": 80.0,
+        "iqr_outlier_count": 11
+      },
+      "SkinThickness": {
+        "min": 7.0,
+        "max": 60.0,
+        "mean": 28.886405959031656,
+        "median": 29.0,
+        "q1": 25.0,
+        "q3": 32.0,
+        "iqr_outlier_count": 60
+      },
+      "Insulin": {
+        "min": 16.0,
+        "max": 744.0,
+        "mean": 138.53445065176908,
+        "median": 126.0,
+        "q1": 122.0,
+        "q3": 130.0,
+        "iqr_outlier_count": 232
+      },
+      "BMI": {
+        "min": 18.2,
+        "max": 67.1,
+        "mean": 32.61731843575419,
+        "median": 32.4,
+        "q1": 27.8,
+        "q3": 36.4,
+        "iqr_outlier_count": 8
+      },
+      "DiabetesPedigreeFunction": {
+        "min": 0.084,
+        "max": 2.329,
+        "mean": 0.4805288640595903,
+        "median": 0.385,
+        "q1": 0.246,
+        "q3": 0.645,
+        "iqr_outlier_count": 16
+      },
+      "Age": {
+        "min": 21.0,
+        "max": 81.0,
+        "mean": 33.5512104283054,
+        "median": 30.0,
+        "q1": 24.0,
+        "q3": 41.0,
+        "iqr_outlier_count": 5
+      }
+    },
+    "feature_target_relationships": {
+      "Pregnancies": {
+        "mean_target_0": 3.317142857142857,
+        "mean_target_1": 4.9411764705882355
+      },
+      "Glucose": {
+        "mean_target_0": 110.68857142857142,
+        "mean_target_1": 141.91978609625667
+      },
+      "BloodPressure": {
+        "mean_target_0": 70.69142857142857,
+        "mean_target_1": 75.10160427807487
+      },
+      "SkinThickness": {
+        "mean_target_0": 27.674285714285713,
+        "mean_target_1": 31.155080213903744
+      },
+      "Insulin": {
+        "mean_target_0": 124.16,
+        "mean_target_1": 165.4385026737968
+      },
+      "BMI": {
+        "mean_target_0": 31.063142857142854,
+        "mean_target_1": 35.52620320855615
+      },
+      "DiabetesPedigreeFunction": {
+        "mean_target_0": 0.44513142857142857,
+        "mean_target_1": 0.5467807486631016
+      },
+      "Age": {
+        "mean_target_0": 31.571428571428573,
+        "mean_target_1": 37.25668449197861
+      }
+    }
+  },
+  "models": {
+    "logistic_regression": {
+      "validation": {
+        "threshold": 0.5,
+        "recall": 0.55,
+        "specificity": 0.8,
+        "precision": 0.5945945945945946,
+        "f1": 0.5714285714285714,
+        "roc_auc": 0.8096666666666665,
+        "pr_auc": 0.6847826012524735,
+        "brier_score": 0.17739471635401946,
+        "confusion_matrix": [
+          [
+            60,
+            15
+          ],
+          [
+            18,
+            22
+          ]
+        ]
+      },
+      "test": {
+        "threshold": 0.5,
+        "recall": 0.5121951219512195,
+        "specificity": 0.92,
+        "precision": 0.7777777777777778,
+        "f1": 0.6176470588235294,
+        "roc_auc": 0.8624390243902438,
+        "pr_auc": 0.7832249786711549,
+        "brier_score": 0.14926960055757285,
+        "confusion_matrix": [
+          [
+            69,
+            6
+          ],
+          [
+            20,
+            21
+          ]
+        ]
+      }
+    },
+    "random_forest": {
+      "validation": {
+        "threshold": 0.5,
+        "recall": 0.6,
+        "specificity": 0.8266666666666667,
+        "precision": 0.6486486486486487,
+        "f1": 0.6233766233766234,
+        "roc_auc": 0.8163333333333334,
+        "pr_auc": 0.6760915115467675,
+        "brier_score": 0.16372642722864858,
+        "confusion_matrix": [
+          [
+            62,
+            13
+          ],
+          [
+            16,
+            24
+          ]
+        ]
+      },
+      "test": {
+        "threshold": 0.5,
+        "recall": 0.4878048780487805,
+        "specificity": 0.8933333333333333,
+        "precision": 0.7142857142857143,
+        "f1": 0.5797101449275363,
+        "roc_auc": 0.833170731707317,
+        "pr_auc": 0.768221605081592,
+        "brier_score": 0.15679328543592944,
+        "confusion_matrix": [
+          [
+            67,
+            8
+          ],
+          [
+            21,
+            20
+          ]
+        ]
+      }
+    },
+    "mlp": {
+      "validation": {
+        "threshold": 0.5,
+        "recall": 0.45,
+        "specificity": 0.8933333333333333,
+        "precision": 0.6923076923076923,
+        "f1": 0.5454545454545454,
+        "roc_auc": 0.818,
+        "pr_auc": 0.6247569914593201,
+        "brier_score": 0.16588478876518253,
+        "confusion_matrix": [
+          [
+            67,
+            8
+          ],
+          [
+            22,
+            18
+          ]
+        ]
+      },
+      "test": {
+        "threshold": 0.5,
+        "recall": 0.3902439024390244,
+        "specificity": 0.92,
+        "precision": 0.7272727272727273,
+        "f1": 0.5079365079365079,
+        "roc_auc": 0.8266666666666667,
+        "pr_auc": 0.7204689071011207,
+        "brier_score": 0.1646750286260319,
+        "confusion_matrix": [
+          [
+            69,
+            6
+          ],
+          [
+            25,
+            16
+          ]
+        ]
+      },
+      "tuned_validation": {
+        "threshold": 0.25,
+        "recall": 0.875,
+        "specificity": 0.64,
+        "precision": 0.5645161290322581,
+        "f1": 0.6862745098039216,
+        "roc_auc": 0.818,
+        "pr_auc": 0.6247569914593201,
+        "brier_score": 0.16588478876518253,
+        "confusion_matrix": [
+          [
+            48,
+            27
+          ],
+          [
+            5,
+            35
+          ]
+        ]
+      },
+      "tuned_test": {
+        "threshold": 0.25,
+        "recall": 0.8048780487804879,
+        "specificity": 0.68,
+        "precision": 0.5789473684210527,
+        "f1": 0.673469387755102,
+        "roc_auc": 0.8266666666666667,
+        "pr_auc": 0.7204689071011207,
+        "brier_score": 0.1646750286260319,
+        "confusion_matrix": [
+          [
+            51,
+            24
+          ],
+          [
+            8,
+            33
+          ]
+        ]
+      }
+    }
+  },
+  "training_diagnostics": {
+    "logistic_regression": {
+      "status": "completed",
+      "duration_seconds": 0.023
+    },
+    "random_forest": {
+      "status": "completed",
+      "duration_seconds": 0.979,
+      "estimators_trained": 200,
+      "maximum_depth": 10
+    },
+    "mlp": {
+      "status": "completed",
+      "duration_seconds": 0.308,
+      "iterations_completed": 48,
+      "maximum_iterations": 300,
+      "stopped_early": true,
+      "early_stopping_enabled": true,
+      "final_loss": 0.45004647928803365
+    }
+  },
+  "selected_model": "mlp",
+  "selected_threshold": 0.25,
+  "calibration": {
+    "expected_calibration_error": 0.10370056335437954,
+    "bins": [
+      {
+        "count": 28,
+        "mean_probability": 0.045309732397502314,
+        "observed_rate": 0.0
+      },
+      {
+        "count": 18,
+        "mean_probability": 0.14261898940784276,
+        "observed_rate": 0.2222222222222222
+      },
+      {
+        "count": 16,
+        "mean_probability": 0.22500613702677666,
+        "observed_rate": 0.375
+      },
+      {
+        "count": 11,
+        "mean_probability": 0.3059742381274036,
+        "observed_rate": 0.36363636363636365
+      },
+      {
+        "count": 13,
+        "mean_probability": 0.3971890863008457,
+        "observed_rate": 0.5384615384615384
+      },
+      {
+        "count": 10,
+        "mean_probability": 0.47806556095775365,
+        "observed_rate": 0.4
+      },
+      {
+        "count": 5,
+        "mean_probability": 0.5742801957027821,
+        "observed_rate": 0.6
+      },
+      {
+        "count": 7,
+        "mean_probability": 0.6727082470554216,
+        "observed_rate": 1.0
+      },
+      {
+        "count": 5,
+        "mean_probability": 0.7472728706884336,
+        "observed_rate": 0.6
+      },
+      {
+        "count": 3,
+        "mean_probability": 0.8265512233526167,
+        "observed_rate": 1.0
+      }
+    ]
+  },
+  "error_analysis": {
+    "threshold": 0.25,
+    "false_positive_count": 24,
+    "false_negative_count": 8,
+    "error_count": 32,
+    "false_positive_rate": 0.32,
+    "false_negative_rate": 0.1951219512195122
+  },
+  "subgroups": {
+    "AGE_BAND": {
+      "21-30": {
+        "threshold": 0.25,
+        "recall": 0.6470588235294118,
+        "specificity": 0.7735849056603774,
+        "precision": 0.4782608695652174,
+        "f1": 0.55,
+        "roc_auc": 0.8312985571587126,
+        "pr_auc": 0.6589805172467711,
+        "brier_score": 0.14039614934247194,
+        "confusion_matrix": [
+          [
+            41,
+            12
+          ],
+          [
+            6,
+            11
+          ]
+        ],
+        "count": 70,
+        "prevalence": 0.24285714285714285
+      },
+      "31-45": {
+        "threshold": 0.25,
+        "recall": 0.8571428571428571,
+        "specificity": 0.5454545454545454,
+        "precision": 0.7058823529411765,
+        "f1": 0.7741935483870968,
+        "roc_auc": 0.7402597402597403,
+        "pr_auc": 0.7983691120909165,
+        "brier_score": 0.22595878922843987,
+        "confusion_matrix": [
+          [
+            6,
+            5
+          ],
+          [
+            2,
+            12
+          ]
+        ],
+        "count": 25,
+        "prevalence": 0.56
+      },
+      "46-60": {
+        "threshold": 0.25,
+        "recall": 1.0,
+        "specificity": 0.375,
+        "precision": 0.6666666666666666,
+        "f1": 0.8,
+        "roc_auc": 0.7875,
+        "pr_auc": 0.8401037851037851,
+        "brier_score": 0.1823107649482962,
+        "confusion_matrix": [
+          [
+            3,
+            5
+          ],
+          [
+            0,
+            10
+          ]
+        ],
+        "count": 18,
+        "prevalence": 0.5555555555555556
+      },
+      "61+": {
+        "threshold": 0.25,
+        "recall": 0.0,
+        "specificity": 0.3333333333333333,
+        "precision": 0.0,
+        "f1": 0.0,
+        "roc_auc": null,
+        "pr_auc": 0.0,
+        "brier_score": 0.11466978895544704,
+        "confusion_matrix": [
+          [
+            1,
+            2
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "count": 3,
+        "prevalence": 0.0
+      }
+    },
+    "BMI_CATEGORY": {
+      "underweight_normal": {
+        "threshold": 0.25,
+        "recall": 1.0,
+        "specificity": 0.9523809523809523,
+        "precision": 0.6666666666666666,
+        "f1": 0.8,
+        "roc_auc": 0.9761904761904762,
+        "pr_auc": 0.8333333333333333,
+        "brier_score": 0.052426482498003385,
+        "confusion_matrix": [
+          [
+            20,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        "count": 23,
+        "prevalence": 0.08695652173913043
+      },
+      "overweight": {
+        "threshold": 0.25,
+        "recall": 0.5,
+        "specificity": 0.8095238095238095,
+        "precision": 0.42857142857142855,
+        "f1": 0.46153846153846156,
+        "roc_auc": 0.746031746031746,
+        "pr_auc": 0.4165768871651225,
+        "brier_score": 0.16820311848227082,
+        "confusion_matrix": [
+          [
+            17,
+            4
+          ],
+          [
+            3,
+            3
+          ]
+        ],
+        "count": 27,
+        "prevalence": 0.2222222222222222
+      },
+      "obese": {
+        "threshold": 0.25,
+        "recall": 0.8484848484848485,
+        "specificity": 0.42424242424242425,
+        "precision": 0.5957446808510638,
+        "f1": 0.7,
+        "roc_auc": 0.7713498622589531,
+        "pr_auc": 0.792464493557044,
+        "brier_score": 0.20234863672945932,
+        "confusion_matrix": [
+          [
+            14,
+            19
+          ],
+          [
+            5,
+            28
+          ]
+        ],
+        "count": 66,
+        "prevalence": 0.5
+      }
+    }
+  },
+  "threshold_provenance": {
+    "source_partition": "validation",
+    "selection_metric": "recall",
+    "tie_breaker": "f1",
+    "minimum_specificity": 0.6,
+    "candidate_thresholds": "0.05 to 0.95 in 0.05 steps",
+    "test_partition_usage": "evaluation only; never used to select the threshold"
+  },
+  "model_card": {
+    "output_interpretation": "Estimated diabetes risk probability and risk category.",
+    "not_a_diagnosis": "This model does not diagnose diabetes.",
+    "clinical_use": "Results require qualified clinician review and must not replace clinical judgment."
+  }
+}

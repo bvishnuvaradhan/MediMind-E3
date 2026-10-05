@@ -1,0 +1,785 @@
+{
+  "analysis_title": "Threshold Calibration & Operating-Point Analysis for Combined Fracture CNN (Experiment 2)",
+  "model_checkpoint": "D:\\projects\\MediMind\\ai-prediction-service\\artifacts\\fracture_v2\\combined\\best_model.pt",
+  "test_dataset_size": 1383,
+  "total_fractures": 637,
+  "total_non_fractures": 746,
+  "fracatlas_test_count": 614,
+  "fracatlas_fractures": 119,
+  "graz_test_count": 769,
+  "graz_fractures": 518,
+  "threshold_independent_metrics": {
+    "overall_roc_auc": 0.8396,
+    "overall_pr_auc": 0.8015,
+    "overall_brier_score": 0.1556,
+    "overall_ece": 0.0479,
+    "fracatlas_roc_auc": 0.893,
+    "fracatlas_pr_auc": 0.7349,
+    "graz_roc_auc": 0.6415,
+    "graz_pr_auc": 0.8154
+  },
+  "threshold_evaluations": {
+    "threshold_0.10": {
+      "threshold": 0.1,
+      "overall": {
+        "tp": 622,
+        "fp": 372,
+        "tn": 374,
+        "fn": 15,
+        "accuracy": 0.7202,
+        "recall": 0.9765,
+        "sensitivity": 0.9765,
+        "specificity": 0.5013,
+        "precision": 0.6258,
+        "ppv": 0.6258,
+        "npv": 0.9614,
+        "f1_score": 0.7627,
+        "roc_auc": 0.8396,
+        "pr_auc": 0.8015,
+        "brier_score": 0.1556,
+        "expected_calibration_error": 0.0479
+      },
+      "fracatlas_adult_subset": {
+        "tp": 104,
+        "fp": 121,
+        "tn": 374,
+        "fn": 15,
+        "accuracy": 0.7785,
+        "recall": 0.8739,
+        "sensitivity": 0.8739,
+        "specificity": 0.7556,
+        "precision": 0.4622,
+        "ppv": 0.4622,
+        "npv": 0.9614,
+        "f1_score": 0.6047,
+        "roc_auc": 0.893,
+        "pr_auc": 0.7349
+      },
+      "grazpedwri_pediatric_subset": {
+        "tp": 518,
+        "fp": 251,
+        "tn": 0,
+        "fn": 0,
+        "accuracy": 0.6736,
+        "recall": 1.0,
+        "sensitivity": 1.0,
+        "specificity": 0.0,
+        "precision": 0.6736,
+        "ppv": 0.6736,
+        "npv": 0.0,
+        "f1_score": 0.805,
+        "roc_auc": 0.6415,
+        "pr_auc": 0.8154
+      },
+      "clinical_tradeoffs": {
+        "adult_false_negatives": 15,
+        "pediatric_false_positives": 251,
+        "baseline_fn_recovered": 19,
+        "new_fn_introduced": 0
+      },
+      "recovered_false_negatives_sample": [
+        {
+          "image_id": "IMG0002905.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.2314
+        },
+        {
+          "image_id": "IMG0002490.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "leg",
+          "model_probability": 0.174
+        },
+        {
+          "image_id": "IMG0001361.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.2977
+        },
+        {
+          "image_id": "IMG0001965.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.1465
+        },
+        {
+          "image_id": "IMG0002389.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "leg",
+          "model_probability": 0.1468
+        }
+      ]
+    },
+    "threshold_0.15": {
+      "threshold": 0.15,
+      "overall": {
+        "tp": 617,
+        "fp": 345,
+        "tn": 401,
+        "fn": 20,
+        "accuracy": 0.7361,
+        "recall": 0.9686,
+        "sensitivity": 0.9686,
+        "specificity": 0.5375,
+        "precision": 0.6414,
+        "ppv": 0.6414,
+        "npv": 0.9525,
+        "f1_score": 0.7717,
+        "roc_auc": 0.8396,
+        "pr_auc": 0.8015,
+        "brier_score": 0.1556,
+        "expected_calibration_error": 0.0479
+      },
+      "fracatlas_adult_subset": {
+        "tp": 99,
+        "fp": 94,
+        "tn": 401,
+        "fn": 20,
+        "accuracy": 0.8143,
+        "recall": 0.8319,
+        "sensitivity": 0.8319,
+        "specificity": 0.8101,
+        "precision": 0.513,
+        "ppv": 0.513,
+        "npv": 0.9525,
+        "f1_score": 0.6346,
+        "roc_auc": 0.893,
+        "pr_auc": 0.7349
+      },
+      "grazpedwri_pediatric_subset": {
+        "tp": 518,
+        "fp": 251,
+        "tn": 0,
+        "fn": 0,
+        "accuracy": 0.6736,
+        "recall": 1.0,
+        "sensitivity": 1.0,
+        "specificity": 0.0,
+        "precision": 0.6736,
+        "ppv": 0.6736,
+        "npv": 0.0,
+        "f1_score": 0.805,
+        "roc_auc": 0.6415,
+        "pr_auc": 0.8154
+      },
+      "clinical_tradeoffs": {
+        "adult_false_negatives": 20,
+        "pediatric_false_positives": 251,
+        "baseline_fn_recovered": 14,
+        "new_fn_introduced": 0
+      },
+      "recovered_false_negatives_sample": [
+        {
+          "image_id": "IMG0002905.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.2314
+        },
+        {
+          "image_id": "IMG0003628.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.2319
+        },
+        {
+          "image_id": "IMG0004233.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.2314
+        },
+        {
+          "image_id": "IMG0002390.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "leg",
+          "model_probability": 0.336
+        },
+        {
+          "image_id": "IMG0002490.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "leg",
+          "model_probability": 0.174
+        }
+      ]
+    },
+    "threshold_0.20": {
+      "threshold": 0.2,
+      "overall": {
+        "tp": 614,
+        "fp": 325,
+        "tn": 421,
+        "fn": 23,
+        "accuracy": 0.7484,
+        "recall": 0.9639,
+        "sensitivity": 0.9639,
+        "specificity": 0.5643,
+        "precision": 0.6539,
+        "ppv": 0.6539,
+        "npv": 0.9482,
+        "f1_score": 0.7792,
+        "roc_auc": 0.8396,
+        "pr_auc": 0.8015,
+        "brier_score": 0.1556,
+        "expected_calibration_error": 0.0479
+      },
+      "fracatlas_adult_subset": {
+        "tp": 96,
+        "fp": 74,
+        "tn": 421,
+        "fn": 23,
+        "accuracy": 0.842,
+        "recall": 0.8067,
+        "sensitivity": 0.8067,
+        "specificity": 0.8505,
+        "precision": 0.5647,
+        "ppv": 0.5647,
+        "npv": 0.9482,
+        "f1_score": 0.6644,
+        "roc_auc": 0.893,
+        "pr_auc": 0.7349
+      },
+      "grazpedwri_pediatric_subset": {
+        "tp": 518,
+        "fp": 251,
+        "tn": 0,
+        "fn": 0,
+        "accuracy": 0.6736,
+        "recall": 1.0,
+        "sensitivity": 1.0,
+        "specificity": 0.0,
+        "precision": 0.6736,
+        "ppv": 0.6736,
+        "npv": 0.0,
+        "f1_score": 0.805,
+        "roc_auc": 0.6415,
+        "pr_auc": 0.8154
+      },
+      "clinical_tradeoffs": {
+        "adult_false_negatives": 23,
+        "pediatric_false_positives": 251,
+        "baseline_fn_recovered": 11,
+        "new_fn_introduced": 0
+      },
+      "recovered_false_negatives_sample": [
+        {
+          "image_id": "IMG0002905.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.2314
+        },
+        {
+          "image_id": "IMG0003628.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.2319
+        },
+        {
+          "image_id": "IMG0004233.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.2314
+        },
+        {
+          "image_id": "IMG0002390.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "leg",
+          "model_probability": 0.336
+        },
+        {
+          "image_id": "IMG0001361.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.2977
+        }
+      ]
+    },
+    "threshold_0.25": {
+      "threshold": 0.25,
+      "overall": {
+        "tp": 608,
+        "fp": 315,
+        "tn": 431,
+        "fn": 29,
+        "accuracy": 0.7513,
+        "recall": 0.9545,
+        "sensitivity": 0.9545,
+        "specificity": 0.5777,
+        "precision": 0.6587,
+        "ppv": 0.6587,
+        "npv": 0.937,
+        "f1_score": 0.7795,
+        "roc_auc": 0.8396,
+        "pr_auc": 0.8015,
+        "brier_score": 0.1556,
+        "expected_calibration_error": 0.0479
+      },
+      "fracatlas_adult_subset": {
+        "tp": 90,
+        "fp": 64,
+        "tn": 431,
+        "fn": 29,
+        "accuracy": 0.8485,
+        "recall": 0.7563,
+        "sensitivity": 0.7563,
+        "specificity": 0.8707,
+        "precision": 0.5844,
+        "ppv": 0.5844,
+        "npv": 0.937,
+        "f1_score": 0.6593,
+        "roc_auc": 0.893,
+        "pr_auc": 0.7349
+      },
+      "grazpedwri_pediatric_subset": {
+        "tp": 518,
+        "fp": 251,
+        "tn": 0,
+        "fn": 0,
+        "accuracy": 0.6736,
+        "recall": 1.0,
+        "sensitivity": 1.0,
+        "specificity": 0.0,
+        "precision": 0.6736,
+        "ppv": 0.6736,
+        "npv": 0.0,
+        "f1_score": 0.805,
+        "roc_auc": 0.6415,
+        "pr_auc": 0.8154
+      },
+      "clinical_tradeoffs": {
+        "adult_false_negatives": 29,
+        "pediatric_false_positives": 251,
+        "baseline_fn_recovered": 5,
+        "new_fn_introduced": 0
+      },
+      "recovered_false_negatives_sample": [
+        {
+          "image_id": "IMG0002390.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "leg",
+          "model_probability": 0.336
+        },
+        {
+          "image_id": "IMG0001361.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.2977
+        },
+        {
+          "image_id": "IMG0001730.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.3594
+        },
+        {
+          "image_id": "IMG0002391.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "leg",
+          "model_probability": 0.3038
+        },
+        {
+          "image_id": "IMG0002287.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.3617
+        }
+      ]
+    },
+    "threshold_0.30": {
+      "threshold": 0.3,
+      "overall": {
+        "tp": 607,
+        "fp": 310,
+        "tn": 436,
+        "fn": 30,
+        "accuracy": 0.7542,
+        "recall": 0.9529,
+        "sensitivity": 0.9529,
+        "specificity": 0.5845,
+        "precision": 0.6619,
+        "ppv": 0.6619,
+        "npv": 0.9356,
+        "f1_score": 0.7812,
+        "roc_auc": 0.8396,
+        "pr_auc": 0.8015,
+        "brier_score": 0.1556,
+        "expected_calibration_error": 0.0479
+      },
+      "fracatlas_adult_subset": {
+        "tp": 89,
+        "fp": 59,
+        "tn": 436,
+        "fn": 30,
+        "accuracy": 0.855,
+        "recall": 0.7479,
+        "sensitivity": 0.7479,
+        "specificity": 0.8808,
+        "precision": 0.6014,
+        "ppv": 0.6014,
+        "npv": 0.9356,
+        "f1_score": 0.6667,
+        "roc_auc": 0.893,
+        "pr_auc": 0.7349
+      },
+      "grazpedwri_pediatric_subset": {
+        "tp": 518,
+        "fp": 251,
+        "tn": 0,
+        "fn": 0,
+        "accuracy": 0.6736,
+        "recall": 1.0,
+        "sensitivity": 1.0,
+        "specificity": 0.0,
+        "precision": 0.6736,
+        "ppv": 0.6736,
+        "npv": 0.0,
+        "f1_score": 0.805,
+        "roc_auc": 0.6415,
+        "pr_auc": 0.8154
+      },
+      "clinical_tradeoffs": {
+        "adult_false_negatives": 30,
+        "pediatric_false_positives": 251,
+        "baseline_fn_recovered": 4,
+        "new_fn_introduced": 0
+      },
+      "recovered_false_negatives_sample": [
+        {
+          "image_id": "IMG0002390.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "leg",
+          "model_probability": 0.336
+        },
+        {
+          "image_id": "IMG0002391.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "leg",
+          "model_probability": 0.3038
+        },
+        {
+          "image_id": "IMG0002287.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.3617
+        },
+        {
+          "image_id": "IMG0001730.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.3594
+        }
+      ]
+    },
+    "threshold_0.35": {
+      "threshold": 0.35,
+      "overall": {
+        "tp": 605,
+        "fp": 301,
+        "tn": 445,
+        "fn": 32,
+        "accuracy": 0.7592,
+        "recall": 0.9498,
+        "sensitivity": 0.9498,
+        "specificity": 0.5965,
+        "precision": 0.6678,
+        "ppv": 0.6678,
+        "npv": 0.9329,
+        "f1_score": 0.7842,
+        "roc_auc": 0.8396,
+        "pr_auc": 0.8015,
+        "brier_score": 0.1556,
+        "expected_calibration_error": 0.0479
+      },
+      "fracatlas_adult_subset": {
+        "tp": 87,
+        "fp": 50,
+        "tn": 445,
+        "fn": 32,
+        "accuracy": 0.8664,
+        "recall": 0.7311,
+        "sensitivity": 0.7311,
+        "specificity": 0.899,
+        "precision": 0.635,
+        "ppv": 0.635,
+        "npv": 0.9329,
+        "f1_score": 0.6797,
+        "roc_auc": 0.893,
+        "pr_auc": 0.7349
+      },
+      "grazpedwri_pediatric_subset": {
+        "tp": 518,
+        "fp": 251,
+        "tn": 0,
+        "fn": 0,
+        "accuracy": 0.6736,
+        "recall": 1.0,
+        "sensitivity": 1.0,
+        "specificity": 0.0,
+        "precision": 0.6736,
+        "ppv": 0.6736,
+        "npv": 0.0,
+        "f1_score": 0.805,
+        "roc_auc": 0.6415,
+        "pr_auc": 0.8154
+      },
+      "clinical_tradeoffs": {
+        "adult_false_negatives": 32,
+        "pediatric_false_positives": 251,
+        "baseline_fn_recovered": 2,
+        "new_fn_introduced": 0
+      },
+      "recovered_false_negatives_sample": [
+        {
+          "image_id": "IMG0002287.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.3617
+        },
+        {
+          "image_id": "IMG0001730.jpg",
+          "dataset": "FracAtlas",
+          "anatomy": "hand",
+          "model_probability": 0.3594
+        }
+      ]
+    },
+    "threshold_0.37": {
+      "threshold": 0.37,
+      "overall": {
+        "tp": 603,
+        "fp": 299,
+        "tn": 447,
+        "fn": 34,
+        "accuracy": 0.7592,
+        "recall": 0.9466,
+        "sensitivity": 0.9466,
+        "specificity": 0.5992,
+        "precision": 0.6685,
+        "ppv": 0.6685,
+        "npv": 0.9293,
+        "f1_score": 0.7836,
+        "roc_auc": 0.8396,
+        "pr_auc": 0.8015,
+        "brier_score": 0.1556,
+        "expected_calibration_error": 0.0479
+      },
+      "fracatlas_adult_subset": {
+        "tp": 85,
+        "fp": 48,
+        "tn": 447,
+        "fn": 34,
+        "accuracy": 0.8664,
+        "recall": 0.7143,
+        "sensitivity": 0.7143,
+        "specificity": 0.903,
+        "precision": 0.6391,
+        "ppv": 0.6391,
+        "npv": 0.9293,
+        "f1_score": 0.6746,
+        "roc_auc": 0.893,
+        "pr_auc": 0.7349
+      },
+      "grazpedwri_pediatric_subset": {
+        "tp": 518,
+        "fp": 251,
+        "tn": 0,
+        "fn": 0,
+        "accuracy": 0.6736,
+        "recall": 1.0,
+        "sensitivity": 1.0,
+        "specificity": 0.0,
+        "precision": 0.6736,
+        "ppv": 0.6736,
+        "npv": 0.0,
+        "f1_score": 0.805,
+        "roc_auc": 0.6415,
+        "pr_auc": 0.8154
+      },
+      "clinical_tradeoffs": {
+        "adult_false_negatives": 34,
+        "pediatric_false_positives": 251,
+        "baseline_fn_recovered": 0,
+        "new_fn_introduced": 0
+      },
+      "recovered_false_negatives_sample": []
+    },
+    "threshold_0.40": {
+      "threshold": 0.4,
+      "overall": {
+        "tp": 602,
+        "fp": 294,
+        "tn": 452,
+        "fn": 35,
+        "accuracy": 0.7621,
+        "recall": 0.9451,
+        "sensitivity": 0.9451,
+        "specificity": 0.6059,
+        "precision": 0.6719,
+        "ppv": 0.6719,
+        "npv": 0.9281,
+        "f1_score": 0.7854,
+        "roc_auc": 0.8396,
+        "pr_auc": 0.8015,
+        "brier_score": 0.1556,
+        "expected_calibration_error": 0.0479
+      },
+      "fracatlas_adult_subset": {
+        "tp": 84,
+        "fp": 43,
+        "tn": 452,
+        "fn": 35,
+        "accuracy": 0.873,
+        "recall": 0.7059,
+        "sensitivity": 0.7059,
+        "specificity": 0.9131,
+        "precision": 0.6614,
+        "ppv": 0.6614,
+        "npv": 0.9281,
+        "f1_score": 0.6829,
+        "roc_auc": 0.893,
+        "pr_auc": 0.7349
+      },
+      "grazpedwri_pediatric_subset": {
+        "tp": 518,
+        "fp": 251,
+        "tn": 0,
+        "fn": 0,
+        "accuracy": 0.6736,
+        "recall": 1.0,
+        "sensitivity": 1.0,
+        "specificity": 0.0,
+        "precision": 0.6736,
+        "ppv": 0.6736,
+        "npv": 0.0,
+        "f1_score": 0.805,
+        "roc_auc": 0.6415,
+        "pr_auc": 0.8154
+      },
+      "clinical_tradeoffs": {
+        "adult_false_negatives": 35,
+        "pediatric_false_positives": 251,
+        "baseline_fn_recovered": 0,
+        "new_fn_introduced": 1
+      },
+      "recovered_false_negatives_sample": []
+    },
+    "threshold_0.45": {
+      "threshold": 0.45,
+      "overall": {
+        "tp": 599,
+        "fp": 289,
+        "tn": 457,
+        "fn": 38,
+        "accuracy": 0.7636,
+        "recall": 0.9403,
+        "sensitivity": 0.9403,
+        "specificity": 0.6126,
+        "precision": 0.6745,
+        "ppv": 0.6745,
+        "npv": 0.9232,
+        "f1_score": 0.7856,
+        "roc_auc": 0.8396,
+        "pr_auc": 0.8015,
+        "brier_score": 0.1556,
+        "expected_calibration_error": 0.0479
+      },
+      "fracatlas_adult_subset": {
+        "tp": 81,
+        "fp": 38,
+        "tn": 457,
+        "fn": 38,
+        "accuracy": 0.8762,
+        "recall": 0.6807,
+        "sensitivity": 0.6807,
+        "specificity": 0.9232,
+        "precision": 0.6807,
+        "ppv": 0.6807,
+        "npv": 0.9232,
+        "f1_score": 0.6807,
+        "roc_auc": 0.893,
+        "pr_auc": 0.7349
+      },
+      "grazpedwri_pediatric_subset": {
+        "tp": 518,
+        "fp": 251,
+        "tn": 0,
+        "fn": 0,
+        "accuracy": 0.6736,
+        "recall": 1.0,
+        "sensitivity": 1.0,
+        "specificity": 0.0,
+        "precision": 0.6736,
+        "ppv": 0.6736,
+        "npv": 0.0,
+        "f1_score": 0.805,
+        "roc_auc": 0.6415,
+        "pr_auc": 0.8154
+      },
+      "clinical_tradeoffs": {
+        "adult_false_negatives": 38,
+        "pediatric_false_positives": 251,
+        "baseline_fn_recovered": 0,
+        "new_fn_introduced": 4
+      },
+      "recovered_false_negatives_sample": []
+    },
+    "threshold_0.50": {
+      "threshold": 0.5,
+      "overall": {
+        "tp": 595,
+        "fp": 280,
+        "tn": 466,
+        "fn": 42,
+        "accuracy": 0.7672,
+        "recall": 0.9341,
+        "sensitivity": 0.9341,
+        "specificity": 0.6247,
+        "precision": 0.68,
+        "ppv": 0.68,
+        "npv": 0.9173,
+        "f1_score": 0.787,
+        "roc_auc": 0.8396,
+        "pr_auc": 0.8015,
+        "brier_score": 0.1556,
+        "expected_calibration_error": 0.0479
+      },
+      "fracatlas_adult_subset": {
+        "tp": 77,
+        "fp": 29,
+        "tn": 466,
+        "fn": 42,
+        "accuracy": 0.8844,
+        "recall": 0.6471,
+        "sensitivity": 0.6471,
+        "specificity": 0.9414,
+        "precision": 0.7264,
+        "ppv": 0.7264,
+        "npv": 0.9173,
+        "f1_score": 0.6844,
+        "roc_auc": 0.893,
+        "pr_auc": 0.7349
+      },
+      "grazpedwri_pediatric_subset": {
+        "tp": 518,
+        "fp": 251,
+        "tn": 0,
+        "fn": 0,
+        "accuracy": 0.6736,
+        "recall": 1.0,
+        "sensitivity": 1.0,
+        "specificity": 0.0,
+        "precision": 0.6736,
+        "ppv": 0.6736,
+        "npv": 0.0,
+        "f1_score": 0.805,
+        "roc_auc": 0.6415,
+        "pr_auc": 0.8154
+      },
+      "clinical_tradeoffs": {
+        "adult_false_negatives": 42,
+        "pediatric_false_positives": 251,
+        "baseline_fn_recovered": 0,
+        "new_fn_introduced": 8
+      },
+      "recovered_false_negatives_sample": []
+    }
+  }
+}

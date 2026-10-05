@@ -1,0 +1,44 @@
+{
+  "dataset_name": "GRAZPEDWRI-DX",
+  "source_root": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX",
+  "total_raw_rows": 20327,
+  "total_valid_images": 5031,
+  "total_unique_patients": 1499,
+  "excluded_duplicates": 0,
+  "excluded_corrupted": 0,
+  "excluded_unextracted": 15296,
+  "class_distribution_overall": {
+    "fractured_count": 3334,
+    "non_fractured_count": 1697,
+    "fracture_percentage": 66.26913138541045
+  },
+  "splits": {
+    "train": {
+      "total_images": 3522,
+      "unique_patients": 1049,
+      "fractured": 2330,
+      "non_fractured": 1192,
+      "fracture_percentage": 66.15559341283361
+    },
+    "validation": {
+      "total_images": 740,
+      "unique_patients": 225,
+      "fractured": 486,
+      "non_fractured": 254,
+      "fracture_percentage": 65.67567567567568
+    },
+    "test": {
+      "total_images": 769,
+      "unique_patients": 225,
+      "fractured": 518,
+      "non_fractured": 251,
+      "fracture_percentage": 67.36020806241872
+    }
+  },
+  "patient_leakage_check": {
+    "train_val_overlap": 0,
+    "train_test_overlap": 0,
+    "val_test_overlap": 0,
+    "leakage_detected": false
+  }
+}

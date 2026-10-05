@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.pytest_cache/
+pytest-cache-files-*/
+
+# Datasets (large binary X-rays/CSVs downloaded locally)
+ai-prediction-service/test-dataset/
+**/test-dataset/
+test-dataset/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment Variables & Sensitive Credentials
+.env
+.env.local
+.env.*.local
+credentials.txt
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Office Documents
+*.docx
+*.pdf
