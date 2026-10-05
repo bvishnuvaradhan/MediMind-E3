@@ -1,5 +1,18 @@
 import { useState } from 'react';
-import { Sparkles, Activity, HeartPulse, ShieldCheck, ArrowUpRight, History, FileText, Stethoscope, Users, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  Sparkles,
+  Activity,
+  HeartPulse,
+  ShieldCheck,
+  ArrowUpRight,
+  History,
+  FileText,
+  Stethoscope,
+  Users,
+  ChevronDown,
+  ChevronUp,
+  Trash2,
+} from 'lucide-react';
 import { matchesFamilyMember } from '../../../data/medimindData';
 import { PredictionInputModal } from '../components/PredictionInputModal';
 
@@ -12,11 +25,14 @@ export function AiPredictionsView({
   announce,
   onOpenPredictionDetail,
   onAddPrediction,
+  onDeletePrediction,
   onAddRecord,
 }) {
   const [selectedModel, setSelectedModel] = useState(null);
   const [selectedMemberFilter, setSelectedMemberFilter] = useState('All');
   const [showAllHistory, setShowAllHistory] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [dismissedDefaultIds, setDismissedDefaultIds] = useState([]);
 
   const defaultHistory = [
     {
@@ -26,6 +42,7 @@ export function AiPredictionsView({
       memberRelation: 'Father',
       title: 'Heart Health & Cardiovascular Risk',
       type: 'Cardiovascular (Framingham AI)',
+      modelType: 'heart',
       date: '16 Sep 2026',
       score: '86/100',
       riskLevel: 'Low Risk',
@@ -35,7 +52,7 @@ export function AiPredictionsView({
         name: 'Dr. Ananya Rao',
         role: 'Lead Cardiologist',
         department: 'Cardiology',
-        hospital: 'Fortis Healthcare, Bannerghatta',
+        hospital: 'MediMind Central Hospital, Bengaluru',
       },
       attachedDoc: {
         title: 'Lipid Profile & Cardiac Biomarkers',
@@ -56,6 +73,7 @@ export function AiPredictionsView({
       memberRelation: 'Mother',
       title: 'Diabetes 3-Year Risk Forecaster',
       type: 'Metabolic (XGBoost)',
+      modelType: 'diabetes',
       date: '10 Sep 2026',
       score: '24%',
       riskLevel: 'Moderate Risk',
@@ -65,7 +83,7 @@ export function AiPredictionsView({
         name: 'Dr. Kavya Shah',
         role: 'Senior Diabetologist & Endocrinologist',
         department: 'Diabetology',
-        hospital: 'Manipal Hospital, Whitefield',
+        hospital: 'Apex Metro Healthcare, Hyderabad',
       },
       attachedDoc: {
         title: 'Comprehensive Metabolic Panel & HbA1c',
@@ -85,17 +103,19 @@ export function AiPredictionsView({
       memberName: 'Arjun Kapoor',
       memberRelation: 'Son',
       title: 'Fracture Detection Radiograph AI',
-      type: 'Musculoskeletal (ResNet-50)',
+      type: 'Musculoskeletal (ResNet-18)',
+      modelType: 'fracture',
       date: '04 Sep 2026',
       score: '96%',
       riskLevel: 'Low Risk',
       result: 'No Acute Fracture Identified (96% conf)',
       status: 'Completed',
+      isFracture: false,
       relatedDoctor: {
         name: 'Dr. Rahul Mehta',
         role: 'Chief of Orthopedics',
         department: 'Orthopedics',
-        hospital: 'Apollo Hospitals, Greams Road',
+        hospital: 'MediMind Central Hospital, Bengaluru',
       },
       attachedDoc: {
         title: 'Left Wrist AP & Lateral Radiograph',
@@ -103,7 +123,7 @@ export function AiPredictionsView({
         source: 'Medical Records',
       },
       factors: [
-        'Anatomical Site: Left Wrist',
+        'Radiographic View: Left Wrist AP',
         'Cortical Margins: Intact',
         'Joint Space: Preserved',
       ],
@@ -116,6 +136,7 @@ export function AiPredictionsView({
       memberRelation: 'Daughter',
       title: 'General Health Biometric Index',
       type: 'Triage & Wellness (Clinical NLP)',
+      modelType: 'general',
       date: '12 Sep 2026',
       score: '92/100',
       riskLevel: 'Low Risk',
@@ -141,7 +162,8 @@ export function AiPredictionsView({
     },
   ];
 
-  const allHistory = [...predictionHistory, ...defaultHistory];
+  const filteredDefault = defaultHistory.filter((item) => !dismissedDefaultIds.includes(item.id));
+  const allHistory = [...predictionHistory, ...filteredDefault];
 
   const selectedMemberObj = familyMembers.find(
     (m) => m.name === selectedMemberFilter || m.fullName === selectedMemberFilter || m.id === selectedMemberFilter
@@ -169,6 +191,21 @@ export function AiPredictionsView({
       navigate('Personal prediction detail');
     }
     announce(`${predictionPayload.title} assessment completed.`);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!itemToDelete) return;
+    const targetId = itemToDelete.id || itemToDelete._id;
+
+    if (onDeletePrediction) {
+      onDeletePrediction(itemToDelete);
+    }
+    if (targetId && String(targetId).startsWith('pred-')) {
+      setDismissedDefaultIds((prev) => [...prev, targetId]);
+    }
+
+    announce(`AI prediction "${itemToDelete.title}" removed from history.`);
+    setItemToDelete(null);
   };
 
   return (
@@ -199,7 +236,7 @@ export function AiPredictionsView({
                 <Activity size={18} />
               </span>
               <h3>Fracture detection</h3>
-              <p>Upload an X-Ray radiograph to evaluate bone integrity with Grad-CAM heatmap localization.</p>
+              <p>Upload a digital X-Ray radiograph to evaluate bone integrity with deep ResNet-18 neural networks.</p>
               <ArrowUpRight size={16} />
             </button>
 
@@ -223,7 +260,7 @@ export function AiPredictionsView({
                 <HeartPulse size={18} />
               </span>
               <h3>Heart disease risk</h3>
-              <p>Assess cardiovascular parameters, lipid levels, and blood pressure trends.</p>
+              <p>Assess cardiovascular parameters, lipid levels, and blood pressure hemodynamics.</p>
               <ArrowUpRight size={16} />
             </button>
 
@@ -236,7 +273,7 @@ export function AiPredictionsView({
               </span>
               <h3>General health risk</h3>
               <p>
-                Combine family history, lifestyle factors, and symptoms into a holistic risk assessment.
+                Synthesize symptoms, physical habits, and family history into a comprehensive triage assessment.
               </p>
               <ArrowUpRight size={16} />
             </button>
@@ -288,7 +325,7 @@ export function AiPredictionsView({
               </div>
             ) : (
               displayedHistory.map((item, idx) => (
-                <article className="feature-card" key={`${item.id || item.title}-${idx}`}>
+                <article className="feature-card" key={`${item.id || item.title}-${idx}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px' }}>
                   <div className={`avatar avatar-${item.memberName?.toLowerCase().includes('priya') || item.memberRelation === 'Mother' ? 'lilac' : item.memberName?.toLowerCase().includes('arjun') || item.memberRelation === 'Son' ? 'mint' : 'coral'}`}>
                     {item.memberName?.slice(0, 2).toUpperCase() || 'FM'}
                   </div>
@@ -333,18 +370,28 @@ export function AiPredictionsView({
                     </span>
                   </div>
 
-                  <button
-                    className="text-button"
-                    onClick={() => {
-                      if (onOpenPredictionDetail) {
-                        onOpenPredictionDetail(item);
-                      } else {
-                        navigate('Personal prediction detail');
-                      }
-                    }}
-                  >
-                    View details <ArrowUpRight size={14} />
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                    <button
+                      className="text-button"
+                      onClick={() => {
+                        if (onOpenPredictionDetail) {
+                          onOpenPredictionDetail(item);
+                        } else {
+                          navigate('Personal prediction detail');
+                        }
+                      }}
+                    >
+                      View details <ArrowUpRight size={14} />
+                    </button>
+                    <button
+                      className="icon-button"
+                      onClick={() => setItemToDelete(item)}
+                      title={`Delete prediction: ${item.title}`}
+                      style={{ color: '#dc2626', padding: '6px', borderRadius: '6px' }}
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
                 </article>
               ))
             )}
@@ -373,7 +420,7 @@ export function AiPredictionsView({
         </div>
 
         <div className="ai-warning" style={{ margin: 0 }}>
-          <ShieldCheck size={17} /> AI-assisted results support clinical decisions and are not a medical diagnosis. Consult an authorized physician for clinical evaluation.
+          <ShieldCheck size={17} /> AI-assisted results support clinical decision-making and are not a medical diagnosis. Consult an authorized healthcare professional.
         </div>
       </div>
 
@@ -383,12 +430,56 @@ export function AiPredictionsView({
         onClose={() => setSelectedModel(null)}
         modelType={selectedModel}
         member={member}
+        familyMembers={familyMembers}
         records={records}
         onSubmitPrediction={handleRunPrediction}
         onAddRecord={onAddRecord}
         announce={announce}
       />
+
+      {/* Delete Confirmation Modal */}
+      {itemToDelete && (
+        <div className="modal-backdrop" role="presentation" onClick={() => setItemToDelete(null)}>
+          <div
+            className="detail-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-modal-title"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '440px' }}
+          >
+            <div className="modal-header" style={{ borderBottom: '1px solid var(--family-border)', paddingBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Trash2 size={18} style={{ color: '#dc2626' }} />
+                <h3 id="delete-modal-title" style={{ margin: 0, fontSize: '16px', fontWeight: '700' }}>
+                  Delete AI Prediction
+                </h3>
+              </div>
+            </div>
+
+            <div style={{ padding: '16px 0', fontSize: '13.5px', color: 'var(--family-ink)', lineHeight: '1.5' }}>
+              Are you sure you want to delete the <strong>{itemToDelete.title}</strong> prediction for{' '}
+              <strong>{itemToDelete.memberName || 'this patient'}</strong>?
+              <p style={{ margin: '8px 0 0', fontSize: '12.5px', color: 'var(--family-muted)' }}>
+                This action cannot be undone. Associated medical records and original files will not be deleted.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '12px', borderTop: '1px solid var(--family-border)' }}>
+              <button className="secondary-button" onClick={() => setItemToDelete(null)}>
+                Cancel
+              </button>
+              <button
+                className="primary-button"
+                onClick={handleConfirmDelete}
+                style={{ backgroundColor: '#dc2626', borderColor: '#dc2626', color: '#ffffff' }}
+              >
+                Confirm Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
-

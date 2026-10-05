@@ -1203,6 +1203,8 @@
 .detail-modal {
   width: 100%;
   max-width: 540px;
+  max-height: 88vh;
+  overflow-y: auto;
   background-color: var(--family-card);
   border: 1px solid var(--family-border);
   border-radius: var(--radius-xl);

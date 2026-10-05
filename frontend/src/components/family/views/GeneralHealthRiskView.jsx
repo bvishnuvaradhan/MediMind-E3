@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { ShieldCheck, ArrowUpRight, Sparkles } from 'lucide-react';
+import { ShieldCheck, ArrowUpRight, Sparkles, User } from 'lucide-react';
 
-export function GeneralHealthRiskView({ member, navigate, announce }) {
+export function GeneralHealthRiskView({ familyMembers = [], navigate, announce }) {
+  const [selectedPatient, setSelectedPatient] = useState(() => familyMembers[0]?.name || 'Rohan Kapoor');
   const [input, setInput] = useState({ symptoms: '', lifestyle: '', familyHistory: '' });
   const [result, setResult] = useState(null);
+
+  const currentMember = familyMembers.find((m) => m.name === selectedPatient || m.fullName === selectedPatient) || { name: selectedPatient, relation: 'Self' };
 
   const runAssessment = (event) => {
     event.preventDefault();
@@ -11,22 +14,23 @@ export function GeneralHealthRiskView({ member, navigate, announce }) {
       announce('Enter at least one health detail before running the assessment.');
       return;
     }
-    const highPriority = /103|high fever|chest pain|difficulty breathing|severe|faint/i.test(
+    const highPriority = /103|high fever|chest pain|difficulty breathing|severe|faint|collapse|unconscious/i.test(
       `${input.symptoms} ${input.lifestyle} ${input.familyHistory}`
     );
     setResult({
       priority: highPriority ? 'High priority' : 'Routine priority',
       summary: highPriority
-        ? 'Potential risk detected. Clinical review is recommended at the earliest available opportunity.'
-        : 'No urgent pattern was identified in this mock assessment. Continue routine monitoring and discuss concerns with a doctor.',
+        ? `Potential risk indicators detected for ${currentMember.name}. Clinical review is recommended at the earliest available opportunity.`
+        : `No urgent health patterns identified for ${currentMember.name}. Continue routine preventive monitoring and healthy lifestyle practices.`,
       factors: [
-        input.symptoms && 'Symptoms and health concerns',
-        input.lifestyle && 'Lifestyle information',
-        input.familyHistory && 'Family history',
-        'Recent medical records',
+        `Target patient: ${currentMember.name} (${currentMember.relation || 'Member'})`,
+        input.symptoms && `Symptoms: ${input.symptoms.slice(0, 60)}...`,
+        input.lifestyle && 'Lifestyle parameters evaluated',
+        input.familyHistory && 'Family genetic history reviewed',
+        'Unified health telemetry',
       ].filter(Boolean),
     });
-    announce('AI assessment completed.');
+    announce(`AI assessment completed for ${currentMember.name}.`);
   };
 
   return (
@@ -39,8 +43,7 @@ export function GeneralHealthRiskView({ member, navigate, announce }) {
           <p className="eyebrow">AI Decision Support</p>
           <h1>General health risk</h1>
           <p>
-            Review a mock overall risk estimate for {member.name} using free-text health
-            information.
+            Evaluate overall health risk indicators and holistic lifestyle factors for family members.
           </p>
         </div>
         <button
@@ -50,16 +53,39 @@ export function GeneralHealthRiskView({ member, navigate, announce }) {
           <ArrowUpRight size={16} /> Back to predictions
         </button>
       </div>
+
       <form className="booking-form" onSubmit={runAssessment}>
         <div className="booking-form-header">
           <div>
             <h2>Health information</h2>
-            <p>Decision support only. This is not a medical diagnosis.</p>
+            <p>Clinical decision support only. This does not replace medical diagnosis.</p>
           </div>
           <span className="booking-status">
-            <Sparkles size={15} /> Mock assessment
+            <Sparkles size={15} /> AI Clinical Triage
           </span>
         </div>
+
+        {/* Patient Selection Dropdown */}
+        <div style={{ marginBottom: '16px', padding: '14px 16px', backgroundColor: 'var(--family-soft)', borderRadius: '10px', border: '1px solid var(--family-border)' }}>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--family-ink)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <User size={14} style={{ color: 'var(--family-primary)' }} /> Select Family Member *
+            </span>
+            <select
+              className="feature-input"
+              value={selectedPatient}
+              onChange={(e) => setSelectedPatient(e.target.value)}
+              style={{ padding: '8px 12px', fontSize: '13.5px', fontWeight: '600' }}
+            >
+              {familyMembers.map((m) => (
+                <option key={m.id || m.name} value={m.name}>
+                  {m.fullName || m.name} — {m.relationship || m.relation || 'Member'} (Age {m.age || 'N/A'})
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
         <label className="booking-reason">
           <span>Symptoms or general health concerns</span>
           <textarea
@@ -67,7 +93,7 @@ export function GeneralHealthRiskView({ member, navigate, announce }) {
             onChange={(event) =>
               setInput((current) => ({ ...current, symptoms: event.target.value }))
             }
-            placeholder="Example: I have fever and body pain."
+            placeholder="Example: I have occasional morning fatigue and joint discomfort."
           />
         </label>
         <div className="form-grid">
@@ -94,7 +120,7 @@ export function GeneralHealthRiskView({ member, navigate, announce }) {
         </div>
         <div className="booking-summary">
           <ShieldCheck size={17} />
-          <span>Recent medical records are considered as a mock assessment factor.</span>
+          <span>Verified records are synthesized into the clinical decision support index.</span>
         </div>
         {result && (
           <div

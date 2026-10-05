@@ -33,6 +33,7 @@ export function BookAppointmentView({
     reason: assessment?.reason || (rescheduleData ? `Reschedule: ${rescheduleData.title}` : 'Routine specialist review and treatment follow-up'),
     type: rescheduleData ? rescheduleData.title : 'Follow-up consultation',
     mode: 'In-person OPD Clinic',
+    grantConsent: false,
   });
 
   const getBookedSlots = (doctor, date) => bookedSlots[`${doctor}|${date}`] ?? [];
@@ -242,10 +243,32 @@ export function BookAppointmentView({
           </label>
         </div>
 
-        {/* 6. Appointment Summary Card */}
+        {/* 4. Record Access / Consent Opt-in Checkbox (Requirement 8) */}
+        {!isReschedule && (
+          <div style={{ padding: '14px 18px', backgroundColor: 'var(--family-card)', borderRadius: '10px', border: '1px solid var(--family-border)', marginBottom: '16px' }}>
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={booking.grantConsent}
+                onChange={(e) => updateBooking('grantConsent', e.target.checked)}
+                style={{ width: '18px', height: '18px', marginTop: '2px', accentColor: 'var(--family-primary)' }}
+              />
+              <div>
+                <strong style={{ fontSize: '13.5px', color: 'var(--family-ink)', display: 'block' }}>
+                  Grant this doctor access to {booking.patient}'s medical records for this consultation
+                </strong>
+                <span style={{ fontSize: '12px', color: 'var(--family-muted)', lineHeight: '1.4', display: 'block', marginTop: '2px' }}>
+                  Optional: If checked, {booking.doctor} will be authorized to view previous diagnostic reports and lab telemetry. Access can be revoked anytime in the Doctor Access tab.
+                </span>
+              </div>
+            </label>
+          </div>
+        )}
+
+        {/* 5. Appointment Summary Card */}
         <div style={{ padding: '16px 20px', backgroundColor: 'var(--family-soft)', borderRadius: '10px', border: '1px solid var(--family-border)', marginBottom: '16px' }}>
           <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--family-muted)', fontWeight: '700', display: 'block', marginBottom: '6px' }}>
-            6. Confirmed Booking Summary
+            5. Confirmed Booking Summary
           </span>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
             <div>

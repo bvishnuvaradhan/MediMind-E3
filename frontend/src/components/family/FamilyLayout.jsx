@@ -3,7 +3,6 @@ import {
   Activity,
   Building2,
   CalendarDays,
-  ChevronDown,
   ChevronRight,
   CircleHelp,
   Crown,
@@ -102,12 +101,8 @@ export function FamilyLayout({ dark, setDark }) {
   const { user, logout, switchRole } = useAuth();
   const [page, setPage] = useState(getInitialFamilyPage);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [selectedMember, setSelectedMember] = useState(null);
   const [returnTo, setReturnTo] = useState('Doctors');
-  const [memberIndex, setMemberIndex] = useState(() => {
-    const savedIdx = sessionStorage.getItem('medimind_family_member_idx');
-    return savedIdx ? parseInt(savedIdx, 10) : 0;
-  });
-  const [profileOpen, setProfileOpen] = useState(false);
   const [toast, setToast] = useState('');
   const [detailModal, setDetailModal] = useState(null);
   const [appointmentDetailModal, setAppointmentDetailModal] = useState(null);
@@ -124,8 +119,22 @@ export function FamilyLayout({ dark, setDark }) {
   const [bookedAppointments, setBookedAppointments] = useState([]);
   const [appointmentStatuses, setAppointmentStatuses] = useState({});
   const [doctorAccess, setDoctorAccess] = useState(initialDoctorAccess);
+  const [mongoDoctors, setMongoDoctors] = useState([]);
 
-  const member = familyMembers[memberIndex] ?? familyMembers[0];
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/doctors')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data && Array.isArray(data.data)) {
+          setMongoDoctors(data.data);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Refresh and History Navigation Synchronization
   useEffect(() => {
@@ -151,10 +160,10 @@ export function FamilyLayout({ dark, setDark }) {
 
   const navigate = (nextPage, extra = {}) => {
     setPage(nextPage);
-    setProfileOpen(false);
     setMobileMenuOpen(false);
 
     if (extra.doctor) setSelectedDoctor(extra.doctor);
+    if (extra.member) setSelectedMember(extra.member);
     if (extra.returnTo) setReturnTo(extra.returnTo);
     if (extra.prediction) setSelectedPrediction(extra.prediction);
     if (extra.rescheduleData) setRescheduleData(extra.rescheduleData);
@@ -162,11 +171,6 @@ export function FamilyLayout({ dark, setDark }) {
     const slug = nextPage.toLowerCase().replace(/\s+/g, '-');
     window.history.pushState({ page: nextPage }, '', `#${slug}`);
     sessionStorage.setItem('medimind_family_page', nextPage);
-  };
-
-  const handleSelectMemberIndex = (idx) => {
-    setMemberIndex(idx);
-    sessionStorage.setItem('medimind_family_member_idx', idx.toString());
   };
 
   const openFeatureModal = (item, feature) => setDetailModal({ item, feature });
@@ -185,6 +189,7 @@ export function FamilyLayout({ dark, setDark }) {
   };
 
   const handleDeleteRecord = (recordToDelete) => {
+    const recTitle = (recordToDelete.title || recordToDelete.type || '').toLowerCase();
     setRecords((prev) =>
       prev.filter(
         (r) =>
@@ -196,6 +201,13 @@ export function FamilyLayout({ dark, setDark }) {
             (r.title === recordToDelete.title || !r.title)
           )
       )
+    );
+    // Cascade delete any prediction generated from this record (Requirement 5)
+    setPredictionHistory((prev) =>
+      prev.filter((pred) => {
+        const docName = (pred.attachedDoc?.title || pred.attachedDoc?.name || pred.documentUsed?.title || pred.documentUsed?.name || '').toLowerCase();
+        return !docName || !recTitle || !docName.includes(recTitle);
+      })
     );
     if (recordToDelete.patient) {
       setFamilyMembers((prev) =>
@@ -209,10 +221,35 @@ export function FamilyLayout({ dark, setDark }) {
     announce(`Medical record "${recordToDelete.title || recordToDelete.type}" removed.`);
   };
 
+  const handleDeletePrediction = (predToDelete) => {
+    const pId = typeof predToDelete === 'string' ? predToDelete : predToDelete?.id || predToDelete?._id;
+    setPredictionHistory((prev) =>
+      prev.filter((p) => (p.id && p.id !== pId) || (p._id && p._id !== pId) || p !== predToDelete)
+    );
+    if (
+      selectedPrediction &&
+      ((selectedPrediction.id && selectedPrediction.id === pId) ||
+        (selectedPrediction._id && selectedPrediction._id === pId) ||
+        selectedPrediction === predToDelete)
+    ) {
+      setSelectedPrediction(null);
+      navigate('AI predictions');
+    }
+    announce('AI prediction removed.');
+  };
+
   const handleUpdateMember = (updatedMember) => {
     setFamilyMembers((prev) =>
-      prev.map((m, idx) => (idx === memberIndex ? updatedMember : m))
+      prev.map((m) =>
+        (m.id && updatedMember.id && m.id === updatedMember.id) ||
+        (m.name.toLowerCase() === (updatedMember.name || '').toLowerCase())
+          ? updatedMember
+          : m
+      )
     );
+    if (selectedMember && (selectedMember.id === updatedMember.id || selectedMember.name === updatedMember.name)) {
+      setSelectedMember(updatedMember);
+    }
   };
 
   const handleGrantAccess = (grant) => {
@@ -247,8 +284,8 @@ export function FamilyLayout({ dark, setDark }) {
   };
 
   const handleConfirmCancelAppointment = (item) => {
-    const key = `${item.title}|${item.detail}`;
-    setAppointmentStatuses((curr) => ({ ...curr, [key]: 'Cancelled' }));
+    const aptId = item.id || `${item.title}|${item.detail}|${item.date}|${item.slot || item.time}`;
+    setAppointmentStatuses((curr) => ({ ...curr, [aptId]: 'Cancelled' }));
     announce(`Appointment cancelled for ${item.title}.`);
   };
 
@@ -280,9 +317,9 @@ export function FamilyLayout({ dark, setDark }) {
     };
 
     setBookedAppointments((prev) => {
-      const exists = prev.some((a) => a.title === oldApt.title && a.detail === oldApt.detail);
+      const exists = prev.some((a) => (a.id && a.id === oldApt.id) || (a.title === oldApt.title && a.detail === oldApt.detail));
       if (exists) {
-        return prev.map((a) => (a.title === oldApt.title && a.detail === oldApt.detail ? updatedObj : a));
+        return prev.map((a) => ((a.id && a.id === oldApt.id) || (a.title === oldApt.title && a.detail === oldApt.detail) ? updatedObj : a));
       }
       return [updatedObj, ...prev];
     });
@@ -309,7 +346,10 @@ export function FamilyLayout({ dark, setDark }) {
       year: 'numeric',
     });
 
+    const uniqueAptId = `apt_booked_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+
     const newApt = {
+      id: uniqueAptId,
       title: booking.type,
       detail: `${booking.doctor} · ${booking.patient}`,
       meta: `${formattedDate} · ${booking.slot} · ${booking.mode}`,
@@ -326,33 +366,35 @@ export function FamilyLayout({ dark, setDark }) {
 
     setBookedAppointments((current) => [newApt, ...current]);
 
-    // Auto-grant doctor access upon appointment booking (Part 12)
-    setDoctorAccess((current) => {
-      const exists = current.some(
-        (entry) =>
-          entry.member.toLowerCase() === booking.patient.toLowerCase() &&
-          entry.doctor.toLowerCase() === booking.doctor.toLowerCase()
-      );
-      if (exists) return current;
+    // Explicit opt-in doctor access consent only
+    if (booking.grantConsent) {
+      setDoctorAccess((current) => {
+        const exists = current.some(
+          (entry) =>
+            entry.member.toLowerCase() === booking.patient.toLowerCase() &&
+            entry.doctor.toLowerCase() === booking.doctor.toLowerCase()
+        );
+        if (exists) return current;
 
-      const docDept = booking.doctor.includes('Mehta')
-        ? 'Orthopedics'
-        : booking.doctor.includes('Rao')
-        ? 'Cardiology'
-        : booking.doctor.includes('Shah')
-        ? 'Diabetology'
-        : 'General Medicine';
+        const docDept = booking.doctor.includes('Mehta')
+          ? 'Orthopedics'
+          : booking.doctor.includes('Rao')
+          ? 'Cardiology'
+          : booking.doctor.includes('Shah')
+          ? 'Diabetology'
+          : 'General Medicine';
 
-      return [
-        ...current,
-        {
-          member: booking.patient,
-          doctor: booking.doctor,
-          department: docDept,
-          granted: formattedDate,
-        },
-      ];
-    });
+        return [
+          ...current,
+          {
+            member: booking.patient,
+            doctor: booking.doctor,
+            department: docDept,
+            granted: formattedDate,
+          },
+        ];
+      });
+    }
 
     return true;
   };
@@ -360,23 +402,22 @@ export function FamilyLayout({ dark, setDark }) {
   const handleAddMember = (nextMember) => {
     const updatedMembers = [...familyMembers, nextMember];
     setFamilyMembers(updatedMembers);
-    handleSelectMemberIndex(updatedMembers.length - 1);
     announce(`${nextMember.name} was added to your family account.`);
   };
 
-  const handleDeleteMember = (index) => {
+  const handleDeleteMember = (memberToDelete) => {
     if (familyMembers.length <= 1) {
       announce('At least one family member must remain in the account.');
       return;
     }
 
-    const deletedMember = familyMembers[index];
-    const updatedMembers = familyMembers.filter((_, idx) => idx !== index);
+    const mName = typeof memberToDelete === 'string' ? memberToDelete : memberToDelete?.name;
+    const updatedMembers = familyMembers.filter((m) => m.name !== mName && m.id !== memberToDelete?.id);
     setFamilyMembers(updatedMembers);
-    if (memberIndex >= updatedMembers.length) {
-      handleSelectMemberIndex(updatedMembers.length - 1);
+    if (selectedMember && (selectedMember.name === mName || selectedMember.id === memberToDelete?.id)) {
+      setSelectedMember(updatedMembers[0] || null);
     }
-    announce(`${deletedMember.name} was removed from your family account.`);
+    announce(`${mName} was removed from your family account.`);
   };
 
   const handleOpenPredictionDetail = (predictionData) => {
@@ -384,16 +425,17 @@ export function FamilyLayout({ dark, setDark }) {
     navigate('Personal prediction detail');
   };
 
+  const currentProfileMember = selectedMember || familyMembers[0] || { name: 'Rohan Kapoor', relation: 'Father' };
+
   const renderCurrentView = () => {
     if (page === 'Dashboard') {
       return (
         <DashboardView
-          member={member}
           familyMembers={familyMembers}
           records={records}
           bookedAppointments={bookedAppointments}
-          memberIndex={memberIndex}
-          setMemberIndex={handleSelectMemberIndex}
+          predictionHistory={predictionHistory}
+          doctorAccess={doctorAccess}
           navigate={navigate}
           announce={announce}
           openFeatureModal={openFeatureModal}
@@ -406,16 +448,15 @@ export function FamilyLayout({ dark, setDark }) {
     if (page === 'Member profile') {
       return (
         <MemberProfileView
-          member={member}
+          member={currentProfileMember}
           familyMembers={familyMembers}
-          memberIndex={memberIndex}
-          setMemberIndex={handleSelectMemberIndex}
           records={records}
+          predictionHistory={predictionHistory}
           navigate={navigate}
           announce={announce}
           openFeatureModal={openFeatureModal}
           onUpdateMember={handleUpdateMember}
-          onDeleteMember={familyMembers.length > 1 ? () => handleDeleteMember(memberIndex) : null}
+          onDeleteMember={familyMembers.length > 1 ? handleDeleteMember : null}
         />
       );
     }
@@ -423,8 +464,8 @@ export function FamilyLayout({ dark, setDark }) {
       return (
         <FamilyMembersView
           familyMembers={familyMembers}
-          memberIndex={memberIndex}
-          setMemberIndex={handleSelectMemberIndex}
+          records={records}
+          predictionHistory={predictionHistory}
           handleAddMember={handleAddMember}
           handleDeleteMember={handleDeleteMember}
           navigate={navigate}
@@ -437,7 +478,6 @@ export function FamilyLayout({ dark, setDark }) {
         <MedicalRecordsView
           records={records}
           familyMembers={familyMembers}
-          activeMember={member}
           navigate={navigate}
           announce={announce}
           openFeatureModal={openFeatureModal}
@@ -449,7 +489,6 @@ export function FamilyLayout({ dark, setDark }) {
     if (page === 'AI predictions') {
       return (
         <AiPredictionsView
-          member={member}
           familyMembers={familyMembers}
           records={records}
           predictionHistory={predictionHistory}
@@ -457,6 +496,7 @@ export function FamilyLayout({ dark, setDark }) {
           announce={announce}
           onOpenPredictionDetail={handleOpenPredictionDetail}
           onAddPrediction={(newPred) => setPredictionHistory((prev) => [newPred, ...prev])}
+          onDeletePrediction={handleDeletePrediction}
           onAddRecord={handleAddRecord}
         />
       );
@@ -465,11 +505,13 @@ export function FamilyLayout({ dark, setDark }) {
       return (
         <PersonalPredictionDetailView
           prediction={selectedPrediction}
-          member={member}
           records={records}
+          familyMembers={familyMembers}
+          mongoDoctors={mongoDoctors}
           navigate={navigate}
           announce={announce}
           openFeatureModal={openFeatureModal}
+          onDeletePrediction={handleDeletePrediction}
           onBookDoctor={(doc) => {
             setSelectedDoctor(doc);
             setReturnTo('Personal prediction detail');
@@ -498,7 +540,6 @@ export function FamilyLayout({ dark, setDark }) {
           onCancelAppointment={handleCancelAppointment}
           onRescheduleAppointment={handleRescheduleAppointment}
           familyMembers={familyMembers}
-          activeMember={member}
           setReturnTo={setReturnTo}
           navigate={navigate}
           announce={announce}
@@ -510,7 +551,6 @@ export function FamilyLayout({ dark, setDark }) {
       return (
         <ConsultationsView
           familyMembers={familyMembers}
-          activeMember={member}
           openFeatureModal={openFeatureModal}
           announce={announce}
         />
@@ -520,7 +560,6 @@ export function FamilyLayout({ dark, setDark }) {
       return (
         <PrescriptionsView
           familyMembers={familyMembers}
-          activeMember={member}
           openFeatureModal={openFeatureModal}
           announce={announce}
         />
@@ -532,7 +571,6 @@ export function FamilyLayout({ dark, setDark }) {
           doctorAccess={doctorAccess}
           setDoctorAccess={setDoctorAccess}
           familyMembers={familyMembers}
-          activeMember={member}
           onGrant={handleGrantAccess}
           onRevoke={handleRevokeAccess}
           announce={announce}
@@ -544,7 +582,6 @@ export function FamilyLayout({ dark, setDark }) {
         <AppointmentAssessmentView
           selectedDoctor={selectedDoctor}
           familyMembers={familyMembers}
-          member={member}
           records={records}
           returnTo={returnTo}
           navigate={navigate}
@@ -559,7 +596,6 @@ export function FamilyLayout({ dark, setDark }) {
         <BookAppointmentView
           selectedDoctor={selectedDoctor}
           familyMembers={familyMembers}
-          member={member}
           appointmentAssessment={appointmentAssessment}
           bookedSlots={bookedSlots}
           rescheduleData={rescheduleData}
@@ -574,7 +610,7 @@ export function FamilyLayout({ dark, setDark }) {
     if (page === 'General health risk') {
       return (
         <GeneralHealthRiskView
-          member={member}
+          familyMembers={familyMembers}
           navigate={navigate}
           announce={announce}
         />
@@ -750,45 +786,16 @@ export function FamilyLayout({ dark, setDark }) {
             >
               {dark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <button
-              className="profile-button"
-              onClick={() => setProfileOpen(!profileOpen)}
-              aria-label="Switch active family profile"
-              aria-expanded={profileOpen}
+            <div
+              className="family-account-badge"
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 12px', borderRadius: '8px', background: 'var(--family-soft)', border: '1px solid var(--family-border)' }}
+              title="Family Account Workspace"
             >
-              <div className={`avatar small avatar-${member.tone}`}>
-                {member.initials}
-              </div>
-              <ChevronDown size={14} />
-            </button>
+              <UsersRound size={16} style={{ color: 'var(--family-primary)' }} />
+              <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--family-ink)' }}>Kapoor Family</span>
+            </div>
           </div>
         </header>
-
-        {profileOpen && (
-          <div className="profile-popover">
-            <div className="popover-header">
-              <strong>Switch profile</strong>
-              <button onClick={() => setProfileOpen(false)}>×</button>
-            </div>
-            {familyMembers.map((item, idx) => (
-              <button
-                key={item.name}
-                className="popover-member"
-                onClick={() => {
-                  handleSelectMemberIndex(idx);
-                  setProfileOpen(false);
-                  announce(`Switched active view to ${item.name}`);
-                }}
-              >
-                <div className={`avatar small avatar-${item.tone}`}>
-                  {item.initials}
-                </div>
-                <span>{item.name}</span>
-                {idx === memberIndex && <span className="check">✓</span>}
-              </button>
-            ))}
-          </div>
-        )}
 
         <main className="page-content">
           {renderCurrentView()}
@@ -829,7 +836,6 @@ export function FamilyLayout({ dark, setDark }) {
           isOpen={isUploadModalOpen}
           onClose={() => setIsUploadModalOpen(false)}
           familyMembers={familyMembers}
-          activeMember={member}
           onAddRecord={handleAddRecord}
           announce={announce}
         />

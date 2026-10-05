@@ -111,10 +111,10 @@ export function MedicalRecordsView({
 
             <DonutChart
               data={[
-                { label: 'Lab Reports', value: memberFilteredRecords.filter(r => r.category === 'Reports' || r.type?.includes('Report') || r.type?.includes('Lab')).length || 2, color: '#2563eb' },
-                { label: 'Clinical Tests', value: memberFilteredRecords.filter(r => r.category === 'Tests' || r.type?.includes('Panel') || r.type?.includes('ECG')).length || 1, color: '#0f766e' },
-                { label: 'Radiology / X-Rays', value: memberFilteredRecords.filter(r => r.category === 'X-Rays' || r.type?.includes('X-Ray') || r.type?.includes('Scan')).length || 1, color: '#f43f5e' },
-                { label: 'Prescriptions', value: memberFilteredRecords.filter(r => r.category === 'Prescriptions' || r.type?.includes('Prescription')).length || 1, color: '#7c3aed' },
+                { label: 'Lab Reports', value: memberFilteredRecords.filter(r => r.category === 'Reports' || r.type?.includes('Report') || r.type?.includes('Lab')).length, color: '#2563eb' },
+                { label: 'Clinical Tests', value: memberFilteredRecords.filter(r => r.category === 'Tests' || r.type?.includes('Panel') || r.type?.includes('ECG')).length, color: '#0f766e' },
+                { label: 'Radiology / X-Rays', value: memberFilteredRecords.filter(r => r.category === 'X-Rays' || r.type?.includes('X-Ray') || r.type?.includes('Scan')).length, color: '#f43f5e' },
+                { label: 'Prescriptions', value: memberFilteredRecords.filter(r => r.category === 'Prescriptions' || r.type?.includes('Prescription')).length, color: '#7c3aed' },
               ]}
               size={130}
               innerRadius={36}

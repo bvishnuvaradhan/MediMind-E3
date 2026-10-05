@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { UsersRound, Plus, ArrowUpRight, Trash2 } from 'lucide-react';
+import { matchesFamilyMember } from '../../../data/medimindData';
 import { AddMemberModal } from '../components/AddMemberModal';
 
 export function FamilyMembersView({
-  familyMembers,
-  setMemberIndex,
+  familyMembers = [],
+  records = [],
+  predictionHistory = [],
   navigate,
   announce,
   handleAddMember,
@@ -13,17 +15,17 @@ export function FamilyMembersView({
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState(null);
 
-  const confirmDelete = (index, member) => {
+  const confirmDelete = (member) => {
     if (familyMembers.length <= 1) {
       announce('At least one family member profile must remain in the account.');
       return;
     }
-    setMemberToDelete({ index, member });
+    setMemberToDelete(member);
   };
 
   const handleExecuteDelete = () => {
     if (memberToDelete) {
-      handleDeleteMember(memberToDelete.index);
+      handleDeleteMember(memberToDelete);
       setMemberToDelete(null);
     }
   };
@@ -50,13 +52,16 @@ export function FamilyMembersView({
           {familyMembers.map((item, index) => {
             const displayName = item.fullName || item.name;
             const relationship = item.relationship || item.relation || 'Family member';
+            const memberRecsCount = records.filter((r) => matchesFamilyMember(r, item)).length;
+            const memberPredsCount = predictionHistory.filter((p) => matchesFamilyMember(p, item)).length;
+
             return (
               <article className="feature-card" key={`${item.id || item.name}-${index}`}>
-                <div className={`avatar avatar-${item.tone}`}>{item.initials}</div>
+                <div className={`avatar avatar-${item.tone || 'coral'}`}>{item.initials}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h3 style={{ margin: '0 0 2px 0' }}>{displayName}</h3>
                   <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--family-muted)' }}>
-                    <strong>{displayName} — {relationship}</strong> · {item.records || 0} records · {item.predictions || 0} predictions · Age {item.age || 'N/A'}
+                    <strong>{displayName} — {relationship}</strong> · {memberRecsCount} record{memberRecsCount !== 1 ? 's' : ''} · {memberPredsCount} prediction{memberPredsCount !== 1 ? 's' : ''} · Age {item.age || 'N/A'}
                   </p>
                 </div>
 
@@ -65,31 +70,32 @@ export function FamilyMembersView({
                   <button
                     className="text-button"
                     onClick={() => {
-                      setMemberIndex(index);
-                      navigate('Member profile');
+                      navigate('Member profile', { member: item });
                       announce(`Opening ${displayName}'s profile.`);
                     }}
                   >
                     View profile <ArrowUpRight size={14} />
                   </button>
-                  <button
-                    type="button"
-                    className="delete-member-button"
-                    onClick={() => confirmDelete(index, item)}
-                    aria-label={`Delete ${displayName}`}
-                    title={`Delete ${displayName}`}
-                    style={{
-                      color: '#dc2626',
-                      padding: '6px 8px',
-                      borderRadius: '6px',
-                      border: '1px solid transparent',
-                      display: 'grid',
-                      placeItems: 'center',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  {familyMembers.length > 1 && (
+                    <button
+                      type="button"
+                      className="delete-member-button"
+                      onClick={() => confirmDelete(item)}
+                      aria-label={`Delete ${displayName}`}
+                      title={`Delete ${displayName}`}
+                      style={{
+                        color: '#dc2626',
+                        padding: '6px 8px',
+                        borderRadius: '6px',
+                        border: '1px solid transparent',
+                        display: 'grid',
+                        placeItems: 'center',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
                 </div>
               </article>
             );
@@ -128,7 +134,7 @@ export function FamilyMembersView({
                 </div>
               </div>
               <p style={{ margin: '14px 0', fontSize: '13.5px', color: 'var(--family-muted)', lineHeight: '1.5' }}>
-                Are you sure you want to remove <strong>{memberToDelete.member.name}</strong> ({memberToDelete.member.relation}) from this family account?
+                Are you sure you want to remove <strong>{memberToDelete.name}</strong> ({memberToDelete.relation}) from this family account?
               </p>
               <div className="modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
                 <button type="button" className="secondary-button" onClick={() => setMemberToDelete(null)}>

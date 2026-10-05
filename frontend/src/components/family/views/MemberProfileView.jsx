@@ -6,21 +6,20 @@ import {
   Sparkles,
   ShieldCheck,
   User,
-  Activity,
   Heart,
   Pencil,
   Trash2,
+  Upload,
 } from 'lucide-react';
-import { initialRecords } from '../../../data/medimindData';
+import { matchesFamilyMember } from '../../../data/medimindData';
 import { RecordRow } from '../components/RecordRow';
 import { EditMemberModal } from '../components/EditMemberModal';
 
 export function MemberProfileView({
   member,
   familyMembers = [],
-  memberIndex = 0,
-  setMemberIndex,
-  records = initialRecords,
+  records = [],
+  predictionHistory = [],
   navigate,
   announce,
   openFeatureModal,
@@ -30,16 +29,13 @@ export function MemberProfileView({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const memberName = member?.fullName || member?.name || 'Rohan Kapoor';
-  const memberRelation = member?.relationship || member?.relation || 'Father';
-  const memberShortName = member?.name || 'Rohan';
+  const memberName = member?.fullName || member?.name || 'Family Member';
+  const memberRelation = member?.relationship || member?.relation || 'Member';
 
-  const memberRecords = records.filter(
-    (r) => {
-      const patient = (r.patient || r.patientName || '').toLowerCase();
-      return patient.includes(memberShortName.toLowerCase()) || patient.includes(memberName.toLowerCase());
-    }
-  );
+  // Dynamic real data filtering
+  const memberRecords = records.filter((r) => matchesFamilyMember(r, member));
+  const memberPredictions = predictionHistory.filter((p) => matchesFamilyMember(p, member));
+  const isNewMember = memberRecords.length === 0 && memberPredictions.length === 0;
 
   const handleConfirmDelete = () => {
     if (onDeleteMember) {
@@ -51,7 +47,7 @@ export function MemberProfileView({
 
   return (
     <section className="feature-view">
-      {/* 1. Header with Member Switcher & Actions */}
+      {/* 1. Header with Actions */}
       <div className="feature-heading" style={{ marginBottom: '16px', flexWrap: 'wrap', gap: '14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <span className={`avatar avatar-${member?.tone || 'coral'}`} style={{ width: '48px', height: '48px', fontSize: '18px' }}>
@@ -66,31 +62,6 @@ export function MemberProfileView({
           </div>
         </div>
 
-        {/* Member Profile Switcher Selector */}
-        {familyMembers.length > 1 && setMemberIndex && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--family-muted)', textTransform: 'uppercase' }}>
-              Switch:
-            </span>
-            <select
-              className="feature-input"
-              value={memberIndex}
-              onChange={(e) => {
-                const idx = parseInt(e.target.value, 10);
-                setMemberIndex(idx);
-                announce(`Viewing profile for ${familyMembers[idx]?.fullName || familyMembers[idx]?.name}`);
-              }}
-              style={{ padding: '6px 12px', fontSize: '13px', fontWeight: '600', minWidth: '180px' }}
-            >
-              {familyMembers.map((m, idx) => (
-                <option key={m.id || m.name} value={idx}>
-                  {m.fullName || m.name} — {m.relationship || m.relation}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
           <button
             className="secondary-button compact-button"
@@ -100,7 +71,7 @@ export function MemberProfileView({
             <Pencil size={15} /> Edit Profile
           </button>
 
-          {onDeleteMember && (
+          {onDeleteMember && familyMembers.length > 1 && (
             <button
               className="secondary-button compact-button"
               onClick={() => setIsDeleteModalOpen(true)}
@@ -128,23 +99,50 @@ export function MemberProfileView({
               <HeartPulse size={20} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p className="card-kicker">HEALTH OVERVIEW · {member.name.toUpperCase()}</p>
-              <h3 style={{ margin: '0 0 6px 0', fontSize: '16px' }}>Health Profile is Active & Verified</h3>
-              <p className="insight-copy" style={{ margin: '0 0 12px 0', fontSize: '13px', lineHeight: '1.5' }}>
-                Review medical history, authorized consultations, and AI predictive telemetry for {member.name}.
-              </p>
-              <button
-                className="text-button"
-                onClick={() => navigate('Medical records')}
-                style={{ fontSize: '12.5px', fontWeight: '600' }}
-              >
-                View full medical records <ArrowUpRight size={14} />
-              </button>
+              <p className="card-kicker">HEALTH OVERVIEW · {memberName.toUpperCase()}</p>
+              {isNewMember ? (
+                <>
+                  <h3 style={{ margin: '0 0 6px 0', fontSize: '16px' }}>New Profile · Awaiting Health Data</h3>
+                  <p className="insight-copy" style={{ margin: '0 0 12px 0', fontSize: '13px', lineHeight: '1.5' }}>
+                    No medical documents or AI predictions recorded for {memberName} yet. Upload lab reports or run an AI screening to build their health profile.
+                  </p>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <button
+                      className="secondary-button compact-button"
+                      onClick={() => navigate('Medical records')}
+                      style={{ fontSize: '12px' }}
+                    >
+                      <Upload size={14} /> Upload first record
+                    </button>
+                    <button
+                      className="primary-button compact-button"
+                      onClick={() => navigate('AI predictions')}
+                      style={{ fontSize: '12px' }}
+                    >
+                      <Sparkles size={14} /> Run AI screening
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h3 style={{ margin: '0 0 6px 0', fontSize: '16px' }}>Health Profile Active & Verified</h3>
+                  <p className="insight-copy" style={{ margin: '0 0 12px 0', fontSize: '13px', lineHeight: '1.5' }}>
+                    Review verified medical history, authorized consultations, and AI predictive telemetry for {memberName}.
+                  </p>
+                  <button
+                    className="text-button"
+                    onClick={() => navigate('Medical records')}
+                    style={{ fontSize: '12.5px', fontWeight: '600' }}
+                  >
+                    View full medical records <ArrowUpRight size={14} />
+                  </button>
+                </>
+              )}
             </div>
           </div>
           <div className="insight-ring">
-            <span>{member.records ? 75 + Math.min(20, member.records * 3) : 78}</span>
-            <small>index</small>
+            <span>{isNewMember ? '—' : (75 + Math.min(20, memberRecords.length * 3))}</span>
+            <small>{isNewMember ? 'New' : 'index'}</small>
           </div>
         </div>
 
@@ -152,7 +150,7 @@ export function MemberProfileView({
           <div className="section-heading" style={{ marginBottom: '12px' }}>
             <div>
               <h2 style={{ fontSize: '15px', fontWeight: '700', margin: '0 0 2px 0' }}>At a Glance</h2>
-              <p style={{ fontSize: '12px', color: 'var(--family-muted)', margin: 0 }}>{member.name}'s account telemetry</p>
+              <p style={{ fontSize: '12px', color: 'var(--family-muted)', margin: 0 }}>{memberName}'s account telemetry</p>
             </div>
           </div>
           <div className="stat-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -167,7 +165,7 @@ export function MemberProfileView({
               <span className="stat-icon lilac-bg">
                 <Sparkles size={17} />
               </span>
-              <strong>{member.predictions || 2}</strong>
+              <strong>{memberPredictions.length}</strong>
               <span>AI predictions</span>
             </div>
           </div>
@@ -256,48 +254,18 @@ export function MemberProfileView({
 
           <div className="info-tile">
             <span className="info-tile-label">Health Risk Telemetry</span>
-            <span className="info-tile-value">Under continuous family wellness review</span>
+            <span className="info-tile-value">{isNewMember ? 'Awaiting intake screening' : 'Under continuous family wellness review'}</span>
             <span className="info-tile-sub">AI-monitored biomarkers</span>
           </div>
         </div>
       </div>
 
-      {/* 5. Account Activity & Care Team */}
-      <div className="doctor-section-card" style={{ marginBottom: '20px' }}>
-        <div className="doctor-section-title">
-          <Activity size={18} />
-          <span>Care Activity & History</span>
-        </div>
-
-        <div className="doctor-info-grid">
-          <div className="info-tile">
-            <span className="info-tile-label">Scheduled Appointments</span>
-            <span className="info-tile-value">{member.appointments || 0} scheduled visit(s)</span>
-          </div>
-
-          <div className="info-tile">
-            <span className="info-tile-label">Past Consultations</span>
-            <span className="info-tile-value">{member.consultations || 0} completed consultation(s)</span>
-          </div>
-
-          <div className="info-tile">
-            <span className="info-tile-label">Active Prescriptions</span>
-            <span className="info-tile-value">{member.prescriptions || 0} valid prescription(s)</span>
-          </div>
-
-          <div className="info-tile">
-            <span className="info-tile-label">Shared Doctor Access</span>
-            <span className="info-tile-value">Authorized clinicians with active record access</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 6. Recent Records Section */}
+      {/* 5. Recent Records Section */}
       <div className="doctor-section-card" style={{ marginBottom: '10px' }}>
         <div className="section-heading" style={{ marginBottom: '14px' }}>
           <div>
             <h2 style={{ fontSize: '15px', fontWeight: '700', margin: '0 0 2px 0' }}>Recent Medical Records</h2>
-            <p style={{ fontSize: '12px', color: 'var(--family-muted)', margin: 0 }}>Latest verified documents for {member.name}</p>
+            <p style={{ fontSize: '12px', color: 'var(--family-muted)', margin: 0 }}>Latest verified documents for {memberName}</p>
           </div>
           <button className="text-button" onClick={() => navigate('Medical records')}>
             View all ({memberRecords.length}) <ArrowUpRight size={14} />
@@ -307,7 +275,7 @@ export function MemberProfileView({
         <div className="feature-records">
           {memberRecords.length === 0 ? (
             <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--family-muted)', fontSize: '13px' }}>
-              No medical records uploaded for {member.name} yet.
+              No medical records uploaded for {memberName} yet.
             </div>
           ) : (
             memberRecords.slice(0, 3).map((record, idx) => (
@@ -361,7 +329,7 @@ export function MemberProfileView({
               </div>
             </div>
             <p style={{ margin: '14px 0', fontSize: '13.5px', color: 'var(--family-muted)', lineHeight: '1.5' }}>
-              Are you sure you want to delete <strong>{member.name}</strong> ({member.relation})? All associated records and predictions will remain in archive but this profile will be removed from your family account.
+              Are you sure you want to delete <strong>{memberName}</strong> ({memberRelation})? All associated records and predictions will remain in archive but this profile will be removed from your family account.
             </p>
             <div className="modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
               <button type="button" className="secondary-button" onClick={() => setIsDeleteModalOpen(false)}>
@@ -382,4 +350,3 @@ export function MemberProfileView({
     </section>
   );
 }
-

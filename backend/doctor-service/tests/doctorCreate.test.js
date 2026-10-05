@@ -70,11 +70,16 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
+beforeEach(async () => {
+  await Doctor.deleteMany({});
+});
+
 describe('2. Doctor Creation & Account Provisioning', () => {
   it('allows Department Head to create a doctor within assigned department', async () => {
+    const uniqueEmail = `neha.sharma.${Date.now()}.${Math.random().toString(36).substr(2, 5)}@test.org`;
     const payload = {
       fullName: 'Dr. Neha Sharma',
-      email: 'neha.sharma@test.org',
+      email: uniqueEmail,
       mobile: '+91 98765 11111',
       specialization: 'Orthopedics',
       qualifications: ['MBBS', 'MS Ortho'],
@@ -90,13 +95,13 @@ describe('2. Doctor Creation & Account Provisioning', () => {
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
     expect(res.body.data.fullName).toBe('Dr. Neha Sharma');
-    expect(res.body.data.email).toBe('neha.sharma@test.org');
+    expect(res.body.data.email).toBe(uniqueEmail);
     expect(res.body.data.departmentId).toBe(deptAId.toString());
     expect(res.body.data.hospitalId).toBe(hospAId.toString());
     expect(res.body.data.status).toBe('ACTIVE');
 
     // Verify persisted in DB
-    const saved = await Doctor.findOne({ email: 'neha.sharma@test.org' });
+    const saved = await Doctor.findOne({ email: uniqueEmail });
     expect(saved).not.toBeNull();
     expect(saved.full_name).toBe('Dr. Neha Sharma');
   });
@@ -104,7 +109,7 @@ describe('2. Doctor Creation & Account Provisioning', () => {
   it('blocks Department Head from creating doctor in another department', async () => {
     const payload = {
       fullName: 'Dr. Imposter Dept',
-      email: 'imposter.dept@test.org',
+      email: `imposter.dept.${Date.now()}@test.org`,
       mobile: '+91 98765 22222',
       specialization: 'Neurology',
       departmentId: deptBId.toString(),
@@ -120,9 +125,10 @@ describe('2. Doctor Creation & Account Provisioning', () => {
   });
 
   it('allows Hospital Admin to create doctor in any department of their hospital', async () => {
+    const uniqueEmail = `suresh.verma.${Date.now()}.${Math.random().toString(36).substr(2, 5)}@test.org`;
     const payload = {
       fullName: 'Dr. Suresh Verma',
-      email: 'suresh.verma@test.org',
+      email: uniqueEmail,
       mobile: '+91 98765 33333',
       specialization: 'Cardiology',
       departmentId: deptAId.toString(),
@@ -143,7 +149,7 @@ describe('2. Doctor Creation & Account Provisioning', () => {
   it('blocks Hospital Admin from creating doctor for another hospital', async () => {
     const payload = {
       fullName: 'Dr. Cross Hospital',
-      email: 'cross.hosp@test.org',
+      email: `cross.hosp.${Date.now()}@test.org`,
       mobile: '+91 98765 44444',
       specialization: 'Pediatrics',
       hospitalId: hospBId.toString(),
@@ -162,7 +168,7 @@ describe('2. Doctor Creation & Account Provisioning', () => {
   it('returns 400 when Hospital Admin omits departmentId', async () => {
     const payload = {
       fullName: 'Dr. No Dept',
-      email: 'no.dept@test.org',
+      email: `no.dept.${Date.now()}@test.org`,
       mobile: '+91 98765 55555',
       specialization: 'Radiology',
     };
@@ -177,9 +183,10 @@ describe('2. Doctor Creation & Account Provisioning', () => {
   });
 
   it('allows Chairman to create doctor across any hospital and department', async () => {
+    const uniqueEmail = `chairman.doc.${Date.now()}.${Math.random().toString(36).substr(2, 5)}@test.org`;
     const payload = {
       fullName: 'Dr. Chairman Created',
-      email: 'chairman.doc@test.org',
+      email: uniqueEmail,
       mobile: '+91 98765 66666',
       specialization: 'Oncology',
       hospitalId: hospBId.toString(),

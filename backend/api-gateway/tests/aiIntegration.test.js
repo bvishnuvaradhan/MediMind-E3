@@ -129,23 +129,29 @@ beforeAll((done) => {
           created_at: new Date().toISOString(),
         }));
       } else if (req.url === '/api/ai/fracture') {
+        const isFracture = receivedDownstreamBody?.isFracture ?? (receivedDownstreamBody?.filename?.includes('fracture') || false);
+        const prob = isFracture ? 0.94 : 0.052;
+        const riskLevel = prob >= 0.18 ? 'HIGH' : 'LOW';
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           prediction_id: 'pred_frac_001',
-          family_member_id: 'mem_001_01',
+          family_member_id: receivedDownstreamBody?.family_member_id || 'mem_001_01',
           prediction_type: 'FRACTURE_DETECTION',
           input_type: 'IMAGE',
-          input_data: { filename: 'xray_wrist.png' },
+          input_data: {
+            filename: receivedDownstreamBody?.filename || 'xray_wrist.png',
+            discomfort_level: receivedDownstreamBody?.painLevel,
+          },
           result: {
-            possibleFracture: false,
-            confidence: 0.948,
-            targetRegion: 'Wrist (Radiograph)',
-            finding: 'No Acute Cortical Fracture Detected',
+            possibleFracture: riskLevel === 'HIGH',
+            probability: prob,
+            calibratedThreshold: 0.18,
+            finding: riskLevel === 'HIGH' ? 'Acute Cortical Fracture Identified' : 'No Acute Cortical Fracture Detected',
             disclaimer: 'AI-assisted assessment. This is not a medical diagnosis. Consult a qualified healthcare professional.',
           },
-          risk_level: 'LOW',
-          risk_score: 0.052,
-          confidence: 0.948,
+          risk_level: riskLevel,
+          risk_score: prob,
+          confidence: riskLevel === 'HIGH' ? 0.94 : 0.948,
           model_name: 'FractureDetection-ResNet18-v0.1.0',
           model_version: '0.1.0',
           created_at: new Date().toISOString(),
@@ -172,7 +178,7 @@ beforeAll((done) => {
             created_at: new Date().toISOString(),
           },
         ]));
-      } else if (req.url === '/api/ai/pred_cardio_001') {
+      } else if (req.method === 'GET' && req.url === '/api/ai/pred_cardio_001') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           prediction_id: 'pred_cardio_001',
@@ -184,6 +190,13 @@ beforeAll((done) => {
           confidence: 0.885,
           model_name: 'CardioRisk-RandomForest-v1.0.0',
           created_at: new Date().toISOString(),
+        }));
+      } else if (req.method === 'DELETE' && req.url.startsWith('/api/ai/')) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          message: 'Prediction record deleted successfully',
+          deleted_id: req.url.replace('/api/ai/', ''),
         }));
       } else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
@@ -298,12 +311,55 @@ describe('2. Four AI Model Prediction Invocations', () => {
       .post('/api/ai/fracture')
       .set('Authorization', `Bearer ${doctorToken}`)
       .set('Content-Type', 'application/json')
-      .send({ family_member_id: 'mem_001_01' });
+      .send({ family_member_id: 'mem_001_01', filename: 'wrist_xray_normal.png' });
 
     expect(res.status).toBe(200);
     expect(res.body.prediction_type).toBe('FRACTURE_DETECTION');
     expect(res.body.risk_level).toBe('LOW');
     expect(res.body.confidence).toBe(0.948);
+  });
+
+  it('POST /api/ai/fracture: fractured X-ray produces HIGH risk fracture prediction whether pain is 1 or 10', async () => {
+    // Case 1: Fractured X-Ray with Pain = 1 (Mild / Minimal pain)
+    const resPain1 = await request(app)
+      .post('/api/ai/fracture')
+      .set('Authorization', `Bearer ${familyToken}`)
+      .set('Content-Type', 'application/json')
+      .send({ family_member_id: 'mem_001_01', filename: 'wrist_fracture_cortical_break.png', isFracture: true, painLevel: '1' });
+
+    expect(resPain1.status).toBe(200);
+    expect(resPain1.body.risk_level).toBe('HIGH');
+    expect(resPain1.body.result.possibleFracture).toBe(true);
+    expect(resPain1.body.result.probability).toBe(0.94);
+    expect(resPain1.body.result.calibratedThreshold).toBe(0.18);
+
+    // Case 2: Fractured X-Ray with Pain = 10 (Severe pain)
+    const resPain10 = await request(app)
+      .post('/api/ai/fracture')
+      .set('Authorization', `Bearer ${familyToken}`)
+      .set('Content-Type', 'application/json')
+      .send({ family_member_id: 'mem_001_01', filename: 'wrist_fracture_cortical_break.png', isFracture: true, painLevel: '10' });
+
+    expect(resPain10.status).toBe(200);
+    expect(resPain10.body.risk_level).toBe('HIGH');
+    expect(resPain10.body.result.possibleFracture).toBe(true);
+    expect(resPain10.body.result.probability).toBe(resPain1.body.result.probability);
+    expect(resPain10.body.risk_level).toBe(resPain1.body.risk_level);
+  });
+
+  it('POST /api/ai/fracture: intact normal X-ray produces LOW risk prediction even when pain is 10', async () => {
+    // Normal X-Ray with Severe Pain = 10 (e.g. soft tissue sprain without bone fracture)
+    const res = await request(app)
+      .post('/api/ai/fracture')
+      .set('Authorization', `Bearer ${familyToken}`)
+      .set('Content-Type', 'application/json')
+      .send({ family_member_id: 'mem_001_01', filename: 'wrist_normal_intact.png', isFracture: false, painLevel: '10' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.risk_level).toBe('LOW');
+    expect(res.body.result.possibleFracture).toBe(false);
+    expect(res.body.result.probability).toBe(0.052);
+    expect(res.body.result.finding).toBe('No Acute Cortical Fracture Detected');
   });
 });
 
@@ -328,6 +384,16 @@ describe('3. Prediction Retrieval & History Scoping', () => {
     expect(res.body.prediction_id).toBe('pred_cardio_001');
     expect(res.body.prediction_type).toBe('HEART_DISEASE_RISK');
   });
+
+  it('DELETE /api/ai/:predictionId deletes prediction record for authorized user', async () => {
+    const res = await request(app)
+      .delete('/api/ai/pred_cardio_001')
+      .set('Authorization', `Bearer ${familyToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.deleted_id).toBe('pred_cardio_001');
+  });
 });
 
 describe('4. Security & Role Boundary Enforcement', () => {
@@ -335,6 +401,14 @@ describe('4. Security & Role Boundary Enforcement', () => {
     const res = await request(app)
       .post('/api/ai/general-health')
       .send({ family_member_id: 'mem_001_01', text: 'Headache' });
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+  });
+
+  it('rejects unauthenticated DELETE request with 401', async () => {
+    const res = await request(app)
+      .delete('/api/ai/pred_cardio_001');
 
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
@@ -360,6 +434,15 @@ describe('4. Security & Role Boundary Enforcement', () => {
     expect(res.body.message).toContain('Access forbidden');
   });
 
+  it('BLOCKS Hospital Admin from deleting private clinical predictions (403 Forbidden)', async () => {
+    const res = await request(app)
+      .delete('/api/ai/pred_cardio_001')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(403);
+    expect(res.body.success).toBe(false);
+  });
+
   it('BLOCKS Chairman from accessing private clinical predictions (403 Forbidden)', async () => {
     const res = await request(app)
       .get('/api/ai/member/mem_001_01')
@@ -379,5 +462,24 @@ describe('4. Security & Role Boundary Enforcement', () => {
     expect(res.status).toBe(403);
     expect(res.body.success).toBe(false);
     expect(res.body.message).toContain('Access forbidden');
+  });
+});
+
+describe('5. General Health & Clinical NLP Tri-Pillar Triage Validation', () => {
+  it('Processes all 3 inputs: Symptoms, Lifestyle, and Family History', async () => {
+    const res = await request(app)
+      .post('/api/ai/general-health')
+      .set('Authorization', `Bearer ${familyToken}`)
+      .send({
+        family_member_id: 'mem_001_01',
+        symptoms: 'Mild fatigue after busy day. No chest pain, no breathing difficulty.',
+        lifestyle: 'Exercises 4x/wk, balanced diet, non-smoker.',
+        familyHistory: 'No chronic diseases in family.',
+      });
+
+    expect(res.status).toBe(200);
+    expect(receivedDownstreamBody.symptoms).toBeDefined();
+    expect(receivedDownstreamBody.lifestyle).toBeDefined();
+    expect(receivedDownstreamBody.familyHistory).toBeDefined();
   });
 });

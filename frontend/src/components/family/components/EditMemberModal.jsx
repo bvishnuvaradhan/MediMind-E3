@@ -51,7 +51,7 @@ export function EditMemberModal({ isOpen, onClose, member, onUpdateMember, annou
         aria-modal="true"
         aria-labelledby="edit-member-title"
         onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: '580px' }}
+        style={{ maxWidth: '580px', maxHeight: '88vh', overflowY: 'auto' }}
       >
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

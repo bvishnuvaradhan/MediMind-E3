@@ -98,24 +98,44 @@ export function AppointmentsView({
           ) : (
             filteredAppointments.map((item, idx) => {
               const itemKey = `${item.title}|${item.detail}`;
-              const isCancelled = appointmentStatuses[itemKey] === 'Cancelled';
+              const isCancelled =
+                (item.id && appointmentStatuses[item.id] === 'Cancelled') ||
+                appointmentStatuses[itemKey] === 'Cancelled' ||
+                item.status === 'Cancelled';
+
               const isWalkIn = item.type === 'Walk-in' || (item.title && item.title.toLowerCase().includes('walk-in'));
 
+              // Dynamic past vs upcoming check
+              const itemDateStr = item.date || item.meta?.split(' · ')[0] || '';
+              let isPast = false;
+              if (itemDateStr) {
+                const parsedDate = new Date(itemDateStr.includes('T') ? itemDateStr : `${itemDateStr} 2026`);
+                if (!isNaN(parsedDate.getTime()) && parsedDate < new Date('2026-09-17T00:00:00')) {
+                  isPast = true;
+                }
+              }
+
+              const statusBadge = isCancelled ? (
+                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', backgroundColor: '#fee2e2', color: '#dc2626', fontWeight: '600' }}>
+                  Cancelled
+                </span>
+              ) : isPast ? (
+                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', backgroundColor: '#f1f5f9', color: '#475569', fontWeight: '600' }}>
+                  Completed
+                </span>
+              ) : (
+                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', backgroundColor: '#dcfce7', color: '#16a34a', fontWeight: '600' }}>
+                  Confirmed
+                </span>
+              );
+
               return (
-                <article className="feature-card" key={`apt-${item.title}-${idx}`}>
+                <article className="feature-card" key={item.id || `apt-${item.title}-${idx}`}>
                   <div className={`avatar avatar-${item.tone || 'coral'}`}>{item.initials || '01'}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                       <h3 style={{ margin: 0, fontSize: '14px' }}>{item.title}</h3>
-                      {isCancelled ? (
-                        <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', backgroundColor: '#fee2e2', color: '#dc2626', fontWeight: '600' }}>
-                          Cancelled
-                        </span>
-                      ) : (
-                        <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', backgroundColor: '#dcfce7', color: '#16a34a', fontWeight: '600' }}>
-                          Confirmed
-                        </span>
-                      )}
+                      {statusBadge}
 
                       {/* Linked AI Screening status badge */}
                       {isWalkIn ? (
@@ -145,7 +165,7 @@ export function AppointmentsView({
                     >
                       View details <ArrowUpRight size={14} />
                     </button>
-                    {!isCancelled && (
+                    {!isCancelled && !isPast && (
                       <>
                         <button
                           className="text-button"
