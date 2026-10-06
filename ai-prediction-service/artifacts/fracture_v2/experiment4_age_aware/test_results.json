@@ -1,0 +1,34 @@
+{
+  "evaluation_cohort": "Untouched GRAZPEDWRI-DX Pediatric Test Cohort",
+  "total_test_samples": 769,
+  "test_fractures": 518,
+  "test_non_fractures": 251,
+  "frozen_operating_threshold": 0.25,
+  "metrics": {
+    "recall": 96.91,
+    "specificity": 1.59,
+    "precision": 67.02,
+    "npv": 20.0,
+    "f1": 0.7924,
+    "roc_auc": 0.621,
+    "pr_auc": 0.8029,
+    "brier_score": 0.2477,
+    "ece": 18.09
+  },
+  "confusion_matrix": {
+    "tp": 502,
+    "fp": 247,
+    "tn": 4,
+    "fn": 16,
+    "raw_matrix": [
+      [
+        4,
+        247
+      ],
+      [
+        16,
+        502
+      ]
+    ]
+  }
+}

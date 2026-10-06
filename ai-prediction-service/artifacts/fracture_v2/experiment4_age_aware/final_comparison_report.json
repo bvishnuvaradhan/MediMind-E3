@@ -1,0 +1,79 @@
+{
+  "1_Production_MURA_FracAtlas": {
+    "description": "Production ResNet-18 (MURA -> FracAtlas fine-tuned, threshold 0.18)",
+    "adult_recall": 96.26,
+    "adult_spec": 63.64,
+    "adult_prec": 35.89,
+    "adult_f1": 0.5228,
+    "overall_recall": 96.26,
+    "overall_spec": 63.64,
+    "overall_prec": 35.89,
+    "overall_f1": 0.5228,
+    "overall_roc_auc": 0.9244
+  },
+  "2_Experiment2_Combined": {
+    "description": "Experiment 2 ResNet-18 (FracAtlas + GRAZ combined training, threshold 0.37)",
+    "overall_recall": 94.66,
+    "overall_spec": 59.92,
+    "overall_prec": 66.85,
+    "overall_f1": 0.7836,
+    "overall_roc_auc": 0.8396,
+    "pediatric_recall": 99.42,
+    "pediatric_spec": 0.8,
+    "pediatric_prec": 67.41,
+    "pediatric_f1": 0.8034,
+    "pediatric_roc_auc": 0.6152
+  },
+  "3_Experiment3_Pediatric_Tuned": {
+    "description": "Experiment 3 ResNet-18 (Targeted pediatric-bias tuning, threshold 0.10)",
+    "overall_recall": 97.33,
+    "overall_spec": 50.67,
+    "overall_prec": 62.75,
+    "overall_f1": 0.7631,
+    "overall_roc_auc": 0.8111,
+    "adult_recall": 85.71,
+    "adult_spec": 76.16,
+    "adult_prec": 46.36,
+    "adult_roc_auc": 0.8901,
+    "pediatric_recall": 100.0,
+    "pediatric_spec": 0.4,
+    "pediatric_prec": 67.45,
+    "pediatric_roc_auc": 0.6285
+  },
+  "4_Experiment4_Pediatric_Specialist": {
+    "description": "Experiment 4 ResNet-18 (Dedicated pediatric specialist model)",
+    "pediatric_recall": 96.91,
+    "pediatric_spec": 1.59,
+    "pediatric_prec": 67.02,
+    "pediatric_npv": 20.0,
+    "pediatric_f1": 0.7924,
+    "pediatric_roc_auc": 0.621,
+    "pediatric_pr_auc": 0.8029,
+    "pediatric_brier": 0.2477,
+    "pediatric_ece": 18.09,
+    "confusion_matrix": {
+      "tp": 502,
+      "fp": 247,
+      "tn": 4,
+      "fn": 16
+    }
+  },
+  "5_Experiment4_Age_Aware_Dual_System": {
+    "description": "Experiment 4 Dual-Model Architecture (Adult -> Prod | Pediatric -> Exp4 Specialist)",
+    "overall_recall": 95.6,
+    "overall_spec": 42.76,
+    "overall_prec": 58.78,
+    "overall_npv": 91.93,
+    "overall_f1": 0.728,
+    "overall_roc_auc": 0.8071,
+    "overall_pr_auc": 0.7764,
+    "overall_brier": 0.1816,
+    "overall_ece": 8.63,
+    "confusion_matrix": {
+      "tp": 609,
+      "fp": 427,
+      "tn": 319,
+      "fn": 28
+    }
+  }
+}

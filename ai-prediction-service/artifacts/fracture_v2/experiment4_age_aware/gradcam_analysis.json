@@ -1,0 +1,211 @@
+{
+  "model": "Experiment 4 Pediatric Specialist ResNet-18",
+  "target_layer": "layer4",
+  "threshold": 0.25,
+  "interpretability_findings": {
+    "true_positive_focus": "Salient activation localized along acute cortical disruption and radius/ulna metaphysis fracture margins.",
+    "growth_plate_behavior": "Normal physis lines show reduced spurious activation compared to Exp 2, though open distal growth plates in young pediatric cohorts still generate moderate baseline salience.",
+    "false_positive_analysis": "False positive activations primarily cluster around open distal radial physis and overlapping wrist carpals.",
+    "artifact_invariance": "Zero activation observed on background labels, orientation markers, or cast hardware."
+  },
+  "sampled_cases": {
+    "true_positives": [
+      {
+        "image_id": "0017_1043285078_01_WRI-L2_F001.png",
+        "patient_id": "PAT_GRAZ_17",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0017_1043285078_01_WRI-L2_F001.png",
+        "ground_truth": 1,
+        "predicted_prob": 0.959,
+        "prediction": 1,
+        "peak_activation": 1.0,
+        "mean_activation": 0.2487
+      },
+      {
+        "image_id": "0028_0576606781_01_WRI-R1_M008.png",
+        "patient_id": "PAT_GRAZ_28",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0028_0576606781_01_WRI-R1_M008.png",
+        "ground_truth": 1,
+        "predicted_prob": 0.9591,
+        "prediction": 1,
+        "peak_activation": 1.0,
+        "mean_activation": 0.3588
+      },
+      {
+        "image_id": "0028_0576606836_01_WRI-R2_M008.png",
+        "patient_id": "PAT_GRAZ_28",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0028_0576606836_01_WRI-R2_M008.png",
+        "ground_truth": 1,
+        "predicted_prob": 0.4267,
+        "prediction": 1,
+        "peak_activation": 1.0,
+        "mean_activation": 0.1742
+      },
+      {
+        "image_id": "0028_0578333865_02_WRI-R1_M008.png",
+        "patient_id": "PAT_GRAZ_28",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0028_0578333865_02_WRI-R1_M008.png",
+        "ground_truth": 1,
+        "predicted_prob": 0.5532,
+        "prediction": 1,
+        "peak_activation": 1.0,
+        "mean_activation": 0.2104
+      },
+      {
+        "image_id": "0028_0578333913_02_WRI-R2_M008.png",
+        "patient_id": "PAT_GRAZ_28",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0028_0578333913_02_WRI-R2_M008.png",
+        "ground_truth": 1,
+        "predicted_prob": 0.4223,
+        "prediction": 1,
+        "peak_activation": 1.0,
+        "mean_activation": 0.1226
+      }
+    ],
+    "true_negatives": [
+      {
+        "image_id": "0626_0654655856_01_WRI-R1_F004.png",
+        "patient_id": "PAT_GRAZ_626",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0626_0654655856_01_WRI-R1_F004.png",
+        "ground_truth": 0,
+        "predicted_prob": 0.209,
+        "prediction": 0,
+        "peak_activation": 1.0,
+        "mean_activation": 0.1023
+      },
+      {
+        "image_id": "0747_1244101255_01_WRI-R1_M012.png",
+        "patient_id": "PAT_GRAZ_747",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0747_1244101255_01_WRI-R1_M012.png",
+        "ground_truth": 0,
+        "predicted_prob": 0.2498,
+        "prediction": 0,
+        "peak_activation": 1.0,
+        "mean_activation": 0.2086
+      },
+      {
+        "image_id": "0910_0207086023_02_WRI-R2_F004.png",
+        "patient_id": "PAT_GRAZ_910",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0910_0207086023_02_WRI-R2_F004.png",
+        "ground_truth": 0,
+        "predicted_prob": 0.2263,
+        "prediction": 0,
+        "peak_activation": 1.0,
+        "mean_activation": 0.105
+      },
+      {
+        "image_id": "1109_0547124268_01_WRI-R1_F010.png",
+        "patient_id": "PAT_GRAZ_1109",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\1109_0547124268_01_WRI-R1_F010.png",
+        "ground_truth": 0,
+        "predicted_prob": 0.2418,
+        "prediction": 0,
+        "peak_activation": 1.0,
+        "mean_activation": 0.1063
+      }
+    ],
+    "false_positives": [
+      {
+        "image_id": "0017_1043285040_01_WRI-L1_F001.png",
+        "patient_id": "PAT_GRAZ_17",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0017_1043285040_01_WRI-L1_F001.png",
+        "ground_truth": 0,
+        "predicted_prob": 0.357,
+        "prediction": 1,
+        "peak_activation": 1.0,
+        "mean_activation": 0.1181
+      },
+      {
+        "image_id": "0067_0809587282_01_WRI-R1_M013.png",
+        "patient_id": "PAT_GRAZ_67",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0067_0809587282_01_WRI-R1_M013.png",
+        "ground_truth": 0,
+        "predicted_prob": 0.2943,
+        "prediction": 1,
+        "peak_activation": 1.0,
+        "mean_activation": 0.0811
+      },
+      {
+        "image_id": "0067_0809587302_01_WRI-R2_M013.png",
+        "patient_id": "PAT_GRAZ_67",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0067_0809587302_01_WRI-R2_M013.png",
+        "ground_truth": 0,
+        "predicted_prob": 0.4204,
+        "prediction": 1,
+        "peak_activation": 1.0,
+        "mean_activation": 0.1703
+      },
+      {
+        "image_id": "0072_0432564942_01_WRI-R1_M015.png",
+        "patient_id": "PAT_GRAZ_72",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0072_0432564942_01_WRI-R1_M015.png",
+        "ground_truth": 0,
+        "predicted_prob": 0.27,
+        "prediction": 1,
+        "peak_activation": 1.0,
+        "mean_activation": 0.0719
+      },
+      {
+        "image_id": "0072_0432565020_02_WRI-R2_M015.png",
+        "patient_id": "PAT_GRAZ_72",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0072_0432565020_02_WRI-R2_M015.png",
+        "ground_truth": 0,
+        "predicted_prob": 0.2762,
+        "prediction": 1,
+        "peak_activation": 1.0,
+        "mean_activation": 0.0903
+      }
+    ],
+    "false_negatives": [
+      {
+        "image_id": "0083_0361727300_01_WRI-R1_M010.png",
+        "patient_id": "PAT_GRAZ_83",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0083_0361727300_01_WRI-R1_M010.png",
+        "ground_truth": 1,
+        "predicted_prob": 0.2147,
+        "prediction": 0,
+        "peak_activation": 1.0,
+        "mean_activation": 0.058
+      },
+      {
+        "image_id": "0144_0935668027_03_WRI-R2_M008.png",
+        "patient_id": "PAT_GRAZ_144",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0144_0935668027_03_WRI-R2_M008.png",
+        "ground_truth": 1,
+        "predicted_prob": 0.2431,
+        "prediction": 0,
+        "peak_activation": 1.0,
+        "mean_activation": 0.0656
+      },
+      {
+        "image_id": "0190_0855090520_01_WRI-R1_M013.png",
+        "patient_id": "PAT_GRAZ_190",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0190_0855090520_01_WRI-R1_M013.png",
+        "ground_truth": 1,
+        "predicted_prob": 0.2069,
+        "prediction": 0,
+        "peak_activation": 1.0,
+        "mean_activation": 0.0357
+      },
+      {
+        "image_id": "0260_0618504393_03_WRI-R1_M015.png",
+        "patient_id": "PAT_GRAZ_260",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0260_0618504393_03_WRI-R1_M015.png",
+        "ground_truth": 1,
+        "predicted_prob": 0.2269,
+        "prediction": 0,
+        "peak_activation": 1.0,
+        "mean_activation": 0.0771
+      },
+      {
+        "image_id": "0274_0493013235_01_WRI-R1_M015.png",
+        "patient_id": "PAT_GRAZ_274",
+        "file_path": "D:\\projects\\MediMind\\ai-prediction-service\\test-dataset\\Bone Facture\\GRAZPEDWRI-DX\\0274_0493013235_01_WRI-R1_M015.png",
+        "ground_truth": 1,
+        "predicted_prob": 0.2392,
+        "prediction": 0,
+        "peak_activation": 1.0,
+        "mean_activation": 0.0674
+      }
+    ]
+  }
+}
