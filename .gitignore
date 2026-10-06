@@ -36,3 +36,9 @@ Thumbs.db
 # Office Documents
 *.docx
 *.pdf
+
+# ML Training temporary runs & dataset images
+ai-prediction-service/artifacts/fracture_v2/experiment5_localization/dataset/images/
+ai-prediction-service/artifacts/fracture_v2/experiment5_localization/runs/
+*.cache
+

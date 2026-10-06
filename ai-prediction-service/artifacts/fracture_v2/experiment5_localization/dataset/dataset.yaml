@@ -1,0 +1,7 @@
+path: D:/projects/MediMind/ai-prediction-service/artifacts/fracture_v2/experiment5_localization/dataset
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: fracture

@@ -1,0 +1,27 @@
+{
+  "cohort": "GRAZPEDWRI-DX Held-out Test Cohort",
+  "total_test_images": 769,
+  "total_fractured": 518,
+  "total_non_fractured": 251,
+  "selected_operating_threshold": 0.17,
+  "selection_criterion": "Maximized Specificity with Validation Recall >= 90%",
+  "metrics": {
+    "recall": 0.916988416988417,
+    "specificity": 0.8725099601593626,
+    "precision": 0.9368836291913215,
+    "npv": 0.8358778625954199,
+    "f1_score": 0.9268292682926829,
+    "roc_auc": 0.9638819240412865,
+    "pr_auc": 0.9839539006426945,
+    "brier_score": 0.16337970184371814,
+    "ece": 0.26527923720244495,
+    "true_positives": 475,
+    "false_positives": 32,
+    "true_negatives": 219,
+    "false_negatives": 43,
+    "normal_images_producing_false_detections": 32,
+    "total_normal_images": 251,
+    "normal_image_fp_percentage": 12.749003984063744,
+    "fp_detections_per_normal_image": 0.17131474103585656
+  }
+}

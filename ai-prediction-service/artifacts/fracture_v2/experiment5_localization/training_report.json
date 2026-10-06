@@ -1,0 +1,90 @@
+{
+  "experiment_name": "Experiment 5 \u2014 Phase 2: Pediatric Fracture Object Detection Baseline",
+  "timestamp": "2026-10-06T13:55:36+05:30",
+  "total_epochs_trained": 10,
+  "best_epoch": 9,
+  "best_epoch_metrics": {
+    "mAP50": 0.77438,
+    "mAP50_95": 0.40077,
+    "precision": 0.84374,
+    "recall": 0.66671
+  },
+  "best_checkpoint_path": "D:\\projects\\MediMind\\ai-prediction-service\\artifacts\\fracture_v2\\experiment5_localization\\best_model.pt",
+  "validation_metrics": {
+    "mAP50": 0.7955130564552455,
+    "mAP50_95": 0.39182680016492255,
+    "precision": 0.827142935550537,
+    "recall": 0.7042682926829268,
+    "fitness": 0.39182680016492255
+  },
+  "selected_threshold": 0.17,
+  "selection_criterion": "Maximized Specificity with Validation Recall >= 90%",
+  "operating_points": {
+    "recall_95_target": {
+      "threshold": 0.07,
+      "recall": 0.9547,
+      "specificity": 0.5906,
+      "precision": 0.8169,
+      "npv": 0.8721,
+      "f1_score": 0.8805,
+      "tp": 464,
+      "fp": 104,
+      "tn": 150,
+      "fn": 22,
+      "fp_detections_per_normal_image": 0.7047
+    },
+    "recall_90_target": {
+      "threshold": 0.17,
+      "recall": 0.9033,
+      "specificity": 0.8661,
+      "precision": 0.9281,
+      "npv": 0.824,
+      "f1_score": 0.9155,
+      "tp": 439,
+      "fp": 34,
+      "tn": 220,
+      "fn": 47,
+      "fp_detections_per_normal_image": 0.1732
+    },
+    "recall_85_target": {
+      "threshold": 0.29,
+      "recall": 0.8519,
+      "specificity": 0.9449,
+      "precision": 0.9673,
+      "npv": 0.7692,
+      "f1_score": 0.9059,
+      "tp": 414,
+      "fp": 14,
+      "tn": 240,
+      "fn": 72,
+      "fp_detections_per_normal_image": 0.0591
+    }
+  },
+  "test_detection_metrics": {
+    "mAP50": 0.7294100086134674,
+    "mAP50_95": 0.370282072346722,
+    "precision": 0.8324912708793539,
+    "recall": 0.704323570432357,
+    "fitness": 0.370282072346722
+  },
+  "test_clinical_metrics": {
+    "recall": 0.916988416988417,
+    "specificity": 0.8725099601593626,
+    "precision": 0.9368836291913215,
+    "npv": 0.8358778625954199,
+    "f1_score": 0.9268292682926829,
+    "roc_auc": 0.9638819240412865,
+    "pr_auc": 0.9839539006426945,
+    "brier_score": 0.16337970184371814,
+    "ece": 0.26527923720244495,
+    "true_positives": 475,
+    "false_positives": 32,
+    "true_negatives": 219,
+    "false_negatives": 43,
+    "normal_images_producing_false_detections": 32,
+    "total_normal_images": 251,
+    "normal_image_fp_percentage": 12.749003984063744,
+    "fp_detections_per_normal_image": 0.17131474103585656
+  },
+  "verdict": "EXCELLENT GO \u2014 Object detection solves pediatric growth-plate false-positive crisis (>50% specificity at >90% recall)."
+}

@@ -1,0 +1,62 @@
+{
+  "production_baseline": {
+    "name": "Production MURA -> FracAtlas ResNet-18",
+    "threshold": 0.18,
+    "architecture": "ImageNet ResNet-18",
+    "overall_recall": 97.41,
+    "overall_specificity": 40.78,
+    "pediatric_specificity": 0.0,
+    "f1_score": 0.7225,
+    "pediatric_false_positives": 251,
+    "pediatric_true_negatives": 0
+  },
+  "experiment_2": {
+    "name": "Experiment 2: Combined FracAtlas + GRAZPEDWRI-DX",
+    "threshold": 0.37,
+    "architecture": "ImageNet ResNet-18",
+    "overall_recall": 94.66,
+    "overall_specificity": 59.92,
+    "pediatric_specificity": 0.0,
+    "f1_score": 0.7836,
+    "pediatric_false_positives": 251,
+    "pediatric_true_negatives": 0
+  },
+  "experiment_3": {
+    "name": "Experiment 3: Targeted Pediatric Fine-Tuning",
+    "threshold": 0.1,
+    "architecture": "ResNet-18 (Targeted Tuning)",
+    "overall_recall": 96.0,
+    "overall_specificity": 68.0,
+    "pediatric_specificity": 0.4,
+    "f1_score": 0.814,
+    "pediatric_false_positives": 250,
+    "pediatric_true_negatives": 1
+  },
+  "experiment_4": {
+    "name": "Experiment 4: Pediatric Specialist Classifier",
+    "threshold": 0.25,
+    "architecture": "ResNet-18 (Pediatric Specialist)",
+    "overall_recall": 99.42,
+    "overall_specificity": 1.59,
+    "pediatric_specificity": 1.59,
+    "f1_score": 0.8037,
+    "pediatric_false_positives": 247,
+    "pediatric_true_negatives": 4
+  },
+  "experiment_5": {
+    "name": "Experiment 5 Phase 2: Pediatric Object Detector (YOLOv8n)",
+    "threshold": 0.17,
+    "architecture": "YOLOv8n-Detection",
+    "pediatric_recall": 91.7,
+    "pediatric_specificity": 87.25,
+    "pediatric_precision": 93.69,
+    "pediatric_npv": 83.59,
+    "pediatric_f1": 0.9268,
+    "pediatric_roc_auc": 0.9639,
+    "pediatric_pr_auc": 0.984,
+    "pediatric_brier": 0.1634,
+    "pediatric_ece": 0.2653,
+    "pediatric_false_positives": 32,
+    "pediatric_true_negatives": 219
+  }
+}
