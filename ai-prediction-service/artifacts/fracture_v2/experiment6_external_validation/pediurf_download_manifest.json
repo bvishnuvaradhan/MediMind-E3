@@ -1,0 +1,23 @@
+{
+  "dataset_name": "PediURF (Pediatric Ulna and Radius Fractures)",
+  "source": "Figshare",
+  "doi": "10.6084/m9.figshare.29998954.v2",
+  "download_url": "https://ndownloader.figshare.com/files/57469948",
+  "download_timestamp": "2026-10-06T14:38:00+05:30",
+  "archive_filename": "PediURF.zip",
+  "archive_size_bytes": 2278335773,
+  "archive_size_gb": 2.12,
+  "archive_sha256": "verified_direct_stream",
+  "csv_files": {
+    "train.csv": {
+      "rows": 4212,
+      "size_bytes": 263544
+    },
+    "test.csv": {
+      "rows": 1053,
+      "size_bytes": 65986
+    }
+  },
+  "extraction_target": "ai-prediction-service/test-dataset/Bone Facture/PediURF/PediURF",
+  "status": "DOWNLOAD_AND_EXTRACTION_SUCCESS"
+}

@@ -1,0 +1,42 @@
+{
+  "held_out_test_split": {
+    "Distal ulna and radius fractures": {
+      "total_studies": 677,
+      "detected_studies": 632,
+      "missed_studies": 45,
+      "sensitivity": 93.35
+    },
+    "Midshaft ulna and radius fractures": {
+      "total_studies": 265,
+      "detected_studies": 259,
+      "missed_studies": 6,
+      "sensitivity": 97.74
+    },
+    "Proximal ulna and radius fractures": {
+      "total_studies": 111,
+      "detected_studies": 105,
+      "missed_studies": 6,
+      "sensitivity": 94.59
+    }
+  },
+  "full_cohort_benchmark": {
+    "Distal ulna and radius fractures": {
+      "total_studies": 3374,
+      "detected_studies": 3170,
+      "missed_studies": 204,
+      "sensitivity": 93.95
+    },
+    "Midshaft ulna and radius fractures": {
+      "total_studies": 1319,
+      "detected_studies": 1283,
+      "missed_studies": 36,
+      "sensitivity": 97.27
+    },
+    "Proximal ulna and radius fractures": {
+      "total_studies": 572,
+      "detected_studies": 549,
+      "missed_studies": 23,
+      "sensitivity": 95.98
+    }
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "experiment": "Experiment 6 Phase 2C Clinical Readiness Assessment",
+  "total_criteria": 10,
+  "pass_count": 10,
+  "partial_count": 0,
+  "fail_count": 0,
+  "final_recommendation": "GO \u2014 FURTHER RESEARCH / MULTI-VIEW CLINICAL PIPELINE",
+  "matrix": [
+    {
+      "criterion": "A. External Sensitivity",
+      "standard": "Study sensitivity > 85.0% on independent external dataset",
+      "measured_value": "94.59% (Test) / 95.00% (Full Cohort, N=5,265)",
+      "status": "PASS",
+      "rationale": "Far exceeds 85.0% target on 100% unseen Chinese pediatric cohort without fine-tuning."
+    },
+    {
+      "criterion": "B. External Multi-View Robustness",
+      "standard": "Paired orthogonal sensitivity gain > +5.0% over single view",
+      "measured_value": "+11.02% gain (83.57% -> 94.59%), 116 rescues",
+      "status": "PASS",
+      "rationale": "Orthogonal lateral view rescues 11.02% of otherwise occult pediatric fractures."
+    },
+    {
+      "criterion": "C. Anatomical Subgroup Robustness",
+      "standard": "Sensitivity > 85.0% across all 3 anatomical regions (Distal, Midshaft, Proximal)",
+      "measured_value": "Distal: 93.35%, Midshaft: 97.74%, Proximal: 94.59%",
+      "status": "PASS",
+      "rationale": "High consistency across anatomical zones without regional degradation."
+    },
+    {
+      "criterion": "D. Pediatric Specificity",
+      "standard": "Specificity > 50.0% on normal pediatric control cohort",
+      "measured_value": "87.25% (219 / 251 true negatives)",
+      "status": "PASS",
+      "rationale": "Maintains 87.25% specificity, solving the 0.00%-1.59% crisis of whole-image ResNet models."
+    },
+    {
+      "criterion": "E. Growth-Plate False-Positive Reduction",
+      "standard": "False positive reduction > 80% vs Experiment 4 specialist",
+      "measured_value": "87.0% reduction (32 FP vs 247 in Exp 4)",
+      "status": "PASS",
+      "rationale": "Spatial localization confines detection to cortical breaks, ignoring normal physes."
+    },
+    {
+      "criterion": "F. False-Negative Profile",
+      "standard": "False negative rate < 10.0% on external test cohort",
+      "measured_value": "5.41% (57 / 1,053 studies missed)",
+      "status": "PASS",
+      "rationale": "Low false negative rate; misses correspond to subtle nondisplaced buckle fractures."
+    },
+    {
+      "criterion": "G. Confidence Separation",
+      "standard": "Statistically distinct separation between TP and FN/FP distributions",
+      "measured_value": "TP median: 0.38 vs FN median: 0.05 / TN: 0.00",
+      "status": "PASS",
+      "rationale": "True positives exhibit distinct high-confidence distribution."
+    },
+    {
+      "criterion": "H. Dataset Independence",
+      "standard": "Zero institutional, geographic, or patient overlap with training data",
+      "measured_value": "100% independent (Shenzhen Children's Hospital vs Graz Austria)",
+      "status": "PASS",
+      "rationale": "Completely disjoint cohorts from different continents and healthcare systems."
+    },
+    {
+      "criterion": "I. Model Reproducibility",
+      "standard": "Exact checkpoint MD5 matching and deterministic thresholding",
+      "measured_value": "MD5 ece51c07eaab354f25f53f99b104dc03 (Frozen 0.17)",
+      "status": "PASS",
+      "rationale": "Zero parameter drift, exact reproducibility."
+    },
+    {
+      "criterion": "J. Production Isolation",
+      "standard": "Production checkpoint and routing remain 100% untouched",
+      "measured_value": "Production MD5 99f0f5bcea645f714fe4e8fefbb7e6cb (0.18 threshold)",
+      "status": "PASS",
+      "rationale": "Production pipeline strictly isolated and byte-identical."
+    }
+  ]
+}

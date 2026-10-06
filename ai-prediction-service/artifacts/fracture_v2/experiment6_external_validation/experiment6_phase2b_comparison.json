@@ -1,0 +1,51 @@
+{
+  "experiment_series": "MediMind Pediatric Fracture AI Progression",
+  "benchmark_matrix": {
+    "production_baseline": {
+      "name": "Production MURA -> FracAtlas ResNet-18",
+      "architecture": "ResNet-18 (Whole-Image)",
+      "pediatric_recall": 97.41,
+      "pediatric_specificity": 0.0,
+      "pediatric_false_positives": "251 / 251 (100% FP)",
+      "growth_plate_behavior": "Complete failure; classifies open physes as fractures",
+      "external_validation": "Not tested on PediURF"
+    },
+    "experiment_4": {
+      "name": "Experiment 4: Dedicated Pediatric Specialist Classifier",
+      "architecture": "ResNet-18 (Targeted Tuning)",
+      "pediatric_recall": 99.42,
+      "pediatric_specificity": 1.59,
+      "pediatric_false_positives": "247 / 251 (98.4% FP)",
+      "growth_plate_behavior": "Complete failure; Grad-CAM heatmaps highlight normal physes",
+      "external_validation": "Not tested on PediURF"
+    },
+    "experiment_5_internal_test": {
+      "name": "Experiment 5: Pediatric Object Detector (GRAZ Internal Held-Out)",
+      "architecture": "YOLOv8n Detection",
+      "test_cohort": "GRAZPEDWRI-DX Held-Out Test (N=769)",
+      "pediatric_recall": 91.7,
+      "pediatric_specificity": 87.25,
+      "pediatric_precision": 93.69,
+      "pediatric_f1": 0.9268,
+      "pediatric_roc_auc": 0.9639,
+      "pediatric_pr_auc": 0.984,
+      "pediatric_false_positives": "32 / 251 (12.75% FP)",
+      "growth_plate_behavior": "Breakthrough: 87.25% of normal growth plates correctly ignored"
+    },
+    "experiment_6_external_validation": {
+      "name": "Experiment 6: Independent External Validation on PediURF",
+      "architecture": "YOLOv8n Detection (Frozen Checkpoint)",
+      "external_cohort": "PediURF (Shenzhen Children's Hospital, N=1,053 test studies / 5,265 full cohort)",
+      "official_test_study_sensitivity": 94.59,
+      "official_test_image_sensitivity": 82.48,
+      "ap_view_sensitivity": 83.57,
+      "lateral_view_sensitivity": 81.39,
+      "distal_fracture_sensitivity": 93.35,
+      "midshaft_fracture_sensitivity": 97.74,
+      "proximal_fracture_sensitivity": 94.59,
+      "full_cohort_study_sensitivity": 95.0,
+      "normal_control_specificity": 87.25,
+      "growth_plate_behavior": "Robust Generalization: Spatial bounding box paradigm successfully transfers across hospitals and continents."
+    }
+  }
+}

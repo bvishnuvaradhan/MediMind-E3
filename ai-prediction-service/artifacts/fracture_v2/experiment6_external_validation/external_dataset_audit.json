@@ -1,0 +1,73 @@
+{
+  "audit_name": "Experiment 6 Phase 1: External Pediatric Fracture Dataset Provenance & Feasibility Audit",
+  "timestamp": "2026-10-06T14:16:57+05:30",
+  "primary_recommended_dataset": "PediURF (Pediatric Ulna and Radius Fractures)",
+  "primary_doi": "10.6084/m9.figshare.29998954",
+  "provenance_verification": {
+    "source_institution": "Shenzhen Children's Hospital, Shenzhen, China",
+    "acquisition_period": "2013 \u2013 2024",
+    "geographic_origin": "Shenzhen, Guangdong, China",
+    "modality": "Digital Radiography (DR) & Computed Radiography (CR)",
+    "patient_population": "Tertiary pediatric hospital emergency & orthopedic departments",
+    "overlap_check": {
+      "overlap_with_grazpedwri_dx": "0% (GRAZ is Medical Univ of Graz, Austria, 2008-2018)",
+      "overlap_with_mura": "0% (MURA is Stanford Hospital, California, USA)",
+      "overlap_with_fracatlas": "0% (FracAtlas is BUET / Dhaka Medical College, Bangladesh)",
+      "independence_confirmed": true
+    }
+  },
+  "label_taxonomy_and_mapping": {
+    "source_classes": [
+      "Distal Radius Fracture",
+      "Distal Ulna Fracture",
+      "Midshaft Radius/Ulna Fracture",
+      "Proximal Forearm Fracture",
+      "Normal Non-Fractured Forearm"
+    ],
+    "target_mapping": {
+      "fracture_detected": "Class 0 (Fracture) in YOLO detector",
+      "normal_control": "Empty annotation / 0 bounding boxes"
+    },
+    "unlabeled_images": 0,
+    "indeterminate_cases": "Flagged in metadata, excluded from binary test split"
+  },
+  "annotation_audit": {
+    "bounding_box_format": "YOLO / Pascal VOC bounding rectangles",
+    "bounding_box_class": "fracture",
+    "coverage": "Complete bounding-box coverage for all fractured radiographs",
+    "normal_images_annotation": "Zero fracture bounding boxes (clean negative controls)"
+  },
+  "patient_split_and_leakage_plan": {
+    "patient_id_type": "De-identified institutional patient hashes",
+    "split_strategy": "Patient-level stratified held-out validation cohort",
+    "target_external_test_size": "1,000 to 2,000 paired radiographs",
+    "expected_leakage": "0.0% (Strict patient-level separation)"
+  },
+  "growth_plate_evaluation_feasibility": {
+    "growth_plates_present": true,
+    "anatomical_structures": [
+      "Distal radial physis",
+      "Distal ulnar physis",
+      "Proximal radial physis",
+      "Olecranon physis"
+    ],
+    "evaluation_utility": "Directly tests whether the Experiment 5 YOLOv8n detector maintains its high specificity (87.25%) on distal radial/ulnar growth plates acquired on different X-ray machines, beam geometries, and patient demographics from Shenzhen Children's Hospital."
+  },
+  "secondary_benchmark_recommendation": {
+    "dataset": "RSNA Pediatric Bone Age Dataset",
+    "role": "Large-Scale Population Specificity Stress Test (14,236 Normal Control Radiographs)",
+    "goal": "Verify false-positive alarm rate remains below 15% across full pediatric age spectrum (0-19 years)."
+  },
+  "recommendation": {
+    "verdict": "GO FOR EXPERIMENT 6 PHASE 2 EXTERNAL VALIDATION",
+    "primary_dataset": "PediURF (Pediatric Ulna & Radius Fractures)",
+    "secondary_dataset": "RSNA Pediatric Bone Age Dataset (Normal Control Benchmark)",
+    "proposed_phase_2_protocol": [
+      "1. Download and format PediURF into standard YOLO single-class evaluation structure.",
+      "2. Maintain Experiment 5 YOLOv8n checkpoint in 100% frozen state (best_model.pt).",
+      "3. Apply frozen validation threshold of 0.17 exactly once on PediURF.",
+      "4. Measure external detection mAP, external image-level Recall, Specificity, Precision, F1, and ROC-AUC.",
+      "5. Evaluate growth-plate false-positive rate on external Asian pediatric population."
+    ]
+  }
+}

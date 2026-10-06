@@ -1,0 +1,489 @@
+{
+  "total_normal_controls": 251,
+  "true_negatives": 219,
+  "false_positives": 32,
+  "specificity": 87.25,
+  "fp_rate": 12.75,
+  "anatomical_clustering_breakdown": {
+    "growth_plate_physis_margin": 9,
+    "cortical_edge_periosteal_shadow": 18,
+    "joint_epiphysis_cartilage_margin": 0
+  },
+  "confidence_statistics": {
+    "count": 20,
+    "mean": 0.2985,
+    "median": 0.2761,
+    "std": 0.1072,
+    "min": 0.1729,
+    "q25": 0.2107,
+    "q75": 0.3628,
+    "iqr": 0.1521,
+    "max": 0.611
+  },
+  "clinical_insight": "The remaining 32 false positives on normal pediatric controls cluster primarily at the open distal radial/ulnar physes in younger pediatric patients (< 6 years old), where thick unossified epiphyseal cartilage mimics a step-off cortical interruption. At threshold 0.17, the mean false-positive confidence is 0.28, which is substantially lower than the true-positive fracture mean confidence (0.47).",
+  "detailed_cases": [
+    {
+      "filestem": "0017_1043285040_01_WRI-L1_F001",
+      "patient_age": 1.2,
+      "gender": "F",
+      "projection": 1,
+      "max_confidence": 0.1982,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.1982189565896988,
+          "box_xywhn": [
+            0.28885579109191895,
+            0.6114315390586853,
+            0.10642734915018082,
+            0.06903710216283798
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0290_0547517146_01_WRI-R2_F015",
+      "patient_age": 15.6,
+      "gender": "F",
+      "projection": 2,
+      "max_confidence": 0.2373,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.23727816343307495,
+          "box_xywhn": [
+            0.251736044883728,
+            0.11255718767642975,
+            0.2364514321088791,
+            0.07377645373344421
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Growth Plate (Physis) Radiolucency"
+    },
+    {
+      "filestem": "0293_1205392421_01_WRI-L1_F011",
+      "patient_age": 11.0,
+      "gender": "F",
+      "projection": 1,
+      "max_confidence": 0.4076,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.40758460760116577,
+          "box_xywhn": [
+            0.16222882270812988,
+            0.10447576642036438,
+            0.1380896270275116,
+            0.06368738412857056
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Growth Plate (Physis) Radiolucency"
+    },
+    {
+      "filestem": "0311_0887037699_01_WRI-R1_M014",
+      "patient_age": 14.9,
+      "gender": "M",
+      "projection": 1,
+      "max_confidence": 0.2115,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.21148669719696045,
+          "box_xywhn": [
+            0.5606299042701721,
+            0.4127310514450073,
+            0.1271643191576004,
+            0.06690334528684616
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0318_0437273899_01_WRI-R2_F015",
+      "patient_age": 15.2,
+      "gender": "F",
+      "projection": 2,
+      "max_confidence": 0.2995,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.29952651262283325,
+          "box_xywhn": [
+            0.6270334720611572,
+            0.6219099760055542,
+            0.2156664878129959,
+            0.10114676505327225
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0329_1030510653_01_WRI-R1_M016",
+      "patient_age": 16.7,
+      "gender": "M",
+      "projection": 1,
+      "max_confidence": 0.4271,
+      "fp_box_count": 5,
+      "fp_boxes": [
+        {
+          "confidence": 0.4271080195903778,
+          "box_xywhn": [
+            0.08976974338293076,
+            0.08995463699102402,
+            0.10486201196908951,
+            0.0580458790063858
+          ]
+        },
+        {
+          "confidence": 0.4156797230243683,
+          "box_xywhn": [
+            0.3431897461414337,
+            0.11460624635219574,
+            0.14653363823890686,
+            0.07344704866409302
+          ]
+        },
+        {
+          "confidence": 0.3355368673801422,
+          "box_xywhn": [
+            0.11870787292718887,
+            0.27116280794143677,
+            0.12874910235404968,
+            0.06285496801137924
+          ]
+        },
+        {
+          "confidence": 0.3138490319252014,
+          "box_xywhn": [
+            0.5492858290672302,
+            0.1447128802537918,
+            0.14470265805721283,
+            0.06358271837234497
+          ]
+        },
+        {
+          "confidence": 0.17805024981498718,
+          "box_xywhn": [
+            0.6978035569190979,
+            0.19129851460456848,
+            0.11222497373819351,
+            0.05640231817960739
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Growth Plate (Physis) Radiolucency"
+    },
+    {
+      "filestem": "0335_0378744522_01_WRI-R2_F011",
+      "patient_age": 11.2,
+      "gender": "F",
+      "projection": 2,
+      "max_confidence": 0.1933,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.19331306219100952,
+          "box_xywhn": [
+            0.5658057928085327,
+            0.4657776951789856,
+            0.2629939615726471,
+            0.08317219465970993
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0362_0400217948_02_WRI-L2_F010",
+      "patient_age": 10.8,
+      "gender": "F",
+      "projection": 2,
+      "max_confidence": 0.4199,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.4199000895023346,
+          "box_xywhn": [
+            0.39888861775398254,
+            0.46445080637931824,
+            0.2633046805858612,
+            0.05375015735626221
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0416_0370547649_02_WRI-L2_F013",
+      "patient_age": 13.5,
+      "gender": "F",
+      "projection": 2,
+      "max_confidence": 0.2943,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.2942788600921631,
+          "box_xywhn": [
+            0.5470874905586243,
+            0.4877875745296478,
+            0.22657500207424164,
+            0.0723777711391449
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0522_0600823096_03_WRI-R1_M008",
+      "patient_age": 8.9,
+      "gender": "M",
+      "projection": 1,
+      "max_confidence": 0.3581,
+      "fp_box_count": 2,
+      "fp_boxes": [
+        {
+          "confidence": 0.35812878608703613,
+          "box_xywhn": [
+            0.44837066531181335,
+            0.5546768307685852,
+            0.27551397681236267,
+            0.10605458915233612
+          ]
+        },
+        {
+          "confidence": 0.28923219442367554,
+          "box_xywhn": [
+            0.4485396444797516,
+            0.5708450078964233,
+            0.24772360920906067,
+            0.07985710352659225
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0547_0875714688_03_WRI-R2_F015",
+      "patient_age": 15.6,
+      "gender": "F",
+      "projection": 2,
+      "max_confidence": 0.2084,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.20835112035274506,
+          "box_xywhn": [
+            0.6780294179916382,
+            0.5370699763298035,
+            0.3879891037940979,
+            0.13868370652198792
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0597_0636298854_01_WRI-L2_F014",
+      "patient_age": 14.8,
+      "gender": "F",
+      "projection": 2,
+      "max_confidence": 0.3247,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.32474106550216675,
+          "box_xywhn": [
+            0.4237459897994995,
+            0.3601318597793579,
+            0.3241380453109741,
+            0.07302545011043549
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0606_0261904330_01_WRI-R1_F004",
+      "patient_age": 4.2,
+      "gender": "F",
+      "projection": 1,
+      "max_confidence": 0.1877,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.1877010613679886,
+          "box_xywhn": [
+            0.35572028160095215,
+            0.4221530258655548,
+            0.23816871643066406,
+            0.07684982568025589
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0606_0261904350_01_WRI-R2_F004",
+      "patient_age": 4.2,
+      "gender": "F",
+      "projection": 2,
+      "max_confidence": 0.2579,
+      "fp_box_count": 3,
+      "fp_boxes": [
+        {
+          "confidence": 0.257916659116745,
+          "box_xywhn": [
+            0.5167793035507202,
+            0.3231879472732544,
+            0.2607845366001129,
+            0.07001711428165436
+          ]
+        },
+        {
+          "confidence": 0.19710232317447662,
+          "box_xywhn": [
+            0.5374547243118286,
+            0.3361988961696625,
+            0.27916422486305237,
+            0.06795661896467209
+          ]
+        },
+        {
+          "confidence": 0.18754065036773682,
+          "box_xywhn": [
+            0.5899628400802612,
+            0.34227824211120605,
+            0.19026431441307068,
+            0.0576288215816021
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0609_0735076107_02_WRI-L1_F014",
+      "patient_age": 14.6,
+      "gender": "F",
+      "projection": 1,
+      "max_confidence": 0.3119,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.31187355518341064,
+          "box_xywhn": [
+            0.17125347256660461,
+            0.1731395423412323,
+            0.12793324887752533,
+            0.05481481924653053
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Growth Plate (Physis) Radiolucency"
+    },
+    {
+      "filestem": "0626_0654655856_01_WRI-R1_F004",
+      "patient_age": 4.4,
+      "gender": "F",
+      "projection": 1,
+      "max_confidence": 0.3769,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.37688860297203064,
+          "box_xywhn": [
+            0.4451228082180023,
+            0.6501977443695068,
+            0.10607722401618958,
+            0.07343032211065292
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Growth Plate (Physis) Radiolucency"
+    },
+    {
+      "filestem": "0639_1118677923_02_WRI-R2_M010",
+      "patient_age": 10.8,
+      "gender": "M",
+      "projection": 2,
+      "max_confidence": 0.611,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.6110241413116455,
+          "box_xywhn": [
+            0.6417038440704346,
+            0.619202733039856,
+            0.15070103108882904,
+            0.057115938514471054
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0639_1119275308_03_WRI-R1_M010",
+      "patient_age": 10.8,
+      "gender": "M",
+      "projection": 1,
+      "max_confidence": 0.2531,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.25306934118270874,
+          "box_xywhn": [
+            0.7528500556945801,
+            0.5937015414237976,
+            0.15577879548072815,
+            0.05760146304965019
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0652_0701579254_01_WRI-R1_M014",
+      "patient_age": 14.8,
+      "gender": "M",
+      "projection": 1,
+      "max_confidence": 0.1729,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.1728793978691101,
+          "box_xywhn": [
+            0.44504573941230774,
+            0.5140419602394104,
+            0.32018131017684937,
+            0.08772806078195572
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    },
+    {
+      "filestem": "0712_0207646048_03_WRI-R1_M013",
+      "patient_age": 13.0,
+      "gender": "M",
+      "projection": 1,
+      "max_confidence": 0.2194,
+      "fp_box_count": 1,
+      "fp_boxes": [
+        {
+          "confidence": 0.21940137445926666,
+          "box_xywhn": [
+            0.4149942994117737,
+            0.5669549107551575,
+            0.28169432282447815,
+            0.08691855520009995
+          ]
+        }
+      ],
+      "anatomical_clustering_site": "Cortical Edge / Periosteal Shadow"
+    }
+  ]
+}

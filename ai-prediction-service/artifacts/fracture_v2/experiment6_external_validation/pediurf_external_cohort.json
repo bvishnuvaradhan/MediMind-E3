@@ -1,0 +1,35 @@
+{
+  "experiment": "Experiment 6 Phase 2B External Validation",
+  "primary_dataset": "PediURF",
+  "frozen_model": {
+    "path": "ai-prediction-service/artifacts/fracture_v2/experiment5_localization/best_model.pt",
+    "md5": "ece51c07eaab354f25f53f99b104dc03",
+    "frozen_confidence_threshold": 0.17,
+    "architecture": "YOLOv8n Detection"
+  },
+  "evaluation_cohorts": {
+    "cohort_1_pediurf_official_test": {
+      "description": "Official held-out test split of PediURF",
+      "studies": 1053,
+      "images": 2106,
+      "ap_views": 1053,
+      "lateral_views": 1053,
+      "categories": {
+        "Distal": 677,
+        "Midshaft": 265,
+        "Proximal": 111
+      },
+      "primary_metric": "Fracture Sensitivity / Recall at threshold 0.17 across views and categories"
+    },
+    "cohort_2_pediurf_full": {
+      "description": "Entire PediURF dataset (since YOLOv8n was trained ONLY on Austrian GRAZPEDWRI-DX, all 5,265 Chinese PediURF studies are 100% external held-out)",
+      "studies": 5265,
+      "images": 10530,
+      "primary_metric": "Large-scale External Fracture Sensitivity / Recall"
+    },
+    "cohort_3_negative_controls": {
+      "description": "GRAZPEDWRI-DX test split normal controls (N=251) + optional RSNA Bone Age subset to benchmark external specificity",
+      "primary_metric": "External Specificity and False Positive Rate"
+    }
+  }
+}

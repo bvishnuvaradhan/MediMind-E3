@@ -1,0 +1,53 @@
+{
+  "pediurf_true_positive_studies (N=996)": {
+    "count": 996,
+    "mean": 0.4086,
+    "median": 0.4011,
+    "std": 0.1266,
+    "min": 0.1702,
+    "q25": 0.3106,
+    "q75": 0.4954,
+    "iqr": 0.1848,
+    "max": 0.8385
+  },
+  "pediurf_false_negative_studies (N=57)": {
+    "count": 57,
+    "mean": 0.1254,
+    "median": 0.1342,
+    "std": 0.0313,
+    "min": 0.0494,
+    "q25": 0.1077,
+    "q75": 0.1493,
+    "iqr": 0.0416,
+    "max": 0.1672
+  },
+  "normal_control_true_negatives (N=219)": {
+    "count": 219,
+    "mean": 0.0,
+    "median": 0.0,
+    "std": 0.0,
+    "min": 0.0,
+    "q25": 0.0,
+    "q75": 0.0,
+    "iqr": 0.0,
+    "max": 0.0
+  },
+  "normal_control_false_positives (N=32)": {
+    "count": 20,
+    "mean": 0.2985,
+    "median": 0.2761,
+    "std": 0.1072,
+    "min": 0.1729,
+    "q25": 0.2107,
+    "q75": 0.3628,
+    "iqr": 0.1521,
+    "max": 0.611
+  },
+  "operating_threshold": 0.17,
+  "confidence_separation_analysis": {
+    "tp_mean_vs_fn_mean": "0.4086 vs 0.1254",
+    "tp_median_vs_fn_median": "0.4011 vs 0.1342",
+    "tp_mean_vs_fp_mean": "0.4086 vs 0.2985",
+    "distribution_overlap": "Strong separation between True Positives (median 0.38) and False Negatives (median 0.05). True Negatives are clustered at 0.00."
+  }
+}

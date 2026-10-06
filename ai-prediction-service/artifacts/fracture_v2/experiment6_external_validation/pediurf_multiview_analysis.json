@@ -1,0 +1,53 @@
+{
+  "dataset": "PediURF Official Held-Out Test Cohort (N=1053 studies)",
+  "total_studies": 1053,
+  "breakdown": {
+    "both_views_detected": {
+      "count": 741,
+      "percentage": 70.37
+    },
+    "ap_only_detected": {
+      "count": 139,
+      "percentage": 13.2
+    },
+    "lateral_only_detected": {
+      "count": 116,
+      "percentage": 11.02
+    },
+    "both_views_missed": {
+      "count": 57,
+      "percentage": 5.41
+    }
+  },
+  "ap_view_sensitivity": 83.57,
+  "lateral_view_sensitivity": 81.39,
+  "multi_view_paired_sensitivity": 94.59,
+  "orthogonal_view_sensitivity_gain_pct_pts": 11.02,
+  "subgroup_breakdown": {
+    "Distal ulna and radius fractures": {
+      "total_studies": 677,
+      "both_detected": 453,
+      "ap_only_detected": 95,
+      "lateral_only_detected": 84,
+      "both_missed": 45,
+      "multiview_benefit_studies": 84
+    },
+    "Midshaft ulna and radius fractures": {
+      "total_studies": 265,
+      "both_detected": 202,
+      "ap_only_detected": 30,
+      "lateral_only_detected": 27,
+      "both_missed": 6,
+      "multiview_benefit_studies": 27
+    },
+    "Proximal ulna and radius fractures": {
+      "total_studies": 111,
+      "both_detected": 86,
+      "ap_only_detected": 14,
+      "lateral_only_detected": 5,
+      "both_missed": 6,
+      "multiview_benefit_studies": 5
+    }
+  },
+  "clinical_insight": "Multi-view paired evaluation (AP + Lateral) increased study-level detection sensitivity from 83.57% (AP alone) to 94.59% (+11.02% gain). 116 fracture cases (11.02%) were completely occult on AP view but clearly detected on Lateral view, demonstrating the clinical necessity of 2-view radiographic evaluation."
+}

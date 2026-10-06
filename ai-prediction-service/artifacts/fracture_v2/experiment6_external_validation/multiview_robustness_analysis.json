@@ -1,0 +1,34 @@
+{
+  "dataset": "PediURF Official Held-Out Test Cohort (N=1053 studies / 2106 images)",
+  "total_studies": 1053,
+  "metrics": {
+    "ap_view_alone": {
+      "detected_studies": 880,
+      "missed_studies": 173,
+      "sensitivity": 83.57
+    },
+    "lateral_view_alone": {
+      "detected_studies": 857,
+      "missed_studies": 196,
+      "sensitivity": 81.39
+    },
+    "paired_multiview_max": {
+      "detected_studies": 996,
+      "missed_studies": 57,
+      "sensitivity": 94.59
+    },
+    "concordant_bilateral_both_positive": {
+      "detected_studies": 741,
+      "percentage": 70.37
+    }
+  },
+  "view_contribution_matrix": {
+    "ap_only_detections": 139,
+    "lateral_only_rescues": 116,
+    "both_views_positive": 741,
+    "both_views_negative": 57,
+    "paired_sensitivity_gain_over_ap": 11.02,
+    "paired_sensitivity_gain_over_lateral": 13.2
+  },
+  "clinical_conclusion": "Multi-view radiographic evaluation (AP + Lateral) provides a decisive +11.02% sensitivity boost over AP alone. 116 pediatric fractures were entirely occult on AP but clearly identified on Lateral."
+}

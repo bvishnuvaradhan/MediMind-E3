@@ -1,0 +1,17 @@
+{
+  "dataset_name": "PediURF",
+  "annotation_level": "Study-level & Image-level clinical fracture classification with anatomical localization category",
+  "bounding_box_format": "Implicit anatomical category (Distal, Midshaft, Proximal). Zero bounding box XMLs/TXTs in raw distribution.",
+  "evaluation_strategy": {
+    "paradigm": "Object detector binary & multi-view fracture validation",
+    "detector_tested": "Experiment 5 YOLOv8n (frozen at threshold 0.17)",
+    "fracture_detection_rule": "An image is evaluated as positive (fracture detected) if YOLOv8n predicts >= 1 fracture box with confidence >= 0.17.",
+    "study_level_rule": "A study is positive if either front.jpg (AP) or side.jpg (LAT) has >= 1 detected fracture box (or max confidence >= 0.17).",
+    "anatomical_concordance": "Predicted bounding box center Y-coordinate is compared against anatomical third (Distal: bottom/top based on wrist orientation, Midshaft: middle third, Proximal: proximal third) to assess anatomical localization fidelity."
+  },
+  "ground_truth_classes": [
+    "Distal ulna and radius fractures",
+    "Midshaft ulna and radius fractures",
+    "Proximal ulna and radius fractures"
+  ]
+}
