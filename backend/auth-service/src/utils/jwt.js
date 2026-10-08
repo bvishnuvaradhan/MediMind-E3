@@ -8,6 +8,10 @@ export const generateToken = (payload, options = {}) => {
     userId: payload.userId,
     role: payload.role,
     referenceId: payload.referenceId,
+    ...(payload.familyId ? { familyId: payload.familyId } : {}),
+    ...(payload.doctorId ? { doctorId: payload.doctorId } : {}),
+    ...(payload.departmentId ? { departmentId: payload.departmentId } : {}),
+    ...(payload.hospitalId ? { hospitalId: payload.hospitalId } : {}),
   };
 
   return jwt.sign(cleanPayload, secret, { expiresIn });

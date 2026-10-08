@@ -2,6 +2,7 @@ import React, { useState, useEffect, useTransition } from 'react';
 import './Doctor.css';
 import { doctorService } from '../../services/doctorService';
 import { useAuth } from '../../context/useAuth';
+import { doctors as allDoctors } from '../../data/medimindData';
 
 // Views
 import DashboardView from './views/DashboardView';
@@ -70,7 +71,7 @@ const getInitialDoctorAiReturnTab = () => {
 };
 
 export function DoctorLayout({ dark, setDark }) {
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout } = useAuth();
   const [, startTransition] = useTransition();
 
   const [activeTab, setActiveTab] = useState(getInitialDoctorTab);
@@ -181,7 +182,21 @@ export function DoctorLayout({ dark, setDark }) {
         doctorService.getSettings(),
       ]);
 
-      setDoctorProfile(prof);
+      const matchedDoctor = (user && allDoctors.find((d) => d.email?.toLowerCase() === user.email?.toLowerCase() || d.id === user.doctorId || d.id === user.id)) || null;
+      const effectiveProfile = matchedDoctor
+        ? {
+            ...prof,
+            ...matchedDoctor,
+            name: user?.name || matchedDoctor.name,
+            email: user?.email || matchedDoctor.email,
+            avatarInitials: matchedDoctor.avatarInitials || user?.avatarInitials || 'MD',
+            title: matchedDoctor.title || user?.title || 'Senior Consultant',
+            departmentName: matchedDoctor.departmentName || user?.departmentName || prof?.departmentName,
+            hospitalName: matchedDoctor.hospitalName || user?.hospitalName || prof?.hospitalName,
+          }
+        : prof;
+
+      setDoctorProfile(effectiveProfile);
       setPatients(pats);
       setAppointments(apts);
       setConsultations(cons);
@@ -192,7 +207,7 @@ export function DoctorLayout({ dark, setDark }) {
       setSettings(stts);
     }
     loadData();
-  }, []);
+  }, [user]);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -698,50 +713,18 @@ export function DoctorLayout({ dark, setDark }) {
         <div className="doctor-sidebar-footer">
           <div className="doctor-user-card">
             <div className="doctor-avatar-circle">
-              {doctorProfile?.avatarInitials || 'RM'}
+              {doctorProfile?.avatarInitials || user?.avatarInitials || 'MD'}
             </div>
             <div className="doctor-user-meta">
               <span className="doctor-user-name">{doctorProfile?.name || user?.name || 'Dr. Rahul Mehta'}</span>
-              <span className="doctor-user-role">Orthopedic Specialist</span>
+              <span className="doctor-user-role">{doctorProfile?.title || doctorProfile?.specialization || user?.title || 'Specialist Physician'}</span>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
-            <button
-              className="doctor-btn doctor-btn-outline doctor-btn-sm"
-              style={{ fontSize: '11px', padding: '4px 6px' }}
-              onClick={() => switchRole('DEPARTMENT_HEAD')}
-              title="Switch to Department Head"
-            >
-              Dept Head
-            </button>
-            <button
-              className="doctor-btn doctor-btn-outline doctor-btn-sm"
-              style={{ fontSize: '11px', padding: '4px 6px' }}
-              onClick={() => switchRole('HOSPITAL_ADMIN')}
-              title="Switch to Hospital Admin"
-            >
-              Hosp Admin
-            </button>
-            <button
-              className="doctor-btn doctor-btn-outline doctor-btn-sm"
-              style={{ fontSize: '11px', padding: '4px 6px' }}
-              onClick={() => switchRole('CHAIRMAN')}
-              title="Switch to Chairman"
-            >
-              Chairman
-            </button>
-            <button
-              className="doctor-btn doctor-btn-outline doctor-btn-sm"
-              style={{ fontSize: '11px', padding: '4px 6px' }}
-              onClick={() => switchRole('FAMILY')}
-              title="Switch to Family Portal"
-            >
-              Family
-            </button>
+          <div style={{ marginTop: '8px' }}>
             <button
               className="doctor-btn doctor-btn-ghost doctor-btn-sm"
-              style={{ gridColumn: 'span 2', fontSize: '11px', padding: '4px 6px', color: 'var(--doctor-coral)' }}
+              style={{ width: '100%', fontSize: '12px', padding: '6px 10px', color: 'var(--doctor-coral)' }}
               onClick={logout}
               title="Sign Out"
             >

@@ -35,10 +35,19 @@ export const authService = {
     user.last_login_at = new Date();
     await user.save();
 
+    const familyId = user.family_id || (user.role === 'FAMILY' ? 'FAM-001' : undefined);
+    const doctorId = user.doctor_id || undefined;
+    const departmentId = user.department_id || undefined;
+    const hospitalId = user.hospital_id || undefined;
+
     const tokenPayload = {
       userId: user._id.toString(),
       role: user.role,
       referenceId: user.reference_id ? user.reference_id.toString() : user._id.toString(),
+      familyId,
+      doctorId,
+      departmentId,
+      hospitalId,
     };
 
     const token = generateToken(tokenPayload);
@@ -51,6 +60,10 @@ export const authService = {
         role: user.role,
         accountType: user.account_type,
         referenceId: user.reference_id ? user.reference_id.toString() : user._id.toString(),
+        familyId: user.family_id || (user.role === 'FAMILY' ? 'FAM-001' : null),
+        doctorId: user.doctor_id || null,
+        departmentId: user.department_id || null,
+        hospitalId: user.hospital_id || null,
       },
     };
   },
@@ -69,6 +82,10 @@ export const authService = {
       role: user.role,
       accountType: user.account_type,
       referenceId: user.reference_id ? user.reference_id.toString() : user._id.toString(),
+      familyId: user.family_id || (user.role === 'FAMILY' ? 'FAM-001' : null),
+      doctorId: user.doctor_id || null,
+      departmentId: user.department_id || null,
+      hospitalId: user.hospital_id || null,
     };
   },
 

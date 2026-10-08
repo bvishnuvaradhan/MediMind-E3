@@ -6,10 +6,11 @@ export function PrescriptionsView({
   announce,
   openFeatureModal,
   familyMembers = [],
+  prescriptions = null,
 }) {
   const [selectedMemberFilter, setSelectedMemberFilter] = useState('All');
 
-  const baseItems = initialPresentationData.Prescriptions || [];
+  const baseItems = prescriptions || initialPresentationData.Prescriptions || [];
 
   const selectedMemberObj = familyMembers.find(
     (m) => m.name === selectedMemberFilter || m.fullName === selectedMemberFilter || m.id === selectedMemberFilter

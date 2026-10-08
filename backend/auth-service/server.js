@@ -1,6 +1,7 @@
 import '../load-env.js';
 import app from './src/app.js';
 import { connectDB } from './src/config/db.js';
+import { seedCanonicalAuthUsers } from './src/utils/seedData.js';
 
 const PORT = process.env.PORT || process.env.AUTH_SERVICE_PORT || 5001;
 
@@ -8,6 +9,8 @@ const startServer = async () => {
   try {
     await connectDB();
     console.log(`[auth-service] Connected to MongoDB database: ${process.env.AUTH_DB_NAME || 'medimind_auth'}`);
+
+    await seedCanonicalAuthUsers();
 
     const server = app.listen(PORT, () => {
       console.log(`[auth-service] Running on port ${PORT}`);

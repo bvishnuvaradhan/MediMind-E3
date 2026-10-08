@@ -23,10 +23,10 @@ export const sanitizeIdentityHeaders = (req, res, next) => {
   next();
 };
 
-// Rate limiter for authentication attempts (10 requests per minute per IP)
+// Rate limiter for authentication attempts
 export const authRateLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 20,
+  max: process.env.NODE_ENV === 'test' ? 1000 : (process.env.AUTH_RATE_LIMIT_MAX ? parseInt(process.env.AUTH_RATE_LIMIT_MAX, 10) : 120),
   standardHeaders: true,
   legacyHeaders: false,
   message: {

@@ -6,10 +6,11 @@ export function ConsultationsView({
   announce,
   openFeatureModal,
   familyMembers = [],
+  consultations = null,
 }) {
   const [selectedMemberFilter, setSelectedMemberFilter] = useState('All');
 
-  const baseItems = initialPresentationData.Consultations || [];
+  const baseItems = consultations || initialPresentationData.Consultations || [];
 
   const selectedMemberObj = familyMembers.find(
     (m) => m.name === selectedMemberFilter || m.fullName === selectedMemberFilter || m.id === selectedMemberFilter

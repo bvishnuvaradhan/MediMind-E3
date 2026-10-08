@@ -9,7 +9,7 @@ import { DoctorLayout } from './components/doctor/DoctorLayout'
 import { FamilyLayout } from './components/family/FamilyLayout'
 
 function MainRouter() {
-  const { isAuthenticated, loading, role } = useAuth()
+  const { isAuthenticated, loading, role, user } = useAuth()
   const [authMode, setAuthMode] = useState('login')
   const [dark, setDark] = useState(false)
 
@@ -22,7 +22,7 @@ function MainRouter() {
     )
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     return authMode === 'signup' ? (
       <SignupPage onSwitchToLogin={() => setAuthMode('login')} />
     ) : (
@@ -30,23 +30,29 @@ function MainRouter() {
     )
   }
 
+  const userKey = user?.id || user?.userId || user?.email || role || 'unknown';
+
   if (role === 'CHAIRMAN') {
-    return <ChairmanLayout dark={dark} setDark={setDark} />
+    return <ChairmanLayout key={`chairman-${userKey}`} dark={dark} setDark={setDark} />
   }
 
   if (role === 'HOSPITAL_ADMIN') {
-    return <HospitalAdminLayout dark={dark} setDark={setDark} />
+    return <HospitalAdminLayout key={`hadmin-${userKey}`} dark={dark} setDark={setDark} />
   }
 
   if (role === 'DEPARTMENT_HEAD') {
-    return <DepartmentHeadLayout dark={dark} setDark={setDark} />
+    return <DepartmentHeadLayout key={`depthead-${userKey}`} dark={dark} setDark={setDark} />
   }
 
   if (role === 'DOCTOR') {
-    return <DoctorLayout dark={dark} setDark={setDark} />
+    return <DoctorLayout key={`doctor-${userKey}`} dark={dark} setDark={setDark} />
   }
 
-  return <FamilyLayout dark={dark} setDark={setDark} />
+  if (role === 'FAMILY') {
+    return <FamilyLayout key={`family-${userKey}`} dark={dark} setDark={setDark} />
+  }
+
+  return <LoginPage onSwitchToSignup={() => setAuthMode('signup')} />
 }
 
 export default function App() {

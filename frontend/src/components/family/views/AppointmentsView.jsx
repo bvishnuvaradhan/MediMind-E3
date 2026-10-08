@@ -12,10 +12,11 @@ export function AppointmentsView({
   onRescheduleAppointment,
   familyMembers = [],
   setReturnTo,
+  appointments = null,
 }) {
   const [selectedMemberFilter, setSelectedMemberFilter] = useState('All');
 
-  const baseItems = initialPresentationData.Appointments || [];
+  const baseItems = appointments || initialPresentationData.Appointments || [];
   const allAppointments = [...baseItems, ...bookedAppointments];
 
   const selectedMemberObj = familyMembers.find(

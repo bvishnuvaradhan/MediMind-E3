@@ -25,6 +25,10 @@ import {
 import { useAuth } from '../../context/useAuth';
 import { hospitalAdminService } from '../../services/hospitalAdminService';
 import {
+  hospitals,
+  departments as allDepartments,
+  departmentHeads as allDepartmentHeads,
+  doctors as allDoctors,
   initialHospitalProfile,
   initialHospitalDepartments,
   initialDepartmentHeads,
@@ -141,7 +145,7 @@ const getInitialDoctorId = () => {
 };
 
 export function HospitalAdminLayout({ dark, setDark }) {
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout } = useAuth();
   const [, startTransition] = useTransition();
 
   const [currentPage, setCurrentPage] = useState(getInitialPage);
@@ -215,17 +219,41 @@ export function HospitalAdminLayout({ dark, setDark }) {
     }
   }, [isAnyModalOpen]);
 
+  const activeHospitalId = user?.hospitalId || (user?.email && hospitals.find((h) => h.adminEmail?.toLowerCase() === user.email.toLowerCase() || h.email?.toLowerCase() === user.email.toLowerCase())?.id) || 'HOSP-001';
+  const activeHospital = hospitals.find((h) => h.id === activeHospitalId) || initialHospitalProfile;
+
   // Data States
-  const [hospital, setHospital] = useState(initialHospitalProfile);
-  const [departments, setDepartments] = useState(initialHospitalDepartments);
-  const [departmentHeads, setDepartmentHeads] = useState(initialDepartmentHeads);
-  const [doctors, setDoctors] = useState(initialHospitalDoctors);
+  const [hospital, setHospital] = useState(activeHospital);
+  const [departments, setDepartments] = useState(() => {
+    const list = allDepartments.filter((d) => d.hospitalId === activeHospitalId);
+    return list.length > 0 ? list : initialHospitalDepartments;
+  });
+  const [departmentHeads, setDepartmentHeads] = useState(() => {
+    const list = allDepartmentHeads.filter((h) => h.hospitalId === activeHospitalId);
+    return list.length > 0 ? list : initialDepartmentHeads;
+  });
+  const [doctors, setDoctors] = useState(() => {
+    const list = allDoctors.filter((d) => d.hospitalId === activeHospitalId);
+    return list.length > 0 ? list : initialHospitalDoctors;
+  });
   const [appointments] = useState(initialAppointments);
   const [analytics] = useState(initialHospitalAnalytics);
   const [reports, setReports] = useState(initialReports);
   const [knowledge] = useState(initialKnowledgeActivity);
   const [auditLogs] = useState(initialAuditLogs);
   const [hospitalSettings, setHospitalSettings] = useState(initialHospitalSettings);
+
+  useEffect(() => {
+    const targetHospId = user?.hospitalId || (user?.email && hospitals.find((h) => h.adminEmail?.toLowerCase() === user.email.toLowerCase() || h.email?.toLowerCase() === user.email.toLowerCase())?.id) || 'HOSP-001';
+    const targetHosp = hospitals.find((h) => h.id === targetHospId) || initialHospitalProfile;
+    setHospital(targetHosp);
+    const depts = allDepartments.filter((d) => d.hospitalId === targetHospId);
+    if (depts.length > 0) setDepartments(depts);
+    const heads = allDepartmentHeads.filter((h) => h.hospitalId === targetHospId);
+    if (heads.length > 0) setDepartmentHeads(heads);
+    const docs = allDoctors.filter((d) => d.hospitalId === targetHospId);
+    if (docs.length > 0) setDoctors(docs);
+  }, [user]);
 
   const announce = (message) => {
     setToast(message);
@@ -617,49 +645,8 @@ export function HospitalAdminLayout({ dark, setDark }) {
           </button>
         ))}
 
-        {/* Sidebar Footer & Quick Role Switches */}
+        {/* Sidebar Footer */}
         <div className="ha-sidebar-footer">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
-            <button
-              className="ha-nav-item"
-              style={{ padding: '6px 8px', fontSize: '11px', color: '#0f766e', backgroundColor: '#f0fdfa', borderRadius: '6px' }}
-              onClick={() => switchRole('DOCTOR')}
-              title="Switch to Doctor"
-            >
-              <Stethoscope size={14} />
-              <span>Doctor</span>
-            </button>
-
-            <button
-              className="ha-nav-item"
-              style={{ padding: '6px 8px', fontSize: '11px', color: '#7c3aed', backgroundColor: '#f5f3ff', borderRadius: '6px' }}
-              onClick={() => switchRole('DEPARTMENT_HEAD')}
-              title="Switch to Department Head"
-            >
-              <UserCheck size={14} />
-              <span>Dept Head</span>
-            </button>
-
-            <button
-              className="ha-nav-item"
-              style={{ padding: '6px 8px', fontSize: '11px', color: '#4338ca', backgroundColor: '#eef2ff', borderRadius: '6px' }}
-              onClick={() => switchRole('CHAIRMAN')}
-              title="Switch to Chairman"
-            >
-              <Crown size={14} />
-              <span>Chairman</span>
-            </button>
-
-            <button
-              className="ha-nav-item"
-              style={{ padding: '6px 8px', fontSize: '11px', color: '#2563eb', backgroundColor: '#eff6ff', borderRadius: '6px' }}
-              onClick={() => switchRole('FAMILY')}
-              title="Switch to Family Portal"
-            >
-              <UsersRound size={14} />
-              <span>Family</span>
-            </button>
-          </div>
 
           <button
             className="ha-nav-item"
@@ -707,10 +694,10 @@ export function HospitalAdminLayout({ dark, setDark }) {
 
             <div className="ha-user-profile-btn" onClick={() => navigate('Settings')}>
               <div className="ha-avatar">
-                {user?.avatarInitials || 'RS'}
+                {user?.avatarInitials || 'HA'}
               </div>
               <div className="ha-user-info">
-                <strong>{user?.name || 'Dr. Rajesh Sharma'}</strong>
+                <strong>{user?.name || hospital.adminName || 'Hospital Administrator'}</strong>
                 <span>{user?.title || 'Hospital Administrator'}</span>
               </div>
             </div>
