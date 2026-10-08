@@ -45,6 +45,26 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
+    family_id: {
+      type: String,
+      default: null,
+    },
+
+    doctor_id: {
+      type: String,
+      default: null,
+    },
+
+    department_id: {
+      type: String,
+      default: null,
+    },
+
+    hospital_id: {
+      type: String,
+      default: null,
+    },
+
     status: {
       type: String,
       enum: ['ACTIVE', 'INACTIVE', 'DELETED'],
@@ -72,6 +92,10 @@ userSchema.methods.toPublicJSON = function () {
     role: this.role,
     accountType: this.account_type,
     referenceId: this.reference_id ? this.reference_id.toString() : this._id.toString(),
+    familyId: this.family_id || (this.role === 'FAMILY' ? 'FAM-001' : null),
+    doctorId: this.doctor_id || null,
+    departmentId: this.department_id || null,
+    hospitalId: this.hospital_id || null,
     status: this.status,
     lastLoginAt: this.last_login_at,
   };

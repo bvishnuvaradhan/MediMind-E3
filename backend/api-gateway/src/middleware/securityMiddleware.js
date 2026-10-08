@@ -18,15 +18,24 @@ export const sanitizeIdentityHeaders = (req, res, next) => {
   delete req.headers['x-user-id'];
   delete req.headers['x-user-role'];
   delete req.headers['x-user-reference-id'];
+  delete req.headers['x-family-id'];
+  delete req.headers['x-user-family-id'];
+  delete req.headers['x-doctor-id'];
+  delete req.headers['x-user-doctor-id'];
+  delete req.headers['x-department-id'];
+  delete req.headers['x-user-department-id'];
+  delete req.headers['x-hospital-id'];
+  delete req.headers['x-user-hospital-id'];
+  delete req.headers['x-member-id'];
   delete req.headers['x-internal-service-secret'];
 
   next();
 };
 
-// Rate limiter for authentication attempts (10 requests per minute per IP)
+// Rate limiter for authentication attempts
 export const authRateLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 20,
+  max: process.env.NODE_ENV === 'test' ? 1000 : (process.env.AUTH_RATE_LIMIT_MAX ? parseInt(process.env.AUTH_RATE_LIMIT_MAX, 10) : 120),
   standardHeaders: true,
   legacyHeaders: false,
   message: {

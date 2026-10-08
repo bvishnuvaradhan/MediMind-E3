@@ -1,0 +1,38 @@
+{
+  "benchmark_matrix": {
+    "experiment_5_yolo_single_view": {
+      "model": "YOLOv8n Single-View Localization",
+      "graz_test_sensitivity": 91.7,
+      "graz_test_specificity": 87.25,
+      "n251_specificity": 87.25,
+      "pediurf_sensitivity": 82.48
+    },
+    "experiment_6_heuristic_max_yolo": {
+      "model": "Heuristic Max Fusion: max(AP, LAT) >= 0.17",
+      "graz_test_sensitivity": 94.59,
+      "graz_test_specificity": 87.25,
+      "n251_specificity": 87.25,
+      "pediurf_sensitivity": 94.59,
+      "pediurf_both_misses": 57
+    },
+    "experiment_7a_global_dual_view": {
+      "model": "Global Dual-View ResNet-18 (Whole Image Concatenation)",
+      "graz_test_sensitivity": 100.0,
+      "graz_test_specificity": 0.0,
+      "n251_specificity": 0.0,
+      "pediurf_sensitivity": 100.0,
+      "pediurf_both_misses": 0
+    },
+    "experiment_8a_localized_dual_view": {
+      "model": "Dual-View ROI-Aligned Fusion (YOLO Localization + ResNet ROI Encoder + Confidence Gate)",
+      "graz_test_sensitivity": 95.18,
+      "graz_test_specificity": 75.25,
+      "n251_specificity": 87.25,
+      "pediurf_sensitivity": 94.59,
+      "pediurf_both_misses": 57,
+      "graz_test_roc_auc": 0.9586,
+      "graz_test_pr_auc": 0.986,
+      "operating_threshold": 0.01
+    }
+  }
+}

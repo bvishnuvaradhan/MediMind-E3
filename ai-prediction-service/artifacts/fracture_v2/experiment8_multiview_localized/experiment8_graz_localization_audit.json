@@ -1,0 +1,63 @@
+{
+  "splits": {
+    "train": {
+      "total_studies": 1620,
+      "fractured_studies": 1122,
+      "normal_studies": 498,
+      "gt_annotation_availability": {
+        "ap_annotated": 1025,
+        "lat_annotated": 1108,
+        "both_views_annotated": 1011,
+        "neither_view_annotated": 498
+      },
+      "yolo_detection_availability": {
+        "ap_detected": 1018,
+        "lat_detected": 1096,
+        "both_views_detected": 945,
+        "neither_view_detected": 451
+      }
+    },
+    "val": {
+      "total_studies": 348,
+      "fractured_studies": 242,
+      "normal_studies": 106,
+      "gt_annotation_availability": {
+        "ap_annotated": 214,
+        "lat_annotated": 235,
+        "both_views_annotated": 207,
+        "neither_view_annotated": 106
+      },
+      "yolo_detection_availability": {
+        "ap_detected": 210,
+        "lat_detected": 229,
+        "both_views_detected": 193,
+        "neither_view_detected": 102
+      }
+    },
+    "test": {
+      "total_studies": 350,
+      "fractured_studies": 249,
+      "normal_studies": 101,
+      "gt_annotation_availability": {
+        "ap_annotated": 231,
+        "lat_annotated": 248,
+        "both_views_annotated": 230,
+        "neither_view_annotated": 101
+      },
+      "yolo_detection_availability": {
+        "ap_detected": 223,
+        "lat_detected": 248,
+        "both_views_detected": 209,
+        "neither_view_detected": 88
+      }
+    }
+  },
+  "localization_quality": {
+    "total_evaluated_fracture_views": 2815,
+    "mean_iou": 0.7218,
+    "median_iou": 0.7762,
+    "localization_recall_iou_ge_0_25": 95.28,
+    "localization_recall_iou_ge_0_50": 90.48,
+    "localization_recall_iou_ge_0_75": 57.55
+  }
+}

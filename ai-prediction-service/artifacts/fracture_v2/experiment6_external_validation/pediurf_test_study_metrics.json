@@ -1,0 +1,11 @@
+{
+  "dataset": "PediURF Official Held-Out Test Cohort",
+  "evaluation_level": "Study-Level (Multi-View Paired AP + Lateral)",
+  "aggregation_rule": "study_probability = max(AP_probability, Lateral_probability); study_prediction = study_probability >= 0.17",
+  "frozen_threshold": 0.17,
+  "total_studies": 1053,
+  "true_positives": 996,
+  "false_negatives": 57,
+  "study_sensitivity": 94.59,
+  "mean_study_max_confidence": 0.3933
+}

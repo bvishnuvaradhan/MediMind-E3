@@ -1,0 +1,17 @@
+{
+  "cohort_name": "Predefined Uncorrupted Normal Pediatric Controls Stress Test Cohort",
+  "total_images": 251,
+  "detector_threshold": 0.17,
+  "clean_zero_detections_true_negatives": 219,
+  "false_positive_detections": 32,
+  "localization_specificity_pct": 87.25,
+  "false_positive_rate_pct": 12.75,
+  "fp_characteristics": {
+    "mean_fp_confidence": 0.2836,
+    "median_fp_confidence": 0.2575,
+    "mean_fp_area_pct": 1.66,
+    "mean_fp_y_center": 0.3942,
+    "spatial_distribution": "Concentrated at distal physis / epiphyseal plates (y > 0.65)"
+  },
+  "localization_advantage_over_exp7a": "YOLO detector successfully rejects 87.25% of normal growth plates prior to feature extraction, avoiding the global false positive collapse observed in Experiment 7A."
+}

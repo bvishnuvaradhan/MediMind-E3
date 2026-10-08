@@ -1,0 +1,32 @@
+{
+  "experiment_name": "Experiment 7: Multi-View Pediatric Fracture Detection",
+  "primary_evaluation_metric": "Study-Level Fracture Sensitivity / Recall at Target Operating Point",
+  "secondary_evaluation_metrics": [
+    "Pediatric Specificity on Uncorrupted Normal Controls",
+    "Study Precision / PPV",
+    "Study Negative Predictive Value (NPV)",
+    "Study F1-Score",
+    "Area Under ROC Curve (ROC-AUC)",
+    "Area Under Precision-Recall Curve (PR-AUC)",
+    "Calibration Brier Score and Expected Calibration Error (ECE)"
+  ],
+  "baselines_to_beat": {
+    "baseline_a_ap_only": {
+      "model": "Single-View ResNet-18 / YOLOv8n (AP Projection Only)",
+      "reference_ap_sensitivity": 83.57
+    },
+    "baseline_b_lateral_only": {
+      "model": "Single-View ResNet-18 / YOLOv8n (Lateral Projection Only)",
+      "reference_lateral_sensitivity": 81.39
+    },
+    "baseline_c_non_learned_max_fusion": {
+      "model": "Experiment 6 Heuristic Max Fusion: max(conf_AP, conf_LAT) >= 0.17",
+      "reference_study_sensitivity": 94.59,
+      "reference_pediatric_specificity": 87.25
+    }
+  },
+  "success_thresholds": {
+    "minimum_viable_success": "Study sensitivity >= 94.59% with pediatric specificity >= 85.0%",
+    "clear_superiority": "Study sensitivity >= 96.0% with pediatric specificity >= 88.0% and reduction of both-view misses below 40 cases"
+  }
+}

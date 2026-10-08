@@ -1,0 +1,19 @@
+{
+  "cohort_name": "Uncorrupted Normal Pediatric Controls Stress Test Cohort",
+  "cohort_size": 251,
+  "frozen_threshold": 0.01,
+  "true_negatives": 219,
+  "false_positives": 32,
+  "specificity": 87.25,
+  "false_positive_rate": 12.75,
+  "mean_predicted_probability": 0.0821,
+  "median_predicted_probability": 0.0,
+  "max_predicted_probability": 0.6441,
+  "comparison_against_prior": {
+    "exp4_resnet_specialist_specificity": 1.59,
+    "exp5_yolo_localization_specificity": 87.25,
+    "exp6_frozen_yolo_specificity": 87.25,
+    "exp7a_learned_multiview_specificity": 0.0,
+    "exp8a_localized_multiview_specificity": 87.25
+  }
+}

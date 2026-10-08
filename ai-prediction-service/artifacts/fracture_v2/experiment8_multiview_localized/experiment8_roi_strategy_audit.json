@@ -1,0 +1,59 @@
+{
+  "strategies_evaluated": {
+    "Strategy 1: Full Image": {
+      "description": "Pass entire 512x512 radiograph without cropping",
+      "implementation_complexity": "Very Low",
+      "information_retained": "Complete anatomical context including distal and proximal joints",
+      "growth_plate_risk": "VERY HIGH (Cause of Exp 7A specificity collapse on normal controls)",
+      "compatibility_with_multiview": "High",
+      "computational_cost": "High (computes features over background/normal tissue)",
+      "recommendation": "REJECTED as primary strategy based on Experiment 7A findings."
+    },
+    "Strategy 2: Tight Predicted Box": {
+      "description": "Crop exact bounding box predicted by YOLOv8n detector",
+      "implementation_complexity": "Low",
+      "information_retained": "Focal fracture line only",
+      "growth_plate_risk": "Very Low",
+      "compatibility_with_multiview": "High",
+      "computational_cost": "Very Low",
+      "recommendation": "FEASIBLE but risks clipping subtle cortical buckling (torus/buckle fractures) at margins."
+    },
+    "Strategy 3: 10% Expanded Box": {
+      "description": "Expand predicted box by 10% in width and height",
+      "implementation_complexity": "Low",
+      "information_retained": "Focal fracture + immediate periosteal cortex",
+      "growth_plate_risk": "Low",
+      "compatibility_with_multiview": "High",
+      "computational_cost": "Low",
+      "recommendation": "FEASIBLE."
+    },
+    "Strategy 4: 20% Expanded Box (RECOMMENDED)": {
+      "description": "Expand predicted box by 20% in width and height with full-image fallback when no box is found",
+      "implementation_complexity": "Low",
+      "information_retained": "Optimal balance: fracture line + periosteal reaction + trabecular step-off while excluding distal/proximal growth plates",
+      "growth_plate_risk": "Low",
+      "compatibility_with_multiview": "High",
+      "computational_cost": "Low",
+      "recommendation": "RECOMMENDED PRIMARY STRATEGY for Experiment 8A."
+    },
+    "Strategy 5: 30% Expanded Box": {
+      "description": "Expand predicted box by 30% in width and height",
+      "implementation_complexity": "Low",
+      "information_retained": "Broad anatomical region",
+      "growth_plate_risk": "Moderate (may start including adjacent physis on small pediatric wrists)",
+      "compatibility_with_multiview": "High",
+      "computational_cost": "Low",
+      "recommendation": "FEASIBLE secondary candidate."
+    },
+    "Strategy 6: Multi-Box Top-K": {
+      "description": "Extract top-K candidate boxes per view and pool features",
+      "implementation_complexity": "Moderate",
+      "information_retained": "Multiple potential sites",
+      "growth_plate_risk": "Moderate",
+      "compatibility_with_multiview": "Moderate",
+      "computational_cost": "Moderate (K forward passes per view)",
+      "recommendation": "RESERVED for complex multi-fragmentary trauma."
+    }
+  },
+  "selected_primary_strategy": "Strategy 4: 20% Expanded Predicted Box with Deterministic Zero-Confidence Fallback"
+}

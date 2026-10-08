@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-10-06T15:20:42+05:30",
+  "exp5_model_checkpoint": {
+    "path": "d:\\projects\\MediMind\\ai-prediction-service\\artifacts\\fracture_v2\\experiment5_localization\\best_model.pt",
+    "pre_eval_md5": "ece51c07eaab354f25f53f99b104dc03",
+    "post_eval_md5": "ece51c07eaab354f25f53f99b104dc03",
+    "expected_md5": "ece51c07eaab354f25f53f99b104dc03",
+    "is_frozen_and_byte_identical": true
+  },
+  "production_model_checkpoint": {
+    "path": "d:\\projects\\MediMind\\ai-prediction-service\\artifacts\\fracture\\best_model.pt",
+    "pre_eval_md5": "99f0f5bcea645f714fe4e8fefbb7e6cb",
+    "post_eval_md5": "99f0f5bcea645f714fe4e8fefbb7e6cb",
+    "expected_md5": "99f0f5bcea645f714fe4e8fefbb7e6cb",
+    "is_untouched_and_byte_identical": true
+  },
+  "operating_thresholds": {
+    "exp5_frozen_threshold": 0.17,
+    "production_threshold": 0.18
+  },
+  "production_routing_modified": false,
+  "overall_invariance_status": "PASSED"
+}

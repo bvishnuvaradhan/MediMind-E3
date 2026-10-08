@@ -1,0 +1,49 @@
+{
+  "dataset_name": "PediURF",
+  "institution": "Shenzhen Children's Hospital",
+  "total_studies": 5265,
+  "total_radiographs": 10530,
+  "splits": {
+    "train": {
+      "studies": 4212,
+      "images": 8424,
+      "ap_front_images": 4212,
+      "lateral_side_images": 4212,
+      "categories": {
+        "Distal ulna and radius fractures": 2697,
+        "Midshaft ulna and radius fractures": 1054,
+        "Proximal ulna and radius fractures": 461
+      }
+    },
+    "test": {
+      "studies": 1053,
+      "images": 2106,
+      "ap_front_images": 1053,
+      "lateral_side_images": 1053,
+      "categories": {
+        "Distal ulna and radius fractures": 677,
+        "Midshaft ulna and radius fractures": 265,
+        "Proximal ulna and radius fractures": 111
+      }
+    }
+  },
+  "views": {
+    "front.jpg (AP view)": 5265,
+    "side.jpg (Lateral view)": 5265
+  },
+  "anatomical_distribution_total": {
+    "Distal ulna and radius fractures": 3374,
+    "Midshaft ulna and radius fractures": 1319,
+    "Proximal ulna and radius fractures": 572
+  },
+  "demographics": {
+    "gender_distribution": {
+      "male": 3913,
+      "female": 1352
+    },
+    "age_range": "0.42 to 17.0 years",
+    "mean_age_years": 7.69,
+    "std_age_years": 3.45,
+    "median_age_years": 8.0
+  }
+}

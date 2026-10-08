@@ -1,0 +1,21 @@
+{
+  "experiment_name": "Experiment 8: Multi-View Localized Fusion",
+  "primary_hypothesis": "Combining spatially localized fracture representations from paired AP and Lateral radiographs retains the high specificity of bounding-box localization while exploiting complementary orthogonal-view rescue.",
+  "success_benchmarks": {
+    "target_1_baseline_match": {
+      "description": "Match Experiment 6 Heuristic Max baseline on PediURF while maintaining normal control specificity",
+      "pediurf_paired_sensitivity": ">= 94.59%",
+      "n251_normal_control_specificity": ">= 85.0%"
+    },
+    "target_2_strong_success": {
+      "description": "Superior sensitivity and high pediatric specificity",
+      "pediurf_paired_sensitivity": ">= 96.0%",
+      "n251_normal_control_specificity": ">= 88.0%",
+      "pediurf_both_view_misses": "< 40 studies"
+    },
+    "target_3_safety_guardrail": {
+      "description": "Reject any model that collapses specificity on normal pediatric controls",
+      "n251_normal_control_specificity_floor": ">= 85.0%"
+    }
+  }
+}

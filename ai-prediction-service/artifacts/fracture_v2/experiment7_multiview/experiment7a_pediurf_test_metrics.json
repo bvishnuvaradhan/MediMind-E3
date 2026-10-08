@@ -1,0 +1,22 @@
+{
+  "dataset": "PediURF Official Held-Out Test Cohort (Shenzhen Children's Hospital)",
+  "total_studies": 1053,
+  "frozen_threshold": 0.01,
+  "learned_dual_view_sensitivity": 100.0,
+  "ap_only_sensitivity": 100.0,
+  "lateral_only_sensitivity": 100.0,
+  "detected_tp": 1053,
+  "missed_fn": 0,
+  "multi_view_breakdown": {
+    "both_views_positive": 1053,
+    "ap_only_positive": 0,
+    "lateral_only_rescues": 0,
+    "both_views_missed": 0
+  },
+  "comparison_with_exp6_heuristic_max": {
+    "exp6_heuristic_max_sensitivity": 94.59,
+    "exp7a_learned_fusion_sensitivity": 100.0,
+    "exp6_both_missed_count": 57,
+    "exp7a_both_missed_count": 0
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "dataset": "GRAZPEDWRI-DX Test Cohort Paired Fractures",
+  "total_paired_fractures": 249,
+  "both_views_detected_count": 207,
+  "anatomically_aligned_within_15pct_vertical_axis": 184,
+  "alignment_rate_pct": 88.89,
+  "mean_vertical_center_offset": 0.0738,
+  "median_vertical_center_offset": 0.0564,
+  "mean_area_ratio": 0.7405,
+  "architectural_recommendation": "High vertical alignment (mean offset < 0.08) confirms that AP and Lateral ROIs represent the same longitudinal bone segment. Simple feature concatenation with shared backbone is highly suitable."
+}

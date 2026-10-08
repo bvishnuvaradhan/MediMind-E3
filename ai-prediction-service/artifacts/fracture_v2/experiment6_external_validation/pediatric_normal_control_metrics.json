@@ -1,0 +1,21 @@
+{
+  "cohort_name": "Uncorrupted Normal Pediatric Control Cohort",
+  "cohort_size": 251,
+  "operating_threshold": 0.17,
+  "true_negatives": 219,
+  "false_positives": 32,
+  "specificity": 87.25,
+  "false_positive_rate": 12.75,
+  "total_false_positive_bounding_boxes": 43,
+  "mean_false_detections_per_normal_image": 0.1713,
+  "comparison_against_prior_experiments": {
+    "exp2_combined_pediatric_specificity": 0.0,
+    "exp3_targeted_tuning_pediatric_specificity": 0.4,
+    "exp4_specialist_pediatric_specificity": 1.59,
+    "exp5_localization_pediatric_specificity": 87.25,
+    "exp6_frozen_model_pediatric_specificity": 87.25,
+    "specificity_gain_vs_exp4_specialist_pct_pts": 85.66,
+    "false_positive_reduction_vs_exp4": "215 fewer false positives (from 247 down to 32)"
+  },
+  "scientific_interpretation": "The frozen YOLOv8n detector maintains an 87.25% specificity (219/251 normal pediatric images completely free of false detections). Whole-image classifiers in Exp 2-4 failed almost 100% of these cases (Exp 4 specificity: 1.59%, Exp 2: 0.00%) due to unconstrained attention on open growth plates (physes). Spatial localization successfully suppresses growth-plate false positives."
+}

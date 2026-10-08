@@ -1,0 +1,16 @@
+{
+  "primary_external_dataset": "PediURF (Shenzhen Children's Hospital)",
+  "training_dataset": "GRAZPEDWRI-DX (Medical University of Graz)",
+  "historical_adult_datasets": [
+    "FracAtlas (BSMMU Bangladesh)",
+    "MURA (Stanford University)"
+  ],
+  "institutional_provenance": {
+    "GRAZPEDWRI-DX": "Graz, Austria (Pediatric Emergency Department)",
+    "PediURF": "Shenzhen, China (Shenzhen Children's Hospital)",
+    "FracAtlas": "Dhaka, Bangladesh (Adult & Mixed Orthopedics)",
+    "MURA": "California, USA (Stanford Health Care Adult Musculoskeletal)"
+  },
+  "overlap_percentage": 0.0,
+  "external_validation_validity": "CONFIRMED_100_PERCENT_INDEPENDENT"
+}

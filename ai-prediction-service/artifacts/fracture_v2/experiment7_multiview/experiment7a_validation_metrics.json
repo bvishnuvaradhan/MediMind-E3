@@ -1,0 +1,21 @@
+{
+  "dataset": "GRAZPEDWRI-DX Validation Cohort",
+  "total_studies": 348,
+  "total_fractured": 242,
+  "total_normal": 106,
+  "roc_auc": 0.5711,
+  "pr_auc": 0.7709,
+  "brier_score": 0.2347,
+  "ece": 0.1604,
+  "metrics_at_threshold": {
+    "sensitivity": 100.0,
+    "specificity": 0.0,
+    "precision": 69.54,
+    "npv": 0.0,
+    "f1_score": 0.8203,
+    "tp": 242,
+    "fp": 106,
+    "tn": 0,
+    "fn": 0
+  }
+}

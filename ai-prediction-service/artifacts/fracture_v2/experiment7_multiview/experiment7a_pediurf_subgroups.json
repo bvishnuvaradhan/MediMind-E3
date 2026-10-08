@@ -1,0 +1,20 @@
+{
+  "Distal ulna and radius fractures": {
+    "total_studies": 677,
+    "detected_tp": 677,
+    "missed_fn": 0,
+    "sensitivity": 100.0
+  },
+  "Midshaft ulna and radius fractures": {
+    "total_studies": 265,
+    "detected_tp": 265,
+    "missed_fn": 0,
+    "sensitivity": 100.0
+  },
+  "Proximal ulna and radius fractures": {
+    "total_studies": 111,
+    "detected_tp": 111,
+    "missed_fn": 0,
+    "sensitivity": 100.0
+  }
+}

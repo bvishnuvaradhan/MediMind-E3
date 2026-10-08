@@ -1,0 +1,25 @@
+{
+  "dataset": "PediURF Official Held-Out Test Cohort",
+  "evaluation_level": "Image-Level",
+  "frozen_threshold": 0.17,
+  "total_images": 2106,
+  "ground_truth_fractures": 2106,
+  "overall_image_sensitivity": 82.48,
+  "true_positives": 1737,
+  "false_negatives": 369,
+  "ap_view_metrics": {
+    "total_images": 1053,
+    "true_positives": 880,
+    "false_negatives": 173,
+    "sensitivity": 83.57,
+    "mean_confidence": 0.3176
+  },
+  "lateral_view_metrics": {
+    "total_images": 1053,
+    "true_positives": 857,
+    "false_negatives": 196,
+    "sensitivity": 81.39,
+    "mean_confidence": 0.3157
+  },
+  "note": "PediURF test split is composed of confirmed pediatric fracture cases. True negatives and specificity on normal pediatric controls are evaluated independently in the N=251 normal control stress test."
+}

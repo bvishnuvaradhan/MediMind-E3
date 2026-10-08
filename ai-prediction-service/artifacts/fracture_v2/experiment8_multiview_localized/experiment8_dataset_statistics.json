@@ -1,0 +1,9 @@
+{
+  "dataset_name": "GRAZPEDWRI-DX Multi-View ROI Cohort",
+  "train_studies": 1620,
+  "val_studies": 348,
+  "test_studies": 350,
+  "external_pediurf_test_studies": 1053,
+  "normal_controls_stress_test_images": 251,
+  "total_manifest_entries": 3622
+}

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useTransition } from 'react';
 import './DepartmentHead.css';
 import { departmentHeadService } from '../../services/departmentHeadService';
 import { useAuth } from '../../context/useAuth';
+import { departmentHeads, departments, doctors as allDoctors } from '../../data/medimindData';
 
 // Views
 import DashboardView from './views/DashboardView';
@@ -49,7 +50,7 @@ const getInitialDepartmentHeadDoctorId = () => {
 };
 
 export function DepartmentHeadLayout({ dark, setDark }) {
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout } = useAuth();
   const [, startTransition] = useTransition();
 
   const [activeTab, setActiveTab] = useState(getInitialDepartmentHeadTab);
@@ -130,17 +131,46 @@ export function DepartmentHeadLayout({ dark, setDark }) {
         departmentHeadService.getSettings(),
       ]);
 
-      setProfile(prof);
-      setDepartmentInfo(dept);
-      setDoctors(docs);
-      setAppointments(apts);
+      const matchedHead = (user && departmentHeads.find((dh) => dh.email?.toLowerCase() === user.email?.toLowerCase() || dh.id === user.id || dh.departmentId === user.departmentId)) || null;
+      const effectiveProfile = matchedHead
+        ? {
+            ...prof,
+            ...matchedHead,
+            name: user?.name || matchedHead.name,
+            email: user?.email || matchedHead.email,
+            avatarInitials: matchedHead.avatarInitials || user?.avatarInitials || 'DH',
+            title: matchedHead.title || user?.title || 'Head of Department',
+          }
+        : prof;
+
+      const matchedDept = matchedHead ? departments.find((d) => d.id === matchedHead.departmentId) : null;
+      const effectiveDept = matchedDept ? { ...dept, ...matchedDept } : dept;
+
+      const scopedDoctors = matchedHead
+        ? allDoctors.filter((d) => d.departmentId === matchedHead.departmentId)
+        : docs;
+
+      const targetDeptId = matchedHead?.departmentId || user?.departmentId || 'DEP-H1-ORTHO';
+      const targetDeptName = matchedDept?.name || matchedHead?.departmentName || 'Orthopedics';
+
+      const scopedAppointments = appointments.filter(
+        (a) => a.departmentId === targetDeptId || (a.departmentName && a.departmentName.toLowerCase().includes(targetDeptName.toLowerCase()))
+      );
+      const scopedArticles = knowledgeArticles.filter(
+        (a) => a.departmentId === targetDeptId || (a.department && a.department.toLowerCase().includes(targetDeptName.toLowerCase()))
+      );
+
+      setProfile(effectiveProfile);
+      setDepartmentInfo(effectiveDept);
+      setDoctors(scopedDoctors.length > 0 ? scopedDoctors : docs);
+      setAppointments(scopedAppointments.length > 0 ? scopedAppointments : apts);
       setAnalytics(anlyt);
       setPerformance(perf);
-      setArticles(arts);
+      setArticles(scopedArticles.length > 0 ? scopedArticles : arts);
       setSettings(stt);
     }
     loadData();
-  }, []);
+  }, [user]);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -434,50 +464,18 @@ export function DepartmentHeadLayout({ dark, setDark }) {
         <div className="dh-sidebar-footer">
           <div className="dh-user-card">
             <div className="dh-avatar-circle">
-              {profile?.avatarInitials || 'PS'}
+              {profile?.avatarInitials || user?.avatarInitials || 'DH'}
             </div>
             <div className="dh-user-meta">
               <span className="dh-user-name">{profile?.name || user?.name || 'Dr. Priya Sharma'}</span>
-              <span className="dh-user-role">Head of Orthopedics</span>
+              <span className="dh-user-role">{profile?.title || user?.title || 'Head of Department'}</span>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
-            <button
-              className="dh-btn dh-btn-outline dh-btn-sm"
-              style={{ fontSize: '11px', padding: '4px 6px' }}
-              onClick={() => switchRole('DOCTOR')}
-              title="Switch to Doctor"
-            >
-              Doctor
-            </button>
-            <button
-              className="dh-btn dh-btn-outline dh-btn-sm"
-              style={{ fontSize: '11px', padding: '4px 6px' }}
-              onClick={() => switchRole('HOSPITAL_ADMIN')}
-              title="Switch to Hospital Admin"
-            >
-              Hosp Admin
-            </button>
-            <button
-              className="dh-btn dh-btn-outline dh-btn-sm"
-              style={{ fontSize: '11px', padding: '4px 6px' }}
-              onClick={() => switchRole('CHAIRMAN')}
-              title="Switch to Chairman"
-            >
-              Chairman
-            </button>
-            <button
-              className="dh-btn dh-btn-outline dh-btn-sm"
-              style={{ fontSize: '11px', padding: '4px 6px' }}
-              onClick={() => switchRole('FAMILY')}
-              title="Switch to Family Portal"
-            >
-              Family
-            </button>
+          <div style={{ marginTop: '8px' }}>
             <button
               className="dh-btn dh-btn-ghost dh-btn-sm"
-              style={{ gridColumn: 'span 2', fontSize: '11px', padding: '4px 6px', color: 'var(--dh-coral)' }}
+              style={{ width: '100%', fontSize: '12px', padding: '6px 10px', color: 'var(--dh-coral)' }}
               onClick={logout}
               title="Sign Out"
             >

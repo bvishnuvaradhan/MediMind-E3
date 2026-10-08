@@ -1,0 +1,13 @@
+{
+  "experiment_name": "Experiment 8A Error Analysis",
+  "false_negative_breakdown": {
+    "graz_test_fn_count": 12,
+    "pediurf_fn_count": 57,
+    "root_cause_analysis": "Zero-detection on subtle non-displaced greenstick/torus fractures where detector conf < 0.17 on both views."
+  },
+  "false_positive_breakdown": {
+    "graz_test_fp_count": 25,
+    "n251_normal_control_fp_count": 32,
+    "root_cause_analysis": "Prominent distal radial epiphyseal growth plates triggering focal YOLO candidate boxes."
+  }
+}

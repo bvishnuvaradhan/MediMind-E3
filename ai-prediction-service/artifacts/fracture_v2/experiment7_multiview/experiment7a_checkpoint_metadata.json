@@ -1,0 +1,14 @@
+{
+  "model_name": "Experiment 7A Shared-Backbone Dual-View ResNet-18",
+  "checkpoint_file": "experiment7a_best_model.pt",
+  "checkpoint_size_bytes": 46366359,
+  "checkpoint_md5": "1eb85408a5358d8912b218530f0556c4",
+  "checkpoint_sha256": "e6b072f4c51be272723b93b67f8212018cf046dcc5e21b4f2ddca0286ac5a6e7",
+  "total_parameters": 11570755,
+  "input_resolution": [
+    512,
+    512
+  ],
+  "torch_version": "2.14.1+cpu",
+  "evaluation_timestamp": "2026-10-06T21:05:27+05:30"
+}

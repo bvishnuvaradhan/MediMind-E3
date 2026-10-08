@@ -1,0 +1,13 @@
+{
+  "status": "COMPLETED",
+  "total_training_duration_seconds": 5268.7,
+  "best_epoch": 1,
+  "best_val_roc_auc": 0.9405,
+  "selected_threshold": 0.01,
+  "key_metrics": {
+    "graz_test_sensitivity": 95.18,
+    "graz_test_specificity": 75.25,
+    "n251_normal_control_specificity": 87.25,
+    "pediurf_external_sensitivity": 94.59
+  }
+}

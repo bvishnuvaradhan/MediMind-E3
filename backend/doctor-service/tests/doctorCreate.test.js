@@ -220,9 +220,20 @@ describe('2. Doctor Creation & Account Provisioning', () => {
   });
 
   it('returns 409 conflict when doctor email is already registered', async () => {
+    // Create the initial doctor first
+    await request(app)
+      .post('/api/doctors')
+      .set('Authorization', `Bearer ${headAToken}`)
+      .send({
+        fullName: 'Dr. Original',
+        email: 'neha.sharma@test.org',
+        mobile: '+91 98765 11111',
+        specialization: 'Orthopedics',
+      });
+
     const payload = {
       fullName: 'Dr. Duplicate',
-      email: 'neha.sharma@test.org', // Already created in test 1
+      email: 'neha.sharma@test.org',
       mobile: '+91 98765 88888',
       specialization: 'General Surgery',
     };

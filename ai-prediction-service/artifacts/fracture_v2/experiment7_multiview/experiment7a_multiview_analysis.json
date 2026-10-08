@@ -1,0 +1,10 @@
+{
+  "dataset": "GRAZPEDWRI-DX Held-Out Test Cohort (N=249 Fractured Studies)",
+  "total_fractured_studies": 249,
+  "both_views_positive": 249,
+  "ap_only_positive": 0,
+  "lateral_only_positive_rescues": 0,
+  "both_views_missed": 0,
+  "learned_fusion_sensitivity": 100.0,
+  "orthogonal_rescue_count": 0
+}

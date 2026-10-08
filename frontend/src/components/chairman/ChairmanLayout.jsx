@@ -90,7 +90,7 @@ const getInitialPage = () => {
 };
 
 export function ChairmanLayout({ dark, setDark }) {
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState(getInitialPage);
   const [viewParams, setViewParams] = useState({});
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -203,9 +203,11 @@ export function ChairmanLayout({ dark, setDark }) {
 
         {/* User Card */}
         <div className="chairman-user-card">
-          <div className="chairman-avatar">SM</div>
+          <div className="chairman-avatar">
+            {user?.avatarInitials || (user?.name ? user.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : 'CO')}
+          </div>
           <div className="chairman-user-copy">
-            <strong>{user?.name || 'Dr. Suresh Menon'}</strong>
+            <strong>{user?.name || 'Dr. Devendra Roy'}</strong>
             <span>Platform Owner</span>
           </div>
         </div>
@@ -340,7 +342,7 @@ export function ChairmanLayout({ dark, setDark }) {
                 aria-label="User account menu"
               >
                 <div className="chairman-avatar" style={{ width: '32px', height: '32px', fontSize: '11px' }}>
-                  SM
+                  {user?.avatarInitials || (user?.name ? user.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : 'CO')}
                 </div>
                 <ChevronDown size={14} />
               </button>
@@ -348,57 +350,13 @@ export function ChairmanLayout({ dark, setDark }) {
               {profileOpen && (
                 <div className="user-menu-popover">
                   <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--chair-border)' }}>
-                    <div style={{ fontSize: '13px', fontWeight: 700 }}>{user?.name || 'Dr. Suresh Menon'}</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700 }}>{user?.name || 'Dr. Devendra Roy'}</div>
                     <div style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>Chairman / Platform Owner</div>
                   </div>
 
                   <button className="user-menu-item" onClick={() => navigateTo('Settings')}>
                     <Settings size={15} />
                     <span>System Settings</span>
-                  </button>
-
-                  <button
-                    className="user-menu-item"
-                    onClick={() => {
-                      switchRole('HOSPITAL_ADMIN');
-                      announce('Switched to Hospital Admin Portal.');
-                    }}
-                  >
-                    <Building2 size={15} />
-                    <span>Switch to Hospital Admin</span>
-                  </button>
-
-                  <button
-                    className="user-menu-item"
-                    onClick={() => {
-                      switchRole('DEPARTMENT_HEAD');
-                      announce('Switched to Department Head Portal.');
-                    }}
-                  >
-                    <Activity size={15} />
-                    <span>Switch to Dept Head</span>
-                  </button>
-
-                  <button
-                    className="user-menu-item"
-                    onClick={() => {
-                      switchRole('DOCTOR');
-                      announce('Switched to Doctor Portal.');
-                    }}
-                  >
-                    <Stethoscope size={15} />
-                    <span>Switch to Doctor</span>
-                  </button>
-
-                  <button
-                    className="user-menu-item"
-                    onClick={() => {
-                      switchRole('FAMILY');
-                      announce('Switched to Family Account experience.');
-                    }}
-                  >
-                    <UsersRound size={15} />
-                    <span>Switch to Family Demo</span>
                   </button>
 
                   <div style={{ borderTop: '1px solid var(--chair-border)', margin: '4px 0' }} />

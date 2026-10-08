@@ -1,0 +1,10 @@
+{
+  "train_validation_patient_overlap": 0,
+  "train_test_patient_overlap": 0,
+  "validation_test_patient_overlap": 0,
+  "pediurf_overlap_with_graz_train": 0,
+  "pediurf_overlap_with_graz_val": 0,
+  "pediurf_overlap_with_graz_test": 0,
+  "normal_control_stress_test_isolation": "100% isolated to test split, 0% in training or validation",
+  "leakage_verdict": "ZERO LEAKAGE (0.0% patient overlap across all training, validation, test, and external sets)"
+}

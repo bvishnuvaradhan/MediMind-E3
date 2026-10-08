@@ -171,6 +171,9 @@ export function PredictionInputModal({
       documentUsed: attachedDoc,
     };
 
+    const token = (typeof localStorage !== 'undefined' && localStorage.getItem('medimind_jwt_token')) || currentMemberObj?.token || '';
+    const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+
     if (modelType === 'fracture') {
       let isFracture = false;
       let modelProb = 0.042;
@@ -187,20 +190,25 @@ export function PredictionInputModal({
 
         const res = await fetch('/api/ai/fracture', {
           method: 'POST',
+          headers: authHeaders,
           body: formData,
         });
 
         if (res.ok) {
           const data = await res.json();
           if (data && data.result) {
-            modelProb = typeof data.result.probability === 'number' ? data.result.probability : (data.risk_score || 0.042);
+            modelProb = typeof data.result.probability === 'number'
+              ? data.result.probability
+              : typeof data.result.confidence === 'number'
+              ? data.result.confidence
+              : (data.risk_score || 0.042);
             isFracture = data.result.possibleFracture ?? (modelProb >= calibratedThreshold);
           }
         } else {
           // Fallback JSON payload
           const jsonRes = await fetch('/api/ai/fracture', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...authHeaders },
             body: JSON.stringify({
               family_member_id: currentMemberObj?.id || 'mem_001_01',
               filename: uploadedFileName || selectedExistingRecordId || 'radiograph.png',
@@ -209,7 +217,11 @@ export function PredictionInputModal({
           if (jsonRes.ok) {
             const data = await jsonRes.json();
             if (data && data.result) {
-              modelProb = typeof data.result.probability === 'number' ? data.result.probability : (data.risk_score || 0.042);
+              modelProb = typeof data.result.probability === 'number'
+                ? data.result.probability
+                : typeof data.result.confidence === 'number'
+                ? data.result.confidence
+                : (data.risk_score || 0.042);
               isFracture = data.result.possibleFracture ?? (modelProb >= calibratedThreshold);
             }
           }
@@ -274,12 +286,49 @@ export function PredictionInputModal({
       const glucoseVal = parseFloat(diabetesData.glucose) || 110;
       const hba1cVal = parseFloat(diabetesData.hba1c) || 5.7;
       const bmiVal = parseFloat(diabetesData.bmi) || 24;
+      const bpVal = parseFloat(diabetesData.bpSystolic) || 120;
 
-      const isHigh = glucoseVal >= 140 || hba1cVal >= 6.5 || bmiVal >= 30;
-      const isModerate = !isHigh && (glucoseVal >= 110 || hba1cVal >= 5.7 || bmiVal >= 25);
+      let apiProb = null;
+      let apiCategory = null;
+
+      try {
+        const res = await fetch('/api/ai/diabetes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders,
+          },
+          body: JSON.stringify({
+            family_member_id: currentMemberObj?.id || 'mem_001_01',
+            Pregnancies: currentMemberObj?.gender === 'Female' ? 2 : 0,
+            Glucose: glucoseVal,
+            BloodPressure: Math.round(bpVal * 0.65) || 80,
+            SkinThickness: 25,
+            Insulin: 100,
+            BMI: bmiVal,
+            DiabetesPedigreeFunction: 0.45,
+            Age: parseInt(currentMemberObj?.age, 10) || 45,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.result) {
+            apiProb = data.result.risk_probability ?? data.risk_score;
+            apiCategory = data.result.risk_category ?? data.risk_level;
+          }
+        }
+      } catch (err) {
+        console.warn('[AI Diabetes Inference Request]', err.message);
+      }
+
+      const isHigh = (apiCategory === 'HIGH' && (glucoseVal >= 140 || hba1cVal >= 6.5 || bmiVal >= 30)) || (!apiCategory && (glucoseVal >= 140 || hba1cVal >= 6.5 || bmiVal >= 30));
+      const isModerate = !isHigh && (glucoseVal >= 110 || hba1cVal >= 5.7 || bmiVal >= 25 || apiCategory === 'HIGH' || apiCategory === 'MODERATE' || apiCategory === 'MEDIUM');
 
       const riskLevel = isHigh ? 'High Risk' : isModerate ? 'Moderate Risk' : 'Low Risk';
-      const score = isHigh ? '68%' : isModerate ? '26%' : '9%';
+      const score = apiProb !== null
+        ? `${Math.round(apiProb * 100)}%`
+        : (isHigh ? '68%' : isModerate ? '26%' : '9%');
       const result = isHigh ? 'Elevated Glycemic Risk Profile' : isModerate ? 'Prediabetes Risk Monitoring Zone' : 'Optimal Metabolic Baseline';
 
       payload = {
@@ -306,11 +355,50 @@ export function PredictionInputModal({
       const bpVal = parseFloat(heartData.bpSystolic) || 125;
       const isSmoker = heartData.smoker === 'Yes';
 
-      const isHigh = cholVal >= 240 || bpVal >= 145 || (isSmoker && cholVal >= 210);
-      const isModerate = !isHigh && (cholVal >= 200 || bpVal >= 130 || isSmoker);
+      let apiProb = null;
+      let apiCategory = null;
+
+      try {
+        const res = await fetch('/api/ai/heart-disease', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders,
+          },
+          body: JSON.stringify({
+            family_member_id: currentMemberObj?.id || 'mem_001_01',
+            AGE: parseFloat(currentMemberObj?.age) || 50,
+            GENDER: currentMemberObj?.gender === 'Female' ? 2 : 1,
+            HEIGHT: 165,
+            WEIGHT: 70,
+            AP_HIGH: bpVal,
+            AP_LOW: Math.round(bpVal * 0.65) || 80,
+            CHOLESTEROL: cholVal >= 240 ? 3 : cholVal >= 200 ? 2 : 1,
+            GLUCOSE: 1,
+            SMOKE: isSmoker ? 1 : 0,
+            ALCOHOL: 0,
+            PHYSICAL_ACTIVITY: 1,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.result) {
+            apiProb = data.result.risk_probability ?? data.risk_score;
+            apiCategory = data.result.risk_category ?? data.risk_level;
+          }
+        }
+      } catch (err) {
+        console.warn('[AI Heart Inference Request]', err.message);
+      }
+
+      const isHigh = (apiCategory === 'HIGH' && (cholVal >= 240 || bpVal >= 145 || (isSmoker && cholVal >= 210))) || (!apiCategory && (cholVal >= 240 || bpVal >= 145 || (isSmoker && cholVal >= 210)));
+      const isModerate = !isHigh && (cholVal >= 200 || bpVal >= 130 || isSmoker || apiCategory === 'HIGH' || apiCategory === 'MODERATE' || apiCategory === 'MEDIUM');
 
       const riskLevel = isHigh ? 'High Risk' : isModerate ? 'Moderate Risk' : 'Low Risk';
-      const score = isHigh ? '34%' : isModerate ? '18%' : '8%';
+      const score = apiProb !== null
+        ? `${Math.round(apiProb * 100)}%`
+        : (isHigh ? '34%' : isModerate ? '18%' : '8%');
       const result = isHigh ? 'Elevated Cardiovascular ASCVD Risk' : isModerate ? 'Borderline ASCVD Risk Profile' : 'Stable Cardiovascular Status';
 
       payload = {
@@ -333,11 +421,36 @@ export function PredictionInputModal({
           : 'Cardiovascular parameters remain optimal. Continue current aerobic exercise and routine annual cardiovascular screening.',
       };
     } else {
-      const nlpResult = evaluateGeneralHealth({
+      let nlpResult = evaluateGeneralHealth({
         symptoms: generalData.symptoms,
         lifestyle: generalData.lifestyle,
         familyHistory: generalData.familyHistory,
       });
+
+      try {
+        const res = await fetch('/api/ai/general-health', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders,
+          },
+          body: JSON.stringify({
+            family_member_id: currentMemberObj?.id || 'mem_001_01',
+            text: `${generalData.symptoms}. Lifestyle: ${generalData.lifestyle}. Family history: ${generalData.familyHistory}.`,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.result) {
+            if (data.risk_score && !nlpResult.score) {
+              nlpResult.score = `${Math.round(data.risk_score * 100)}%`;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[AI General Health Inference Request]', err.message);
+      }
 
       payload = {
         ...payload,

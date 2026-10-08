@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import {
   Activity,
-  Building2,
   CalendarDays,
   ChevronRight,
   CircleHelp,
-  Crown,
   FileText,
   HeartPulse,
   LayoutDashboard,
@@ -22,10 +20,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
 import {
-  initialFamilyMembers,
-  initialRecords,
+  families,
+  getFamilyData,
+  getFamilyPresentationData,
   initialBookedSlots,
-  initialDoctorAccess,
 } from '../../data/medimindData';
 import { FeatureDetailModal } from './components/FeatureDetailModal';
 import { AppointmentDetailModal } from './components/AppointmentDetailModal';
@@ -98,7 +96,13 @@ const getInitialFamilyPage = () => {
 };
 
 export function FamilyLayout({ dark, setDark }) {
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout } = useAuth();
+
+  const activeFamilyId = user?.familyId || (user?.email && families.find((f) => f.email?.toLowerCase() === user.email.toLowerCase())?.id) || 'FAM-001';
+  const activeFamily = families.find((f) => f.id === activeFamilyId) || families[0];
+  const initialData = getFamilyData(activeFamilyId);
+  const presentationData = getFamilyPresentationData(activeFamilyId);
+
   const [page, setPage] = useState(getInitialFamilyPage);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
@@ -110,15 +114,15 @@ export function FamilyLayout({ dark, setDark }) {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [appointmentAssessment, setAppointmentAssessment] = useState(null);
   const [selectedPrediction, setSelectedPrediction] = useState(null);
-  const [predictionHistory, setPredictionHistory] = useState([]);
+  const [predictionHistory, setPredictionHistory] = useState(() => initialData.predictions || []);
   const [rescheduleData, setRescheduleData] = useState(null);
 
-  const [familyMembers, setFamilyMembers] = useState(initialFamilyMembers);
-  const [records, setRecords] = useState(initialRecords);
+  const [familyMembers, setFamilyMembers] = useState(() => initialData.members || []);
+  const [records, setRecords] = useState(() => initialData.records || []);
   const [bookedSlots, setBookedSlots] = useState(initialBookedSlots);
   const [bookedAppointments, setBookedAppointments] = useState([]);
   const [appointmentStatuses, setAppointmentStatuses] = useState({});
-  const [doctorAccess, setDoctorAccess] = useState(initialDoctorAccess);
+  const [doctorAccess, setDoctorAccess] = useState(() => initialData.doctorAccess || []);
   const [mongoDoctors, setMongoDoctors] = useState([]);
 
   useEffect(() => {
@@ -425,12 +429,14 @@ export function FamilyLayout({ dark, setDark }) {
     navigate('Personal prediction detail');
   };
 
-  const currentProfileMember = selectedMember || familyMembers[0] || { name: 'Rohan Kapoor', relation: 'Father' };
+  const currentProfileMember = selectedMember || familyMembers[0] || { name: activeFamily?.primaryContact || user?.name || 'Primary Member', relation: 'Self' };
 
   const renderCurrentView = () => {
     if (page === 'Dashboard') {
       return (
         <DashboardView
+          activeFamily={activeFamily}
+          appointments={presentationData.Appointments}
           familyMembers={familyMembers}
           records={records}
           bookedAppointments={bookedAppointments}
@@ -534,6 +540,7 @@ export function FamilyLayout({ dark, setDark }) {
     if (page === 'Appointments') {
       return (
         <AppointmentsView
+          appointments={presentationData.Appointments}
           bookedAppointments={bookedAppointments}
           appointmentStatuses={appointmentStatuses}
           setAppointmentStatuses={setAppointmentStatuses}
@@ -550,6 +557,7 @@ export function FamilyLayout({ dark, setDark }) {
     if (page === 'Consultations') {
       return (
         <ConsultationsView
+          consultations={presentationData.Consultations}
           familyMembers={familyMembers}
           openFeatureModal={openFeatureModal}
           announce={announce}
@@ -559,6 +567,7 @@ export function FamilyLayout({ dark, setDark }) {
     if (page === 'Prescriptions') {
       return (
         <PrescriptionsView
+          prescriptions={presentationData.Prescriptions}
           familyMembers={familyMembers}
           openFeatureModal={openFeatureModal}
           announce={announce}
@@ -703,52 +712,9 @@ export function FamilyLayout({ dark, setDark }) {
             <span>Help center</span>
           </button>
 
-          {/* Quick role switches */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', marginTop: '8px' }}>
-            <button
-              className="nav-item"
-              style={{ padding: '6px 8px', fontSize: '11px', color: '#0f766e', background: '#f0fdfa', borderRadius: '6px' }}
-              onClick={() => switchRole('DOCTOR')}
-              title="Switch to Doctor"
-            >
-              <Stethoscope size={14} />
-              <span>Doctor</span>
-            </button>
-
-            <button
-              className="nav-item"
-              style={{ padding: '6px 8px', fontSize: '11px', color: '#7c3aed', background: '#f5f3ff', borderRadius: '6px' }}
-              onClick={() => switchRole('DEPARTMENT_HEAD')}
-              title="Switch to Department Head"
-            >
-              <Activity size={14} />
-              <span>Dept Head</span>
-            </button>
-
-            <button
-              className="nav-item"
-              style={{ padding: '6px 8px', fontSize: '11px', color: '#2563eb', background: '#eff6ff', borderRadius: '6px' }}
-              onClick={() => switchRole('HOSPITAL_ADMIN')}
-              title="Switch to Hospital Admin"
-            >
-              <Building2 size={14} />
-              <span>Admin</span>
-            </button>
-
-            <button
-              className="nav-item"
-              style={{ padding: '6px 8px', fontSize: '11px', color: '#4338ca', background: '#eef2ff', borderRadius: '6px' }}
-              onClick={() => switchRole('CHAIRMAN')}
-              title="Switch to Chairman"
-            >
-              <Crown size={14} />
-              <span>Chairman</span>
-            </button>
-          </div>
-
           <button
             className="nav-item"
-            style={{ marginTop: '4px', color: '#ef4444' }}
+            style={{ marginTop: '12px', color: '#ef4444' }}
             onClick={logout}
           >
             <LogOut size={18} />
@@ -792,7 +758,7 @@ export function FamilyLayout({ dark, setDark }) {
               title="Family Account Workspace"
             >
               <UsersRound size={16} style={{ color: 'var(--family-primary)' }} />
-              <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--family-ink)' }}>Kapoor Family</span>
+              <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--family-ink)' }}>{activeFamily?.name?.replace(' Account', '') || 'Family Account'}</span>
             </div>
           </div>
         </header>

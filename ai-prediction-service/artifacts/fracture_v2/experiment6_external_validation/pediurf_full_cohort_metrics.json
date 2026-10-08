@@ -1,0 +1,51 @@
+{
+  "dataset": "PediURF Full Cohort Benchmark (100% Unseen External Dataset)",
+  "institution": "Shenzhen Children's Hospital",
+  "frozen_threshold": 0.17,
+  "total_studies": 5265,
+  "detected_studies": 5002,
+  "missed_studies": 263,
+  "overall_study_sensitivity": 95.0,
+  "total_images": 10530,
+  "detected_images": 8651,
+  "overall_image_sensitivity": 82.16,
+  "view_breakdown": {
+    "ap_view": {
+      "total": 5265,
+      "detected": 4380,
+      "sensitivity": 83.19
+    },
+    "lateral_view": {
+      "total": 5265,
+      "detected": 4271,
+      "sensitivity": 81.12
+    }
+  },
+  "subgroups": {
+    "Distal ulna and radius fractures": {
+      "total_studies": 3374,
+      "detected_studies": 3170,
+      "study_sensitivity": 93.95,
+      "total_images": 6748,
+      "detected_images": 5370,
+      "image_sensitivity": 79.58
+    },
+    "Midshaft ulna and radius fractures": {
+      "total_studies": 1319,
+      "detected_studies": 1283,
+      "study_sensitivity": 97.27,
+      "total_images": 2638,
+      "detected_images": 2300,
+      "image_sensitivity": 87.19
+    },
+    "Proximal ulna and radius fractures": {
+      "total_studies": 572,
+      "detected_studies": 549,
+      "study_sensitivity": 95.98,
+      "total_images": 1144,
+      "detected_images": 981,
+      "image_sensitivity": 85.75
+    }
+  },
+  "clinical_label_audit_note": "PediURF provides 100% confirmed clinical fracture diagnosis across anatomical regions. Normal control specificity cannot be derived from PediURF alone and is evaluated via the N=251 normal control cohort."
+}

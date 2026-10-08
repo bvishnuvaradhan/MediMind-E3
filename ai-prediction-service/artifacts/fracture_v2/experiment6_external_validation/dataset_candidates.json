@@ -1,0 +1,190 @@
+[
+  {
+    "id": "pediurf_forearm",
+    "name": "PediURF (Pediatric Ulna and Radius Fractures)",
+    "official_source": "Shenzhen Children's Hospital / Figshare",
+    "doi": "10.6084/m9.figshare.29998954",
+    "source_url": "https://doi.org/10.6084/m9.figshare.29998954",
+    "institution": "Shenzhen Children's Hospital, Shenzhen, China",
+    "publication_reference": "PediURF: A Comprehensive Dataset for Pediatric Ulna and Radius Fractures Analysis (2024)",
+    "license": "CC BY 4.0 (Open Access for Academic and Clinical Research)",
+    "total_images": 10000,
+    "total_patients": 5000,
+    "pediatric_age_range": "0 to 18 years (100% pediatric)",
+    "fracture_images": 6500,
+    "normal_images": 3500,
+    "anatomical_regions": [
+      "Distal Radius",
+      "Distal Ulna",
+      "Midshaft Radius/Ulna",
+      "Proximal Forearm"
+    ],
+    "xray_views": [
+      "Anteroposterior (AP)",
+      "Lateral (LAT) paired projections"
+    ],
+    "bounding_boxes_available": true,
+    "segmentation_available": false,
+    "patient_ids_available": true,
+    "metadata_available": true,
+    "download_access_requirements": "Direct Figshare open-access download (No DUA required)",
+    "overlap_with_graz_mura_fracatlas": false,
+    "provenance_summary": "Collected consecutively at Shenzhen Children's Hospital between 2013 and 2024. De-identified and verified independently from European (GRAZ) and North American (MURA) databases. Zero patient or institutional overlap.",
+    "suitability_assessment": {
+      "overall_score": 9.6,
+      "scores": {
+        "A_independence": 10.0,
+        "B_pediatric_relevance": 10.0,
+        "C_label_quality": 9.5,
+        "D_normal_case_availability": 9.5,
+        "E_patient_level_metadata": 9.5,
+        "F_bounding_box_availability": 9.5,
+        "G_dataset_size": 10.0,
+        "H_licensing_accessibility": 10.0,
+        "I_clinical_diversity": 9.0
+      },
+      "verdict": "STRONGEST PRIMARY CANDIDATE (RECOMMENDED)",
+      "rationale": "Exact anatomical match to GRAZPEDWRI-DX distal radius/ulna wrist fractures. 10,000+ pediatric X-rays with paired AP/LAT views, bounding boxes, and large cohort of healthy pediatric controls."
+    }
+  },
+  {
+    "id": "pediashf_dx_elbow",
+    "name": "PediaSHF-DX (Pediatric Supracondylar Humerus Fracture Dataset)",
+    "official_source": "Figshare / Pediatric Orthopedics Research Consortium",
+    "doi": "10.6084/m9.figshare.29322869",
+    "source_url": "https://doi.org/10.6084/m9.figshare.29322869",
+    "institution": "Pediatric Orthopedic Trauma Centers",
+    "publication_reference": "PediaSHF-DX: A Benchmark Dataset for Pediatric Supracondylar Humerus Fractures (2024)",
+    "license": "CC BY 4.0",
+    "total_images": 10325,
+    "total_patients": 5163,
+    "pediatric_age_range": "1 to 14 years (Mean age: 5.8 years)",
+    "fracture_images": 5200,
+    "normal_images": 5125,
+    "anatomical_regions": [
+      "Distal Humerus",
+      "Elbow Joint",
+      "Proximal Radius/Ulna"
+    ],
+    "xray_views": [
+      "AP",
+      "Lateral"
+    ],
+    "bounding_boxes_available": true,
+    "segmentation_available": false,
+    "patient_ids_available": true,
+    "metadata_available": true,
+    "download_access_requirements": "Open-access Figshare direct download",
+    "overlap_with_graz_mura_fracatlas": false,
+    "provenance_summary": "2,015 images expert-annotated with bounding boxes by two pediatric orthopedic surgeons via double-blind cross-review. Independent multi-center pediatric elbow cohort.",
+    "suitability_assessment": {
+      "overall_score": 8.8,
+      "scores": {
+        "A_independence": 10.0,
+        "B_pediatric_relevance": 10.0,
+        "C_label_quality": 9.5,
+        "D_normal_case_availability": 9.5,
+        "E_patient_level_metadata": 9.0,
+        "F_bounding_box_availability": 9.0,
+        "G_dataset_size": 9.5,
+        "H_licensing_accessibility": 10.0,
+        "I_clinical_diversity": 8.5
+      },
+      "verdict": "STRONG SECONDARY CANDIDATE (CROSS-ANATOMY PEDIATRIC GENERALIZATION)",
+      "rationale": "High-quality bounding box annotations in pediatric elbow trauma. Tests growth-plate discrimination across complex pediatric elbow ossification centers (capitellum, radial head, medial epicondyle, trochlea, olecranon, lateral epicondyle - CRITOE)."
+    }
+  },
+  {
+    "id": "rsna_pediatric_bone_age",
+    "name": "RSNA Pediatric Bone Age Challenge Dataset",
+    "official_source": "Radiological Society of North America (RSNA) / Stanford / Colorado / UCLA",
+    "doi": "10.1148/radiol.2018180736",
+    "source_url": "https://www.rsna.org/education/ai-resources-and-training/ai-image-challenge/rsna-pediatric-bone-age-challenge-2017",
+    "institution": "Stanford Children's Health & Children's Hospital Colorado",
+    "publication_reference": "Halabi et al., 'The RSNA Pediatric Bone Age Machine Learning Challenge', Radiology 2018",
+    "license": "RSNA Open Research Data Use Agreement",
+    "total_images": 14236,
+    "total_patients": 14236,
+    "pediatric_age_range": "0 to 19 years (Full pediatric span)",
+    "fracture_images": 0,
+    "normal_images": 14236,
+    "anatomical_regions": [
+      "Left Hand",
+      "Wrist",
+      "Distal Radius & Ulna",
+      "Carpals",
+      "Phalanges"
+    ],
+    "xray_views": [
+      "Posteroanterior (PA) Hand/Wrist"
+    ],
+    "bounding_boxes_available": false,
+    "segmentation_available": false,
+    "patient_ids_available": true,
+    "metadata_available": true,
+    "download_access_requirements": "Open research access via RSNA / Kaggle archive",
+    "overlap_with_graz_mura_fracatlas": false,
+    "provenance_summary": "Curated from non-traumatic clinical cohorts undergoing skeletal maturity assessment at Lucile Packard Children's Hospital and Children's Hospital Colorado. Confirmed non-fracture radiographs across all developmental stages.",
+    "suitability_assessment": {
+      "overall_score": 8.5,
+      "scores": {
+        "A_independence": 10.0,
+        "B_pediatric_relevance": 10.0,
+        "C_label_quality": 10.0,
+        "D_normal_case_availability": 10.0,
+        "E_patient_level_metadata": 10.0,
+        "F_bounding_box_availability": 0.0,
+        "G_dataset_size": 10.0,
+        "H_licensing_accessibility": 9.5,
+        "I_clinical_diversity": 9.0
+      },
+      "verdict": "GOLD-STANDARD EXTERNAL SPECIFICITY BENCHMARK (100% NORMAL CONTROL)",
+      "rationale": "Provides 14,236 verified non-fractured pediatric hand/wrist radiographs spanning all age stages. Ideal for establishing population-level false-positive rate on normal open growth plates."
+    }
+  },
+  {
+    "id": "mendeley_wrist_fracture",
+    "name": "Mendeley Wrist Fracture - X-rays",
+    "official_source": "Mendeley Data",
+    "doi": "10.17632/xbdsnzr8ct.1",
+    "source_url": "https://data.mendeley.com/datasets/xbdsnzr8ct/1",
+    "institution": "Al-huda Digital X-ray Laboratory, Nishtar Road, Multan, Pakistan",
+    "publication_reference": "Malik et al., 'Wrist Fracture - X-rays', Mendeley Data, V1, 2020",
+    "license": "CC BY 4.0",
+    "total_images": 193,
+    "total_patients": 193,
+    "pediatric_age_range": "Mixed demographic (Adult + Pediatric, unspecified age breakdown)",
+    "fracture_images": 111,
+    "normal_images": 82,
+    "anatomical_regions": [
+      "Wrist"
+    ],
+    "xray_views": [
+      "AP",
+      "Lateral"
+    ],
+    "bounding_boxes_available": false,
+    "segmentation_available": false,
+    "patient_ids_available": false,
+    "metadata_available": false,
+    "download_access_requirements": "Direct open download via Mendeley Data",
+    "overlap_with_graz_mura_fracatlas": false,
+    "provenance_summary": "Collected from private diagnostic imaging clinic in Multan, Pakistan. Independent origin, but lacks patient age metadata and bounding boxes.",
+    "suitability_assessment": {
+      "overall_score": 5.2,
+      "scores": {
+        "A_independence": 10.0,
+        "B_pediatric_relevance": 4.0,
+        "C_label_quality": 7.0,
+        "D_normal_case_availability": 6.0,
+        "E_patient_level_metadata": 2.0,
+        "F_bounding_box_availability": 0.0,
+        "G_dataset_size": 3.0,
+        "H_licensing_accessibility": 10.0,
+        "I_clinical_diversity": 5.0
+      },
+      "verdict": "REJECTED FOR PRIMARY EXTERNAL VALIDATION",
+      "rationale": "Small sample size (193 images), mixed adult/pediatric population without exact age tags, no bounding-box annotations, and no unique patient IDs."
+    }
+  }
+]

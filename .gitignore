@@ -40,5 +40,7 @@ Thumbs.db
 # ML Training temporary runs & dataset images
 ai-prediction-service/artifacts/fracture_v2/experiment5_localization/dataset/images/
 ai-prediction-service/artifacts/fracture_v2/experiment5_localization/runs/
+ai-prediction-service/artifacts/fracture_v2/experiment7_multiview/*.pt
+ai-prediction-service/artifacts/fracture_v2/experiment8_multiview_localized/*.pt
+backend/scripts/*-results.json
 *.cache
-

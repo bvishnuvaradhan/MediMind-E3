@@ -28,12 +28,19 @@ export function DashboardView({
   openFeatureModal,
   onOpenAppointmentDetail,
   onOpenUploadModal,
+  activeFamily = null,
+  appointments = null,
 }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // 1. All Appointments across the family
+  const familyTitle = activeFamily?.name
+    ? activeFamily.name.replace(' Account', '')
+    : 'Family';
+
+  const baseAppointments = appointments || initialPresentationData.Appointments || [];
   const allAppointments = [
-    ...initialPresentationData.Appointments,
+    ...baseAppointments,
     ...bookedAppointments,
   ];
 
@@ -60,7 +67,7 @@ export function DashboardView({
         <div>
           <p className="eyebrow">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
           <h1>
-            Kapoor Family Health Workspace <span>✦</span>
+            {familyTitle} Health Workspace <span>✦</span>
           </h1>
           <p className="subheading">
             Centralized health management, AI decision support, and specialist care for all {familyMembers.length} family members.

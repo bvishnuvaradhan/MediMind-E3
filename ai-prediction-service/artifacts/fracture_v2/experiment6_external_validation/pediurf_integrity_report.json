@@ -1,0 +1,21 @@
+{
+  "total_files_scanned": 10530,
+  "readable_images": 10530,
+  "corrupted_files": 0,
+  "zero_byte_files": 0,
+  "image_format": "JPEG (RGB)",
+  "resolution_statistics": {
+    "mean_width": 1204.3,
+    "mean_height": 1776.0,
+    "min_width": 205,
+    "max_width": 2690,
+    "min_height": 305,
+    "max_height": 2816
+  },
+  "local_dataset_overlap": {
+    "GRAZPEDWRI-DX": "0% (Geographically disjoint: Shenzhen Children's Hospital vs Medical University of Graz)",
+    "FracAtlas": "0% (Geographically disjoint: Shenzhen Children's Hospital vs BSMMU Bangladesh)",
+    "MURA-v1.1": "0% (Geographically disjoint: Shenzhen Children's Hospital vs Stanford University)"
+  },
+  "dataset_integrity_verdict": "PASSED_100_PERCENT"
+}

@@ -1,0 +1,29 @@
+{
+  "Distal ulna and radius fractures": {
+    "total_studies": 677,
+    "detected_studies_tp": 632,
+    "missed_studies_fn": 45,
+    "study_sensitivity": 93.35,
+    "total_images": 1354,
+    "detected_images_tp": 1085,
+    "image_sensitivity": 80.13
+  },
+  "Midshaft ulna and radius fractures": {
+    "total_studies": 265,
+    "detected_studies_tp": 259,
+    "missed_studies_fn": 6,
+    "study_sensitivity": 97.74,
+    "total_images": 530,
+    "detected_images_tp": 461,
+    "image_sensitivity": 86.98
+  },
+  "Proximal ulna and radius fractures": {
+    "total_studies": 111,
+    "detected_studies_tp": 105,
+    "missed_studies_fn": 6,
+    "study_sensitivity": 94.59,
+    "total_images": 222,
+    "detected_images_tp": 191,
+    "image_sensitivity": 86.04
+  }
+}
