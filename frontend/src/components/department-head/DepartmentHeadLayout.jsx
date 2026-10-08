@@ -153,10 +153,10 @@ export function DepartmentHeadLayout({ dark, setDark }) {
       const targetDeptId = matchedHead?.departmentId || user?.departmentId || 'DEP-H1-ORTHO';
       const targetDeptName = matchedDept?.name || matchedHead?.departmentName || 'Orthopedics';
 
-      const scopedAppointments = appointments.filter(
-        (a) => a.departmentId === targetDeptId || (a.departmentName && a.departmentName.toLowerCase().includes(targetDeptName.toLowerCase()))
+      const scopedAppointments = apts.filter(
+        (a) => a.departmentId === targetDeptId || (a.departmentName && a.departmentName.toLowerCase().includes(targetDeptName.toLowerCase())) || (a.department && a.department.toLowerCase().includes(targetDeptName.toLowerCase()))
       );
-      const scopedArticles = knowledgeArticles.filter(
+      const scopedArticles = arts.filter(
         (a) => a.departmentId === targetDeptId || (a.department && a.department.toLowerCase().includes(targetDeptName.toLowerCase()))
       );
 

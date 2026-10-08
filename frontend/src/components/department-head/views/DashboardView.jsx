@@ -109,7 +109,7 @@ export function DashboardView({
           tone="blue"
           change="100% covered"
           changeType="positive"
-          subtext="Orthopedic outpatient slots"
+          subtext={`${departmentInfo?.name || 'Department'} outpatient slots`}
           icon={
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -117,12 +117,12 @@ export function DashboardView({
           }
         />
         <StatCard
-          label="Bed Occupancy (Ortho Ward)"
+          label={`Bed Occupancy (${departmentInfo?.name || 'Ward'})`}
           value={departmentInfo?.bedOccupancy || '88%'}
           tone="coral"
-          change="53 / 60 beds"
+          change={`${departmentInfo?.occupiedBeds || 0} / ${departmentInfo?.bedCapacity || 0} beds`}
           changeType="neutral"
-          subtext="Musculoskeletal wing"
+          subtext={`${departmentInfo?.specialization || 'Clinical'} wing`}
           icon={
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -131,11 +131,11 @@ export function DashboardView({
         />
         <StatCard
           label="AI Scans Screened"
-          value={analytics?.aiPipelineSummary?.totalScans || 31}
+          value={analytics?.aiPipelineSummary?.totalScans || Math.round(todayAppointments * 0.7)}
           tone="teal"
           change="98.4% accuracy"
           changeType="positive"
-          subtext="Fracture Detection CNN"
+          subtext={departmentInfo?.linkedAi || 'AI Pipeline'}
           icon={
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -204,7 +204,7 @@ export function DashboardView({
                 </svg>
                 AI Diagnostic Telemetry
               </h3>
-              <div className="dh-card-description">Fracture Detection CNN (Aggregate Scans)</div>
+              <div className="dh-card-description">{departmentInfo?.linkedAi || 'AI Pipeline'} (Aggregate Scans)</div>
             </div>
             <button className="dh-btn dh-btn-ghost dh-btn-sm" onClick={() => onNavigate('ai_analytics')}>
               Telemetry &rarr;
@@ -213,11 +213,11 @@ export function DashboardView({
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
             <div style={{ padding: '12px', backgroundColor: 'var(--dh-soft-teal)', borderRadius: '8px' }}>
-              <div style={{ fontSize: '11px', color: 'var(--dh-teal)', fontWeight: 600, textTransform: 'uppercase' }}>Fractures Flagged</div>
+              <div style={{ fontSize: '11px', color: 'var(--dh-teal)', fontWeight: 600, textTransform: 'uppercase' }}>Anomalies Flagged</div>
               <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--dh-text-primary)' }}>
-                {analytics?.aiPipelineSummary?.fracturesDetected || 19}
+                {analytics?.aiPipelineSummary?.fracturesDetected || Math.round(todayAppointments * 0.4)}
               </div>
-              <div style={{ fontSize: '11px', color: 'var(--dh-text-muted)' }}>61.3% positive rate</div>
+              <div style={{ fontSize: '11px', color: 'var(--dh-text-muted)' }}>High positive rate</div>
             </div>
             <div style={{ padding: '12px', backgroundColor: 'var(--dh-soft-bg)', borderRadius: '8px' }}>
               <div style={{ fontSize: '11px', color: 'var(--dh-primary-light)', fontWeight: 600, textTransform: 'uppercase' }}>Avg Inference Latency</div>
@@ -230,12 +230,12 @@ export function DashboardView({
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--dh-text-secondary)' }}>
-              Top Anatomical Fracture Regions Screened:
+              Top Clinical Findings Flagged:
             </div>
             {(analytics?.aiPipelineSummary?.commonFractureTypes || [
-              { type: 'Distal Radius / Wrist', count: 8, confidence: '98.2%' },
-              { type: 'Femoral Neck / Hip', count: 5, confidence: '96.5%' },
-              { type: 'Tibia / Ankle Malleolus', count: 4, confidence: '97.1%' },
+              { type: 'Critical Pattern A', count: 8, confidence: '98.2%' },
+              { type: 'High Risk Indicator B', count: 5, confidence: '96.5%' },
+              { type: 'Routine Anomaly C', count: 4, confidence: '97.1%' },
             ]).slice(0, 3).map((f, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12.5px', padding: '6px 8px', backgroundColor: 'var(--dh-bg)', borderRadius: '6px' }}>
                 <span style={{ fontWeight: 500, color: 'var(--dh-text-primary)' }}>{f.type}</span>
@@ -254,7 +254,7 @@ export function DashboardView({
               <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--dh-blue)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-              Today's Orthopedic OPD Schedule
+              Today's {departmentInfo?.name || 'Department'} OPD Schedule
             </h3>
             <div className="dh-card-description">
               Operational appointment slots (Department-level coordination)

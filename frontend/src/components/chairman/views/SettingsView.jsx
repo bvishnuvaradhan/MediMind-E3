@@ -169,14 +169,14 @@ export function SettingsView({ announce }) {
             <div style={{ padding: '14px', borderRadius: '10px', background: 'var(--chair-bg)', border: '1px solid var(--chair-border)' }}>
               <strong>Doctor Access Protocol</strong>
               <p style={{ margin: '4px 0 0', color: 'var(--chair-muted)', fontSize: '12px' }}>
-                {settings.policies.doctorAccessProtocol} — When a patient authorizes a doctor, the doctor receives access to that member's complete medical history. Granular individual record toggles are disabled.
+                {settings.policies?.doctorAccessProtocol || 'Strict RBAC Protocol'} — When a patient authorizes a doctor, the doctor receives access to that member's complete medical history. Granular individual record toggles are disabled.
               </p>
             </div>
 
             <div style={{ padding: '14px', borderRadius: '10px', background: 'var(--chair-bg)', border: '1px solid var(--chair-border)' }}>
               <strong>Consultation & Prescription Immutability</strong>
               <p style={{ margin: '4px 0 0', color: 'var(--chair-muted)', fontSize: '12px' }}>
-                {settings.policies.clinicalConsultationLock} — Finalized consultations and prescriptions are locked against deletion or direct editing to preserve trusted clinical audit trails. Corrections are submitted as timestamped amendments.
+                {settings.policies?.clinicalConsultationLock || 'Immutable Clinical Audit Trail'} — Finalized consultations and prescriptions are locked against deletion or direct editing to preserve trusted clinical audit trails. Corrections are submitted as timestamped amendments.
               </p>
             </div>
 
@@ -184,11 +184,11 @@ export function SettingsView({ announce }) {
               <strong>Mandatory AI Diagnostic Disclaimer</strong>
               <textarea
                 style={{ width: '100%', marginTop: '8px', padding: '10px', borderRadius: '8px', border: '1px solid var(--chair-border)', background: 'var(--chair-card)', color: 'var(--chair-ink)', fontSize: '12px' }}
-                value={settings.policies.aiDisclaimerText}
+                value={settings.policies?.aiDisclaimerText || 'This prediction is an AI-assisted analysis and not a final medical diagnosis. Always consult a certified healthcare professional.'}
                 onChange={(e) =>
                   setSettings({
                     ...settings,
-                    policies: { ...settings.policies, aiDisclaimerText: e.target.value },
+                    policies: { ...(settings.policies || {}), aiDisclaimerText: e.target.value },
                   })
                 }
               />
@@ -279,11 +279,11 @@ export function SettingsView({ announce }) {
             <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', cursor: 'pointer' }}>
               <input
                 type="checkbox"
-                checked={settings.notifications.emailOnHospitalRequest}
+                checked={!!settings.notifications?.emailOnHospitalRequest}
                 onChange={(e) =>
                   setSettings({
                     ...settings,
-                    notifications: { ...settings.notifications, emailOnHospitalRequest: e.target.checked },
+                    notifications: { ...(settings.notifications || {}), emailOnHospitalRequest: e.target.checked },
                   })
                 }
               />
@@ -293,11 +293,11 @@ export function SettingsView({ announce }) {
             <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', cursor: 'pointer' }}>
               <input
                 type="checkbox"
-                checked={settings.notifications.emailOnAdminCreation}
+                checked={!!settings.notifications?.emailOnAdminCreation}
                 onChange={(e) =>
                   setSettings({
                     ...settings,
-                    notifications: { ...settings.notifications, emailOnAdminCreation: e.target.checked },
+                    notifications: { ...(settings.notifications || {}), emailOnAdminCreation: e.target.checked },
                   })
                 }
               />
@@ -307,11 +307,11 @@ export function SettingsView({ announce }) {
             <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', cursor: 'pointer' }}>
               <input
                 type="checkbox"
-                checked={settings.notifications.emailOnSecurityAlert}
+                checked={!!settings.notifications?.emailOnSecurityAlert}
                 onChange={(e) =>
                   setSettings({
                     ...settings,
-                    notifications: { ...settings.notifications, emailOnSecurityAlert: e.target.checked },
+                    notifications: { ...(settings.notifications || {}), emailOnSecurityAlert: e.target.checked },
                   })
                 }
               />

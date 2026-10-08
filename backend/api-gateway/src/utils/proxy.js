@@ -5,7 +5,9 @@ export const forwardRequest = (targetServiceUrl) => {
 
       const headers = { ...req.headers };
       delete headers.host;
-      delete headers['content-length'];
+      if (req.method === 'GET' || req.method === 'HEAD') {
+        delete headers['content-length'];
+      }
 
       // Ensure correlation ID is forwarded
       if (req.requestId) {

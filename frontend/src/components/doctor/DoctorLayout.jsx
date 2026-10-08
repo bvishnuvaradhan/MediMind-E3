@@ -2,7 +2,7 @@ import React, { useState, useEffect, useTransition } from 'react';
 import './Doctor.css';
 import { doctorService } from '../../services/doctorService';
 import { useAuth } from '../../context/useAuth';
-import { doctors as allDoctors } from '../../data/medimindData';
+import { doctors as allDoctors, appointments as globalAppointments, consultations as globalConsultations, prescriptions as globalPrescriptions, familyMembers } from '../../data/medimindData';
 
 // Views
 import DashboardView from './views/DashboardView';
@@ -195,33 +195,44 @@ export function DoctorLayout({ dark, setDark }) {
             hospitalName: matchedDoctor.hospitalName || user?.hospitalName || prof?.hospitalName,
           }
         : prof;
-
       const currentDocId = matchedDoctor?.id || user?.doctorId || 'doc_001';
       const currentDocName = matchedDoctor?.name || user?.name || '';
       const currentDeptName = matchedDoctor?.departmentName || user?.departmentName || 'Orthopedics';
 
-      const docAppointments = (apts && apts.length > 0 ? apts : []).filter(
+      const allApts = globalAppointments?.length > 0 ? globalAppointments : apts;
+      const allCons = globalConsultations?.length > 0 ? globalConsultations : cons;
+      const allRxs = globalPrescriptions?.length > 0 ? globalPrescriptions : rxs;
+
+      const docAppointments = allApts.filter(
         (a) => a.doctorId === currentDocId || (currentDocName && a.doctorName && a.doctorName.toLowerCase().includes(currentDocName.toLowerCase()))
       );
 
-      const docConsultations = (cons && cons.length > 0 ? cons : []).filter(
+      const docConsultations = allCons.filter(
         (c) => c.doctorId === currentDocId || (currentDocName && c.doctorName && c.doctorName.toLowerCase().includes(currentDocName.toLowerCase()))
       );
 
-      const docPrescriptions = (rxs && rxs.length > 0 ? rxs : []).filter(
+      const docPrescriptions = allRxs.filter(
         (p) => p.doctorId === currentDocId || (currentDocName && p.doctorName && p.doctorName.toLowerCase().includes(currentDocName.toLowerCase()))
       );
 
       const aptPatientNames = new Set(docAppointments.map((a) => a.patientName).filter(Boolean));
       const aptPatientIds = new Set(docAppointments.map((a) => a.patientId || a.memberId).filter(Boolean));
-      const docPatients = pats.filter((p) => aptPatientIds.has(p.id) || aptPatientIds.has(p.memberId) || aptPatientNames.has(p.name));
+      
+      const familyPatients = familyMembers.map(m => ({
+        ...m,
+        id: m.id,
+        name: m.name,
+      }));
+      const globalPatientsList = familyPatients.length > 0 ? familyPatients : pats;
+      
+      const docPatients = globalPatientsList.filter((p) => aptPatientIds.has(p.id) || aptPatientIds.has(p.memberId) || aptPatientNames.has(p.name));
 
       const docArticles = (arts && arts.length > 0 ? arts : []).filter(
         (a) => a.department === currentDeptName || a.departmentId === matchedDoctor?.departmentId
       );
 
       setDoctorProfile(effectiveProfile);
-      setPatients(docPatients.length > 0 ? docPatients : (matchedDoctor ? pats.filter((p) => p.department === currentDeptName || p.accessScope?.includes(currentDeptName)) : pats));
+      setPatients(docPatients);
       setAppointments(docAppointments);
       setConsultations(docConsultations);
       setPrescriptions(docPrescriptions);

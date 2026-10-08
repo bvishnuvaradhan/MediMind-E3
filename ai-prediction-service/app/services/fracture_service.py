@@ -13,6 +13,7 @@ from app.models.fracture.fracture_preprocessing import (
 )
 from app.models.fracture.fracture_training import FractureClassifier
 from app.core.database import Database
+from app.services.groq_service import GroqService
 from app.schemas.prediction_schemas import (
     InputType,
     PredictionType,
@@ -190,6 +191,14 @@ class FractureInferenceService:
             "explanation_reference": None,
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
+
+        explanation = await GroqService.generate_explanation(
+            model_type="Fracture Detection (ResNet-50 CNN)",
+            prediction_result=result,
+            metadata={"filename": filename}
+        )
+        if explanation:
+            prediction_record["explanation_reference"] = explanation
 
         saved_id = await Database.save_prediction(prediction_record)
         if saved_id and not prediction_record.get("_id"):

@@ -11,6 +11,7 @@ import pandas as pd
 
 from app.models.diabetes.diabetes_preprocessing import DIABETES_FEATURES
 from app.core.database import Database
+from app.services.groq_service import GroqService
 from app.schemas.prediction_schemas import (
     DiabetesRequest,
     InputType,
@@ -137,6 +138,14 @@ class DiabetesInferenceService:
             "explanation_reference": None,
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
+
+        explanation = await GroqService.generate_explanation(
+            model_type="Diabetes Risk Scoring (Gradient Boosting)",
+            prediction_result=result,
+            metadata={"features": features}
+        )
+        if explanation:
+            prediction_record["explanation_reference"] = explanation
 
         saved_id = await Database.save_prediction(prediction_record)
         if saved_id and not prediction_record.get("_id"):

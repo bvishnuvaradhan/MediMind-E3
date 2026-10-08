@@ -11,6 +11,7 @@ import pandas as pd
 
 from app.models.heart_disease.heart_disease_preprocessing import CARDIOVASCULAR_FEATURES
 from app.core.database import Database
+from app.services.groq_service import GroqService
 from app.schemas.prediction_schemas import (
     HeartDiseaseRequest,
     InputType,
@@ -87,6 +88,14 @@ class HeartDiseaseInferenceService:
             "explanation_reference": None,
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
+
+        explanation = await GroqService.generate_explanation(
+            model_type="Heart Disease Risk Scoring (Deep Ensemble)",
+            prediction_result=result,
+            metadata={"features": prediction_record["input_data"]}
+        )
+        if explanation:
+            prediction_record["explanation_reference"] = explanation
 
         saved_id = await Database.save_prediction(prediction_record)
         if saved_id and not prediction_record.get("_id"):

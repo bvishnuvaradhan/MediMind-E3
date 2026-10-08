@@ -301,7 +301,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
     setDepartments(updatedDepts);
     setShowEditDeptModal(false);
     setSelectedEditDept(null);
-    announce(`Updated department: ${updated.name}`);
+    announce(`Updated department: ${updated?.name || 'Unknown'}`);
   };
 
   const handleToggleDepartmentStatus = (deptId) => {
@@ -518,6 +518,9 @@ export function HospitalAdminLayout({ dark, setDark }) {
         <HospitalAnalyticsView
           analytics={analytics}
           hospital={hospital}
+          appointments={appointments}
+          departments={departments}
+          doctors={doctors}
         />
       );
     }
@@ -525,6 +528,9 @@ export function HospitalAdminLayout({ dark, setDark }) {
       return (
         <DepartmentAnalyticsView
           analytics={analytics}
+          departments={departments}
+          appointments={appointments}
+          doctors={doctors}
         />
       );
     }
@@ -533,6 +539,8 @@ export function HospitalAdminLayout({ dark, setDark }) {
         <AiAnalyticsView
           analytics={analytics}
           hospital={hospital}
+          departments={departments}
+          appointments={appointments}
         />
       );
     }

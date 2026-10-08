@@ -67,6 +67,8 @@ MediMind integrates four validated clinical decision support modules:
   - *Production Operating Threshold:* `0.4000`
 - **General Health Assessment (`ai_general`):** Deterministic clinical Natural Language Processing (NLP) triage engine featuring negation detection, third-person attribution filtering, and emergency tri-pillar rules.
 
+- **Groq NLP Explanations (Optional):** Supports integration with Groq (`GROQ_API_KEY`, `GROQ_ENABLED=true`) for server-side generation of patient-friendly natural language explanations for primary model outputs. Ensures strict zero-dependency fallback to primary models if Groq is unavailable.
+
 For an extensive technical breakdown of model architectures and validation experiments, refer to [MediMind AI/ML Final Report](MediMind_AI_ML_Final_Report.md).
 
 ---
