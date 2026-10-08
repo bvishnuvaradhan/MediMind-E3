@@ -1,0 +1,51 @@
+{
+  "dataset_name": "Experiment 7 Multi-View Dual-Branch Dataset",
+  "primary_cohort_graz": {
+    "train": {
+      "paired_studies": 1620,
+      "fractured_studies": 1122,
+      "normal_studies": 498,
+      "fracture_percentage": 69.26,
+      "total_radiographs": 3240
+    },
+    "validation": {
+      "paired_studies": 348,
+      "fractured_studies": 242,
+      "normal_studies": 106,
+      "fracture_percentage": 69.54,
+      "total_radiographs": 696
+    },
+    "test": {
+      "paired_studies": 350,
+      "fractured_studies": 249,
+      "normal_studies": 101,
+      "fracture_percentage": 71.14,
+      "total_radiographs": 700
+    },
+    "total_paired_studies": 2318,
+    "total_radiographs": 4636
+  },
+  "external_cohort_pediurf": {
+    "official_test_pairs": {
+      "paired_studies": 1053,
+      "fractured_studies": 1053,
+      "categories": {
+        "Distal ulna and radius fractures": 677,
+        "Midshaft ulna and radius fractures": 265,
+        "Proximal ulna and radius fractures": 111
+      },
+      "total_radiographs": 2106
+    },
+    "full_cohort_pairs": {
+      "paired_studies": 5265,
+      "fractured_studies": 5265,
+      "categories": {
+        "Distal ulna and radius fractures": 3374,
+        "Midshaft ulna and radius fractures": 1319,
+        "Proximal ulna and radius fractures": 572
+      },
+      "total_radiographs": 10530
+    }
+  },
+  "unpaired_handling_policy": "Studies with only a single projection (AP only or Lateral only) are explicitly logged and excluded from dual-branch training to prevent synthetic view fabrication."
+}

@@ -1,0 +1,35 @@
+{
+  "benchmark_matrix": {
+    "experiment_6_ap_only": {
+      "model": "Single-View YOLOv8n (AP View Only)",
+      "pediurf_sensitivity": 83.57,
+      "graz_test_sensitivity": 83.57,
+      "n251_specificity": 87.25
+    },
+    "experiment_6_lateral_only": {
+      "model": "Single-View YOLOv8n (Lateral View Only)",
+      "pediurf_sensitivity": 81.39,
+      "graz_test_sensitivity": 81.39,
+      "n251_specificity": 87.25
+    },
+    "experiment_6_heuristic_max_fusion": {
+      "model": "Heuristic Max Fusion: max(AP, LAT) >= 0.17",
+      "pediurf_sensitivity": 94.59,
+      "graz_test_sensitivity": 94.59,
+      "n251_specificity": 87.25,
+      "pediurf_both_misses": 57
+    },
+    "experiment_7a_learned_dual_view": {
+      "model": "Learned Dual-View ResNet-18 (Shared Backbone + Fusion MLP)",
+      "pediurf_sensitivity": 100.0,
+      "graz_test_sensitivity": 100.0,
+      "graz_test_specificity": 0.0,
+      "n251_specificity": 0.0,
+      "pediurf_both_misses": 0,
+      "graz_test_f1": 0.8314,
+      "graz_test_roc_auc": 0.6506,
+      "graz_test_pr_auc": 0.8302,
+      "operating_threshold": 0.01
+    }
+  }
+}

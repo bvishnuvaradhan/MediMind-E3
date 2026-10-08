@@ -1,0 +1,79 @@
+{
+  "grazpedwri_dx_paired_properties": {
+    "dataset": "GRAZPEDWRI-DX",
+    "sample_size_audited": 500,
+    "corrupted_files": 0,
+    "zero_byte_files": 0,
+    "color_modes_ap": {
+      "I;16": 500
+    },
+    "color_modes_lat": {
+      "I;16": 500
+    },
+    "ap_dimensions": {
+      "mean_width": 608.9,
+      "mean_height": 1006.9,
+      "min_width": 360,
+      "max_width": 1421,
+      "min_height": 498,
+      "max_height": 1626
+    },
+    "lat_dimensions": {
+      "mean_width": 519.8,
+      "mean_height": 1021.3,
+      "min_width": 263,
+      "max_width": 1541,
+      "min_height": 512,
+      "max_height": 1650
+    },
+    "ap_to_lat_aspect_ratio_mean": 1.217,
+    "duplicate_ap_lat_hashes": 0
+  },
+  "pediurf_paired_properties": {
+    "dataset": "PediURF",
+    "sample_size_audited": 500,
+    "corrupted_files": 0,
+    "zero_byte_files": 0,
+    "color_modes_ap": {
+      "RGB": 500
+    },
+    "color_modes_lat": {
+      "RGB": 500
+    },
+    "ap_dimensions": {
+      "mean_width": 1286.0,
+      "mean_height": 1832.2,
+      "min_width": 634,
+      "max_width": 2346,
+      "min_height": 560,
+      "max_height": 2690
+    },
+    "lat_dimensions": {
+      "mean_width": 1250.7,
+      "mean_height": 1861.9,
+      "min_width": 634,
+      "max_width": 2644,
+      "min_height": 560,
+      "max_height": 2690
+    },
+    "ap_to_lat_aspect_ratio_mean": 1.074,
+    "duplicate_ap_lat_hashes": 0
+  },
+  "preprocessing_policy": {
+    "target_resolution": [
+      512,
+      512
+    ],
+    "interpolation": "Bilinear",
+    "aspect_ratio_preservation": "Letterbox padding with zero (black) borders to prevent anatomical distortion",
+    "normalization": "Standard ImageNet mean [0.485, 0.456, 0.406] and std [0.229, 0.224, 0.225]",
+    "channel_handling": "3-channel RGB (grayscale replicated across channels)",
+    "augmentation_rules": [
+      "Random horizontal flip (p=0.5 applied synchronously or appropriately)",
+      "Small rotation (-10 to +10 degrees)",
+      "Small translation (-5% to +5%)",
+      "Subtle brightness/contrast adjustment (+/- 10%)",
+      "STRICTLY PROHIBITED: Random vertical flips, large zooms, elastic distortions, heavy blurring"
+    ]
+  }
+}

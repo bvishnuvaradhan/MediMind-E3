@@ -1,0 +1,117 @@
+{
+  "experiment_name": "Experiment 8A: Dual-View ROI-Aligned Fusion (DualViewROIResNet18)",
+  "research_status": "FORMALLY_FROZEN_RESEARCH_BEST",
+  "freeze_timestamp": "2026-10-06T23:30:00+05:30",
+  "git_branch": "experiment8-multiview-localized-fusion",
+  "git_commit": "ead0e88a6260d752f44ed727e176d7ba345ecebb",
+  "architecture": {
+    "name": "DualViewROIResNet18",
+    "total_parameters": 11439681,
+    "input_resolution": "256x256 per ROI crop",
+    "crop_expansion_margin": "20%",
+    "spatial_detector": "Frozen YOLOv8n (Exp 5)",
+    "encoder": "Shared ResNet-18",
+    "fusion_mechanism": "Concatenation of [AP_512, LAT_512, ap_conf, lat_conf] -> Linear(1026->256) -> ReLU -> Dropout(0.3) -> Linear(256->1)"
+  },
+  "model_checkpoints": {
+    "best_model": {
+      "filename": "experiment8a_best_model.pt",
+      "path": "artifacts/fracture_v2/experiment8_multiview_localized/experiment8a_best_model.pt",
+      "file_size_bytes": 45839207,
+      "md5": "ac7ebe3c91deea13cedb5ca36a841829",
+      "sha256": "eab5ff2910a50665ed5de9626df309130efb0c31a878019408ba95e7aa63fb6d",
+      "selection_epoch": 1,
+      "selection_metric": "Validation ROC-AUC = 0.9405"
+    },
+    "final_model": {
+      "filename": "experiment8a_final_model.pt",
+      "path": "artifacts/fracture_v2/experiment8_multiview_localized/experiment8a_final_model.pt",
+      "file_size_bytes": 45839337,
+      "md5": "aadf2b8fc1c00fa4750a8873b8042888",
+      "sha256": "81ea709e76245ed6b60930154b8f5823930d8a271cccd70d3075ce71b9c71654",
+      "total_epochs": 15
+    }
+  },
+  "operating_threshold": {
+    "frozen_threshold": 0.0100,
+    "derivation_split": "GRAZPEDWRI-DX Validation Cohort (N=348 Studies / 696 Radiographs)",
+    "selection_policy": "Sensitivity >= 90.0% while maximizing Specificity on Validation Split",
+    "validation_sensitivity": 91.74,
+    "validation_specificity": 77.36,
+    "validation_roc_auc": 0.9405,
+    "validation_pr_auc": 0.9794
+  },
+  "datasets": {
+    "graz_train": "1,620 paired studies (1,122 fractured, 498 normal)",
+    "graz_val": "348 paired studies (242 fractured, 106 normal)",
+    "graz_test": "350 paired studies (249 fractured, 101 normal)",
+    "normal_controls": "251 uncorrupted pediatric radiographs",
+    "pediurf_external": "1,053 paired studies (2,106 radiographs) from Shenzhen Children's Hospital"
+  },
+  "key_results": {
+    "graz_held_out_test": {
+      "total_studies": 350,
+      "true_positives": 237,
+      "true_negatives": 76,
+      "false_positives": 25,
+      "false_negatives": 12,
+      "sensitivity_percent": 95.18,
+      "specificity_percent": 75.25,
+      "precision_percent": 90.46,
+      "npv_percent": 86.36,
+      "f1_score": 0.9276,
+      "roc_auc": 0.9586,
+      "pr_auc": 0.9860,
+      "brier_score": 0.0811,
+      "ece": 0.0897
+    },
+    "multi_view_state_synergy": {
+      "state_a_dual_detected": "207 / 207 fractured (100.0% sens)",
+      "state_b_ap_only_detected": "6 / 6 fractured (100.0% sens)",
+      "state_c_lat_only_rescue": "24 / 24 fractured (100.0% sens, 24 orthogonal rescues)",
+      "state_d_zero_detected": "0 / 12 fractured (12 misses)"
+    },
+    "normal_control_stress_test": {
+      "total_cohort": 251,
+      "true_negatives": 219,
+      "false_positives": 32,
+      "specificity_percent": 87.25,
+      "mean_probability": 0.0821,
+      "median_probability": 0.0
+    },
+    "pediurf_external_validation": {
+      "total_studies": 1053,
+      "true_positives": 996,
+      "missed_studies": 57,
+      "study_sensitivity_percent": 94.59,
+      "distal_radius_ulna_sensitivity": 93.35,
+      "midshaft_radius_ulna_sensitivity": 97.74,
+      "proximal_radius_ulna_sensitivity": 94.59
+    }
+  },
+  "baseline_checkpoints_verification": {
+    "exp5_yolo": {
+      "path": "artifacts/fracture_v2/experiment5_localization/best_model.pt",
+      "expected_md5": "ece51c07eaab354f25f53f99b104dc03",
+      "measured_md5": "ece51c07eaab354f25f53f99b104dc03",
+      "threshold": 0.1700,
+      "status": "VERIFIED_FROZEN"
+    },
+    "exp7a_multiview": {
+      "path": "artifacts/fracture_v2/experiment7_multiview/experiment7a_best_model.pt",
+      "expected_md5": "1eb85408a5358d8912b218530f0556c4",
+      "measured_md5": "1eb85408a5358d8912b218530f0556c4",
+      "threshold": 0.5000,
+      "status": "VERIFIED_UNCHANGED"
+    },
+    "production_model": {
+      "path": "artifacts/fracture/best_model.pt",
+      "expected_md5": "99f0f5bcea645f714fe4e8fefbb7e6cb",
+      "measured_md5": "99f0f5bcea645f714fe4e8fefbb7e6cb",
+      "threshold": 0.1800,
+      "pipeline_routing": "Adult Radiographs -> ResNet-18 MURA -> FracAtlas",
+      "status": "VERIFIED_UNTOUCHED"
+    }
+  },
+  "production_isolation_statement": "The production fracture service remains strictly bound to artifacts/fracture/best_model.pt (threshold 0.18). Experiment 8A is a 100% isolated research artifact."
+}

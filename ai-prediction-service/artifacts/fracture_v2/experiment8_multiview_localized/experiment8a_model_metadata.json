@@ -1,0 +1,21 @@
+{
+  "model_name": "Experiment 8A Dual-View ROI-Aligned Fusion",
+  "architecture": "DualViewROIResNet18",
+  "total_parameters": 11439681,
+  "input_crop_size": [
+    256,
+    256
+  ],
+  "roi_expansion_pct": 20,
+  "yolo_threshold": 0.17,
+  "total_epochs": 15,
+  "best_epoch": 1,
+  "best_val_roc_auc": 0.9405,
+  "selected_threshold": 0.01,
+  "checkpoint_file": "experiment8a_best_model.pt",
+  "checkpoint_sha256": "eab5ff2910a50665ed5de9626df309130efb0c31a878019408ba95e7aa63fb6d",
+  "checkpoint_md5": "ac7ebe3c91deea13cedb5ca36a841829",
+  "torch_version": "2.14.1+cpu",
+  "random_seed": 42,
+  "created_at": "2026-10-06T23:24:30+05:30"
+}

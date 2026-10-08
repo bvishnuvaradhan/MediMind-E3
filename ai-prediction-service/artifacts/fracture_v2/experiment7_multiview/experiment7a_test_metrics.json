@@ -1,0 +1,22 @@
+{
+  "dataset": "GRAZPEDWRI-DX Held-Out Paired Test Cohort",
+  "cohort_size_studies": 350,
+  "total_fractured": 249,
+  "total_normal": 101,
+  "frozen_threshold": 0.01,
+  "metrics": {
+    "sensitivity_recall": 100.0,
+    "specificity": 0.0,
+    "precision_ppv": 71.14,
+    "npv": 0.0,
+    "f1_score": 0.8314,
+    "roc_auc": 0.6506,
+    "pr_auc": 0.8302,
+    "brier_score": 0.231,
+    "ece": 0.1751,
+    "true_positives": 249,
+    "true_negatives": 0,
+    "false_positives": 101,
+    "false_negatives": 0
+  }
+}

@@ -1,144 +1,199 @@
-# MediMind-E3: Intelligent Healthcare & Clinical AI Diagnostic Platform
+# MediMind
 
-[![Frontend Certification](https://img.shields.io/badge/Frontend-Certified%20%26%20Backend--Ready-success)](docs/frontend-audit/FRONTEND_E2E_MASTER_AUDIT.md)
-[![React](https://img.shields.io/badge/React-19.2.8-blue)](https://react.dev)
-[![Vite](https://img.shields.io/badge/Vite-8.3.0-646CFF)](https://vitejs.dev)
-[![Linter](https://img.shields.io/badge/Oxlint-0%20errors-brightgreen)](https://oxc.rs)
-
-MediMind-E3 is a multi-tier, AI-assisted healthcare ecosystem unifying hospital networks, clinical departments, practicing physicians, and family health management.
+Intelligent clinical decision support and multi-hospital healthcare platform unifying patient families, clinicians, department heads, hospital administrators, and network platform owners.
 
 ---
 
-## 1. Core Architecture & Stakeholder Roles
+## Overview
 
-MediMind implements strict Role-Based Access Control (RBAC) and explicit patient consent protocols across 5 distinct portals:
-
-1. **Chairman & Platform Owner Portal** (`CHAIRMAN`):
-   - Executive network governance across multi-hospital facilities.
-   - Hospital membership onboarding & accreditation review (`Pending` $\rightarrow$ `Approved` / `Rejected`).
-   - Platform-wide appointment volume, administrator provisioning, and ecosystem AI engine utilization.
-2. **Hospital Administrator Portal** (`HOSPITAL_ADMIN`):
-   - Facility profile, NABH/JCI accreditation, and ward bed capacity oversight.
-   - Clinical department creation, department head onboarding, and staff doctor administration.
-   - Operational admissions trajectories (5-month trend) and cross-department comparative analytics.
-3. **Department Head Portal** (`DEPARTMENT_HEAD`):
-   - Department hub (Orthopedics / Cardiology / Diabetology), clinician provisioning, and OPD shift roster coordination.
-   - Physician capacity utilization, workload balancing, and doctor performance analytics.
-   - Clinical practice guideline publication and subspecialty anomaly distribution.
-4. **Doctor Clinical Workspace Portal** (`DOCTOR`):
-   - Outpatient consultation queue, clinical funnel pipeline, and authorized patient charts (scoped by `RecordAccess`).
-   - Clinical consultations lifecycle (`DRAFT` $\rightarrow$ `FINAL` $\rightarrow$ `AMENDED`).
-   - Electronic prescriptions formulation (`DRAFT` $\rightarrow$ `FINAL` $\rightarrow$ `CORRECTED`).
-   - AI decision support with interactive Grad-CAM heatmap saliency and feature activation weights.
-5. **Family Healthcare Portal** (`FAMILY`):
-   - Family unified medical records, biometric member profiles, and document repository.
-   - Clinical AI diagnostic screenings across 4 locked pipelines with population benchmarks.
-   - Direct OPD appointment booking and patient consent management (`Grant` / `Revoke` doctor access).
+MediMind is a comprehensive, production-grade digital health ecosystem that bridges everyday clinical care with machine learning diagnostics. It provides:
+- **Family Health Management:** Household-scoped records, dependent tracking, diagnostic screening, and appointments.
+- **Clinical Physician Workspace:** Patient queue triage, clinical consultations, e-prescriptions, and AI-assisted radiological/risk decision support.
+- **Departmental Governance:** Clinical department coordination, OPD shift scheduling, and practitioner performance oversight.
+- **Hospital Administration:** Facility capacity, department provisioning, accreditation, and operational throughput monitoring.
+- **Executive Network Governance:** Cross-hospital onboarding, multi-facility metrics, and platform-wide diagnostic utilization.
 
 ---
 
-## 2. Centralized Dataset Baseline & Source of Truth
+## Architecture
 
-All frontend data flows strictly from `frontend/src/data/medimindData.js` through role-scoped services:
+MediMind uses an asynchronous microservice architecture mediated by a unified API Gateway and a dedicated high-performance Python FastAPI AI inference service.
 
-- **Active Network Hospitals**: 3 (`HOSP-001` MediMind Central Hospital, `HOSP-002` St. Jude Multispecialty Hospital, `HOSP-003` Apex Institute of Medical Sciences)
-- **Pending Onboarding Hospital Requests**: 2 (`REQ-HOSP-001` Aster Prime Hospital, `REQ-HOSP-002` Fortis Memorial Research Institute)
-- **Clinical Departments**: 17 (H1: 6, H2: 3, H3: 8)
-- **Department Heads**: 18 (H1: 6, H2: 3, H3: 9 with dual heads in `DEP-H3-ORTHO`)
-- **Staff Physicians**: 66 (H1: 21, H2: 6, H3: 39)
-- **Hospital Administrators**: 6 (H1: 2, H2: 1, H3: 3)
-- **Family Accounts**: 6 (`FAM-001` to `FAM-006`)
-- **Family Members**: 29 (`MEM-001-01` to `MEM-006-08`)
-- **Authenticated Mock Users**: 97
-- **Medical Records**: 20 (`rec_001` to `rec_020`)
-- **AI Predictions**: 16 (`ai_pred_001` to `ai_pred_016`)
-- **Appointments**: 16 (`apt_001` to `apt_016`)
-- **Consultations**: 10 (`cons_001` to `cons_010`)
-- **Prescriptions**: 10 (`rx_001` to `rx_010`)
-- **Consent Records**: 12 (`acc_001` to `acc_012`)
-- **Knowledge Articles**: 8 (`art_001` to `art_008`)
-- **Locked Clinical AI Pipelines**: 4
-- **Dataset Validation**: `validateCentralDataset()` $\rightarrow$ `valid: true, errors: []`
-
----
-
-## 3. 4-Module Clinical AI Engine Portfolio
-
-MediMind integrates 4 locked AI diagnostic pipelines with dedicated mathematical visualizations:
-
-| AI Module Key | Module Name | Primary Specialty | Diagnostic Model Type | Key Metrics |
-| :--- | :--- | :--- | :--- | :--- |
-| `ai_fracture` | **Fracture Detection** | Orthopedics | Deep Residual CNN (ResNet-50) | 98.4% Acc, 98.1% Sens, 98.8% Spec, 99.9% Uptime |
-| `ai_diabetes` | **Diabetes Risk** | Diabetology / Endocrinology | Gradient Boosted ML (XGBoost) | 94.2% Acc, 93.5% Sens, 94.8% Spec, 99.8% Uptime |
-| `ai_cardio` | **Heart Disease Risk** | Cardiology | Ensemble Classifier & Random Forest | 95.7% Acc, 95.2% Sens, 96.1% Spec, 99.9% Uptime |
-| `ai_general` | **General Health Assessment** | General Medicine / Triage | Clinical Transformer NLP (BERT) | 93.1% Acc, 92.4% Sens, 93.8% Spec, 99.7% Uptime |
-
----
-
-## 4. Pure-SVG Data Visualization Catalog
-
-MediMind features a pure-SVG mathematical charting engine housed in `frontend/src/components/common/charts/`:
-
-- **LineChart**: Multi-series continuous time-series trajectories with cubic Bézier curves.
-- **BarChart**: Grouped vertical, stacked vertical, and horizontal latency comparison layouts.
-- **DonutChart**: Part-to-whole categorical allocations with animated hover trigonometry.
-- **ScatterPlot**: 2D Cartesian bivariate observations (e.g. Caseload vs On-Time Rate) with benchmark lines.
-- **FunnelChart**: Multi-stage clinical outpatient workflow throughput and conversion.
-- **RadialGauge**: Calibrated semi-circular and $240^\circ$ arc confidence and health index gauges.
-- **BulletChart**: Stephen Few qualitative performance bars mapped against target markers.
-- **HeatmapChart**: 2D temporal intensity matrix grids (Day of Week $\times$ Hourly Shifts).
-- **RadarChart**: 4-Model multidimensional polygonal spider charts with Unified Overlay and 4-Panel Grid modes.
-
----
-
-## 5. Frontend Route Structure (68 Certified Routes across 66 Views)
-
-- **Public / Auth** (2): `LoginPage`, `SignupPage`
-- **Family Portal** (18 Views): `#family/dashboard`, `#family/members`, `#family/member-profile`, `#family/records`, `#family/upload-record`, `#family/predictions`, `#family/prediction-detail`, `#family/doctors`, `#family/doctor-profile`, `#family/doctor-access`, `#family/appointments`, `#family/book-appointment`, `#family/appointment-assessment`, `#family/consultations`, `#family/prescriptions`, `#family/general-health-risk`, `#family/help`, `#family/settings`
-- **Doctor Portal** (12 Views): `#doctor/dashboard`, `#doctor/patients`, `#doctor/patient-profile`, `#doctor/patient-access`, `#doctor/appointments`, `#doctor/consultations`, `#doctor/prescriptions`, `#doctor/ai-diagnostic`, `#doctor/ai-explainability`, `#doctor/availability`, `#doctor/knowledge`, `#doctor/settings`
-- **Department Head Portal** (10 Views): `#department-head/dashboard`, `#department-head/doctors`, `#department-head/doctor-details`, `#department-head/appointments`, `#department-head/analytics`, `#department-head/performance`, `#department-head/workload`, `#department-head/ai-analytics`, `#department-head/knowledge`, `#department-head/settings`
-- **Hospital Admin Portal** (14 Views): `#hospital-admin/dashboard`, `#hospital-admin/profile`, `#hospital-admin/departments`, `#hospital-admin/department-heads`, `#hospital-admin/department-head-details`, `#hospital-admin/doctors`, `#hospital-admin/doctor-details`, `#hospital-admin/staff`, `#hospital-admin/analytics`, `#hospital-admin/department-analytics`, `#hospital-admin/ai-analytics`, `#hospital-admin/reports`, `#hospital-admin/knowledge`, `#hospital-admin/settings`
-- **Chairman Portal** (12 Views): `#chairman/dashboard`, `#chairman/analytics`, `#chairman/hospitals`, `#chairman/admins`, `#chairman/departments`, `#chairman/families`, `#chairman/performance`, `#chairman/appointments`, `#chairman/ai-analytics`, `#chairman/reports`, `#chairman/knowledge`, `#chairman/settings`
-
----
-
-## 6. Development & Quality Assurance
-
-### Installation & Local Run
-```bash
-cd frontend
-npm install
-npm run dev
 ```
-
-### Automated Quality Gates
-```bash
-# 1. Zero-error linter check
-npx oxlint
-
-# 2. Production build verification
-npm run build
-
-# 3. Central dataset foreign key & count validation
-node -e "import('./src/data/medimindData.js').then(m => { const r = m.validateCentralDataset(); console.log('Valid:', r.valid); if(!r.valid) process.exit(1); })"
+                               ┌─────────────────────────────────┐
+                               │   MediMind Frontend (React 19)  │
+                               │   Vite / Pure-SVG Charts (5173) │
+                               └────────────────┬────────────────┘
+                                                │ REST / JSON
+                                                ▼
+                               ┌─────────────────────────────────┐
+                               │     API Gateway (Express)       │
+                               │     Port: 5000                  │
+                               │  Anti-Spoofing & Header Scoping │
+                               └────────────────┬────────────────┘
+                                                │
+         ┌──────────────┬──────────────┬────────┼───────┬──────────────┬──────────────┐
+         ▼              ▼              ▼        ▼       ▼              ▼              ▼
+   ┌───────────┐  ┌───────────┐  ┌───────────┐ ... ┌───────────┐  ┌───────────┐  ┌──────────────────┐
+   │   Auth    │  │  Family   │  │ Hospital  │     │  Record   │  │ Knowledge │  │   AI Prediction  │
+   │  Service  │  │  Service  │  │  Service  │     │  Service  │  │  Service  │  │      Service     │
+   │ Port 5001 │  │ Port 5002 │  │ Port 5003 │     │ Port 5006 │  │ Port 5008 │  │ Port 5007 (FastAPI)│
+   └───────────┘  └───────────┘  └───────────┘     └───────────┘  └───────────┘  └──────────────────┘
 ```
 
 ---
 
-## 7. Frontend Certification & Backend Readiness
+## User Roles
 
-Complete audit reports and backend REST contracts are documented in `docs/frontend-audit/`:
-- [Master E2E Audit](docs/frontend-audit/FRONTEND_E2E_MASTER_AUDIT.md)
-- [Route Inventory](docs/frontend-audit/FRONTEND_ROUTE_INVENTORY.md)
-- [Service Contract Audit](docs/frontend-audit/FRONTEND_SERVICE_CONTRACT_AUDIT.md)
-- [Backend Readiness Contract](docs/frontend-audit/FRONTEND_BACKEND_READINESS.md)
-- [Data Integrity Audit](docs/frontend-audit/FRONTEND_DATA_INTEGRITY_AUDIT.md)
-- [UI Theme & Accessibility Audit](docs/frontend-audit/FRONTEND_UI_THEME_ACCESSIBILITY_AUDIT.md)
-- [Business Flow Matrix](docs/frontend-audit/FRONTEND_FLOW_MATRIX.md)
-- [Family Portal Audit](docs/frontend-audit/FAMILY_FRONTEND_AUDIT.md)
-- [Doctor Portal Audit](docs/frontend-audit/DOCTOR_FRONTEND_AUDIT.md)
-- [Department Head Audit](docs/frontend-audit/DEPARTMENT_HEAD_FRONTEND_AUDIT.md)
-- [Hospital Admin Audit](docs/frontend-audit/HOSPITAL_ADMIN_FRONTEND_AUDIT.md)
-- [Chairman Portal Audit](docs/frontend-audit/CHAIRMAN_FRONTEND_AUDIT.md)
+The platform enforces strict Role-Based Access Control (RBAC) across five canonical personas:
 
-**Status:** The frontend is certified as complete, fully tested, and ready for backend REST API implementation.
+1. **`FAMILY`**: Household health portal for managing family members, booking consultations, accessing medical records, and running patient-facing AI symptom/risk screenings.
+2. **`DOCTOR`**: Clinical practitioner workspace for viewing scheduled patient appointments, conducting consultations, prescribing medications, and inspecting model explainability (e.g., Grad-CAM heatmaps).
+3. **`DEPARTMENT_HEAD`**: Clinical department leadership overseeing departmental doctors, OPD shifts, and clinical practice guideline publication.
+4. **`HOSPITAL_ADMIN`**: Hospital operational management administering facility beds, clinical departments, department heads, and hospital admissions trends.
+5. **`CHAIRMAN`**: Platform owner governing multi-hospital network accreditation, onboarding applications, and system-wide clinical analytics.
+
+---
+
+## AI Modules
+
+MediMind integrates four validated clinical decision support modules:
+
+- **Fracture Detection (`ai_fracture`):** Deep convolutional neural network (ResNet-18 initialized on Stanford MURA v1.1 and calibrated on FracAtlas) detecting bone fractures in musculoskeletal radiographs.
+  - *Production Operating Threshold:* `0.1800`
+- **Diabetes Risk Assessment (`ai_diabetes`):** Multi-Layer Perceptron (MLP) trained on validated metabolic indicators (PIMA cohort) predicting type-2 diabetes onset.
+  - *Production Operating Threshold:* `0.2500`
+- **Heart Disease Risk Assessment (`ai_cardio`):** Calibrated Random Forest ensemble predicting 10-year cardiovascular disease risk from patient clinical profiles.
+  - *Production Operating Threshold:* `0.4000`
+- **General Health Assessment (`ai_general`):** Deterministic clinical Natural Language Processing (NLP) triage engine featuring negation detection, third-person attribution filtering, and emergency tri-pillar rules.
+
+For an extensive technical breakdown of model architectures and validation experiments, refer to [MediMind AI/ML Final Report](MediMind_AI_ML_Final_Report.md).
+
+---
+
+## Backend Services
+
+| Service | Purpose | Port | Database |
+| :--- | :--- | :--- | :--- |
+| **API Gateway** | Entry point, routing, anti-spoofing, rate limiting, and request correlation | `5000` | Stateless (Reverse Proxy) |
+| **Auth Service** | User authentication, password hashing, and JWT token issuance | `5001` | MongoDB (`medimind_auth`) |
+| **Family Service** | Household accounts, member profiles, and dependent records | `5002` | MongoDB (`medimind_family`) |
+| **Hospital Service** | Facilities, clinical departments, and onboarding workflows | `5003` | MongoDB (`medimind_hospital`) |
+| **Doctor Service** | Doctor rosters, clinical specializations, and OPD availability | `5004` | MongoDB (`medimind_doctor`) |
+| **Appointment Service**| Patient appointment scheduling and lifecycle management | `5005` | MongoDB (`medimind_appointment`) |
+| **Medical Record Service** | Consultations, electronic prescriptions, and access consent | `5006` | MongoDB (`medimind_record`) |
+| **AI Prediction Service** | Clinical AI model inference, thresholding, and validation persistence | `5007` | MongoDB (`medimind_ai`) |
+| **Knowledge Service** | Clinical articles, guidelines, and patient health education | `5008` | MongoDB (`medimind_knowledge`) |
+
+---
+
+## Authentication & Security
+
+- **JWT Authentication:** Cryptographically signed tokens encoding verified identity claims (`userId`, `role`, `referenceId`, `accountType`, `hospitalId`, `departmentId`).
+- **Multi-Account Identity Isolation:** 26 canonical platform accounts across all five roles operate with strict session and data boundary isolation.
+- **Gateway Anti-Spoofing:** The API Gateway strips all client-supplied identity headers (`x-user-id`, `x-user-role`, `x-hospital-id`, `x-department-id`, `x-family-id`) and replaces them with verified JWT claims.
+- **Internal Service Authentication:** Downstream inter-service calls require mutual authentication using a private internal microservice secret.
+- **Data Scoping:** Queries and mutations are dynamically constrained:
+  - Doctors access only patients with active consent or appointment bookings.
+  - Department Heads access only doctors and resources within their hospital and department.
+  - Hospital Admins access only facilities and personnel belonging to their assigned hospital.
+  - Families access only members and records belonging to their authenticated family ID.
+
+---
+
+## Testing & Validation
+
+MediMind maintains exhaustive automated test suites across every tier of the application:
+
+- **Multi-Account Identity Audit:** 523 / 523 checks passed (100% verification across all 26 accounts, cross-role switching, and data boundary isolation).
+- **Backend Service Test Suites:** 264 / 264 unit and integration tests passed across 20 test suites (Auth, Gateway, Family, Hospital, Doctor, Appointment, Medical Records, Knowledge).
+- **AI Prediction Service Tests:** 253 / 253 tests passed (Diabetes, Heart Disease, General Health NLP, Fracture Inference, Auth & Persistence).
+- **Frontend Quality Gates:** Production Vite build passes cleanly with 0 errors; Oxlint passes on 302 files with 0 errors.
+
+---
+
+## AI / Research Status
+
+- **Production Models:**
+  - Fracture Detection: ResNet-18 (MURA $\to$ FracAtlas), operating threshold `0.1800`.
+  - Heart Disease: Calibrated Random Forest, operating threshold `0.4000`.
+  - Diabetes: MLP Classifier, operating threshold `0.2500`.
+  - General Health: Deterministic clinical NLP triage engine with negation and attribution handling.
+- **Research Experiments (Exp 1 – 8A):**
+  - Experiments 1 through 8A systematically explored pediatric musculoskeletal radiograph analysis and dual-view fusion.
+  - **Experiment 8A (`DualViewROIResNet18`):** Formally frozen research best achieving 95.18% sensitivity on GRAZ held-out test data and 94.59% on external PediURF cohort while maintaining 87.25% specificity on normal controls.
+- **Frozen Artifacts:**
+  - The academic *MediMind Data Science Case Study*, historical datasets, and research checkpoints remain frozen and protected.
+
+---
+
+## Development
+
+### Prerequisites
+- Node.js $\ge$ 18
+- Python $\ge$ 3.11 with PyTorch, Torchvision, Scikit-Learn, and FastAPI
+- MongoDB instance running on `localhost:27017`
+
+### Setup & Local Execution
+
+1. **Install Dependencies:**
+   ```bash
+   # Backend dependencies
+   npm --prefix backend install
+
+   # Frontend dependencies
+   npm --prefix frontend install
+
+   # AI Service dependencies
+   pip install -r ai-prediction-service/requirements.txt
+   ```
+
+2. **Run All Backend Microservices:**
+   ```bash
+   npm --prefix backend run dev
+   ```
+
+3. **Run AI Prediction Service:**
+   ```bash
+   python -m uvicorn app.main:app --host 0.0.0.0 --port 5007
+   ```
+
+4. **Run Frontend Application:**
+   ```bash
+   npm --prefix frontend run dev
+   ```
+
+5. **Run Full Live Demonstration Launcher:**
+   ```bash
+   node backend/scripts/start-live-demo.mjs
+   ```
+
+6. **Execute Automated Validation:**
+   ```bash
+   # Backend test suite
+   npm --prefix backend test
+
+   # Multi-account identity audit
+   node backend/scripts/audit-all-role-accounts.mjs
+
+   # Frontend production build
+   npm --prefix frontend run build
+   ```
+
+---
+
+## Repository Safety
+
+- **Excluded Sensitive Assets:** All credentials, private keys, `.env` files, and session tokens are strictly ignored by version control.
+- **Local Secret Storage:** `credentials.txt` serves strictly as an offline reference for local testing and demonstration rehearsal and is never committed.
+- **Protected Checkpoints:** Large experiment binary weights (`.pt`) and local run result logs are kept locally and excluded from git tracking.
+
+---
+
+## Current Status
+
+- **Authentication & Identity:** Fully completed, hardened, and verified with 523/523 checks passing across 26 canonical accounts.
+- **Microservices & API Gateway:** All 8 Node.js services and the API Gateway are fully operational, tested, and integrated.
+- **Clinical AI Services:** 4 production models active and tested (253/253 tests passing); Experiment 8A research baseline frozen.
+- **Frontend Application:** Certified React 19 / Vite application with 68 routes, pure-SVG interactive visualizations, and zero lint errors.
+- **Live Demo Readiness:** Verified and certified ready for evaluator presentation.

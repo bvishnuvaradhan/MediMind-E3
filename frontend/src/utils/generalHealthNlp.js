@@ -19,7 +19,8 @@ const NEGATION_CUES = [
   'free of', 'zero', 'dont have', "don't have", 'do not have',
   'doesnt have', "does't have", 'does not have', 'never had',
   'never experienced', 'no history of', 'no known', 'havent had',
-  "haven't had", 'have not had', 'rarely', 'seldom',
+  "haven't had", 'have not had', 'not coughing up', 'not coughing',
+  'no blood in', 'not experiencing', 'rarely', 'seldom',
 ];
 
 // Red-flag acute emergency symptoms (Unnegated match triggers immediate emergency priority)
@@ -29,6 +30,11 @@ const EMERGENCY_SYMPTOMS = [
   { term: 'difficulty breathing', label: 'Dyspnea / acute respiratory distress' },
   { term: 'shortness of breath', label: 'Shortness of breath / dyspnea' },
   { term: 'breathlessness', label: 'Acute breathlessness' },
+  { term: 'struggling to breathe', label: 'Acute respiratory distress / dyspnea' },
+  { term: 'cant breathe', label: 'Acute respiratory compromise / inability to breathe' },
+  { term: 'cannot breathe', label: 'Acute respiratory compromise / inability to breathe' },
+  { term: 'breathing is becoming difficult', label: 'Progressive respiratory distress' },
+  { term: 'breathing becoming difficult', label: 'Progressive respiratory distress' },
   { term: 'faint', label: 'Presyncope / feeling faint' },
   { term: 'fainting', label: 'Syncope / loss of consciousness' },
   { term: 'passed out', label: 'Syncope / collapse' },
@@ -39,9 +45,39 @@ const EMERGENCY_SYMPTOMS = [
   { term: 'sudden weakness', label: 'Sudden focal neurological weakness' },
   { term: 'sudden numbness', label: 'Sudden acute numbness' },
   { term: 'worst headache', label: 'Thunderclap headache / acute severe cephalalgia' },
+  // Airway & Anaphylaxis
+  { term: 'throat closing up', label: 'Airway compromise / throat closing' },
+  { term: 'throat closing', label: 'Airway compromise / throat closing' },
+  { term: 'throat feels like it is closing', label: 'Airway compromise / throat closing' },
+  { term: 'throat feels closed', label: 'Airway compromise / throat constriction' },
+  { term: 'lips swelling', label: 'Angioedema / lip swelling' },
+  { term: 'lips are swelling', label: 'Angioedema / lip swelling' },
+  { term: 'tongue swelling', label: 'Angioedema / tongue swelling' },
+  { term: 'face swelling', label: 'Angioedema / facial swelling' },
+  { term: 'severe allergic reaction', label: 'Severe allergic reaction / anaphylaxis' },
+  { term: 'allergic reaction after eating', label: 'Food-induced allergic reaction / anaphylaxis' },
+  { term: 'anaphylaxis', label: 'Severe anaphylaxis' },
+  // Hemoptysis
+  { term: 'coughing up blood', label: 'Hemoptysis / coughing blood' },
+  { term: 'cough up blood', label: 'Hemoptysis / coughing blood' },
+  { term: 'coughing with blood', label: 'Hemoptysis / coughing with blood' },
+  { term: 'cough with blood', label: 'Hemoptysis / coughing with blood' },
+  { term: 'blood when coughing', label: 'Hemoptysis / blood when coughing' },
+  { term: 'blood while coughing', label: 'Hemoptysis / blood while coughing' },
+  { term: 'blood in cough', label: 'Hemoptysis / blood in cough' },
   { term: 'coughing blood', label: 'Hemoptysis / coughing blood' },
   { term: 'vomiting blood', label: 'Hematemesis / upper GI bleeding' },
 ];
+
+const THIRD_PERSON_REGEX = /\b(?:my\s+(?:friend|mother|mom|father|dad|wife|husband|brother|sister|uncle|aunt|colleague|neighbor|patient|child|son|daughter|relative|parent)s?|a\s+(?:friend|colleague|relative|patient|neighbor)|someone(?:\s+i\s+know)?|(?:calling|inquiring|asking)\s+(?:for|about|regarding)\s+my\s+(?:mother|mom|father|dad|wife|husband|brother|sister|friend|child|son|daughter))\b/i;
+
+const FIRST_PERSON_REASSERTION_REGEX = /\b(?:now\s+i\s+have|now\s+i|i\s+also\s+have|i\s+also|i\s+have|i\s+am\s+having|i\s+am\s+experiencing|i\s+feel|i\s+myself|myself\s+have|for\s+me)\b/i;
+
+const HISTORICAL_REGEX = /\b(?:had\s+[\w\s]{1,35}?\s+(?:last\s+year|last\s+month|years?\s+ago|months?\s+ago|long\s+ago|in\s+the\s+past|before\s+last\s+summer)|previously\s+had|once\s+had|used\s+to\s+have|used\s+to\s+get|used\s+to\s+suffer\s+from|history\s+of)\b/i;
+
+const RECURRENCE_REGEX = /\b(?:started\s+again|came\s+back|returned|started\s+this\s+morning|started\s+today|having\s+it\s+again|recurred|recurring|recurrent|happening\s+again|back\s+again|now\s+it\s+is\s+back)\b/i;
+
+const HISTORICAL_RESOLUTION_REGEX = /\b(?:feel|am)\s+(?:completely\s+|totally\s+)?(?:fine|okay|better|well|good|normal)|(?:now|today|currently)\s+(?:i\s+)?(?:am|feel)\s+(?:completely\s+|totally\s+)?(?:fine|okay|better|well|good|normal)|(?:right\s+now\s+today|today|currently|now|at\s+present)\s+(?:i\s+have\s+)?zero|zero\s+(?:chest\s+pain|symptoms?|pain|shortness\s+of\s+breath|trouble)|completely\s+fine|breathing\s+normally\s+(?:now|currently)|currently\s+(?:i'?m\s+)?breathing\s+normally|just\s+need\s+(?:a\s+)?routine|recovered\s+fully|fully\s+recovered|no\s+longer\s+(?:have|experiencing)|resolved\b/i;
 
 // Moderate & Routine clinical symptoms
 const ROUTINE_SYMPTOMS = [
@@ -55,7 +91,14 @@ const ROUTINE_SYMPTOMS = [
   { term: 'thirsty', label: 'Thirst sensation', weight: 6 },
   { term: 'frequent urination', label: 'Frequent urination / polyuria', weight: 10 },
   { term: 'mild headaches', label: 'Mild tension-type headaches', weight: 6 },
+  { term: 'headaches', label: 'Reported recurrent cephalalgia / headaches', weight: 8 },
   { term: 'headache', label: 'Reported cephalalgia / headache', weight: 8 },
+  { term: 'sore throat', label: 'Persistent pharyngitis / sore throat', weight: 8 },
+  { term: 'stomach discomfort', label: 'Abdominal discomfort / gastrointestinal symptoms', weight: 6 },
+  { term: 'bloated', label: 'Bloating / gastrointestinal distension', weight: 5 },
+  { term: 'sluggish', label: 'Sluggishness / low energy state', weight: 8 },
+  { term: 'rundown', label: 'Persistent fatigue / rundown state', weight: 8 },
+  { term: 'heavy in my limbs', label: 'Limb heaviness / asthenia', weight: 8 },
   { term: 'joint discomfort', label: 'Mild joint discomfort / arthralgia', weight: 5 },
   { term: 'joint pain', label: 'Joint pain / stiffness', weight: 7 },
   { term: 'cough', label: 'Respiratory cough', weight: 5 },
@@ -109,6 +152,117 @@ function isTermPresentAndUnnegated(text, searchPattern) {
 }
 
 /**
+ * Evaluates whether an emergency search term is present in fullText as a real,
+ * active patient emergency, properly distinguishing:
+ * - Direct negation
+ * - Third-person attribution leakage (unless overridden by first-person reassertion)
+ * - Historical symptom temporal bleed (unless overridden by acute recurrence)
+ */
+function evaluateEmergencyTerm(fullText, searchPattern) {
+  if (!fullText) return { found: false, isPatientEmergency: false, isNegated: false };
+  const normalized = fullText.toLowerCase().replace(/['’]/g, '');
+  const patternNorm = searchPattern.toLowerCase().replace(/['’]/g, '');
+
+  let foundAny = false;
+  let allNegated = true;
+  let hasValidEmergency = false;
+
+  let startIndex = 0;
+  while (startIndex < normalized.length) {
+    const termIndex = normalized.indexOf(patternNorm, startIndex);
+    if (termIndex === -1) break;
+
+    startIndex = termIndex + patternNorm.length;
+
+    // Check word boundaries
+    const beforeChar = termIndex > 0 ? normalized[termIndex - 1] : ' ';
+    const afterIndex = termIndex + patternNorm.length;
+    const afterChar = afterIndex < normalized.length ? normalized[afterIndex] : ' ';
+    if (/[a-z0-9]/.test(beforeChar) || /[a-z0-9]/.test(afterChar)) {
+      continue;
+    }
+
+    foundAny = true;
+
+    // Determine the enclosing clause / sentence for context
+    const textBeforeMatch = normalized.slice(0, termIndex);
+    const clauseBreakIndex = Math.max(
+      textBeforeMatch.lastIndexOf('.'),
+      textBeforeMatch.lastIndexOf('!'),
+      textBeforeMatch.lastIndexOf('?'),
+      textBeforeMatch.lastIndexOf(';'),
+      textBeforeMatch.lastIndexOf('\n')
+    );
+    const clauseTextBefore = clauseBreakIndex !== -1
+      ? textBeforeMatch.slice(clauseBreakIndex + 1)
+      : textBeforeMatch;
+
+    // 1. Direct Negation Check within clause
+    const isNegatedInClause = NEGATION_CUES.some((cue) => {
+      const cueNorm = cue.replace(/['’]/g, '');
+      const regex = new RegExp(`\\b${cueNorm}\\b`, 'i');
+      return regex.test(clauseTextBefore);
+    });
+
+    if (isNegatedInClause) {
+      continue;
+    }
+
+    // 2. Third-Person Attribution Check
+    let isThirdPersonAttributed = false;
+    const tpMatches = [...textBeforeMatch.matchAll(new RegExp(THIRD_PERSON_REGEX.source, 'gi'))];
+    if (tpMatches.length > 0) {
+      const lastTpEnd = tpMatches[tpMatches.length - 1].index + tpMatches[tpMatches.length - 1][0].length;
+      const interveningText = textBeforeMatch.slice(lastTpEnd);
+      if (!FIRST_PERSON_REASSERTION_REGEX.test(interveningText)) {
+        isThirdPersonAttributed = true;
+      }
+    }
+
+    if (isThirdPersonAttributed) {
+      allNegated = false;
+      continue;
+    }
+
+    // 3. Historical Symptom Temporal Check
+    let isHistoricalDescoped = false;
+    const textAfterMatch = normalized.slice(termIndex);
+    const nextClauseBreak = textAfterMatch.search(/[.!?;\n]/);
+    const clauseTextFull = clauseTextBefore + (nextClauseBreak !== -1 ? textAfterMatch.slice(0, nextClauseBreak) : textAfterMatch);
+
+    const hasPastFraming = HISTORICAL_REGEX.test(clauseTextFull) || HISTORICAL_REGEX.test(clauseTextBefore) || HISTORICAL_REGEX.test(normalized);
+    if (hasPastFraming) {
+      const hasRecurrence = RECURRENCE_REGEX.test(normalized);
+      if (!hasRecurrence) {
+        const hasResolution = HISTORICAL_RESOLUTION_REGEX.test(normalized);
+        if (hasResolution || /\b(?:previously\s+had|once\s+had|used\s+to\s+have|used\s+to\s+suffer|years\s+ago)\b/i.test(normalized)) {
+          isHistoricalDescoped = true;
+        }
+      }
+    }
+
+    if (isHistoricalDescoped) {
+      allNegated = false;
+      continue;
+    }
+
+    hasValidEmergency = true;
+    allNegated = false;
+    break;
+  }
+
+  if (!foundAny) {
+    return { found: false, isPatientEmergency: false, isNegated: false };
+  }
+
+  return {
+    found: true,
+    isPatientEmergency: hasValidEmergency,
+    isNegated: allNegated && !hasValidEmergency,
+  };
+}
+
+/**
  * Main General Health Evaluation Function
  */
 export function evaluateGeneralHealth({ symptoms = '', lifestyle = '', familyHistory = '' }) {
@@ -122,18 +276,33 @@ export function evaluateGeneralHealth({ symptoms = '', lifestyle = '', familyHis
 
   // 1. Evaluate Red-Flag / Emergency Symptoms
   for (const em of EMERGENCY_SYMPTOMS) {
-    const check = isTermPresentAndUnnegated(symptoms, em.term);
+    const check = evaluateEmergencyTerm(symptoms, em.term);
     if (check.found) {
-      if (check.negated) {
-        if (!extractedNegatedSymptoms.includes(`Denied / Ruled Out: ${em.label}`)) {
-          extractedNegatedSymptoms.push(`Denied / Ruled Out: ${em.label}`);
-        }
-      } else {
+      if (check.isPatientEmergency) {
         isEmergency = true;
         if (!emergencyTriggers.includes(em.label)) {
           emergencyTriggers.push(em.label);
           extractedPositiveSymptoms.push(`CRITICAL: ${em.label}`);
         }
+      } else if (check.isNegated) {
+        if (!extractedNegatedSymptoms.includes(`Denied / Ruled Out: ${em.label}`)) {
+          extractedNegatedSymptoms.push(`Denied / Ruled Out: ${em.label}`);
+        }
+      }
+    }
+  }
+
+  // Cross-check: Food allergy + airway symptoms
+  const symNorm = (symptoms || '').toLowerCase().replace(/['’]/g, '');
+  if (
+    /(shellfish|peanuts?|nuts?|shrimp)/i.test(symNorm) &&
+    /(throat|breath|breathing|swelling|anaphylaxis|closing)/i.test(symNorm)
+  ) {
+    if (!isEmergency) {
+      isEmergency = true;
+      if (!emergencyTriggers.includes('Acute food-induced allergic airway reaction')) {
+        emergencyTriggers.push('Acute food-induced allergic airway reaction');
+        extractedPositiveSymptoms.push('CRITICAL: Acute food-induced allergic airway reaction');
       }
     }
   }

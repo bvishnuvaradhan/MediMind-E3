@@ -1,0 +1,34 @@
+{
+  "dataset": "PediURF Official Held-Out Test Cohort (Shenzhen Children's Hospital)",
+  "total_studies": 1053,
+  "frozen_threshold": 0.01,
+  "study_sensitivity": 94.59,
+  "detected_tp": 996,
+  "missed_fn": 57,
+  "subgroup_performance": {
+    "Distal ulna and radius fractures": {
+      "total_studies": 677,
+      "detected_tp": 632,
+      "missed_fn": 45,
+      "sensitivity": 93.35
+    },
+    "Midshaft ulna and radius fractures": {
+      "total_studies": 265,
+      "detected_tp": 259,
+      "missed_fn": 6,
+      "sensitivity": 97.74
+    },
+    "Proximal ulna and radius fractures": {
+      "total_studies": 111,
+      "detected_tp": 105,
+      "missed_fn": 6,
+      "sensitivity": 94.59
+    }
+  },
+  "comparison_with_exp6_heuristic_max": {
+    "exp6_heuristic_max_sensitivity": 94.59,
+    "exp8a_localized_multiview_sensitivity": 94.59,
+    "exp6_both_missed_count": 57,
+    "exp8a_both_missed_count": 57
+  }
+}

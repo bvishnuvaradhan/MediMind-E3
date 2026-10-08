@@ -1,0 +1,21 @@
+{
+  "dataset": "PediURF External Held-Out Test Cohort",
+  "total_studies": 1053,
+  "detector_threshold": 0.17,
+  "detection_rates": {
+    "ap_detection_rate": 83.57,
+    "lat_detection_rate": 81.39,
+    "both_views_detected_rate": 70.37,
+    "neither_view_detected_rate": 5.41,
+    "ap_detected_count": 880,
+    "lat_detected_count": 857,
+    "both_detected_count": 741,
+    "neither_detected_count": 57
+  },
+  "roi_size_distribution_pct": {
+    "mean_roi_area_pct": 0.92,
+    "median_roi_area_pct": 0.82,
+    "mean_roi_width_pct": 12.94,
+    "mean_roi_height_pct": 6.94
+  }
+}

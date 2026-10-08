@@ -1,0 +1,16 @@
+{
+  "selected_threshold": 0.01,
+  "selection_dataset": "GRAZPEDWRI-DX Validation Split (N=348 Studies)",
+  "selection_rule": "High Sensitivity (>=90%) with Maximum Balanced Specificity on Validation Set",
+  "validation_metrics_at_selected_threshold": {
+    "sensitivity": 100.0,
+    "specificity": 0.0,
+    "precision": 69.54,
+    "npv": 0.0,
+    "f1_score": 0.8203,
+    "tp": 242,
+    "fp": 106,
+    "tn": 0,
+    "fn": 0
+  }
+}

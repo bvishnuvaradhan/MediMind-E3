@@ -1,0 +1,29 @@
+{
+  "dataset": "GRAZPEDWRI-DX Test Multi-View State Analysis",
+  "state_a_dual_detection": {
+    "total_studies": 209,
+    "fractured": 207,
+    "detected_tp": 207,
+    "sensitivity": 100.0
+  },
+  "state_b_ap_only": {
+    "total_studies": 14,
+    "fractured": 6,
+    "detected_tp": 6,
+    "sensitivity": 100.0
+  },
+  "state_c_lat_only_rescue": {
+    "total_studies": 39,
+    "fractured": 24,
+    "detected_tp": 24,
+    "sensitivity": 100.0
+  },
+  "state_d_zero_detection": {
+    "total_studies": 88,
+    "fractured": 12,
+    "detected_tp": 0,
+    "sensitivity": 0.0
+  },
+  "orthogonal_rescue_count": 24,
+  "both_views_missed_count": 12
+}

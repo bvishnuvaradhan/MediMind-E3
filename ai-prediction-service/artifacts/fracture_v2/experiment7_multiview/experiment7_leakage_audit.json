@@ -1,0 +1,28 @@
+{
+  "dataset": "GRAZPEDWRI-DX Multi-View Paired Cohort",
+  "split_patients": {
+    "train_unique_patients": 985,
+    "val_unique_patients": 215,
+    "test_unique_patients": 206,
+    "total_unique_patients": 1406
+  },
+  "split_paired_studies": {
+    "train_studies": 1620,
+    "val_studies": 348,
+    "test_studies": 350,
+    "total_paired_studies": 2318
+  },
+  "patient_overlap_check": {
+    "train_vs_val_overlap": 0,
+    "train_vs_test_overlap": 0,
+    "val_vs_test_overlap": 0,
+    "verdict": "ZERO_LEAKAGE"
+  },
+  "image_stem_overlap_check": {
+    "train_vs_val_stem_overlap": 0,
+    "train_vs_test_stem_overlap": 0,
+    "val_vs_test_stem_overlap": 0,
+    "verdict": "ZERO_DUPLICATES"
+  },
+  "pairing_integrity": "100% of AP and Lateral pairs from the same patient strictly remain within the exact same split."
+}
