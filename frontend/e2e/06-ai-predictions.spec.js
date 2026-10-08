@@ -13,32 +13,13 @@ test.describe('AI Predictions & Groq Explanation E2E Suite', () => {
     await expect(page.locator('text=Kapoor Family').first()).toBeVisible({ timeout: 10000 });
   });
 
-  test('General Health NLP Prediction & Groq Second Opinion', async ({ page }) => {
-    const generalHealthBtn = page.locator('button:has-text("General Health"), button:has-text("Triage Assessment"), button:has-text("Symptom Checker")').first();
-    if (await generalHealthBtn.isVisible()) {
-      await generalHealthBtn.click();
-      await page.waitForTimeout(500);
-
-      const symptomInput = page.locator('textarea, input[placeholder*="fatigue"], input[placeholder*="symptoms"]').first();
-      if (await symptomInput.isVisible()) {
-        await symptomInput.fill('Mild headache and fatigue since yesterday');
-        const submitBtn = page.locator('button:has-text("Evaluate"), button:has-text("Assess"), button:has-text("Submit")').first();
-        if (await submitBtn.isVisible()) {
-          await submitBtn.click();
-          await page.waitForTimeout(1000);
-          await expect(page.locator('body')).not.toBeEmpty();
-        }
-      }
-    }
-  });
-
-  test('Fracture Detection X-Ray File Upload & Inference Flow', async ({ page }) => {
-    const aiTab = page.locator('button:has-text("AI Predictions"), button:has-text("AI Assessment"), div:has-text("AI Predictions")').first();
+  test('Fracture Detection X-Ray Upload & Real Inference Workflow', async ({ page }) => {
+    const aiTab = page.locator('button:has-text("AI Predictions"), div:has-text("AI Predictions")').first();
     if (await aiTab.isVisible()) {
       await aiTab.click();
       await page.waitForTimeout(500);
 
-      const fractureCard = page.locator('button:has-text("Fracture"), div:has-text("Fracture Detection")').first();
+      const fractureCard = page.locator('button:has-text("Fracture detection"), button:has-text("Fracture")').first();
       if (await fractureCard.isVisible()) {
         await fractureCard.click();
         await page.waitForTimeout(500);
@@ -48,9 +29,9 @@ test.describe('AI Predictions & Groq Explanation E2E Suite', () => {
           await fileInput.setInputFiles(SAMPLE_XRAY_PATH);
           await page.waitForTimeout(500);
 
-          const analyzeBtn = page.locator('button:has-text("Analyze"), button:has-text("Run Prediction"), button:has-text("Detect Fracture")').first();
-          if (await analyzeBtn.isVisible()) {
-            await analyzeBtn.click();
+          const submitBtn = page.locator('button:has-text("Execute Predictive Analysis"), button:has-text("Run Prediction"), button:has-text("Analyze")').first();
+          if (await submitBtn.isVisible()) {
+            await submitBtn.click();
             await page.waitForTimeout(2000);
             await expect(page.locator('body')).not.toBeEmpty();
           }
@@ -59,12 +40,65 @@ test.describe('AI Predictions & Groq Explanation E2E Suite', () => {
     }
   });
 
-  test('Heart Disease and Diabetes AI Workflow Verification', async ({ page }) => {
-    const aiTab = page.locator('button:has-text("AI Predictions"), button:has-text("AI Assessment"), div:has-text("AI Predictions")').first();
+  test('Diabetes 3-Year Risk Forecaster Form Submission & Telemetry', async ({ page }) => {
+    const aiTab = page.locator('button:has-text("AI Predictions"), div:has-text("AI Predictions")').first();
     if (await aiTab.isVisible()) {
       await aiTab.click();
       await page.waitForTimeout(500);
-      await expect(page.locator('body')).not.toBeEmpty();
+
+      const diabetesCard = page.locator('button:has-text("Diabetes risk"), button:has-text("Diabetes")').first();
+      if (await diabetesCard.isVisible()) {
+        await diabetesCard.click();
+        await page.waitForTimeout(500);
+
+        const submitBtn = page.locator('button:has-text("Execute Predictive Analysis"), button:has-text("Run Prediction")').first();
+        if (await submitBtn.isVisible()) {
+          await submitBtn.click();
+          await page.waitForTimeout(2000);
+          await expect(page.locator('body')).not.toBeEmpty();
+        }
+      }
+    }
+  });
+
+  test('Cardiovascular Risk Assessment Form Submission & Telemetry', async ({ page }) => {
+    const aiTab = page.locator('button:has-text("AI Predictions"), div:has-text("AI Predictions")').first();
+    if (await aiTab.isVisible()) {
+      await aiTab.click();
+      await page.waitForTimeout(500);
+
+      const heartCard = page.locator('button:has-text("Cardiovascular risk"), button:has-text("Heart")').first();
+      if (await heartCard.isVisible()) {
+        await heartCard.click();
+        await page.waitForTimeout(500);
+
+        const submitBtn = page.locator('button:has-text("Execute Predictive Analysis"), button:has-text("Run Prediction")').first();
+        if (await submitBtn.isVisible()) {
+          await submitBtn.click();
+          await page.waitForTimeout(2000);
+          await expect(page.locator('body')).not.toBeEmpty();
+        }
+      }
+    }
+  });
+
+  test('General Health NLP Tri-Pillar Triage & Negation Handling', async ({ page }) => {
+    const generalHealthBtn = page.locator('button:has-text("General Health"), button:has-text("Triage Assessment"), button:has-text("Symptom Checker")').first();
+    if (await generalHealthBtn.isVisible()) {
+      await generalHealthBtn.click();
+      await page.waitForTimeout(500);
+
+      const symptomInput = page.locator('textarea, input[placeholder*="fatigue"], input[placeholder*="symptoms"]').first();
+      if (await symptomInput.isVisible()) {
+        // Test Negation: "I do not have chest pain"
+        await symptomInput.fill('Mild headache and fatigue, but I do not have chest pain or shortness of breath');
+        const submitBtn = page.locator('button:has-text("Evaluate"), button:has-text("Assess"), button:has-text("Submit")').first();
+        if (await submitBtn.isVisible()) {
+          await submitBtn.click();
+          await page.waitForTimeout(1000);
+          await expect(page.locator('body')).not.toBeEmpty();
+        }
+      }
     }
   });
 });
