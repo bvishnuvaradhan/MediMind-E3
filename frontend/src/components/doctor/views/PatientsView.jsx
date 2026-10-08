@@ -14,9 +14,9 @@ export function PatientsView({
     const matchesStatus = statusFilter === 'All' || pat.accessStatus === statusFilter;
     const q = searchTerm.toLowerCase();
     const matchesSearch =
-      pat.name.toLowerCase().includes(q) ||
-      pat.bloodGroup.toLowerCase().includes(q) ||
-      pat.chiefComplaint.toLowerCase().includes(q);
+      (pat.name || '').toLowerCase().includes(q) ||
+      (pat.bloodGroup || '').toLowerCase().includes(q) ||
+      (pat.chiefComplaint || '').toLowerCase().includes(q);
     return matchesStatus && matchesSearch;
   });
 

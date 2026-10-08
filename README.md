@@ -178,9 +178,29 @@ MediMind maintains exhaustive automated test suites across every tier of the app
    # Multi-account identity audit
    node backend/scripts/audit-all-role-accounts.mjs
 
-   # Frontend production build
+   # Frontend production build & lint
+   npm --prefix frontend run lint
    npm --prefix frontend run build
+
+   # End-to-End Browser Acceptance Suite (Playwright)
+   # Requires running stack (ports 5000-5008, 5173)
+   npm --prefix frontend run test:e2e
    ```
+
+---
+
+## End-to-End (E2E) Browser Testing
+
+MediMind includes an automated Playwright acceptance suite validating full browser-to-backend-to-AI workflows:
+- **Test Framework:** Playwright with headless Chromium
+- **Execution Command:** `npm --prefix frontend run test:e2e`
+- **Scope Covered:**
+  - `01-chairman.spec.js`: Executive network governance, hospital list, platform analytics, and settings.
+  - `02-hospital-admin.spec.js`: Hospital admin oversight, multi-hospital analytics (H1, H2, H3), and department rosters.
+  - `03-department-head.spec.js`: Department-specific dashboards, clinical guidelines, and cross-department isolation.
+  - `04-doctor.spec.js`: Doctor workspaces (Orthopedics, Diabetology), consultations, e-prescriptions, and practitioner identity isolation.
+  - `05-family.spec.js`: Family portals, household member switching, and cross-family boundary privacy.
+  - `06-ai-predictions.spec.js`: Live clinical inference pipelines: X-ray radiograph fracture upload, metabolic risk scoring, symptom NLP triage, and Groq supporting explanations.
 
 ---
 

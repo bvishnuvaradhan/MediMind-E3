@@ -18,9 +18,9 @@ export function PrescriptionsView({
     const matchesStatus = statusFilter === 'All' || rx.status === statusFilter;
     const q = searchTerm.toLowerCase();
     const matchesSearch =
-      rx.patientName.toLowerCase().includes(q) ||
-      rx.prescriptionNumber.toLowerCase().includes(q) ||
-      rx.diagnosis.toLowerCase().includes(q);
+      (rx.patientName || '').toLowerCase().includes(q) ||
+      (rx.prescriptionNumber || '').toLowerCase().includes(q) ||
+      (rx.diagnosis || '').toLowerCase().includes(q);
     return matchesStatus && matchesSearch;
   });
 

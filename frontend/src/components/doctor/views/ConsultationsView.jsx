@@ -19,9 +19,9 @@ export function ConsultationsView({
     const matchesStatus = statusFilter === 'All' || cons.status === statusFilter;
     const q = searchTerm.toLowerCase();
     const matchesSearch =
-      cons.patientName.toLowerCase().includes(q) ||
-      cons.consultationNumber.toLowerCase().includes(q) ||
-      cons.diagnosis.toLowerCase().includes(q);
+      (cons.patientName || '').toLowerCase().includes(q) ||
+      (cons.consultationNumber || '').toLowerCase().includes(q) ||
+      (cons.diagnosis || '').toLowerCase().includes(q);
     return matchesStatus && matchesSearch;
   });
 

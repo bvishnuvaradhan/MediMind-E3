@@ -47,9 +47,9 @@ export function AppointmentsView({
 
     const q = searchTerm.toLowerCase();
     const matchesSearch =
-      apt.patientName.toLowerCase().includes(q) ||
-      apt.token.toLowerCase().includes(q) ||
-      apt.purpose.toLowerCase().includes(q);
+      (apt.patientName || '').toLowerCase().includes(q) ||
+      (apt.token || '').toLowerCase().includes(q) ||
+      (apt.purpose || '').toLowerCase().includes(q);
 
     return matchesTab && matchesSearch;
   });
