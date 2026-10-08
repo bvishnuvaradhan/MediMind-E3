@@ -142,7 +142,7 @@ class DiabetesInferenceService:
         explanation = await GroqService.generate_explanation(
             model_type="Diabetes Risk Scoring (Gradient Boosting)",
             prediction_result=result,
-            metadata={"features": features}
+            metadata={"features": prediction_record["input_data"]}
         )
         if explanation:
             prediction_record["explanation_reference"] = explanation
