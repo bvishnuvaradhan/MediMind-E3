@@ -130,6 +130,9 @@ describe('3. Token Forwarding, Trusted Identity & Anti-Spoofing', () => {
       userId: 'user_doc_999',
       role: 'DOCTOR',
       referenceId: 'ref_profile_777',
+      doctorId: 'DOC-H1-ORTHO-1',
+      departmentId: 'DEP-H1-ORTHO',
+      hospitalId: 'HOSP-001',
     },
     JWT_SECRET,
     { expiresIn: '1h' }
@@ -144,6 +147,9 @@ describe('3. Token Forwarding, Trusted Identity & Anti-Spoofing', () => {
     expect(receivedDownstreamHeaders['x-user-id']).toBe('user_doc_999');
     expect(receivedDownstreamHeaders['x-user-role']).toBe('DOCTOR');
     expect(receivedDownstreamHeaders['x-user-reference-id']).toBe('ref_profile_777');
+    expect(receivedDownstreamHeaders['x-doctor-id']).toBe('DOC-H1-ORTHO-1');
+    expect(receivedDownstreamHeaders['x-department-id']).toBe('DEP-H1-ORTHO');
+    expect(receivedDownstreamHeaders['x-hospital-id']).toBe('HOSP-001');
   });
 
   it('injects internal service authentication secret', async () => {
@@ -160,12 +166,16 @@ describe('3. Token Forwarding, Trusted Identity & Anti-Spoofing', () => {
       .set('Authorization', `Bearer ${validToken}`)
       .set('x-user-id', 'spoofed_hacker_id')
       .set('x-user-role', 'CHAIRMAN')
+      .set('x-doctor-id', 'DOC-SPOOFED')
+      .set('x-hospital-id', 'HOSP-SPOOFED')
       .set('x-internal-service-secret', 'spoofed_secret');
 
     expect(res.status).toBe(200);
     // Downstream must receive verified JWT data, NOT the spoofed values
     expect(receivedDownstreamHeaders['x-user-id']).toBe('user_doc_999');
     expect(receivedDownstreamHeaders['x-user-role']).toBe('DOCTOR');
+    expect(receivedDownstreamHeaders['x-doctor-id']).toBe('DOC-H1-ORTHO-1');
+    expect(receivedDownstreamHeaders['x-hospital-id']).toBe('HOSP-001');
     expect(receivedDownstreamHeaders['x-internal-service-secret']).toBe(INTERNAL_SECRET);
   });
 });

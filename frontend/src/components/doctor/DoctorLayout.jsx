@@ -196,13 +196,37 @@ export function DoctorLayout({ dark, setDark }) {
           }
         : prof;
 
+      const currentDocId = matchedDoctor?.id || user?.doctorId || 'doc_001';
+      const currentDocName = matchedDoctor?.name || user?.name || '';
+      const currentDeptName = matchedDoctor?.departmentName || user?.departmentName || 'Orthopedics';
+
+      const docAppointments = (apts && apts.length > 0 ? apts : []).filter(
+        (a) => a.doctorId === currentDocId || (currentDocName && a.doctorName && a.doctorName.toLowerCase().includes(currentDocName.toLowerCase()))
+      );
+
+      const docConsultations = (cons && cons.length > 0 ? cons : []).filter(
+        (c) => c.doctorId === currentDocId || (currentDocName && c.doctorName && c.doctorName.toLowerCase().includes(currentDocName.toLowerCase()))
+      );
+
+      const docPrescriptions = (rxs && rxs.length > 0 ? rxs : []).filter(
+        (p) => p.doctorId === currentDocId || (currentDocName && p.doctorName && p.doctorName.toLowerCase().includes(currentDocName.toLowerCase()))
+      );
+
+      const aptPatientNames = new Set(docAppointments.map((a) => a.patientName).filter(Boolean));
+      const aptPatientIds = new Set(docAppointments.map((a) => a.patientId || a.memberId).filter(Boolean));
+      const docPatients = pats.filter((p) => aptPatientIds.has(p.id) || aptPatientIds.has(p.memberId) || aptPatientNames.has(p.name));
+
+      const docArticles = (arts && arts.length > 0 ? arts : []).filter(
+        (a) => a.department === currentDeptName || a.departmentId === matchedDoctor?.departmentId
+      );
+
       setDoctorProfile(effectiveProfile);
-      setPatients(pats);
-      setAppointments(apts);
-      setConsultations(cons);
-      setPrescriptions(rxs);
+      setPatients(docPatients.length > 0 ? docPatients : (matchedDoctor ? pats.filter((p) => p.department === currentDeptName || p.accessScope?.includes(currentDeptName)) : pats));
+      setAppointments(docAppointments);
+      setConsultations(docConsultations);
+      setPrescriptions(docPrescriptions);
       setAccessHistory(accs);
-      setArticles(arts);
+      setArticles(docArticles.length > 0 ? docArticles : arts);
       setNotifications(notifs);
       setSettings(stts);
     }

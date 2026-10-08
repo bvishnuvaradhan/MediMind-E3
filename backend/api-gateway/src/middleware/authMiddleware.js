@@ -22,6 +22,22 @@ export const verifyJwt = (req, res, next) => {
     req.headers['x-user-id'] = decoded.userId;
     req.headers['x-user-role'] = decoded.role;
     req.headers['x-user-reference-id'] = decoded.referenceId || '';
+    if (decoded.familyId) {
+      req.headers['x-family-id'] = decoded.familyId;
+      req.headers['x-user-family-id'] = decoded.familyId;
+    }
+    if (decoded.doctorId) {
+      req.headers['x-doctor-id'] = decoded.doctorId;
+      req.headers['x-user-doctor-id'] = decoded.doctorId;
+    }
+    if (decoded.departmentId) {
+      req.headers['x-department-id'] = decoded.departmentId;
+      req.headers['x-user-department-id'] = decoded.departmentId;
+    }
+    if (decoded.hospitalId) {
+      req.headers['x-hospital-id'] = decoded.hospitalId;
+      req.headers['x-user-hospital-id'] = decoded.hospitalId;
+    }
     req.headers['x-internal-service-secret'] = internalSecret;
 
     next();
@@ -55,6 +71,22 @@ export const optionalJwt = (req, res, next) => {
     req.headers['x-user-id'] = decoded.userId;
     req.headers['x-user-role'] = decoded.role;
     req.headers['x-user-reference-id'] = decoded.referenceId || '';
+    if (decoded.familyId) {
+      req.headers['x-family-id'] = decoded.familyId;
+      req.headers['x-user-family-id'] = decoded.familyId;
+    }
+    if (decoded.doctorId) {
+      req.headers['x-doctor-id'] = decoded.doctorId;
+      req.headers['x-user-doctor-id'] = decoded.doctorId;
+    }
+    if (decoded.departmentId) {
+      req.headers['x-department-id'] = decoded.departmentId;
+      req.headers['x-user-department-id'] = decoded.departmentId;
+    }
+    if (decoded.hospitalId) {
+      req.headers['x-hospital-id'] = decoded.hospitalId;
+      req.headers['x-user-hospital-id'] = decoded.hospitalId;
+    }
     req.headers['x-internal-service-secret'] = internalSecret;
 
     next();

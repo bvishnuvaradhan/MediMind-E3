@@ -18,6 +18,15 @@ export const sanitizeIdentityHeaders = (req, res, next) => {
   delete req.headers['x-user-id'];
   delete req.headers['x-user-role'];
   delete req.headers['x-user-reference-id'];
+  delete req.headers['x-family-id'];
+  delete req.headers['x-user-family-id'];
+  delete req.headers['x-doctor-id'];
+  delete req.headers['x-user-doctor-id'];
+  delete req.headers['x-department-id'];
+  delete req.headers['x-user-department-id'];
+  delete req.headers['x-hospital-id'];
+  delete req.headers['x-user-hospital-id'];
+  delete req.headers['x-member-id'];
   delete req.headers['x-internal-service-secret'];
 
   next();

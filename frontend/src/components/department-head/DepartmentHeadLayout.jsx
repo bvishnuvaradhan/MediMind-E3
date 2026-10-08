@@ -150,13 +150,23 @@ export function DepartmentHeadLayout({ dark, setDark }) {
         ? allDoctors.filter((d) => d.departmentId === matchedHead.departmentId)
         : docs;
 
+      const targetDeptId = matchedHead?.departmentId || user?.departmentId || 'DEP-H1-ORTHO';
+      const targetDeptName = matchedDept?.name || matchedHead?.departmentName || 'Orthopedics';
+
+      const scopedAppointments = appointments.filter(
+        (a) => a.departmentId === targetDeptId || (a.departmentName && a.departmentName.toLowerCase().includes(targetDeptName.toLowerCase()))
+      );
+      const scopedArticles = knowledgeArticles.filter(
+        (a) => a.departmentId === targetDeptId || (a.department && a.department.toLowerCase().includes(targetDeptName.toLowerCase()))
+      );
+
       setProfile(effectiveProfile);
       setDepartmentInfo(effectiveDept);
       setDoctors(scopedDoctors.length > 0 ? scopedDoctors : docs);
-      setAppointments(apts);
+      setAppointments(scopedAppointments.length > 0 ? scopedAppointments : apts);
       setAnalytics(anlyt);
       setPerformance(perf);
-      setArticles(arts);
+      setArticles(scopedArticles.length > 0 ? scopedArticles : arts);
       setSettings(stt);
     }
     loadData();

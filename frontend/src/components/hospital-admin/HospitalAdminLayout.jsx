@@ -236,7 +236,11 @@ export function HospitalAdminLayout({ dark, setDark }) {
     const list = allDoctors.filter((d) => d.hospitalId === activeHospitalId);
     return list.length > 0 ? list : initialHospitalDoctors;
   });
-  const [appointments] = useState(initialAppointments);
+  const [appointments, setAppointments] = useState(() => {
+    return initialAppointments.filter(
+      (a) => a.hospitalId === activeHospitalId || (a.hospitalName && activeHospital && a.hospitalName.toLowerCase().includes(activeHospital.name.toLowerCase()))
+    );
+  });
   const [analytics] = useState(initialHospitalAnalytics);
   const [reports, setReports] = useState(initialReports);
   const [knowledge] = useState(initialKnowledgeActivity);
@@ -253,6 +257,10 @@ export function HospitalAdminLayout({ dark, setDark }) {
     if (heads.length > 0) setDepartmentHeads(heads);
     const docs = allDoctors.filter((d) => d.hospitalId === targetHospId);
     if (docs.length > 0) setDoctors(docs);
+    const hospApts = initialAppointments.filter(
+      (a) => a.hospitalId === targetHospId || (a.hospitalName && targetHosp && a.hospitalName.toLowerCase().includes(targetHosp.name.toLowerCase()))
+    );
+    setAppointments(hospApts);
   }, [user]);
 
   const announce = (message) => {

@@ -23,6 +23,46 @@ export const forwardRequest = (targetServiceUrl) => {
         headers['x-user-id'] = req.user.userId;
         headers['x-user-role'] = req.user.role;
         headers['x-user-reference-id'] = req.user.referenceId || '';
+        if (req.user.familyId) {
+          headers['x-family-id'] = req.user.familyId;
+          headers['x-user-family-id'] = req.user.familyId;
+        } else {
+          delete headers['x-family-id'];
+          delete headers['x-user-family-id'];
+        }
+        if (req.user.doctorId) {
+          headers['x-doctor-id'] = req.user.doctorId;
+          headers['x-user-doctor-id'] = req.user.doctorId;
+        } else {
+          delete headers['x-doctor-id'];
+          delete headers['x-user-doctor-id'];
+        }
+        if (req.user.departmentId) {
+          headers['x-department-id'] = req.user.departmentId;
+          headers['x-user-department-id'] = req.user.departmentId;
+        } else {
+          delete headers['x-department-id'];
+          delete headers['x-user-department-id'];
+        }
+        if (req.user.hospitalId) {
+          headers['x-hospital-id'] = req.user.hospitalId;
+          headers['x-user-hospital-id'] = req.user.hospitalId;
+        } else {
+          delete headers['x-hospital-id'];
+          delete headers['x-user-hospital-id'];
+        }
+      } else {
+        delete headers['x-user-id'];
+        delete headers['x-user-role'];
+        delete headers['x-user-reference-id'];
+        delete headers['x-family-id'];
+        delete headers['x-user-family-id'];
+        delete headers['x-doctor-id'];
+        delete headers['x-user-doctor-id'];
+        delete headers['x-department-id'];
+        delete headers['x-user-department-id'];
+        delete headers['x-hospital-id'];
+        delete headers['x-user-hospital-id'];
       }
 
       const options = {

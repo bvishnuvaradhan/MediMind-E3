@@ -22,6 +22,7 @@ export const authenticateFamily = (req, res, next) => {
         userId,
         role,
         referenceId: referenceId || null,
+        familyId: req.headers['x-user-family-id'] || req.headers['x-family-id'] || null,
       };
       return next();
     }

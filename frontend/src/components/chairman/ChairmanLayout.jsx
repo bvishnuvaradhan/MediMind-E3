@@ -203,9 +203,11 @@ export function ChairmanLayout({ dark, setDark }) {
 
         {/* User Card */}
         <div className="chairman-user-card">
-          <div className="chairman-avatar">SM</div>
+          <div className="chairman-avatar">
+            {user?.avatarInitials || (user?.name ? user.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : 'CO')}
+          </div>
           <div className="chairman-user-copy">
-            <strong>{user?.name || 'Dr. Suresh Menon'}</strong>
+            <strong>{user?.name || 'Dr. Devendra Roy'}</strong>
             <span>Platform Owner</span>
           </div>
         </div>

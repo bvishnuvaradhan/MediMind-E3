@@ -9,17 +9,19 @@ export const authenticate = (req, res, next) => {
     const userId = req.headers['x-user-id'];
     const role = req.headers['x-user-role'];
     const referenceId = req.headers['x-user-reference-id'];
-    const hospitalId = req.headers['x-user-hospital-id'];
-    const departmentId = req.headers['x-user-department-id'];
+    const hospitalId = req.headers['x-user-hospital-id'] || req.headers['x-hospital-id'];
+    const departmentId = req.headers['x-user-department-id'] || req.headers['x-department-id'];
+    const familyId = req.headers['x-user-family-id'] || req.headers['x-family-id'];
+    const doctorId = req.headers['x-user-doctor-id'] || req.headers['x-doctor-id'];
 
     if (userId && role) {
       req.user = {
         userId,
         role,
         referenceId: referenceId || null,
-        familyId: role === 'FAMILY' ? referenceId : null,
-        doctorId: role === 'DOCTOR' ? referenceId : null,
-        hospitalId: role === 'HOSPITAL_ADMIN' ? referenceId : (hospitalId || null),
+        familyId: role === 'FAMILY' ? (familyId || referenceId) : null,
+        doctorId: role === 'DOCTOR' ? (doctorId || referenceId) : null,
+        hospitalId: role === 'HOSPITAL_ADMIN' ? (hospitalId || referenceId) : (hospitalId || null),
         departmentId: departmentId || null,
       };
       return next();
@@ -71,17 +73,19 @@ export const optionalAuth = (req, res, next) => {
     const userId = req.headers['x-user-id'];
     const role = req.headers['x-user-role'];
     const referenceId = req.headers['x-user-reference-id'];
-    const hospitalId = req.headers['x-user-hospital-id'];
-    const departmentId = req.headers['x-user-department-id'];
+    const hospitalId = req.headers['x-user-hospital-id'] || req.headers['x-hospital-id'];
+    const departmentId = req.headers['x-user-department-id'] || req.headers['x-department-id'];
+    const familyId = req.headers['x-user-family-id'] || req.headers['x-family-id'];
+    const doctorId = req.headers['x-user-doctor-id'] || req.headers['x-doctor-id'];
 
     if (userId && role) {
       req.user = {
         userId,
         role,
         referenceId: referenceId || null,
-        familyId: role === 'FAMILY' ? referenceId : null,
-        doctorId: role === 'DOCTOR' ? referenceId : null,
-        hospitalId: role === 'HOSPITAL_ADMIN' ? referenceId : (hospitalId || null),
+        familyId: role === 'FAMILY' ? (familyId || referenceId) : null,
+        doctorId: role === 'DOCTOR' ? (doctorId || referenceId) : null,
+        hospitalId: role === 'HOSPITAL_ADMIN' ? (hospitalId || referenceId) : (hospitalId || null),
         departmentId: departmentId || null,
       };
       return next();
