@@ -98,7 +98,7 @@ const hospitalSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['ACTIVE', 'INACTIVE'],
+      enum: ['ACTIVE', 'INACTIVE', 'PENDING', 'APPROVED'],
       default: 'ACTIVE',
     },
     created_by: {
