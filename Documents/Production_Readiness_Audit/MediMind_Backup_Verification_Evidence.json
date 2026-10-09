@@ -1,0 +1,88 @@
+{
+  "audit": "MediMind Production-Readiness Database Backup & Recovery Verification",
+  "timestamp": "2026-10-09T13:07:50+05:30",
+  "backupLocation": "D:\\MediMind_Backups\\MediMind_DB_Backup_20261009_130629",
+  "host": "127.0.0.1",
+  "port": 27017,
+  "status": "VERIFIED",
+  "compression": "gzip",
+  "checksumAlgorithm": "SHA256",
+  "manifestFile": "backup_manifest.json",
+  "checksumFile": "checksums.sha256",
+  "totalDatabasesTargeted": 8,
+  "totalDatabasesVerified": 8,
+  "totalCanonicalCollections": 15,
+  "totalDocuments": 8365,
+  "databases": [
+    {
+      "name": "medimind_ai",
+      "collections": [
+        { "name": "predictions", "count": 1301 }
+      ],
+      "restoreVerification": "PASSED"
+    },
+    {
+      "name": "medimind_appointment",
+      "collections": [
+        { "name": "appointments", "count": 2842 }
+      ],
+      "restoreVerification": "PASSED"
+    },
+    {
+      "name": "medimind_auth",
+      "collections": [
+        { "name": "users", "count": 59 }
+      ],
+      "restoreVerification": "PASSED"
+    },
+    {
+      "name": "medimind_doctor",
+      "collections": [
+        { "name": "doctors", "count": 29 }
+      ],
+      "restoreVerification": "PASSED"
+    },
+    {
+      "name": "medimind_family",
+      "collections": [
+        { "name": "families", "count": 10 },
+        { "name": "familymembers", "count": 44 }
+      ],
+      "restoreVerification": "PASSED"
+    },
+    {
+      "name": "medimind_hospital",
+      "collections": [
+        { "name": "hospitals", "count": 5 },
+        { "name": "departments", "count": 13 },
+        { "name": "departmentheads", "count": 14 },
+        { "name": "hospitalrequests", "count": 5 }
+      ],
+      "restoreVerification": "PASSED"
+    },
+    {
+      "name": "medimind_knowledge",
+      "collections": [
+        { "name": "articles", "count": 39 }
+      ],
+      "restoreVerification": "PASSED"
+    },
+    {
+      "name": "medimind_records",
+      "collections": [
+        { "name": "consultations", "count": 1763 },
+        { "name": "medicalrecords", "count": 25 },
+        { "name": "prescriptions", "count": 1312 },
+        { "name": "recordaccesses", "count": 904 }
+      ],
+      "restoreVerification": "PASSED"
+    }
+  ],
+  "isolatedRestoreTest": {
+    "technique": "Restoration into temporary isolated databases (backup_verify_<name>)",
+    "verificationMethod": "Exact countDocuments() comparison per collection",
+    "result": "8 / 8 core databases matched 100% of collection document counts",
+    "teardown": "All temporary backup_verify_* databases dropped cleanly post-verification",
+    "productionImpact": "Zero impact; original core databases remained completely untouched"
+  }
+}
