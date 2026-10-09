@@ -102,3 +102,14 @@ foreach ($origName in $coreDatabases) {
 }
 
 Write-Host "Backup and verification completed ($verifiedCount / $($coreDatabases.Count) databases verified). Backup located at $backupDir"
+
+# Retention policy: Prune backups older than 30 days, keeping at least 3 recent backups
+$retentionDays = 30
+$allBackups = Get-ChildItem -Path $backupRoot -Directory -Filter "MediMind_DB_Backup_*" | Sort-Object CreationTime -Descending
+if ($allBackups.Count -gt 3) {
+    $expiredBackups = $allBackups | Select-Object -Skip 3 | Where-Object { $_.CreationTime -lt (Get-Date).AddDays(-$retentionDays) }
+    foreach ($expired in $expiredBackups) {
+        Write-Host "Pruning expired backup under 30-day retention: $($expired.FullName)"
+        Remove-Item -Path $expired.FullName -Recurse -Force
+    }
+}
