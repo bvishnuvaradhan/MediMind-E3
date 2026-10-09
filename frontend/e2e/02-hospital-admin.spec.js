@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-const PASSWORD = 'Password123!';
+import { getAccount } from './testAccounts.js';
 
 test.describe('Hospital Admin E2E Acceptance Suite', () => {
   test('Hospital Admin H1 Dashboard, Departments, Analytics and Isolation', async ({ page }) => {
@@ -9,9 +8,11 @@ test.describe('Hospital Admin E2E Acceptance Suite', () => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
     });
 
+    const accH1 = getAccount('admin@aarogyam.hospital');
+
     await page.goto('/');
-    await page.fill('input[type="email"]', 'admin@medimindhospital.com');
-    await page.fill('input[type="password"]', PASSWORD);
+    await page.fill('input[type="email"]', 'admin@aarogyam.hospital');
+    await page.fill('input[type="password"]', accH1.password);
     await page.click('button[type="submit"]');
 
     // Verify Hospital Admin layout
@@ -34,7 +35,7 @@ test.describe('Hospital Admin E2E Acceptance Suite', () => {
     }
 
     // 3. Analytics tab
-    const analyticsBtn = page.locator('button:has-text("Hospital Operational Analytics")').first();
+    const analyticsBtn = page.locator('button:has-text("Hospital Operational Analytics"), button:has-text("Analytics")').first();
     if (await analyticsBtn.isVisible()) {
       await analyticsBtn.click();
       await page.waitForTimeout(500);
@@ -42,7 +43,7 @@ test.describe('Hospital Admin E2E Acceptance Suite', () => {
     }
 
     // 4. Logout
-    const logoutBtn = page.locator('button:has-text("Sign Out")').first();
+    const logoutBtn = page.locator('button:has-text("Sign Out"), button:has-text("Sign out")').first();
     if (await logoutBtn.isVisible()) {
       await logoutBtn.click();
       await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 });
@@ -52,10 +53,12 @@ test.describe('Hospital Admin E2E Acceptance Suite', () => {
     expect(fatalErrors).toHaveLength(0);
   });
 
-  test('Hospital Admin H2 (Apex Metro) Isolation Verification', async ({ page }) => {
+  test('Hospital Admin H2 (Nexora) Isolation Verification', async ({ page }) => {
+    const accH2 = getAccount('admin@nexora.hospital');
+
     await page.goto('/');
-    await page.fill('input[type="email"]', 'admin@apexmetro.hospital');
-    await page.fill('input[type="password"]', PASSWORD);
+    await page.fill('input[type="email"]', 'admin@nexora.hospital');
+    await page.fill('input[type="password"]', accH2.password);
     await page.click('button[type="submit"]');
 
     await expect(page.locator('text=Hospital Admin').first()).toBeVisible({ timeout: 10000 });

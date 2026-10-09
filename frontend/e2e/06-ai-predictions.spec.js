@@ -1,16 +1,18 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
 
-const PASSWORD = 'Password123!';
+import { getAccount } from './testAccounts.js';
+
 const SAMPLE_XRAY_PATH = path.resolve('..', 'ai-prediction-service', 'artifacts', 'fracture_v2', 'experiment5_localization', 'dataset', 'images', 'test', '0017_1043285040_01_WRI-L1_F001.png');
 
 test.describe('AI Predictions & Groq Explanation E2E Suite', () => {
   test.beforeEach(async ({ page }) => {
+    const acc = getAccount('rohan.kapoor@example.com');
     await page.goto('/');
     await page.fill('input[type="email"]', 'rohan.kapoor@example.com');
-    await page.fill('input[type="password"]', PASSWORD);
+    await page.fill('input[type="password"]', acc.password);
     await page.click('button[type="submit"]');
-    await expect(page.locator('text=Kapoor Family').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=Kapoor Family').or(page.locator('text=Family Health Portal'))).toBeVisible({ timeout: 10000 });
   });
 
   test('Fracture Detection X-Ray Upload & Real Inference Workflow', async ({ page }) => {

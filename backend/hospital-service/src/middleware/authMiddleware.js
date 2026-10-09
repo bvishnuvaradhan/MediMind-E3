@@ -64,6 +64,7 @@ export const optionalAuth = (req, res, next) => {
   if (providedInternalSecret && providedInternalSecret === internalSecret) {
     const userId = req.headers['x-user-id'];
     const role = req.headers['x-user-role'];
+    const referenceId = req.headers['x-user-reference-id'];
     const hospitalId = req.headers['x-user-hospital-id'] || req.headers['x-hospital-id'];
     if (userId && role) {
       req.user = {

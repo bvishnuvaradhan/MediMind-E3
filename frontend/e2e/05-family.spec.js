@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-const PASSWORD = 'Password123!';
+import { getAccount } from './testAccounts.js';
 
 test.describe('Family E2E Acceptance Suite', () => {
   test('Family Rohan Kapoor (FAM-001) Dashboard & Member Switching', async ({ page }) => {
@@ -9,9 +8,11 @@ test.describe('Family E2E Acceptance Suite', () => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
     });
 
+    const acc1 = getAccount('rohan.kapoor@example.com');
+
     await page.goto('/');
     await page.fill('input[type="email"]', 'rohan.kapoor@example.com');
-    await page.fill('input[type="password"]', PASSWORD);
+    await page.fill('input[type="password"]', acc1.password);
     await page.click('button[type="submit"]');
 
     // Verify Family layout
@@ -38,9 +39,11 @@ test.describe('Family E2E Acceptance Suite', () => {
   });
 
   test('Family Ravi Sharma (FAM-002) Cross-Family Isolation Verification', async ({ page }) => {
+    const acc2 = getAccount('ravi.sharma@example.com');
+
     await page.goto('/');
     await page.fill('input[type="email"]', 'ravi.sharma@example.com');
-    await page.fill('input[type="password"]', PASSWORD);
+    await page.fill('input[type="password"]', acc2.password);
     await page.click('button[type="submit"]');
 
     await expect(page.locator('text=Sharma Family').or(page.locator('text=Family Health Portal'))).toBeVisible({ timeout: 10000 });

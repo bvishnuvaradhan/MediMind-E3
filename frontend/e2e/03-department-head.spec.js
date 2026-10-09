@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-const PASSWORD = 'Password123!';
+import { getAccount } from './testAccounts.js';
 
 test.describe('Department Head E2E Acceptance Suite', () => {
   test('Orthopedics Department Head Verification', async ({ page }) => {
@@ -9,15 +8,17 @@ test.describe('Department Head E2E Acceptance Suite', () => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
     });
 
+    const acc1 = getAccount('arun.prakash@aarogyam.hospital');
+
     await page.goto('/');
-    await page.fill('input[type="email"]', 'priya.sharma@medimindhospital.com');
-    await page.fill('input[type="password"]', PASSWORD);
+    await page.fill('input[type="email"]', 'arun.prakash@aarogyam.hospital');
+    await page.fill('input[type="password"]', acc1.password);
     await page.click('button[type="submit"]');
 
     // Verify Department Head layout
     await expect(page.locator('text=Department Head').first()).toBeVisible({ timeout: 10000 });
 
-    // Verify Knowledge View loads without ReferenceError (knowledgeArticles)
+    // Verify Knowledge View loads without ReferenceError
     const knowledgeTab = page.locator('button:has-text("Knowledge")').first();
     if (await knowledgeTab.isVisible()) {
       await knowledgeTab.click();
@@ -30,9 +31,11 @@ test.describe('Department Head E2E Acceptance Suite', () => {
   });
 
   test('Diabetology Department Head Isolation Verification', async ({ page }) => {
+    const acc2 = getAccount('meenakshi.sundaram@aarogyam.hospital');
+
     await page.goto('/');
-    await page.fill('input[type="email"]', 'suresh.iyer@medimindhospital.com');
-    await page.fill('input[type="password"]', PASSWORD);
+    await page.fill('input[type="email"]', 'meenakshi.sundaram@aarogyam.hospital');
+    await page.fill('input[type="password"]', acc2.password);
     await page.click('button[type="submit"]');
 
     await expect(page.locator('text=Department Head').first()).toBeVisible({ timeout: 10000 });
