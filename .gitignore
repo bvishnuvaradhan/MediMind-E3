@@ -52,3 +52,9 @@ playwright-report/
 test-results/
 frontend/playwright-report/
 frontend/test-results/
+
+# Build Outputs, Checkpoints & Audit Deliverables
+dist/
+frontend/dist/
+.ipynb_checkpoints/
+MediMind_Test_Reports/
