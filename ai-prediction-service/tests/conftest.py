@@ -7,21 +7,90 @@ Provides:
   - family_token         : JWT for a FAMILY-role user owning a specific family member
   - doctor_token         : JWT for a DOCTOR-role user (full access)
   - make_family_token    : Factory fixture to create custom FAMILY JWTs
+  - cleanup_test_database: Autouse session fixture cleaning up isolated test DB
 """
 
+import logging
 import os
+import re
 import uuid
 
-import pytest
 import jwt
+import pytest
 from fastapi.testclient import TestClient
+from pymongo import MongoClient
 
-os.environ["DB_NAME"] = f"medimind_ai_test_{uuid.uuid4().hex[:8]}"
+logger = logging.getLogger("ai_service.tests")
+
+# Explicit session-isolated test database identifier
+_SESSION_ID = uuid.uuid4().hex[:8]
+_SESSION_TEST_DB_NAME = f"medimind_ai_test_{_SESSION_ID}"
+
+os.environ["DB_NAME"] = _SESSION_TEST_DB_NAME
 os.environ["JWT_SECRET"] = "test-only-jwt-secret-not-for-deployment"
 os.environ["INTERNAL_SERVICE_KEY"] = "test-only-internal-service-key-not-for-deployment"
 
 from app.main import app
 from app.core.config import settings
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Session Database Lifecycle & Cleanup
+# ─────────────────────────────────────────────────────────────────────────────
+
+@pytest.fixture(scope="session", autouse=True)
+def cleanup_test_database():
+    """
+    Session-level fixture that automatically drops the session's isolated test database
+    (medimind_ai_test_<unique_session_id>) upon pytest completion, ensuring clean state.
+    Strictly guards against dropping any production or non-session database.
+    """
+    yield
+
+    # Strict guard verification before teardown
+    expected_pattern = re.compile(r"^medimind_ai_test_[0-9a-f]{8}$")
+    if (
+        not _SESSION_TEST_DB_NAME
+        or not expected_pattern.match(_SESSION_TEST_DB_NAME)
+        or _SESSION_TEST_DB_NAME == "medimind_ai"
+        or _SESSION_TEST_DB_NAME != f"medimind_ai_test_{_SESSION_ID}"
+    ):
+        logger.error(
+            "Teardown guard aborted: '%s' is not a valid isolated test database name for session '%s'.",
+            _SESSION_TEST_DB_NAME,
+            _SESSION_ID,
+        )
+        return
+
+    # Close any lingering async Motor client connections if active
+    try:
+        from app.core.database import Database
+        if Database.client:
+            Database.client.close()
+            Database.client = None
+            Database.db = None
+    except Exception as exc:
+        logger.warning("Error closing async Database client during teardown: %s", exc)
+
+    # Connect synchronously with short timeout to drop the session test database
+    mongo_client = None
+    try:
+        mongo_client = MongoClient(settings.MONGO_URI, serverSelectionTimeoutMS=2000)
+        existing_dbs = mongo_client.list_database_names()
+        if _SESSION_TEST_DB_NAME in existing_dbs:
+            mongo_client.drop_database(_SESSION_TEST_DB_NAME)
+            logger.info("Successfully dropped session test database '%s'.", _SESSION_TEST_DB_NAME)
+        else:
+            logger.info("Session test database '%s' was not persisted to disk; no drop needed.", _SESSION_TEST_DB_NAME)
+    except Exception as exc:
+        logger.warning(
+            "Failed to clean up test database '%s' during teardown: %s",
+            _SESSION_TEST_DB_NAME,
+            exc,
+        )
+    finally:
+        if mongo_client:
+            mongo_client.close()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
