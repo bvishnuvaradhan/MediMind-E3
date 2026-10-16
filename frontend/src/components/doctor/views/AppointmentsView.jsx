@@ -35,15 +35,17 @@ export function AppointmentsView({
   onOpenAiExplain,
   onOpenFullAiAnalysis,
   onUpdateStatus,
+  onCancelAppointment,
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [tabFilter, setTabFilter] = useState('Today');
 
   const filteredAppointments = appointments.filter((apt) => {
     let matchesTab = true;
-    if (tabFilter === 'Today') matchesTab = apt.date?.includes('Today');
-    else if (tabFilter === 'Upcoming') matchesTab = apt.status === 'Confirmed' && !apt.date?.includes('Today');
+    if (tabFilter === 'Today') matchesTab = apt.date?.includes('Today') && apt.status !== 'Cancelled';
+    else if (tabFilter === 'Upcoming') matchesTab = (apt.status === 'Confirmed' || apt.status === 'Booked') && !apt.date?.includes('Today');
     else if (tabFilter === 'Completed') matchesTab = apt.status === 'Completed';
+    else if (tabFilter === 'Cancelled') matchesTab = apt.status === 'Cancelled';
 
     const q = searchTerm.toLowerCase();
     const matchesSearch =
@@ -99,6 +101,12 @@ export function AppointmentsView({
             onClick={() => setTabFilter('Completed')}
           >
             Completed
+          </button>
+          <button
+            className={`doctor-tab-btn ${tabFilter === 'Cancelled' ? 'active' : ''}`}
+            onClick={() => setTabFilter('Cancelled')}
+          >
+            Cancelled ({appointments.filter((a) => a.status === 'Cancelled').length})
           </button>
           <button
             className={`doctor-tab-btn ${tabFilter === 'All' ? 'active' : ''}`}
@@ -286,15 +294,26 @@ export function AppointmentsView({
                             Records
                           </button>
 
-                          {apt.status !== 'Completed' && (
-                            <button
-                              type="button"
-                              className="doctor-btn doctor-btn-outline doctor-btn-sm"
-                              onClick={() => onUpdateStatus(apt.id, 'Completed')}
-                              style={{ fontSize: '11px', padding: '4px 8px' }}
-                            >
-                              Mark Done
-                            </button>
+                          {apt.status !== 'Completed' && apt.status !== 'Cancelled' && (
+                            <>
+                              <button
+                                type="button"
+                                className="doctor-btn doctor-btn-outline doctor-btn-sm"
+                                onClick={() => onUpdateStatus(apt.id, 'Completed')}
+                                style={{ fontSize: '11px', padding: '4px 8px' }}
+                              >
+                                Mark Done
+                              </button>
+                              <button
+                                type="button"
+                                className="doctor-btn doctor-btn-sm"
+                                onClick={() => onCancelAppointment && onCancelAppointment(apt)}
+                                style={{ fontSize: '11px', padding: '4px 8px', color: '#dc2626', borderColor: '#fca5a5', backgroundColor: '#fff1f2' }}
+                                title="Cancel consultation and notify patient with alternative options"
+                              >
+                                Cancel
+                              </button>
+                            </>
                           )}
                         </div>
                       </td>

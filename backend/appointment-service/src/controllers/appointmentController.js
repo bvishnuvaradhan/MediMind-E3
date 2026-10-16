@@ -111,4 +111,42 @@ export const appointmentController = {
       next(error);
     }
   },
+
+  /**
+   * Get alternative doctors and slots after cancellation
+   */
+  async getAlternatives(req, res, next) {
+    try {
+      const appointmentId = req.params.appointmentId || req.query.appointmentId;
+      const alternatives = await appointmentService.getAlternatives(req.user, appointmentId, req.query);
+      return successResponse(res, 200, 'Alternative appointments retrieved successfully', alternatives);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * Get in-app notifications
+   */
+  async getNotifications(req, res, next) {
+    try {
+      const notifications = await appointmentService.getNotifications(req.user, req.query);
+      return successResponse(res, 200, 'Notifications retrieved successfully', notifications);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * Mark notification as read
+   */
+  async markNotificationRead(req, res, next) {
+    try {
+      const { notificationId } = req.params;
+      const notification = await appointmentService.markNotificationRead(req.user, notificationId);
+      return successResponse(res, 200, 'Notification marked as read', notification);
+    } catch (error) {
+      next(error);
+    }
+  },
 };

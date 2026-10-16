@@ -10,6 +10,8 @@ export function AppointmentsView({
   appointmentStatuses = {},
   onCancelAppointment,
   onRescheduleAppointment,
+  onFindAlternative,
+  cancellationAlerts = [],
   familyMembers = [],
   setReturnTo,
   appointments = null,
@@ -55,6 +57,34 @@ export function AppointmentsView({
       </div>
 
       <div className="feature-panel">
+        {/* Urgent Cancellation Alerts Banner */}
+        {cancellationAlerts && cancellationAlerts.length > 0 && (
+          <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '14px 18px', marginBottom: '18px' }}>
+            {cancellationAlerts.map((alert, aIdx) => (
+              <div key={alert.id || aIdx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', borderBottom: aIdx < cancellationAlerts.length - 1 ? '1px solid #fee2e2' : 'none', paddingBottom: aIdx < cancellationAlerts.length - 1 ? '10px' : 0, marginBottom: aIdx < cancellationAlerts.length - 1 ? '10px' : 0 }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#b91c1c', fontWeight: 700, fontSize: '13.5px' }}>
+                    <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#dc2626' }} />
+                    {alert.title || 'Appointment Cancelled by Clinician'}
+                  </div>
+                  <div style={{ fontSize: '12.5px', color: '#7f1d1d', marginTop: '3px' }}>
+                    {alert.message}
+                  </div>
+                </div>
+                {onFindAlternative && (
+                  <button
+                    type="button"
+                    className="primary-button compact-button"
+                    style={{ backgroundColor: '#dc2626', borderColor: '#dc2626', fontSize: '12px', padding: '6px 14px' }}
+                    onClick={() => onFindAlternative(alert)}
+                  >
+                    Find Alternative Appointment
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
         {/* Controls Bar: Member Filter */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px', marginBottom: '18px', paddingBottom: '16px', borderBottom: '1px solid var(--family-border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -182,6 +212,15 @@ export function AppointmentsView({
                           Cancel
                         </button>
                       </>
+                    )}
+                    {isCancelled && onFindAlternative && (
+                      <button
+                        className="primary-button compact-button"
+                        style={{ padding: '4px 10px', fontSize: '12px', backgroundColor: '#dc2626', borderColor: '#dc2626' }}
+                        onClick={() => onFindAlternative(item)}
+                      >
+                        Find Alternative
+                      </button>
                     )}
                   </div>
                 </article>

@@ -25,6 +25,8 @@ import NewPrescriptionModal from './components/NewPrescriptionModal';
 import AiExplainabilityModal from './components/AiExplainabilityModal';
 import CreateArticleModal from './components/CreateArticleModal';
 import ConfirmationModal from './components/ConfirmationModal';
+import DoctorCancelAppointmentModal from './components/DoctorCancelAppointmentModal';
+import { appointmentService } from '../../services/appointmentService';
 
 const validDoctorTabs = [
   'dashboard',
@@ -156,6 +158,51 @@ export function DoctorLayout({ dark, setDark }) {
     message: '',
     onConfirm: () => {},
   });
+  const [appointmentToCancel, setAppointmentToCancel] = useState(null);
+
+  const refreshDoctorAppointments = async () => {
+    try {
+      const backendApts = await appointmentService.getAppointments();
+      if (backendApts && backendApts.length > 0) {
+        const mapped = backendApts.map((a) => {
+          const rawDate = a.appointment_date ? new Date(a.appointment_date) : null;
+          const isToday = rawDate && rawDate.toDateString() === new Date().toDateString();
+          const formattedDate = rawDate
+            ? (isToday ? `Today, ${rawDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}` : rawDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }))
+            : 'Today';
+
+          return {
+            id: a._id || a.id,
+            _id: a._id || a.id,
+            token: a.token || `OPD-${(a._id || a.id).toString().slice(-4).toUpperCase()}`,
+            patientId: a.family_member_id || a.familyMemberId,
+            memberId: a.family_member_id || a.familyMemberId,
+            patientName: a.patientName || 'Family Patient',
+            patientAge: a.patientAge || 35,
+            patientGender: a.patientGender || 'Male',
+            doctorId: a.doctor_id || a.doctorId,
+            doctorName: a.doctorName || user?.name || 'Dr. Attending Physician',
+            department: a.departmentName || user?.departmentName || 'Orthopedics',
+            hospital: a.hospitalName || 'MediMind Central Hospital',
+            date: formattedDate,
+            time: a.start_time ? `${a.start_time}${a.end_time ? ` - ${a.end_time}` : ''}` : '10:00 AM',
+            type: a.appointment_type === 'WALK_IN' ? 'Walk-in' : (a.reason || 'OPD Consultation'),
+            purpose: a.reason || 'Outpatient Consultation',
+            status: a.status === 'CANCELLED' ? 'Cancelled' : a.status === 'COMPLETED' ? 'Completed' : 'Confirmed',
+            cancellationReason: a.cancellation_reason,
+            isWalkIn: a.appointment_type === 'WALK_IN',
+          };
+        });
+
+        setAppointments((prev) => {
+          const seenIds = new Set(mapped.map((m) => m.id));
+          return [...mapped, ...prev.filter((a) => !seenIds.has(a.id))];
+        });
+      }
+    } catch {
+      // safe fallback
+    }
+  };
 
   // Load initial doctor data
   useEffect(() => {
@@ -240,9 +287,15 @@ export function DoctorLayout({ dark, setDark }) {
       setArticles(docArticles.length > 0 ? docArticles : arts);
       setNotifications(notifs);
       setSettings(stts);
+      await refreshDoctorAppointments();
     }
     loadData();
   }, [user]);
+
+  useEffect(() => {
+    const interval = setInterval(refreshDoctorAppointments, 8000);
+    return () => clearInterval(interval);
+  }, []);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -588,6 +641,27 @@ export function DoctorLayout({ dark, setDark }) {
         }}
       />
 
+      {/* Doctor Cancel Appointment Modal */}
+      {appointmentToCancel && (
+        <DoctorCancelAppointmentModal
+          isOpen={!!appointmentToCancel}
+          appointment={appointmentToCancel}
+          onClose={() => setAppointmentToCancel(null)}
+          onSuccess={(cancelledApt) => {
+            setAppointments((prev) =>
+              prev.map((a) =>
+                (a.id === cancelledApt.id || a.id === cancelledApt._id)
+                  ? { ...a, status: 'Cancelled', cancellationReason: cancelledApt.cancellation_reason }
+                  : a
+              )
+            );
+            showToast('Appointment cancelled successfully. Patient notified with alternative options.', 'success');
+            setAppointmentToCancel(null);
+            refreshDoctorAppointments();
+          }}
+        />
+      )}
+
       {/* Mobile Drawer Backdrop */}
       <div
         className={`doctor-sidebar-backdrop ${mobileMenuOpen ? 'open' : ''}`}
@@ -862,6 +936,7 @@ export function DoctorLayout({ dark, setDark }) {
               onOpenNewConsultation={handleOpenNewConsultation}
               onOpenAiExplain={handleOpenAiExplain}
               onOpenFullAiAnalysis={handleOpenFullAiAnalysis}
+              onCancelAppointment={(apt) => setAppointmentToCancel(apt)}
               onUpdateStatus={async (id, status) => {
                 await doctorService.updateAppointmentStatus(id, status);
                 const updated = await doctorService.getAppointments();

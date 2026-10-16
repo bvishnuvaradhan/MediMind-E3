@@ -28,7 +28,9 @@ import {
 import { FeatureDetailModal } from './components/FeatureDetailModal';
 import { AppointmentDetailModal } from './components/AppointmentDetailModal';
 import { CancelAppointmentModal } from './components/CancelAppointmentModal';
+import { AlternativeBookingModal } from './components/AlternativeBookingModal';
 import { UploadRecordModal } from './components/UploadRecordModal';
+import { appointmentService } from '../../services/appointmentService';
 import { DashboardView } from './views/DashboardView';
 import { MemberProfileView } from './views/MemberProfileView';
 import { FamilyMembersView } from './views/FamilyMembersView';
@@ -124,6 +126,78 @@ export function FamilyLayout({ dark, setDark }) {
   const [appointmentStatuses, setAppointmentStatuses] = useState({});
   const [doctorAccess, setDoctorAccess] = useState(() => initialData.doctorAccess || []);
   const [mongoDoctors, setMongoDoctors] = useState([]);
+  const [cancellationAlerts, setCancellationAlerts] = useState([]);
+  const [alternativeModalTarget, setAlternativeModalTarget] = useState({ isOpen: false, appointment: null, doctor: null });
+
+  const syncFamilyAppointmentsAndAlerts = async () => {
+    try {
+      const [backendApts, notifs] = await Promise.all([
+        appointmentService.getAppointments().catch(() => []),
+        appointmentService.getNotifications().catch(() => []),
+      ]);
+
+      if (Array.isArray(backendApts) && backendApts.length > 0) {
+        const mapped = backendApts.map((a) => {
+          const rawDate = a.appointment_date ? new Date(a.appointment_date) : null;
+          const formattedDate = rawDate
+            ? rawDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+            : a.date || 'Today';
+
+          return {
+            id: a._id || a.id,
+            _id: a._id || a.id,
+            token: a.token || `OPD-${(a._id || a.id).toString().slice(-4).toUpperCase()}`,
+            title: a.reason || 'General Outpatient Consultation',
+            detail: `${a.doctorName || 'Attending Doctor'} · ${a.patientName || 'Family Member'}`,
+            meta: `${formattedDate} · ${a.start_time || '10:00 AM'} · ${a.appointment_type || 'In-Person'}`,
+            tone: a.status === 'CANCELLED' ? 'coral' : a.status === 'COMPLETED' ? 'slate' : 'mint',
+            initials: formattedDate.slice(0, 2),
+            action: 'View details',
+            doctor: a.doctorName || 'Attending Doctor',
+            doctorId: a.doctor_id || a.doctorId,
+            patient: a.patientName || 'Family Member',
+            patientId: a.family_member_id || a.familyMemberId,
+            date: formattedDate,
+            slot: a.start_time ? `${a.start_time}${a.end_time ? ` - ${a.end_time}` : ''}` : '10:00 AM',
+            mode: a.appointment_type || 'In-Person',
+            reason: a.reason,
+            status: a.status === 'CANCELLED' ? 'Cancelled' : a.status === 'COMPLETED' ? 'Completed' : 'Confirmed',
+            cancellationReason: a.cancellation_reason,
+            cancelled_at: a.cancelled_at,
+            cancelled_by: a.cancelled_by,
+            original_appointment_id: a.original_appointment_id,
+            replacement_appointment_id: a.replacement_appointment_id,
+          };
+        });
+
+        setBookedAppointments((prev) => {
+          const seenIds = new Set(mapped.map((m) => m.id));
+          return [...mapped, ...prev.filter((p) => !seenIds.has(p.id))];
+        });
+
+        const statusMap = {};
+        mapped.forEach((m) => {
+          statusMap[m.id] = m.status;
+        });
+        setAppointmentStatuses((prev) => ({ ...prev, ...statusMap }));
+      }
+
+      if (Array.isArray(notifs)) {
+        const unreadCancellations = notifs.filter(
+          (n) => n.type === 'APPOINTMENT_CANCELLED' && !n.is_read
+        );
+        setCancellationAlerts(unreadCancellations);
+      }
+    } catch {
+      // safe fallback
+    }
+  };
+
+  useEffect(() => {
+    syncFamilyAppointmentsAndAlerts();
+    const interval = setInterval(syncFamilyAppointmentsAndAlerts, 8000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -287,9 +361,18 @@ export function FamilyLayout({ dark, setDark }) {
     setAppointmentToCancel(item);
   };
 
-  const handleConfirmCancelAppointment = (item) => {
+  const handleConfirmCancelAppointment = async (item) => {
     const aptId = item.id || `${item.title}|${item.detail}|${item.date}|${item.slot || item.time}`;
     setAppointmentStatuses((curr) => ({ ...curr, [aptId]: 'Cancelled' }));
+
+    if (item.id && !item.id.toString().startsWith('apt_booked_')) {
+      try {
+        await appointmentService.cancelAppointment(item.id, 'Cancelled by patient family');
+        await syncFamilyAppointmentsAndAlerts();
+      } catch {
+        // fallback
+      }
+    }
     announce(`Appointment cancelled for ${item.title}.`);
   };
 
@@ -331,7 +414,7 @@ export function FamilyLayout({ dark, setDark }) {
     setRescheduleData(null);
   };
 
-  const handleBookAppointment = (booking) => {
+  const handleBookAppointment = async (booking) => {
     const bookingKey = `${booking.doctor}|${booking.date}`;
     const slotsForDay = bookedSlots[bookingKey] ?? [];
     if (slotsForDay.includes(booking.slot)) {
@@ -369,6 +452,35 @@ export function FamilyLayout({ dark, setDark }) {
     };
 
     setBookedAppointments((current) => [newApt, ...current]);
+
+    try {
+      const targetMember = familyMembers.find((m) => m.name.toLowerCase() === booking.patient.toLowerCase());
+      const memberId = targetMember?.id || targetMember?._id || user?.familyMemberId || 'mem_001';
+      const targetDoc = mongoDoctors.find((d) => (d.name || d.doctorName) === booking.doctor) || selectedDoctor;
+      const docId = targetDoc?.id || targetDoc?._id || 'doc_001';
+      const hospId = targetDoc?.hospitalId || 'hosp_001';
+      const deptId = targetDoc?.departmentId || 'dept_001';
+
+      const payload = {
+        familyMemberId: memberId,
+        doctorId: docId,
+        hospitalId: hospId,
+        departmentId: deptId,
+        appointmentDate: booking.date,
+        startTime: booking.slot ? booking.slot.split(' - ')[0] : '10:00 AM',
+        endTime: booking.slot && booking.slot.includes(' - ') ? booking.slot.split(' - ')[1] : '10:30 AM',
+        appointmentType: booking.mode === 'Video Consultation' ? 'ONLINE' : 'IN_PERSON',
+        reason: booking.reason || booking.type || 'General Consultation',
+      };
+      if (booking.originalAppointmentId) {
+        payload.originalAppointmentId = booking.originalAppointmentId;
+      }
+
+      await appointmentService.bookAppointment(payload);
+      await syncFamilyAppointmentsAndAlerts();
+    } catch {
+      // fallback
+    }
 
     // Explicit opt-in doctor access consent only
     if (booking.grantConsent) {
@@ -546,6 +658,8 @@ export function FamilyLayout({ dark, setDark }) {
           setAppointmentStatuses={setAppointmentStatuses}
           onCancelAppointment={handleCancelAppointment}
           onRescheduleAppointment={handleRescheduleAppointment}
+          onFindAlternative={(apt) => setAlternativeModalTarget({ isOpen: true, appointment: apt, doctor: null })}
+          cancellationAlerts={cancellationAlerts}
           familyMembers={familyMembers}
           setReturnTo={setReturnTo}
           navigate={navigate}
@@ -794,6 +908,21 @@ export function FamilyLayout({ dark, setDark }) {
           appointment={appointmentToCancel}
           onClose={() => setAppointmentToCancel(null)}
           onConfirmCancel={handleConfirmCancelAppointment}
+        />
+      )}
+
+      {alternativeModalTarget.isOpen && (
+        <AlternativeBookingModal
+          isOpen={alternativeModalTarget.isOpen}
+          appointment={alternativeModalTarget.appointment}
+          notification={alternativeModalTarget.appointment?.notification}
+          onClose={() => setAlternativeModalTarget({ isOpen: false, appointment: null, doctor: null })}
+          onRebookSuccess={(newBooking) => {
+            announce(`Successfully rebooked appointment with ${newBooking?.doctorName || 'specialist'}!`);
+            syncFamilyAppointmentsAndAlerts();
+            setAlternativeModalTarget({ isOpen: false, appointment: null, doctor: null });
+          }}
+          announce={announce}
         />
       )}
 

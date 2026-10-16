@@ -88,6 +88,31 @@ const appointmentSchema = new mongoose.Schema(
       default: null,
       trim: true,
     },
+
+    cancelled_by: {
+      type: String,
+      default: null,
+    },
+
+    token: {
+      type: String,
+      default: null,
+      trim: true,
+    },
+
+    original_appointment_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Appointment',
+      default: null,
+      index: true,
+    },
+
+    replacement_appointment_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Appointment',
+      default: null,
+      index: true,
+    },
   },
   {
     timestamps: {
@@ -129,6 +154,13 @@ appointmentSchema.methods.toPublicJSON = function () {
     cancelled_at: this.cancelled_at,
     cancellationReason: this.cancellation_reason,
     cancellation_reason: this.cancellation_reason,
+    cancelledBy: this.cancelled_by,
+    cancelled_by: this.cancelled_by,
+    token: this.token || `OPD-${this._id.toString().slice(-4).toUpperCase()}`,
+    originalAppointmentId: this.original_appointment_id,
+    original_appointment_id: this.original_appointment_id,
+    replacementAppointmentId: this.replacement_appointment_id,
+    replacement_appointment_id: this.replacement_appointment_id,
     createdAt: this.created_at,
     updatedAt: this.updated_at,
   };

@@ -288,6 +288,49 @@ export const hospitalAdminService = {
   // --- Appointments ---
   async getAppointments(filters = {}) {
     let list = [...appointmentsState];
+    try {
+      const token = typeof window !== 'undefined' ? (sessionStorage.getItem('medimind_token') || localStorage.getItem('medimind_token') || localStorage.getItem('token')) : null;
+      if (token) {
+        const res = await fetch('/api/appointments', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (res.ok) {
+          const json = await res.json();
+          const backendList = Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
+          if (backendList.length > 0) {
+            const mapped = backendList.map((a) => {
+              const rawDate = a.appointment_date ? new Date(a.appointment_date) : null;
+              return {
+                id: a._id || a.id,
+                _id: a._id || a.id,
+                token: a.token || `OPD-${(a._id || a.id).toString().slice(-4).toUpperCase()}`,
+                patientRef: a.patientName || `Patient (${(a.family_member_id || a.familyMemberId || '').slice(-4)})`,
+                patientName: a.patientName || `Patient (${(a.family_member_id || a.familyMemberId || '').slice(-4)})`,
+                doctorId: a.doctor_id || a.doctorId,
+                doctorName: a.doctorName || 'Attending Physician',
+                departmentId: a.department_id || a.departmentId,
+                departmentName: a.departmentName || 'Orthopedics',
+                department: a.departmentName || 'Orthopedics',
+                hospitalId: a.hospital_id || a.hospitalId,
+                hospitalName: a.hospitalName || 'MediMind Central Hospital',
+                date: rawDate ? rawDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Today',
+                time: a.start_time ? `${a.start_time}${a.end_time ? ` - ${a.end_time}` : ''}` : '10:00 AM',
+                status: a.status === 'CANCELLED' ? 'Cancelled' : a.status === 'COMPLETED' ? 'Completed' : 'Confirmed',
+                type: a.appointment_type === 'WALK_IN' ? 'Walk-in' : (a.reason || 'General Outpatient'),
+                cancellationReason: a.cancellation_reason,
+              };
+            });
+            const seen = new Set(mapped.map((m) => m.id));
+            list = [...mapped, ...list.filter((x) => !seen.has(x.id))];
+          }
+        }
+      }
+    } catch {
+      // safe fallback
+    }
     if (filters.departmentId) {
       list = list.filter(a => a.departmentId === filters.departmentId);
     }

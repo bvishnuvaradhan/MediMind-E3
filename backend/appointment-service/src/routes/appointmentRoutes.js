@@ -7,6 +7,14 @@ const router = Router();
 // Health endpoints
 router.get('/health', appointmentController.health);
 
+// Notifications endpoints (must be before :appointmentId)
+router.get('/notifications', authenticate, appointmentController.getNotifications);
+router.put('/notifications/:notificationId/read', authenticate, appointmentController.markNotificationRead);
+
+// Alternatives discovery (standalone or appointment-linked)
+router.get('/alternatives', authenticate, appointmentController.getAlternatives);
+router.get('/:appointmentId/alternatives', authenticate, appointmentController.getAlternatives);
+
 // Protected routes (All appointment operations require authentication)
 router.post('/', authenticate, appointmentController.bookAppointment);
 router.get('/', authenticate, appointmentController.getAppointments);
