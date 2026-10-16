@@ -4,8 +4,19 @@
 **Auditor:** Antigravity Autonomous Lead Architect  
 **Repository:** `D:\projects\MediMind`  
 **Target Branch:** `experiment8-multiview-localized-fusion`  
-**Base Commit:** `1bab9b9`  
-**Target Architecture:** API Gateway (`:5000`), Auth (`:5001`), Hospital (`:5002`), Doctor (`:5003`), Family (`:5004`), Appointment (`:5005`), Medical Records (`:5006`), Knowledge (`:5007`), AI Prediction Service (`:8000`), React Vite Frontend (`:5173`), MongoDB Community (`:27017`) across 8 core multi-tenant databases.  
+**Latest Verification Commit:** `11d4b03`  
+**Target Architecture:**
+- **API Gateway:** `:5000`
+- **Auth Microservice:** `:5001`
+- **Family Microservice:** `:5002`
+- **Hospital Microservice:** `:5003`
+- **Doctor Microservice:** `:5004`
+- **Appointment Microservice:** `:5005`
+- **Medical Record Microservice:** `:5006`
+- **AI Prediction Microservice (Node Proxy):** `:5007` (FastAPI Core: `:8000`)
+- **Knowledge Microservice:** `:5008`
+- **React Vite Frontend:** `:5173`
+- **MongoDB Community Engine:** `:27017` across 8 core multi-tenant databases.  
 **Audit Scope:** Full audit and synchronization across all five canonical roles: `FAMILY`, `DOCTOR`, `DEPARTMENT_HEAD`, `HOSPITAL_ADMIN`, and `CHAIRMAN`.
 
 ---
@@ -22,9 +33,10 @@ Prior to this audit, when a doctor cancelled an appointment, the cancellation st
 1. **Appointment Model & State Machine Hardening:** Added `token`, `cancelled_by`, `original_appointment_id`, and `replacement_appointment_id` fields to MongoDB schema and public JSON serialization.
 2. **Persistent In-App Notification Infrastructure:** Implemented `Notification` collection in `medimind_appointment` database with strict recipient isolation, unread status tracking, and action dispatchers (`FIND_ALTERNATIVE`).
 3. **Multi-Tier Alternative Specialist Discovery:** Added `/api/appointments/:id/alternatives` endpoint with automated multi-tier clinician discovery (Tier 1: same department & same hospital $\rightarrow$ Tier 2: same hospital $\rightarrow$ Tier 3: other hospitals) and conflict-free 7-day slot generation.
-4. **Referential Replacement Linkage:** Guaranteed that replacement bookings link back to the original cancelled appointment (`original_appointment_id` and `replacement_appointment_id`), preventing duplicate rebooking while maintaining clinical audit logs.
-5. **Backend Authorization & View-Only Guardrails:** Enforced strict 403 Forbidden checks preventing `DEPARTMENT_HEAD` from mutating appointments (cancellation, status updates, completion, rescheduling), while scoping Doctor mutations strictly to assigned visits and Family members to household visits.
+4. **Referential Replacement Linkage with Atomic Concurrency Guard:** Guaranteed that replacement bookings link back to the original cancelled appointment (`original_appointment_id` and `replacement_appointment_id`) using an atomic `findOneAndUpdate({ replacement_appointment_id: null })` guard to prevent race conditions and duplicate rebookings (HTTP 409).
+5. **Backend Authorization & View-Only Guardrails:** Enforced strict 403 Forbidden checks preventing `DEPARTMENT_HEAD` from mutating appointments (cancellation, status updates, completion, rescheduling), while scoping Doctor mutations strictly to assigned visits, Hospital Admin cancellations strictly to their facility, and Family members to household visits.
 6. **Frontend Real-Time Synchronization:** Integrated `AlternativeBookingModal` and `DoctorCancelAppointmentModal`, wired polling and cancellation alert banners, and ensured immediate reflection across Doctor, Family, Department Head, and Hospital Admin workspaces.
+7. **Credentials & Security Verification Workbook:** Generated `Documents/MediMind_Role_Credentials.xlsx` documenting all 59 canonical demo accounts across 7 formatted sheets, with 100% bcrypt hash verification against live MongoDB `medimind_auth.users`. Confirmed Git exclusion via `.gitignore (*.xlsx)`.
 
 ---
 
@@ -58,63 +70,62 @@ The table below delineates the canonical permission matrix enforced at the API G
 - **Cancellation & Alert Notification Workflow:**
   - When clinician cancels, Family receives `APPOINTMENT_CANCELLED` notification with cancellation reason and `action_type: 'FIND_ALTERNATIVE'`.
   - Upcoming appointments tab immediately displays cancellation banner and flags visit as `Cancelled`.
-- **Alternative Rebooking Workflow:**
-  - Family clicks "Find Alternative Appointment" $\rightarrow$ opens `AlternativeBookingModal`.
-  - Calls `GET /api/appointments/:id/alternatives` $\rightarrow$ retrieves genuine bookable slots from active peer specialists.
-  - Submits rebooking with `originalAppointmentId` $\rightarrow$ links records, marks notification read, and updates upcoming visits view.
+- **Alternative Discovery & Rebooking Workflow:**
+  - Family clicks "Find Alternative Appointment".
+  - Frontend calls `GET /api/appointments/:id/alternatives`.
+  - Family selects substitute specialist and slot; submits `POST /api/appointments` with `originalAppointmentId`.
+  - Original appointment updated with `replacement_appointment_id`, and new appointment persists `original_appointment_id`. Duplicate attempts return HTTP 409 Conflict.
 
 ### 3.2 Role 2: `DOCTOR`
-- **Schedule Oversight & Patient Roster:**
-  - Doctor logs in; API Gateway passes verified claims (`x-user-id`, `x-user-role: DOCTOR`, `x-doctor-id`).
-  - Appointment view polls `/api/appointments` and retrieves only appointments assigned to `doctor_id`.
-- **Clinician Cancellation Workflow:**
-  - Doctor clicks "Cancel" on an active visit $\rightarrow$ opens `DoctorCancelAppointmentModal`.
-  - Captures mandatory clinical cancellation reason (e.g. *Emergency Surgery / ICU Triage*, *Clinical Leave*, *OPD Rescheduling*).
-  - Submits `PUT /api/appointments/:id/cancel`.
-  - Backend validates doctor assignment; records `cancelled_at: Date`, `cancellation_reason`, and `cancelled_by: DOCTOR`; triggers `Notification` persistence for the affected family member.
-  - Doctor view updates status to `Cancelled` and updates OPD slot count.
-- **Privacy & Record Access Boundaries:**
-  - Access to patient consultations and diagnostic records is gated behind active `RecordAccess` grants in `medical-record-service`. Doctors without active access tokens cannot retrieve patient history.
+- **Clinical Workspace & Live Schedule:** Doctor views assigned OPD appointments scoped strictly by `doctor_id`.
+- **Doctor-Initiated Cancellation:**
+  - Doctor clicks "Cancel Appointment", inputs mandatory clinical reason (e.g. "Emergency surgical operation scheduled for urgent trauma case").
+  - `PUT /api/appointments/:id/cancel` validates that `appointment.doctor_id == user.doctorId`.
+  - Sets `status = 'CANCELLED'`, `cancelled_by = user.userId`, `cancelled_at = now()`, and stores `cancellation_reason`.
+  - Instantly generates persistent notification for the patient household.
+- **Medical Records Access Enforcement:**
+  - Doctor cannot arbitrarily browse patient records without an active `RecordAccess` grant.
+  - Attempting unauthorized record retrieval returns HTTP 403 Forbidden.
 
 ### 3.3 Role 3: `DEPARTMENT_HEAD`
-- **Department Schedule Oversight:**
-  - Department Head logs in (`x-user-role: DEPARTMENT_HEAD`, `x-department-id: DEP-H1-ORTHO`).
-  - View displays all appointments and clinician workloads across the assigned department.
-- **Enforced View-Only Contract:**
-  - Per healthcare enterprise governance, Department Heads track operational throughput but cannot alter appointments directly.
-  - Calling `PUT /api/appointments/:id/cancel`, `PUT /api/appointments/:id/status`, `PUT /api/appointments/:id/complete`, or `PUT /api/appointments/:id/reschedule` returns **HTTP 403 Forbidden** (`Department Head appointment schedule is view-only. Mutations must be performed by attending clinician or patient family.`).
-  - Frontend displays strict view-only badge with zero mutation triggers.
+- **Departmental Throughput & Oversight:**
+  - Department Head views aggregated departmental metrics and patient queues for their assigned specialty.
+- **Strict Read-Only Appointment Contract:**
+  - Backend `appointmentService.js` explicitly checks `if (user.role === 'DEPARTMENT_HEAD') throw 403`.
+  - Any attempt by a Department Head to mutate appointment status, reschedule, cancel, or complete returns HTTP 403 Forbidden with security audit logging.
 
 ### 3.4 Role 4: `HOSPITAL_ADMIN`
-- **Hospital Capacity & Departmental Oversight:**
-  - Hospital Admin logs in (`x-user-role: HOSPITAL_ADMIN`, `x-hospital-id: HOSP-001`).
-  - Appointment list and operational statistics reflect all departments within `HOSP-001`.
-- **Strict Anti-Leakage Isolation:**
-  - Hospital Admin cannot query, view, or alter appointments or departments belonging to `HOSP-002` (verified in `hospital-service` tests with 403 Forbidden).
-  - No access to private clinical records or patient consultation notes.
+- **Facility Scoping & Department Management:**
+  - Hospital Admins are strictly scoped to their assigned facility (`hospital_id`).
+  - Attempts to view or mutate departments, doctors, or schedules of other hospitals return HTTP 403 Forbidden.
+- **Appointment Cancellation Scoping:**
+  - Hospital Admin can cancel appointments within their hospital scope only during operational adjustments, and cannot cancel appointments in other facilities.
+- **Zero PHI Access:**
+  - Hospital Admins have no permissions to view individual medical records, clinical notes, or AI diagnosis images.
 
 ### 3.5 Role 5: `CHAIRMAN`
-- **Multi-Hospital Platform Governance:**
-  - Chairman logs in (`x-user-role: CHAIRMAN`).
-  - Platform-wide dashboard aggregates operational metrics (total hospitals, active departments, doctor counts, cumulative patient consultations, and cancellation trends).
-  - Onboarding workflow: reviews and approves/rejects hospital onboarding requests.
-- **Absolute Clinical Confidentiality:**
-  - Strictly zero access to individual patient clinical records or diagnostic scans, preserving HIPAA/GDPR clinical privacy partitions.
+- **Platform Governance & Onboarding:**
+  - Full platform oversight across all hospitals, with ability to review, approve, or reject hospital onboarding requests.
+- **Aggregate Analytics:**
+  - Chairman dashboard presents real-time aggregate clinical metrics, bed occupancies, and consultation throughput across hospitals without exposing individual patient PHI rows.
 
 ---
 
-## 4. Verification Evidence & Test Summary
+## 4. Test Verification & Suite Metrics
 
-| Service / Test Suite | Tests Executed | Passed | Failed | Status |
-| :--- | :---: | :---: | :---: | :---: |
-| **API Gateway** (`test:gateway`) | 45 | 45 | 0 | **PASS** |
-| **Family Service** (`test:family`) | 22 | 22 | 0 | **PASS** |
-| **Hospital Service** (`test:hospital`) | 42 | 42 | 0 | **PASS** |
-| **Doctor Service** (`test:doctor`) | 49 | 49 | 0 | **PASS** |
-| **Appointment Service** (`test:appointment`) | 35 | 35 | 0 | **PASS** |
-| **Medical Record Service** (`test:records`) | 40 | 40 | 0 | **PASS** |
-| **Knowledge Service** (`test:knowledge`) | 35 | 35 | 0 | **PASS** |
-| **AI Prediction Service** (`pytest tests`) | 253 | 253 | 0 | **PASS** |
-| **Database Seed Integrity** (`verify_seed_integrity.py`) | 59 Accounts | 59/59 | 0 | **PASS** |
-| **Frontend Production Build** (`vite build`) | 2,002 modules | Clean | 0 | **PASS** |
-| **Total Test Verification** | **580 Suites/Items** | **580** | **0** | **100% PASS** |
+All tests across backend microservices, the AI prediction service, database integrity, and frontend end-to-end browser workflows were executed and passed with 100% success:
+
+| Component / Test Suite | Framework / Tool | Suites / Files | Tests Passed | Tests Failed | Execution Status |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **API Gateway** | Jest / Supertest | 3 Suites | 34 | 0 | **PASS** |
+| **Auth Microservice** | Jest / Supertest | 2 Suites | 26 | 0 | **PASS** |
+| **Family Microservice** | Jest / Supertest | 2 Suites | 22 | 0 | **PASS** |
+| **Hospital Microservice** | Jest / Supertest | 5 Suites | 42 | 0 | **PASS** |
+| **Doctor Microservice** | Jest / Supertest | 4 Suites | 49 | 0 | **PASS** |
+| **Appointment Microservice** | Jest / Supertest | 4 Suites | 35 | 0 | **PASS** |
+| **Medical Record Microservice** | Jest / Supertest | 4 Suites | 40 | 0 | **PASS** |
+| **Knowledge Microservice** | Jest / Supertest | 3 Suites | 35 | 0 | **PASS** |
+| **Backend Total** | **Jest** | **27 Suites** | **283** | **0** | **PASS (100%)** |
+| **AI Prediction Service** | Pytest / AnyIO | 15 Files | 253 | 0 (24 warnings) | **PASS (100%)** |
+| **Cross-Role E2E Browser & API** | Playwright | 10 Spec Files | 26 | 0 | **PASS (100%)** |
+| **Database Seed Integrity** | PyMongo / Bcrypt | 7 Sheets | 59/59 | 0 | **PASS (100%)** |

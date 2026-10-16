@@ -286,10 +286,19 @@ export const appointmentService = {
       original_appointment_id: originalAppointmentId || null,
     });
 
-    // 8. Link original appointment if rebooking
+    // 8. Link original appointment if rebooking (atomic concurrency check)
     if (originalAppointmentDoc) {
-      originalAppointmentDoc.replacement_appointment_id = newAppointment._id;
-      await originalAppointmentDoc.save();
+      const atomicLink = await Appointment.findOneAndUpdate(
+        { _id: originalAppointmentDoc._id, replacement_appointment_id: null },
+        { replacement_appointment_id: newAppointment._id }
+      );
+      if (!atomicLink) {
+        // Concurrency race: Another request just rebooked this appointment
+        await Appointment.findByIdAndDelete(newAppointment._id);
+        const err = new Error('Original cancelled appointment has already been rebooked');
+        err.statusCode = 409;
+        throw err;
+      }
     }
 
     // 9. Send confirmation notification to family

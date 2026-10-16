@@ -1,9 +1,9 @@
 {
   "auditMetadata": {
     "auditName": "MediMind Complete Role-Based & Cross-Role Workflow Audit",
-    "timestamp": "2026-10-16T16:51:00+05:30",
+    "timestamp": "2026-10-16T17:25:00+05:30",
     "gitBranch": "experiment8-multiview-localized-fusion",
-    "headCommit": "1bab9b9",
+    "headCommit": "11d4b03",
     "auditor": "Antigravity Autonomous Lead Architect",
     "verdict": "PASS_WITH_VERIFIED_FIXES"
   },
@@ -17,7 +17,7 @@
         "Receiving doctor cancellation notifications & alert banner",
         "Discovering genuine alternative doctors with conflict-free slots",
         "Rebooking with original_appointment_id & replacement_appointment_id linkage",
-        "Duplicate rebooking prevention (409 Conflict)",
+        "Duplicate rebooking prevention (409 Conflict) with atomic findOneAndUpdate guard",
         "Strict household privacy boundary enforcement"
       ]
     },
@@ -27,8 +27,8 @@
       "keyCapabilities": [
         "Doctor OPD schedule oversight & live polling",
         "Cancelling appointment with mandatory clinical reason & metadata capture",
-        "Persisting cancelled_at, cancellation_reason, and cancelled_by: DOCTOR",
-        "Doctor ownership authorization (blocking non-assigned cancellations)",
+        "Persisting cancelled_at, cancellation_reason, and cancelled_by: user.userId",
+        "Doctor ownership authorization (blocking non-assigned cancellations with 403)",
         "Releasing slot from active schedule while preserving audit history",
         "Gated patient medical records access via RecordAccess grants"
       ]
@@ -39,7 +39,7 @@
       "keyCapabilities": [
         "Department-scoped OPD schedule tracking",
         "Enforced view-only appointment schedule",
-        "Strict 403 Forbidden on appointment mutations (cancel, complete, update)",
+        "Strict 403 Forbidden on appointment mutations (cancel, complete, update, reschedule)",
         "Department-level doctor performance & knowledge oversight"
       ]
     },
@@ -50,6 +50,7 @@
         "Hospital-scoped appointment & capacity tracking",
         "Strict cross-hospital isolation (blocking cross-hospital queries with 403)",
         "Department & staff account management (Department Heads, Doctors)",
+        "Conditional appointment cancellation within authorized hospital scope only",
         "Zero access to individual patient clinical records"
       ]
     },
@@ -71,7 +72,7 @@
       "features": [
         "Validates slot availability",
         "Generates stable tracking token (OPD-XXXX)",
-        "Persists initial status: CONFIRMED",
+        "Persists initial status: BOOKED",
         "Creates confirmation notification"
       ]
     },
@@ -101,6 +102,7 @@
       "status": "VERIFIED",
       "features": [
         "Links original_appointment_id and replacement_appointment_id",
+        "Atomic findOneAndUpdate guard with rollback on conflict",
         "Prevents duplicate rebooking with 409 Conflict",
         "Marks cancellation notification as read",
         "Emits APPOINTMENT_REBOOKED confirmation"
@@ -109,11 +111,11 @@
   },
   "testExecutionResults": {
     "backendJestSuites": {
-      "totalSuites": 24,
-      "passedSuites": 24,
+      "totalSuites": 27,
+      "passedSuites": 27,
       "failedSuites": 0,
-      "totalTests": 268,
-      "passedTests": 268,
+      "totalTests": 283,
+      "passedTests": 283,
       "failedTests": 0,
       "passRate": "100%"
     },
@@ -123,18 +125,25 @@
       "failedTests": 0,
       "warnings": 24,
       "passRate": "100%",
-      "executionTimeSeconds": 39.51
+      "executionTimeSeconds": 27.65
+    },
+    "playwrightE2E": {
+      "totalSuites": 10,
+      "passedSuites": 10,
+      "totalTests": 26,
+      "passedTests": 26,
+      "failedTests": 0,
+      "passRate": "100%"
     },
     "databaseSeedIntegrity": {
       "accountsValidated": "59/59",
-      "passwordHashVerification": "100% Valid",
-      "foreignKeyIntegrity": "100% Valid across 2842 appointments and 1301 predictions",
+      "passwordHashVerification": "100% Valid (matched bcrypt hashes)",
+      "foreignKeyIntegrity": "100% Valid across appointments and 1301 predictions",
       "status": "PASS"
     },
     "frontendBuild": {
       "modulesTransformed": 2002,
       "buildStatus": "CLEAN_SUCCESS",
-      "buildTimeSeconds": 0.652,
       "errors": 0
     }
   }

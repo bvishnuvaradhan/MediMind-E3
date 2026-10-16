@@ -16,7 +16,10 @@ db_rec = c['medimind_records']
 db_ai = c['medimind_ai']
 
 # 1. Verify Excel Credentials against Database
-wb = openpyxl.load_workbook(r'D:\MediMind_Backups\MediMind_Credentials_20261009.xlsx', data_only=True)
+creds_path = os.environ.get('CREDENTIALS_PATH', os.path.join(os.path.dirname(__file__), '..', 'Documents', 'MediMind_Role_Credentials.xlsx'))
+if not os.path.exists(creds_path):
+    creds_path = r'D:\MediMind_Backups\MediMind_Credentials_20261009.xlsx'
+wb = openpyxl.load_workbook(creds_path, data_only=True)
 sheets = ['Chairman', 'Hospital Admin', 'Department Head', 'Doctor', 'Family']
 print('Sheets in Excel:', wb.sheetnames)
 assert set(sheets).issubset(set(wb.sheetnames)), 'Missing sheets in credentials workbook'
