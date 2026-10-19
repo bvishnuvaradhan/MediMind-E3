@@ -270,7 +270,9 @@ def test_missing_and_delayed_clinical_outcomes_and_metrics(mock_all_governance_a
     assert ledger["adjudication_summary"]["outcome_unavailable"] == 2
 
     metrics = ShadowDiabetesService.compute_prospective_metrics()
-    assert metrics["status"] == "CALCULATED"
+    assert metrics["status"] == "PROVISIONAL_VOLUME_BELOW_GATE"
+    assert metrics["volume_gate_cleared"] is False
+    assert metrics["required_minimum"] == 50
     assert metrics["adjudicated_count"] == 12  # Excludes lost to followup from denominator
     assert metrics["positive_count"] == 6
     assert metrics["negative_count"] == 6
@@ -280,6 +282,32 @@ def test_missing_and_delayed_clinical_outcomes_and_metrics(mock_all_governance_a
     assert "specificity" in m_c1
     assert "ece" in m_c1
     assert "subgroup_fairness" in metrics
+
+
+def test_prospective_metrics_formal_gate_at_50_outcomes(
+    valid_diabetes_request, mock_all_governance_approved, monkeypatch
+):
+    """Verify that compute_prospective_metrics returns FORMAL_GATE_MET when >= 50 adjudicated outcomes exist."""
+    monkeypatch.setenv("ENABLE_DIABETES_SHADOW_EVAL", "true")
+    monkeypatch.setenv("MEDIMIND_ESCROW_HMAC_SECRET", "escrow_super_secret_test_key_at_least_32_bytes_long!")
+
+    for i in range(50):
+        req = valid_diabetes_request.model_copy(
+            update={"family_member_id": f"mem_gate50_{i}", "appointment_id": f"apt_gate50_{i}"}
+        )
+        res = ShadowDiabetesService.run_shadow_inference_sync(req, is_authorized=True)
+        assert res is not None, f"Shadow inference failed for iteration {i}"
+        cid = res["correlation_id"]
+        outcome_val = 1 if i % 2 == 0 else 0
+        ShadowDiabetesService.adjudicate_outcome(cid, confirmed_outcome=outcome_val, caller_role="ADJUDICATION_OFFICER")
+
+    metrics = ShadowDiabetesService.compute_prospective_metrics()
+    assert metrics["status"] == "FORMAL_GATE_MET"
+    assert metrics["volume_gate_cleared"] is True
+    assert metrics["adjudicated_count"] == 50
+    assert metrics["required_minimum"] == 50
+
+
 
 
 def test_production_response_independence_and_shadow_failure_handling(

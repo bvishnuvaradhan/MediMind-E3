@@ -883,7 +883,8 @@ class ShadowDiabetesService:
                 "status": "INSUFFICIENT_ADJUDICATED_VOLUME",
                 "adjudicated_count": n_adjudicated,
                 "required_minimum": 50,
-                "message": "Fewer than 10 adjudicated outcomes recorded. Metrics cannot be reliably computed.",
+                "volume_gate_cleared": False,
+                "message": "Fewer than 10 adjudicated outcomes recorded. Metrics cannot be computed.",
             }
 
         truths = np.array([int(r["adjudicated_truth"]) for r in adjudicated])
@@ -953,9 +954,12 @@ class ShadowDiabetesService:
         if c1_young and c1_senior and c1_young["sensitivity"] > 0 and c1_senior["sensitivity"] > 0:
             c1_disparity = round(min(c1_young["sensitivity"], c1_senior["sensitivity"]) / max(c1_young["sensitivity"], c1_senior["sensitivity"]), 4)
 
+        gate_cleared = (n_adjudicated >= 50)
         return {
-            "status": "CALCULATED",
+            "status": "FORMAL_GATE_MET" if gate_cleared else "PROVISIONAL_VOLUME_BELOW_GATE",
+            "volume_gate_cleared": gate_cleared,
             "adjudicated_count": n_adjudicated,
+            "required_minimum": 50,
             "positive_count": int(np.sum(truths == 1)),
             "negative_count": int(np.sum(truths == 0)),
             "appC_mlp_6layer_bottleneck_gelu": c1_all,
