@@ -1,0 +1,162 @@
+{
+  "auditTimestamp": "2026-10-19T15:25:00+05:30",
+  "auditScope": "Final Independent Verification, Full-Stack Regression & Production Readiness Sign-Off",
+  "branch": "experiment8-multiview-localized-fusion",
+  "environment": {
+    "os": "Windows Server",
+    "mongoDbVersion": "8.0.13",
+    "mongoDbServiceStatus": "Running (Automatic)",
+    "mongoDbUri": "mongodb://127.0.0.1:27017",
+    "backupPath": "D:\\MediMind_Backups\\MediMind_DB_Backup_20261016_202100\\",
+    "backupChecksumStatus": "VERIFIED (34 BSON/JSON files, SHA-256 verified)"
+  },
+  "canonicalBaseline": {
+    "totalUsers": 59,
+    "userRoleBreakdown": {
+      "FAMILY": 10,
+      "DOCTOR": 29,
+      "DEPARTMENT_HEAD": 14,
+      "HOSPITAL_ADMIN": 4,
+      "CHAIRMAN": 2
+    },
+    "totalStaffWorkforce": 66,
+    "families": 10,
+    "familyMembers": 44,
+    "hospitalsTotal": 5,
+    "hospitalsActive": 3,
+    "hospitalsPending": 2,
+    "hospitalRequests": 5,
+    "departments": 13,
+    "appointmentsTotal": 2849,
+    "appointmentsCompleted": 1763,
+    "appointmentsConfirmed": 324,
+    "appointmentsBooked": 316,
+    "appointmentsCancelled": 297,
+    "appointmentsRescheduled": 149,
+    "medicalRecords": 25,
+    "consultations": 1763,
+    "prescriptions": 1312,
+    "recordAccessGrants": 904,
+    "knowledgeArticles": 39,
+    "knowledgeArticlesPublished": 39,
+    "aiPredictions": 1301,
+    "aiPredictionsBreakdown": {
+      "fractureDetection": 412,
+      "diabetesRisk": 271,
+      "heartDiseaseRisk": 257,
+      "generalHealth": 361
+    },
+    "aiToAppointmentLinkageRate": "100.0% (1,301 of 1,301 link to live appointments)",
+    "orphanPredictionsCount": 0
+  },
+  "performanceMeasurements": {
+    "appointmentEnrichment": {
+      "architecture": "Bulk $in batch queries across doctor, family, and hospital collections replacing 11,388 sequential lookups, 6-second in-memory query cache with write-invalidation, and compound database indexes.",
+      "paginated_limit50": {
+        "coldLatencyMs": 217.72,
+        "warmMeanLatencyMs": 28.20,
+        "warmMedianLatencyMs": 31.00,
+        "warmP95LatencyMs": 41.36,
+        "responseSizeBytes": 67094
+      },
+      "unpaginated_full": {
+        "coldLatencyMs": 5490.66,
+        "warmLatencyMs": 144.46,
+        "warmReductionPercent": 97.4,
+        "responseSizeBytes": 3798414,
+        "responseSizeMB": 3.62
+      },
+      "concurrency_test": {
+        "concurrentRequests": 15,
+        "gateway504Timeouts": 0,
+        "errorCount": 0,
+        "errorRatePercent": 0.0,
+        "concurrentMeanLatencyMs": 1128.43
+      }
+    }
+  },
+  "verificationGates": {
+    "canonicalAccountAudit59": {
+      "suite": "frontend/e2e/run_59_accounts_e2e_audit.mjs",
+      "command": "node frontend/e2e/run_59_accounts_e2e_audit.mjs",
+      "total": 59,
+      "passed": 59,
+      "failed": 0,
+      "skipped": 0,
+      "status": "PASS"
+    },
+    "playwrightRoleSuites01to05": {
+      "suite": "frontend/e2e/01-chairman.spec.js ... 05-family.spec.js",
+      "command": "npx playwright test e2e/01-chairman.spec.js e2e/02-hospital-admin.spec.js e2e/03-department-head.spec.js e2e/04-doctor.spec.js e2e/05-family.spec.js",
+      "total": 9,
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "status": "PASS"
+    },
+    "playwrightFeatureSuites06to10": {
+      "suite": "frontend/e2e/06-ai-predictions.spec.js ... 10-appointment-lifecycle-cross-role.spec.js",
+      "command": "npx playwright test e2e/06-ai-predictions.spec.js e2e/07-cross-account-session.spec.js e2e/08-responsive-sanity.spec.js e2e/09-security-boundaries.spec.js e2e/10-appointment-lifecycle-cross-role.spec.js",
+      "total": 21,
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0,
+      "status": "PASS"
+    },
+    "dashboardCorrectionsSanity": {
+      "suite": "frontend/e2e/verify_dashboard_corrections.mjs",
+      "command": "node frontend/e2e/verify_dashboard_corrections.mjs",
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "status": "PASS"
+    },
+    "appointmentServiceUnitTests": {
+      "suite": "backend/appointment-service",
+      "command": "npm test",
+      "suitesPassed": 4,
+      "totalTests": 40,
+      "passed": 40,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "medicalRecordServiceUnitTests": {
+      "suite": "backend/medical-record-service",
+      "command": "npm test",
+      "suitesPassed": 4,
+      "totalTests": 40,
+      "passed": 40,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "knowledgeServiceUnitTests": {
+      "suite": "backend/knowledge-service",
+      "command": "npm test",
+      "suitesPassed": 3,
+      "totalTests": 35,
+      "passed": 35,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "frontendProductionBuild": {
+      "suite": "frontend",
+      "command": "npm run build",
+      "buildTimeSeconds": 0.54,
+      "errors": 0,
+      "status": "PASS"
+    },
+    "grandTotalTestsExecuted": 208,
+    "grandTotalTestsPassed": 208,
+    "grandTotalTestsFailed": 0,
+    "overallPassRate": "100.0%"
+  },
+  "complianceAndSafety": {
+    "uncommittedAppointmentFilesPreserved": true,
+    "credentialsWorkbookExcludedFromGit": true,
+    "singleAuthoritativeWorkbookInDocuments": true,
+    "liveDatabasesPreservedWithoutTruncation": true,
+    "gitPushHeldForUserConfirmation": true,
+    "remainingBlockers": []
+  }
+}
