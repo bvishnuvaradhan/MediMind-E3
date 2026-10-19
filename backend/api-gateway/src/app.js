@@ -16,14 +16,21 @@ import knowledgeRoutes from './routes/knowledgeRoutes.js';
 const app = express();
 
 // 1. CORS Configuration
-const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:3000').split(',');
+const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:3000')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
-      callback(null, true);
-    } else {
-      callback(null, true); // Allow during development
+    // Allow requests with no origin (like mobile apps, curl, server-to-server)
+    if (!origin) {
+      return callback(null, true);
     }
+    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS policy rejection: origin ${origin} is not allowed`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
