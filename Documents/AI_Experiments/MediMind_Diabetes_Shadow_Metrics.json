@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-10-19T19:04:30+05:30",
+  "status": "PRE-EVALUATION READINESS (SHADOW-READY)",
+  "runtime_flags": {
+    "ENABLE_DIABETES_SHADOW_EVAL": false,
+    "ENABLE_STAGING_DIABETES": false
+  },
+  "protocol_parameters": {
+    "target_sample_size": 500,
+    "evaluation_window_days": 30,
+    "min_daily_evaluations": 10,
+    "authorized_scope": "authorized_adult_outpatient",
+    "min_age": 18,
+    "adjudication_window_days": 90
+  },
+  "candidate_models": {
+    "candidate_C": {
+      "candidate_id": "appC_mlp_6layer_bottleneck_gelu",
+      "model_type": "PyTorchTabularClassifier (6-Layer Bottleneck MLP with GELU)",
+      "artifact_path": "artifacts/experiments/benchmark_four_approaches_20261019/diabetes_appC_mlp_6layer_bottleneck_gelu.joblib",
+      "sha256": "26b3a2ae31a19f4a0c84138e6dfd15ee6a17b2b6c7ce1a5401bb26400dbb6be0",
+      "predeclared_threshold": 0.4500,
+      "predeclared_gates": {
+        "min_sensitivity": 0.7500,
+        "min_specificity": 0.7000,
+        "max_ece": 0.1000,
+        "max_p95_latency_ms": 50.0,
+        "max_unhandled_exceptions": 0
+      }
+    },
+    "candidate_A": {
+      "candidate_id": "appA_extratrees",
+      "model_type": "CalibratedClassifierCV(ExtraTreesClassifier)",
+      "artifact_path": "artifacts/experiments/benchmark_four_approaches_20261019/diabetes_appA_extratrees.joblib",
+      "sha256": "c0fe202b2de047cb56247fb0dbe422c5e5aa495f2a1b948dc2a046ce59ec47b5",
+      "predeclared_threshold": 0.5000,
+      "predeclared_gates": {
+        "min_sensitivity": 0.7000,
+        "min_specificity": 0.7500,
+        "max_ece": 0.0600,
+        "max_p95_latency_ms": 20.0,
+        "max_unhandled_exceptions": 0
+      }
+    }
+  },
+  "shared_preprocessing": {
+    "training_medians_path": "artifacts/experiments/benchmark_four_approaches_20261019/training_medians.joblib",
+    "training_medians_sha256": "4a49646452288924b1ae1d62c1257410c55fbcbe4bcfa2763f91ba40a7cf3957",
+    "imputation_features": ["Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI"]
+  },
+  "accounting_ledger_initial_state": {
+    "total_requests": 0,
+    "eligible_requests": 0,
+    "shadow_evaluated_requests": 0,
+    "failed_requests": 0,
+    "invalid_schema_requests": 0,
+    "excluded_requests": 0,
+    "daily_counts": {},
+    "completion_ratio": 0.0000
+  },
+  "production_baseline_verification": {
+    "artifacts/diabetes/best_model.joblib": "65a15bf8674d01ce714033acd38744dc023211c53bcf7f1521fcaf3ab0756af9",
+    "artifacts/heart_disease/best_model.joblib": "1651a506476606ae6e8a4b33ed2edded6181d5917b019287c62f43cdb812ef2c",
+    "app/services/diabetes_service.py": "1d8af27e821ef49177e3295096483d50fa8248a59032b6284c72ba1f1399e268",
+    "app/services/heart_disease_service.py": "678da749c49d5c19937a417e9ffc193d4b0a937308bc6b3987a3392cebf7a3f2",
+    "verification_verdict": "100% UNCHANGED_AND_VERIFIED"
+  },
+  "automated_tests_summary": {
+    "total_regression_tests": 55,
+    "passed_regression_tests": 55,
+    "failed_regression_tests": 0,
+    "shadow_unit_tests": 5,
+    "staging_unit_tests": 3,
+    "all_passed": true
+  }
+}

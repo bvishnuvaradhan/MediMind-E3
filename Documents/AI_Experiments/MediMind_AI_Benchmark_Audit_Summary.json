@@ -1,0 +1,175 @@
+{
+  "document_id": "MEDIMIND-AUDIT-SUMMARY-20261019",
+  "audit_timestamp": "2026-10-19T18:55:00Z",
+  "repository": "D:\\projects\\MediMind",
+  "git_branch": "experiment8-multiview-localized-fusion",
+  "environment": {
+    "python": "3.14.8",
+    "torch": "2.14.1+cpu",
+    "scikit_learn": "1.9.1",
+    "scipy": "1.18.1"
+  },
+  "production_artifacts_integrity": {
+    "status": "VERIFIED_UNTOUCHED_AND_FROZEN",
+    "pre_audit_sha256": {
+      "heart_disease_best_model": "1651a506476606ae6e8a4b33ed2edded6181d5917b019287c62f43cdb812ef2c",
+      "heart_disease_service": "678da749c49d5c19937a417e9ffc193d4b0a937308bc6b3987a3392cebf7a3f2",
+      "diabetes_best_model": "65a15bf8674d01ce714033acd38744dc023211c53bcf7f1521fcaf3ab0756af9",
+      "diabetes_service": "1d8af27e821ef49177e3295096483d50fa8248a59032b6284c72ba1f1399e268"
+    },
+    "post_audit_sha256": {
+      "heart_disease_best_model": "1651a506476606ae6e8a4b33ed2edded6181d5917b019287c62f43cdb812ef2c",
+      "heart_disease_service": "678da749c49d5c19937a417e9ffc193d4b0a937308bc6b3987a3392cebf7a3f2",
+      "diabetes_best_model": "65a15bf8674d01ce714033acd38744dc023211c53bcf7f1521fcaf3ab0756af9",
+      "diabetes_service": "1d8af27e821ef49177e3295096483d50fa8248a59032b6284c72ba1f1399e268"
+    },
+    "checksum_match": true
+  },
+  "dataset_verification": {
+    "heart_disease": {
+      "raw_rows": 68783,
+      "deduplicated_rows": 64963,
+      "features": 11,
+      "splits": {
+        "train": 45474,
+        "val": 9744,
+        "test": 9745
+      },
+      "scaler_leakage": false
+    },
+    "diabetes": {
+      "raw_rows": 768,
+      "deduplicated_rows": 768,
+      "features": 8,
+      "splits": {
+        "train": 537,
+        "val": 115,
+        "test": 116
+      },
+      "positive_test_cases": 41,
+      "negative_test_cases": 75,
+      "imputation_medians_leakage": false,
+      "scaler_leakage": false
+    }
+  },
+  "recomputed_benchmark_metrics": {
+    "heart_disease": [
+      {
+        "candidate_id": "appA_rf_baseline",
+        "approach": "Approach A",
+        "recomputed_test_roc_auc": 0.7961,
+        "recomputed_test_recall": 0.8159,
+        "recomputed_test_specificity": 0.602,
+        "recomputed_test_ece": 0.0106,
+        "match_reported": true
+      },
+      {
+        "candidate_id": "appA_extratrees",
+        "approach": "Approach A",
+        "recomputed_test_roc_auc": 0.7944,
+        "recomputed_test_recall": 0.8201,
+        "recomputed_test_specificity": 0.5947,
+        "recomputed_test_ece": 0.0601,
+        "match_reported": true,
+        "test_specificity_floor_drift": true
+      },
+      {
+        "candidate_id": "appB_hist_gbdt_base",
+        "approach": "Approach B",
+        "recomputed_test_roc_auc": 0.798,
+        "recomputed_test_recall": 0.8193,
+        "recomputed_test_specificity": 0.6004,
+        "recomputed_test_ece": 0.0073,
+        "match_reported": true
+      },
+      {
+        "candidate_id": "appB_grad_boost_std",
+        "approach": "Approach B",
+        "recomputed_test_roc_auc": 0.7987,
+        "recomputed_test_recall": 0.8179,
+        "recomputed_test_specificity": 0.6052,
+        "recomputed_test_ece": 0.0068,
+        "match_reported": true,
+        "winner_approach_b": true
+      },
+      {
+        "candidate_id": "appC_mlp_pyramid_silu",
+        "approach": "Approach C",
+        "recomputed_test_roc_auc": 0.797,
+        "recomputed_test_recall": 0.8247,
+        "recomputed_test_specificity": 0.5952,
+        "recomputed_test_ece": 0.0061,
+        "match_reported": true,
+        "test_specificity_floor_drift": true
+      }
+    ],
+    "diabetes": [
+      {
+        "candidate_id": "baseline_sklearn_mlp",
+        "approach": "Production Baseline",
+        "recomputed_test_roc_auc": 0.8267,
+        "recomputed_test_recall": 0.3902,
+        "recomputed_test_specificity": 0.92,
+        "missed_cases": 25,
+        "detected_cases": 16,
+        "clinical_defect_confirmed": true
+      },
+      {
+        "candidate_id": "appA_extratrees",
+        "approach": "Approach A",
+        "recomputed_test_roc_auc": 0.8634,
+        "recomputed_test_recall": 0.8537,
+        "recomputed_test_specificity": 0.76,
+        "recomputed_test_ece": 0.1374,
+        "missed_cases": 6,
+        "detected_cases": 35,
+        "match_reported": true,
+        "staging_ready": true
+      },
+      {
+        "candidate_id": "appB_hist_gbdt_base",
+        "approach": "Approach B",
+        "recomputed_test_roc_auc": 0.828,
+        "recomputed_test_recall": 0.7561,
+        "recomputed_test_specificity": 0.6933,
+        "recomputed_test_ece": 0.1076,
+        "missed_cases": 10,
+        "detected_cases": 31,
+        "match_reported": true,
+        "staging_ready": true
+      },
+      {
+        "candidate_id": "appC_mlp_6layer_bottleneck_gelu",
+        "approach": "Approach C",
+        "recomputed_test_roc_auc": 0.8387,
+        "recomputed_test_recall": 0.878,
+        "recomputed_test_specificity": 0.64,
+        "recomputed_test_ece": 0.0291,
+        "missed_cases": 5,
+        "detected_cases": 36,
+        "match_reported": true,
+        "staging_ready": true,
+        "recommended_primary": true
+      }
+    ]
+  },
+  "test_execution": {
+    "total_tests": 50,
+    "passed": 50,
+    "failed": 0,
+    "pass_rate_percentage": 100.0,
+    "duration_seconds": 16.35
+  },
+  "final_audit_decisions": {
+    "heart_disease": {
+      "verdict": "HOLD_PROMOTION",
+      "recommendation": "Retain production RandomForestClassifier (ROC-AUC 0.8003 historical, 0.7961 unified test). Stage GradientBoostingClassifier (ROC-AUC 0.7987, latency 0.40ms, size 187KB) for shadow evaluation.",
+      "production_action": "NO_CHANGE"
+    },
+    "diabetes": {
+      "verdict": "CONDITIONAL_GO_FOR_SHADOW_STAGING",
+      "recommendation": "Deploy isolated StagingDiabetesService in shadow mode logging predictions for appC_mlp_6layer_bottleneck_gelu (Sensitivity 87.80%, ECE 0.0291) and appA_extratrees (ROC-AUC 0.8634, Sensitivity 85.37%). Do not modify production pipeline until 30-day shadow audit is complete.",
+      "production_action": "NO_CHANGE_STAGING_ADAPTER_ISOLATED"
+    }
+  }
+}

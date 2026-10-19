@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "audit_version": "1.1.0",
+  "audit_timestamp": "2026-10-19T19:38:00+05:30",
+  "overall_readiness_verdict": "BLOCKED_PENDING_APPROVAL",
+  "activation_eligibility": false,
+  "runtime_configuration": {
+    "ENABLE_DIABETES_SHADOW_EVAL": false,
+    "ENABLE_STAGING_DIABETES": false,
+    "MEDIMIND_ESCROW_HMAC_SECRET_CONFIGURED": false,
+    "bypass_protection_active": true,
+    "fail_closed_mechanism_verified": true
+  },
+  "governance_approval_status": {
+    "overall_status": "BLOCKED_PENDING_APPROVAL",
+    "domains": {
+      "clinical_protocol_and_thresholds": {
+        "role": "Chief Medical Officer (CMO)",
+        "status": "PENDING",
+        "approved_by": null,
+        "timestamp": null,
+        "evidence_reference": "MediMind_CMO_Review_Packet.md",
+        "blocker": "Awaiting formal clinical review of 500-sample, 30-day prospective protocol."
+      },
+      "privacy_and_data_processing": {
+        "role": "Healthcare Privacy Officer",
+        "status": "PENDING",
+        "approved_by": null,
+        "timestamp": null,
+        "evidence_reference": "MediMind_Privacy_Review_Packet.md",
+        "blocker": "Awaiting HIPAA de-identification and data minimization certification."
+      },
+      "security_key_mgmt_and_linkage_escrow": {
+        "role": "Security / SRE Lead",
+        "status": "BLOCKED",
+        "approved_by": null,
+        "timestamp": null,
+        "evidence_reference": "MediMind_Security_Escrow_Readiness.md",
+        "blocker": "Production KMS secret manager and secure escrow storage not initialized."
+      },
+      "runtime_deployment_and_rollback": {
+        "role": "Platform / Deployment Owner",
+        "status": "PENDING",
+        "approved_by": null,
+        "timestamp": null,
+        "evidence_reference": "MediMind_SRE_Deployment_Approval_Packet.md",
+        "blocker": "Awaiting SRE sign-off on monitoring and circuit-breaker runbook."
+      },
+      "data_source_and_adjudication_access": {
+        "role": "Data Governance Owner",
+        "status": "PENDING",
+        "approved_by": null,
+        "timestamp": null,
+        "evidence_reference": "MediMind_Clinical_Data_Access_Request.md",
+        "blocker": "Awaiting authorization of laboratory outcome feed for adjudication."
+      }
+    }
+  },
+  "artifact_integrity_verification": {
+    "production_artifacts": {
+      "diabetes_model": {
+        "path": "artifacts/diabetes/best_model.joblib",
+        "sha256": "65a15bf8674d01ce714033acd38744dc023211c53bcf7f1521fcaf3ab0756af9",
+        "status": "VERIFIED_UNCHANGED"
+      },
+      "heart_disease_model": {
+        "path": "artifacts/heart_disease/best_model.joblib",
+        "sha256": "1651a506476606ae6e8a4b33ed2edded6181d5917b019287c62f43cdb812ef2c",
+        "status": "VERIFIED_UNCHANGED"
+      },
+      "diabetes_serving_service": {
+        "path": "app/services/diabetes_service.py",
+        "sha256": "1d8af27e821ef49177e3295096483d50fa8248a59032b6284c72ba1f1399e268",
+        "status": "VERIFIED_UNCHANGED"
+      },
+      "heart_disease_serving_service": {
+        "path": "app/services/heart_disease_service.py",
+        "sha256": "678da749c49d5c19937a417e9ffc193d4b0a937308bc6b3987a3392cebf7a3f2",
+        "status": "VERIFIED_UNCHANGED"
+      }
+    },
+    "candidate_artifacts": {
+      "candidate_C": {
+        "id": "appC_mlp_6layer_bottleneck_gelu",
+        "path": "artifacts/experiments/benchmark_four_approaches_20261019/diabetes/appC_mlp_6layer_bottleneck_gelu.joblib",
+        "sha256": "a1f15032c7115f6c45766c85aeb8dcba49dc8e7a3d39d7673289d723f3475662",
+        "predeclared_threshold": 0.4000,
+        "verified_test_metrics": {
+          "sensitivity": 0.8780,
+          "specificity": 0.6400,
+          "roc_auc": 0.8387,
+          "pr_auc": 0.7348,
+          "ece": 0.0291,
+          "brier_score": 0.1665
+        }
+      },
+      "candidate_A": {
+        "id": "appA_extratrees",
+        "path": "artifacts/experiments/benchmark_four_approaches_20261019/diabetes/appA_extratrees.joblib",
+        "sha256": "daf817642888e2e7daffe45c6372f9c25048b37d046597659524383f0418f245",
+        "predeclared_threshold": 0.4300,
+        "verified_test_metrics": {
+          "sensitivity": 0.8537,
+          "specificity": 0.7600,
+          "roc_auc": 0.8634,
+          "pr_auc": 0.7883,
+          "ece": 0.1374,
+          "brier_score": 0.1583
+        }
+      },
+      "training_medians": {
+        "path": "artifacts/experiments/benchmark_four_approaches_20261019/diabetes/training_medians.joblib",
+        "sha256": "9917bc4082b554609e7e4fc2e9dba0fe0bc1e6ab96ef7bee4614cf04ec330885"
+      },
+      "training_scaler": {
+        "path": "artifacts/experiments/benchmark_four_approaches_20261019/diabetes/scaler.joblib",
+        "sha256": "a64149644163bf5c89c323ebb868933c9a6bb29d9648cdeec3b5d5b296fc6f68"
+      }
+    }
+  },
+  "automated_tests_verification": {
+    "total_regression_tests": 66,
+    "passed_regression_tests": 66,
+    "failed_regression_tests": 0,
+    "skipped_tests": 0,
+    "shadow_suite_tests": 16,
+    "staging_suite_tests": 3,
+    "all_tests_passed": true,
+    "fail_closed_coverage": "VERIFIED"
+  },
+  "review_packets_generated": {
+    "cmo_review_packet": "Documents/AI_Experiments/MediMind_CMO_Review_Packet.md",
+    "privacy_review_packet": "Documents/AI_Experiments/MediMind_Privacy_Review_Packet.md",
+    "security_escrow_readiness": "Documents/AI_Experiments/MediMind_Security_Escrow_Readiness.md",
+    "sre_deployment_packet": "Documents/AI_Experiments/MediMind_SRE_Deployment_Approval_Packet.md",
+    "clinical_data_access_request": "Documents/AI_Experiments/MediMind_Clinical_Data_Access_Request.md"
+  }
+}
