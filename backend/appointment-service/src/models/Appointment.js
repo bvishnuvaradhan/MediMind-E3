@@ -122,9 +122,30 @@ const appointmentSchema = new mongoose.Schema(
   }
 );
 
-// Compound index for slot lookups & conflict checking
-appointmentSchema.index({ doctor_id: 1, appointment_date: 1, start_time: 1 });
+// Compound unique partial index for slot lookups & race-free active slot conflict prevention
+appointmentSchema.index(
+  { doctor_id: 1, appointment_date: 1, start_time: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      status: {
+        $in: [
+          'BOOKED',
+          'CONFIRMED',
+          'CHECKED_IN',
+          'IN_PROGRESS',
+          'COMPLETED',
+          'RESCHEDULED',
+        ],
+      },
+    },
+  }
+);
 appointmentSchema.index({ hospital_id: 1, department_id: 1 });
+appointmentSchema.index({ appointment_date: 1, start_time: 1 });
+appointmentSchema.index({ status: 1, appointment_date: 1 });
+appointmentSchema.index({ family_member_id: 1, appointment_date: 1 });
+appointmentSchema.index({ doctor_id: 1, appointment_date: 1 });
 
 appointmentSchema.methods.toPublicJSON = function () {
   return {

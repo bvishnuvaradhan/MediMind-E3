@@ -173,10 +173,15 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
     }
   };
 
-  const filteredHospitals = hospitals.filter((h) => {
+  const registeredHospitals = hospitals.filter((h) => (h.status || '').toUpperCase() === 'ACTIVE' || h.status === 'Active');
+  const pendingHospitals = hospitals.filter((h) => (h.status || '').toUpperCase() === 'PENDING' || h.status === 'Pending');
+
+  const filteredHospitals = registeredHospitals.filter((h) => {
     const s = search.toLowerCase();
-    return (
+    const matchStatus = statusFilter === 'All' ? true : h.status.toLowerCase() === statusFilter.toLowerCase();
+    return matchStatus && (
       h.name.toLowerCase().includes(s) ||
+      h.code?.toLowerCase().includes(s) ||
       h.city.toLowerCase().includes(s) ||
       (h.adminName && h.adminName.toLowerCase().includes(s))
     );
@@ -201,6 +206,7 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
   });
 
   const pendingRequestsCount = requests.filter((r) => r.status === 'Pending').length;
+  const totalPendingApplications = pendingHospitals.length + pendingRequestsCount;
 
   return (
     <div className="hospitals-view">
@@ -217,7 +223,7 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
                   Network & Workforce Architecture
                 </p>
                 <h1>Hospital Network Management</h1>
-                <p>Hospital-first institutional oversight. Select any hospital to inspect its clinical departments and medical workforce.</p>
+                <p>Hospital-first institutional oversight. Select any registered hospital to inspect its clinical departments and medical workforce.</p>
               </div>
             </div>
 
@@ -229,6 +235,28 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
             </div>
           </div>
 
+          {/* Institutional KPI Summary Matrix */}
+          <div className="stats-grid" style={{ marginBottom: '22px' }}>
+            <div className="stat-card">
+              <span className="stat-delta">Network Size</span>
+              <h3 style={{ marginTop: '8px' }}>{hospitals.length}</h3>
+              <p>Total Healthcare Facilities</p>
+              <small style={{ color: 'var(--chair-muted)' }}>{registeredHospitals.length} Registered + {pendingHospitals.length} Pending Facilities</small>
+            </div>
+            <div className="stat-card">
+              <span className="stat-delta" style={{ background: '#dcfce7', color: '#166534' }}>Operational</span>
+              <h3 style={{ marginTop: '8px', color: '#16a34a' }}>{registeredHospitals.length}</h3>
+              <p>Registered Active Hospitals</p>
+              <small style={{ color: 'var(--chair-muted)' }}>13 Departments · 29 Doctors · Live OPD Network</small>
+            </div>
+            <div className="stat-card">
+              <span className="stat-delta" style={{ background: '#fef3c7', color: '#d97706' }}>Under Governance Review</span>
+              <h3 style={{ marginTop: '8px', color: '#d97706' }}>{totalPendingApplications}</h3>
+              <p>Pending Applications</p>
+              <small style={{ color: 'var(--chair-muted)' }}>{pendingHospitals.length} facilities + {pendingRequestsCount} onboarding applicants</small>
+            </div>
+          </div>
+
           {/* Tabs */}
           <div className="filter-bar">
             <div className="filter-pills">
@@ -236,13 +264,13 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
                 className={`filter-pill ${activeTab === 'hospitals' ? 'active' : ''}`}
                 onClick={() => setActiveTab('hospitals')}
               >
-                Registered Hospitals ({hospitals.length})
+                Registered Hospitals ({registeredHospitals.length})
               </button>
               <button
                 className={`filter-pill ${activeTab === 'requests' ? 'active' : ''}`}
                 onClick={() => setActiveTab('requests')}
               >
-                Onboarding Requests {pendingRequestsCount > 0 && `(${pendingRequestsCount} Pending)`}
+                Pending Applications {totalPendingApplications > 0 && `(${totalPendingApplications} Pending)`}
               </button>
             </div>
 
@@ -379,9 +407,42 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
             </div>
           )}
 
-          {/* Tab 2: Hospital Onboarding Requests */}
+          {/* Tab 2: Hospital Onboarding Requests & Pending Facilities */}
           {activeTab === 'requests' && (
-            <div style={{ display: 'grid', gap: '16px', marginBottom: '28px' }}>
+            <div style={{ display: 'grid', gap: '20px', marginBottom: '28px' }}>
+              {pendingHospitals.length > 0 && (
+                <div>
+                  <h3 style={{ margin: '0 0 12px', fontSize: '15px', color: 'var(--chair-ink)' }}>
+                    Pending Hospital Facilities ({pendingHospitals.length})
+                  </h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+                    {pendingHospitals.map((hosp) => (
+                      <div key={hosp.id} className="table-card" style={{ padding: '20px', borderLeft: '4px solid #f59e0b' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '10px' }}>
+                          <div>
+                            <strong style={{ fontSize: '15px' }}>{hosp.name}</strong>
+                            <span style={{ fontSize: '12px', color: 'var(--chair-muted)', display: 'block' }}>
+                              {hosp.city}, {hosp.state} · Code: {hosp.code}
+                            </span>
+                          </div>
+                          <span className="badge badge-pending">Pending Review</span>
+                        </div>
+                        <p style={{ margin: '6px 0 12px', fontSize: '12px', color: 'var(--chair-muted)' }}>
+                          Facility application registered on platform. Awaiting Chairman accreditation approval before public activation.
+                        </p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px' }}>
+                          <span>Bed Capacity: <b>{hosp.bedCapacity}</b></span>
+                          <span style={{ color: '#d97706', fontWeight: 600 }}>Status: Onboarding Pending</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <h3 style={{ margin: '0 0 4px', fontSize: '15px', color: 'var(--chair-ink)' }}>
+                Onboarding Applications & Requests ({requests.length})
+              </h3>
               {requests.length === 0 ? (
                 <div className="table-card" style={{ padding: '36px', textAlign: 'center', color: 'var(--chair-muted)' }}>
                   No onboarding requests are currently pending.

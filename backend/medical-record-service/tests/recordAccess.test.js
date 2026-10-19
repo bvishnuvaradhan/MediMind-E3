@@ -38,6 +38,26 @@ beforeAll(async () => {
     JWT_SECRET
   );
 
+  // Mock external HTTP microservice calls to localhost:5002 and localhost:5004 for offline testing
+  jest.spyOn(internalServices, 'verifyFamilyMember').mockImplementation(async ({ user, memberId }) => ({
+    valid: true,
+    member: {
+      _id: memberId,
+      id: memberId,
+      name: 'Test Family Member',
+      fullName: 'Test Family Member',
+      familyId: user?.referenceId || user?.familyId,
+    },
+  }));
+
+  jest.spyOn(internalServices, 'getDoctor').mockImplementation(async (docId) => ({
+    _id: docId,
+    id: docId,
+    name: 'Dr. Test Specialist',
+    hospitalId: new mongoose.Types.ObjectId(),
+    departmentId: new mongoose.Types.ObjectId(),
+  }));
+
   // Seed one active medical record for this member
   await MedicalRecord.create({
     family_member_id: familyMemberId,

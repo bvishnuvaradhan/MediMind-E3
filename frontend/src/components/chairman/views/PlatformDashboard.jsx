@@ -23,6 +23,7 @@ export function PlatformDashboard({ onNavigate }) {
   const [hospitals, setHospitals] = useState([]);
   const [requests, setRequests] = useState([]);
   const [aiData, setAiData] = useState(null);
+  const [expandedHospitals, setExpandedHospitals] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -37,6 +38,14 @@ export function PlatformDashboard({ onNavigate }) {
     }
     loadData();
   }, []);
+
+  // Deduplicate hospitals and calculate displayed slice
+  const uniqueHospitals = hospitals.filter((hosp, idx, arr) => {
+    const key = hosp.id || hosp._id || hosp.code || hosp.name;
+    return arr.findIndex((h) => (h.id || h._id || h.code || h.name) === key) === idx;
+  });
+
+  const displayedHospitals = expandedHospitals ? uniqueHospitals : uniqueHospitals.slice(0, 3);
 
   if (!summary || !aiData) {
     return <div className="loading-state">Loading Platform Dashboard...</div>;
@@ -154,6 +163,21 @@ export function PlatformDashboard({ onNavigate }) {
             4 Active Diagnostic Pipelines
           </small>
         </div>
+
+        <div className="stat-card">
+          <div className="stat-topline">
+            <span className="stat-icon" style={{ background: '#ede9fe', color: '#6d28d9' }}>
+              <UsersRound size={20} />
+            </span>
+            <span className="stat-delta">59 Canonical</span>
+          </div>
+          <h3>{summary.totalPlatformAccounts || 59}</h3>
+          <p>Total Platform Accounts</p>
+          <div style={{ fontSize: '11px', color: 'var(--chair-muted)', marginTop: '4px', lineHeight: 1.35 }}>
+            <strong>29</strong> Doctors (of 66 staff) · <strong>10</strong> Family<br />
+            <strong>14</strong> Dept Heads · <strong>4</strong> Admins · <strong>2</strong> Owner
+          </div>
+        </div>
       </div>
 
       {/* Two Column Layout: Hospital Network + AI Services */}
@@ -175,9 +199,9 @@ export function PlatformDashboard({ onNavigate }) {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {hospitals.slice(0, 3).map((hosp) => (
+            {displayedHospitals.map((hosp) => (
               <div
-                key={hosp.id}
+                key={hosp.id || hosp._id || hosp.name}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -197,16 +221,39 @@ export function PlatformDashboard({ onNavigate }) {
                     <span className="badge badge-active">{hosp.status}</span>
                   </div>
                   <span style={{ fontSize: '12px', color: 'var(--chair-muted)' }}>
-                    Admin: {hosp.adminName} · {hosp.city}, {hosp.state}
+                    Admin: {hosp.adminName || 'Dr. Administrator'} · {hosp.city}, {hosp.state || ''}
                   </span>
                 </div>
                 <div style={{ textAlign: 'right', fontSize: '12px' }}>
-                  <strong>{hosp.doctorsCount} Doctors</strong>
-                  <div style={{ color: 'var(--chair-muted)', fontSize: '11px' }}>{hosp.appointmentsCount} Visits</div>
+                  <strong>{hosp.doctorsCount || 0} Doctors</strong>
+                  <div style={{ color: 'var(--chair-muted)', fontSize: '11px' }}>{hosp.appointmentsCount || 0} Visits</div>
                 </div>
               </div>
             ))}
           </div>
+
+          {uniqueHospitals.length > 3 && (
+            <div style={{ marginTop: '14px', textAlign: 'center' }}>
+              <button
+                type="button"
+                className="secondary-button"
+                style={{
+                  width: '100%',
+                  justifyContent: 'center',
+                  fontSize: '13px',
+                  padding: '9px 16px',
+                  fontWeight: '600',
+                  borderRadius: '8px',
+                  border: '1px solid var(--chair-border)',
+                  background: 'var(--chair-bg)',
+                  cursor: 'pointer',
+                }}
+                onClick={() => setExpandedHospitals(!expandedHospitals)}
+              >
+                {expandedHospitals ? 'View less' : `View more (${uniqueHospitals.length - 3} more)`}
+              </button>
+            </div>
+          )}
 
           {requests.length > 0 && (
             <div style={{ marginTop: '16px', padding: '12px 14px', borderRadius: '10px', background: '#fffbeb', border: '1px solid #fde68a', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

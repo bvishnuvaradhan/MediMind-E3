@@ -8,12 +8,14 @@ import {
   CalendarDays,
   CheckCircle,
   Clock,
+  Calendar,
 } from 'lucide-react';
 import { chairmanService } from '../../../services/chairmanService';
 import { DonutChart } from '../../common/charts';
 
 export function PlatformAnalyticsView() {
   const [summary, setSummary] = useState(null);
+  const [dateRange, setDateRange] = useState('All Time');
 
   useEffect(() => {
     async function load() {
@@ -21,7 +23,7 @@ export function PlatformAnalyticsView() {
       setSummary(data);
     }
     load();
-  }, []);
+  }, [dateRange]);
 
   if (!summary) return <div className="loading-state">Loading Platform Analytics...</div>;
 
@@ -62,6 +64,23 @@ export function PlatformAnalyticsView() {
             </p>
             <h1>Platform Usage & Growth Analytics</h1>
             <p>Comprehensive statistical breakdown across users, appointments, and clinical throughput.</p>
+          </div>
+        </div>
+
+        {/* Standardized Date Range Selector */}
+        <div className="view-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: 'var(--chair-card)', padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--chair-border)' }}>
+            <Calendar size={15} style={{ color: 'var(--chair-sapphire)' }} />
+            <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--chair-muted)' }}>Range:</span>
+            <select
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
+              style={{ background: 'transparent', border: 'none', fontSize: '13px', fontWeight: '600', color: 'var(--chair-text)', cursor: 'pointer', outline: 'none' }}
+            >
+              {['All Time', 'Last 3 Months', 'Last 6 Months', 'Last 1 Year', 'Custom Range'].map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
           </div>
         </div>
       </div>

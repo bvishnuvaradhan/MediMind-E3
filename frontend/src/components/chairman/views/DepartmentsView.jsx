@@ -61,10 +61,10 @@ export function DepartmentsView({ onNavigate: _onNavigate }) {
   const filteredDepts = departments.filter((dept) => {
     const s = search.toLowerCase();
     return (
-      dept.name.toLowerCase().includes(s) ||
-      dept.hospitalName.toLowerCase().includes(s) ||
-      dept.headName.toLowerCase().includes(s) ||
-      dept.linkedAi.toLowerCase().includes(s)
+      (dept.name && dept.name.toLowerCase().includes(s)) ||
+      (dept.hospitalName && dept.hospitalName.toLowerCase().includes(s)) ||
+      (dept.headName && dept.headName.toLowerCase().includes(s)) ||
+      (dept.linkedAi && dept.linkedAi.toLowerCase().includes(s))
     );
   });
 

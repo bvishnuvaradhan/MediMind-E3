@@ -37,6 +37,17 @@ beforeAll(async () => {
     { userId: new mongoose.Types.ObjectId().toString(), role: 'HOSPITAL_ADMIN', referenceId: adminId.toString(), hospitalId: adminId.toString() },
     JWT_SECRET
   );
+
+  jest.spyOn(internalServices, 'verifyFamilyMember').mockImplementation(async ({ user, memberId }) => ({
+    valid: true,
+    member: {
+      _id: memberId,
+      id: memberId,
+      name: 'Test Member',
+      fullName: 'Test Member',
+      familyId: user?.referenceId || user?.familyId,
+    },
+  }));
 });
 
 afterAll(async () => {
@@ -47,6 +58,19 @@ afterAll(async () => {
 
 describe('Medical Record Management Suite', () => {
   let createdRecordId;
+
+  beforeEach(() => {
+    jest.spyOn(internalServices, 'verifyFamilyMember').mockImplementation(async ({ user, memberId }) => ({
+      valid: true,
+      member: {
+        _id: memberId,
+        id: memberId,
+        name: 'Test Member',
+        fullName: 'Test Member',
+        familyId: user?.referenceId || user?.familyId,
+      },
+    }));
+  });
 
   test('1. Health check returns 200 OK', async () => {
     const res = await request(app).get('/health');

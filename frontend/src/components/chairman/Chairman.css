@@ -465,10 +465,22 @@
   margin-bottom: 28px;
 }
 
-/* Balanced responsive layouts for 5-item grids */
+/* Balanced responsive layouts for 5-item and 6-item grids */
 .stats-grid.cols-5,
 .stats-grid:has(> :nth-child(5):last-child) {
   grid-template-columns: repeat(5, 1fr);
+}
+
+.stats-grid.cols-6,
+.stats-grid:has(> :nth-child(6):last-child) {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+@media (max-width: 1400px) {
+  .stats-grid.cols-6,
+  .stats-grid:has(> :nth-child(6):last-child) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 1200px) {
@@ -1041,3 +1053,24 @@
     padding: 12px 18px;
   }
 }
+
+/* Executive Reports Catalog Grid */
+.reports-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 1023px) {
+  .reports-catalog-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .reports-catalog-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

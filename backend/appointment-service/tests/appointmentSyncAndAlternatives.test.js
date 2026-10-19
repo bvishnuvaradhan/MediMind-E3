@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
+import { jest } from '@jest/globals';
 import app from '../src/app.js';
 import Appointment from '../src/models/Appointment.js';
 import Notification from '../src/models/Notification.js';
+import { internalServices } from '../src/utils/internalServices.js';
 
 const TEST_DB_URI = 'mongodb://127.0.0.1:27017/medimind_appointment_test';
 const JWT_SECRET = process.env.JWT_SECRET || 'medimind_jwt_secret_development_key_change_in_production';
@@ -23,6 +25,7 @@ let activeAppt;
 
 beforeAll(async () => {
   await mongoose.connect(TEST_DB_URI);
+  await Appointment.syncIndexes();
   await Appointment.deleteMany({});
   await Notification.deleteMany({});
 
@@ -40,6 +43,38 @@ beforeAll(async () => {
   family2UserId = new mongoose.Types.ObjectId();
   doctor1UserId = new mongoose.Types.ObjectId();
   doctor2UserId = new mongoose.Types.ObjectId();
+
+  jest.spyOn(internalServices, 'verifyFamilyMember').mockImplementation(async ({ user, memberId }) => {
+    const memStr = memberId ? memberId.toString() : '';
+    const userFamId = (user?.familyId || user?.referenceId || '').toString();
+    if (memStr === family1MemberId.toString() && userFamId === family1Id.toString()) {
+      return {
+        valid: true,
+        member: {
+          _id: memberId,
+          id: memberId,
+          name: 'Family 1 Member',
+          familyId: family1Id.toString(),
+        },
+      };
+    }
+    if (memStr === family2MemberId.toString() && userFamId === family2Id.toString()) {
+      return {
+        valid: true,
+        member: {
+          _id: memberId,
+          id: memberId,
+          name: 'Family 2 Member',
+          familyId: family2Id.toString(),
+        },
+      };
+    }
+    return {
+      valid: false,
+      statusCode: 403,
+      message: 'Access forbidden: member does not belong to your family',
+    };
+  });
 
   family1Token = jwt.sign(
     { userId: family1UserId.toString(), role: 'FAMILY', familyId: family1Id.toString(), referenceId: family1Id.toString() },
@@ -75,6 +110,38 @@ beforeAll(async () => {
 beforeEach(async () => {
   await Appointment.deleteMany({});
   await Notification.deleteMany({});
+
+  jest.spyOn(internalServices, 'verifyFamilyMember').mockImplementation(async ({ user, memberId }) => {
+    const memStr = memberId ? memberId.toString() : '';
+    const userFamId = (user?.familyId || user?.referenceId || '').toString();
+    if (memStr === family1MemberId.toString() && userFamId === family1Id.toString()) {
+      return {
+        valid: true,
+        member: {
+          _id: memberId,
+          id: memberId,
+          name: 'Family 1 Member',
+          familyId: family1Id.toString(),
+        },
+      };
+    }
+    if (memStr === family2MemberId.toString() && userFamId === family2Id.toString()) {
+      return {
+        valid: true,
+        member: {
+          _id: memberId,
+          id: memberId,
+          name: 'Family 2 Member',
+          familyId: family2Id.toString(),
+        },
+      };
+    }
+    return {
+      valid: false,
+      statusCode: 403,
+      message: 'Access forbidden: original appointment does not belong to your family',
+    };
+  });
 
   activeAppt = await Appointment.create({
     family_member_id: family1MemberId,
@@ -311,5 +378,244 @@ describe('Appointment Synchronization, Cancellation Notifications, & Alternative
     const updated = await Notification.findById(notif._id);
     expect(updated.is_read).toBe(true);
     expect(updated.read_at).toBeTruthy();
+  });
+
+  test('10. Simultaneous duplicate rebooking race: only one replacement wins (201), the concurrent request gets 409, and no orphaned replacement is left', async () => {
+    // Doctor cancels activeAppt
+    await request(app)
+      .put(`/api/appointments/${activeAppt._id}/cancel`)
+      .set('Authorization', `Bearer ${doctor1Token}`)
+      .send({ reason: 'Simultaneous rebooking test' });
+
+    // Fire two simultaneous rebooking requests for the same cancelled appointment
+    const [resA, resB] = await Promise.all([
+      request(app)
+        .post('/api/appointments')
+        .set('Authorization', `Bearer ${family1Token}`)
+        .send({
+          familyMemberId: family1MemberId,
+          doctorId: doctor2Id,
+          hospitalId,
+          departmentId,
+          appointmentDate: '2026-10-28',
+          startTime: '09:00',
+          endTime: '09:30',
+          originalAppointmentId: activeAppt._id,
+        }),
+      request(app)
+        .post('/api/appointments')
+        .set('Authorization', `Bearer ${family1Token}`)
+        .send({
+          familyMemberId: family1MemberId,
+          doctorId: doctor2Id,
+          hospitalId,
+          departmentId,
+          appointmentDate: '2026-10-28',
+          startTime: '10:00',
+          endTime: '10:30',
+          originalAppointmentId: activeAppt._id,
+        }),
+    ]);
+
+    const statuses = [resA.status, resB.status].sort();
+    expect(statuses).toEqual([201, 409]);
+
+    // Check that the losing request returned 409 Conflict with the rebooked message
+    const loser = resA.status === 409 ? resA : resB;
+    const winner = resA.status === 201 ? resA : resB;
+    expect(loser.body.message).toContain('already been rebooked');
+
+    // Verify DB consistency: Only ONE appointment has original_appointment_id pointing to activeAppt
+    const linkedReplacements = await Appointment.find({ original_appointment_id: activeAppt._id });
+    expect(linkedReplacements.length).toBe(1);
+    expect(linkedReplacements[0]._id.toString()).toBe(winner.body.data._id.toString());
+
+    // Original appointment must point to the winning replacement
+    const origAppt = await Appointment.findById(activeAppt._id);
+    expect(origAppt.replacement_appointment_id.toString()).toBe(winner.body.data._id.toString());
+
+    // Verify no orphaned appointments were created for the loser's slot
+    const loserSlotAppts = await Appointment.find({
+      doctor_id: doctor2Id,
+      appointment_date: new Date('2026-10-28'),
+      start_time: loser === resA ? '09:00' : '10:00',
+    });
+    expect(loserSlotAppts.length).toBe(0);
+  });
+
+  test('11. Simultaneous slot booking race: concurrent bookings of the exact same slot result in one 201 and one 409 Conflict', async () => {
+    // Two users simultaneously attempt to book the exact same slot with Doctor 2
+    const [resA, resB] = await Promise.all([
+      request(app)
+        .post('/api/appointments')
+        .set('Authorization', `Bearer ${family1Token}`)
+        .send({
+          familyMemberId: family1MemberId,
+          doctorId: doctor2Id,
+          hospitalId,
+          departmentId,
+          appointmentDate: '2026-10-29',
+          startTime: '14:00',
+          endTime: '14:30',
+          reason: 'Slot collision A',
+        }),
+      request(app)
+        .post('/api/appointments')
+        .set('Authorization', `Bearer ${family2Token}`)
+        .send({
+          familyMemberId: family2MemberId,
+          doctorId: doctor2Id,
+          hospitalId,
+          departmentId,
+          appointmentDate: '2026-10-29',
+          startTime: '14:00',
+          endTime: '14:30',
+          reason: 'Slot collision B',
+        }),
+    ]);
+
+    const statuses = [resA.status, resB.status].sort();
+    expect(statuses).toEqual([201, 409]);
+
+    const loser = resA.status === 409 ? resA : resB;
+    expect(loser.body.message).toContain('already has an appointment booked for this time slot');
+
+    // In DB, exactly one active appointment exists for that slot
+    const bookedAppts = await Appointment.find({
+      doctor_id: doctor2Id,
+      appointment_date: new Date('2026-10-29'),
+      start_time: '14:00',
+      status: { $nin: ['CANCELLED'] },
+    });
+    expect(bookedAppts.length).toBe(1);
+  });
+
+  test('12. Caller authorization check: Family 2 cannot rebook an appointment originally created for Family 1 (403)', async () => {
+    // Cancel activeAppt (belongs to family1MemberId)
+    await request(app)
+      .put(`/api/appointments/${activeAppt._id}/cancel`)
+      .set('Authorization', `Bearer ${doctor1Token}`)
+      .send({ reason: 'Family authorization test' });
+
+    // Mock internalServices.verifyFamilyMember to reject when family 2 queries family 1's member
+    const spy = jest.spyOn(internalServices, 'verifyFamilyMember').mockImplementation(async ({ user, memberId }) => {
+      if (user.role === 'FAMILY' && memberId.toString() === family1MemberId.toString() && user.referenceId === family2Id.toString()) {
+        return {
+          valid: false,
+          statusCode: 403,
+          message: 'Access forbidden: original appointment does not belong to your family',
+        };
+      }
+      return { valid: true, member: { _id: memberId } };
+    });
+
+    // Family 2 attempts to rebook activeAppt (which was Family 1's appointment)
+    const res = await request(app)
+      .post('/api/appointments')
+      .set('Authorization', `Bearer ${family2Token}`)
+      .send({
+        familyMemberId: family2MemberId,
+        doctorId: doctor2Id,
+        hospitalId,
+        departmentId,
+        appointmentDate: '2026-10-30',
+        startTime: '11:00',
+        endTime: '11:30',
+        originalAppointmentId: activeAppt._id,
+      });
+
+    expect(res.status).toBe(403);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toContain('original appointment does not belong to your family');
+
+    // Original appointment must remain un-rebooked
+    const orig = await Appointment.findById(activeAppt._id);
+    expect(orig.replacement_appointment_id).toBeNull();
+
+    spy.mockRestore();
+  });
+
+  test('13. Failed atomic linkage rolls back replacement appointment cleanly without leaving orphaned records', async () => {
+    // Cancel activeAppt
+    await request(app)
+      .put(`/api/appointments/${activeAppt._id}/cancel`)
+      .set('Authorization', `Bearer ${doctor1Token}`)
+      .send({ reason: 'Linkage rollback test' });
+
+    // Mock findOneAndUpdate to simulate concurrent atomic claim failure
+    const originalFindOneAndUpdate = Appointment.findOneAndUpdate.bind(Appointment);
+    const spy = jest.spyOn(Appointment, 'findOneAndUpdate').mockImplementation(async (filter, update, options) => {
+      if (filter && filter._id && filter._id.toString() === activeAppt._id.toString() && update.replacement_appointment_id) {
+        // Return null as if another thread won the race
+        return null;
+      }
+      return originalFindOneAndUpdate(filter, update, options);
+    });
+
+    const res = await request(app)
+      .post('/api/appointments')
+      .set('Authorization', `Bearer ${family1Token}`)
+      .send({
+        familyMemberId: family1MemberId,
+        doctorId: doctor2Id,
+        hospitalId,
+        departmentId,
+        appointmentDate: '2026-10-31',
+        startTime: '16:00',
+        endTime: '16:30',
+        originalAppointmentId: activeAppt._id,
+      });
+
+    expect(res.status).toBe(409);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toContain('already been rebooked');
+
+    // Verify replacement appointment was deleted and not left orphaned in the database
+    const orphaned = await Appointment.find({
+      doctor_id: doctor2Id,
+      appointment_date: new Date('2026-10-31'),
+      start_time: '16:00',
+    });
+    expect(orphaned.length).toBe(0);
+
+    spy.mockRestore();
+  });
+
+  test('14. Notification consistency: rescheduling notification is generated with accurate appointment details only for the winning booking', async () => {
+    // Cancel activeAppt
+    await request(app)
+      .put(`/api/appointments/${activeAppt._id}/cancel`)
+      .set('Authorization', `Bearer ${doctor1Token}`)
+      .send({ reason: 'Notification consistency test' });
+
+    const beforeNotifCount = await Notification.countDocuments();
+
+    // Rebook successfully
+    const res = await request(app)
+      .post('/api/appointments')
+      .set('Authorization', `Bearer ${family1Token}`)
+      .send({
+        familyMemberId: family1MemberId,
+        doctorId: doctor2Id,
+        hospitalId,
+        departmentId,
+        appointmentDate: '2026-11-01',
+        startTime: '10:00',
+        endTime: '10:30',
+        originalAppointmentId: activeAppt._id,
+      });
+
+    expect(res.status).toBe(201);
+    const newApptId = res.body.data._id || res.body.data.id;
+
+    // Check that exactly ONE new notification was generated
+    const afterNotifCount = await Notification.countDocuments();
+    expect(afterNotifCount).toBe(beforeNotifCount + 1);
+
+    const rebookNotif = await Notification.findOne({ appointment_id: newApptId });
+    expect(rebookNotif).toBeTruthy();
+    expect(rebookNotif.type).toBe('APPOINTMENT_RESCHEDULED');
+    expect(rebookNotif.title).toContain('Alternative Appointment Confirmed');
+    expect(rebookNotif.recipient_user_id).toBe(family1UserId.toString());
   });
 });

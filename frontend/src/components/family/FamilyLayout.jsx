@@ -214,6 +214,63 @@ export function FamilyLayout({ dark, setDark }) {
     };
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+    const token = user?.token || localStorage.getItem('medimind_jwt_token');
+    if (token) {
+      fetch('/api/families/members', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (isMounted && data && Array.isArray(data.data)) {
+            if (data.data.length === 0) {
+              setFamilyMembers([]);
+            } else {
+              const mappedMembers = data.data.map((m, idx) => {
+                const name = m.fullName || m.full_name || m.name || 'Member';
+                const parts = name.split(' ');
+                const initials = parts.length > 1 ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase() : name.slice(0, 2).toUpperCase();
+                const tones = ['coral', 'lilac', 'sapphire', 'mint', 'amber'];
+                const bDate = m.dateOfBirth || m.date_of_birth ? new Date(m.dateOfBirth || m.date_of_birth) : null;
+                const age = bDate ? Math.floor((new Date() - bDate) / (365.25 * 24 * 3600 * 1000)) : (m.age || 30);
+                return {
+                  id: m.id || m._id || `MEM-${activeFamilyId}-${idx + 1}`,
+                  familyId: m.familyId || m.family_id || activeFamilyId,
+                  name,
+                  fullName: name,
+                  relation: idx === 0 ? 'You' : (m.relationship || m.relation || 'Family member'),
+                  relationship: idx === 0 ? 'Primary' : (m.relationship || m.relation || 'Family member'),
+                  initials: m.initials || initials,
+                  tone: m.tone || tones[idx % tones.length],
+                  gender: m.gender ? (m.gender.charAt(0).toUpperCase() + m.gender.slice(1).toLowerCase()) : 'Other',
+                  bloodGroup: m.bloodGroup || m.blood_group || 'O+',
+                  dob: bDate ? bDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : (m.dob || '01 Jan 1990'),
+                  age,
+                  phone: m.phone || '+91 98765 43210',
+                  email: m.email || '',
+                  address: m.address || '',
+                  conditions: (m.medicalConditions || m.medical_conditions || []).join(', ') || 'None reported',
+                  allergies: (m.allergies || []).join(', ') || 'No known allergies',
+                  treatments: (m.previousTreatments || m.previous_treatments || []).join(', ') || 'None',
+                  records: m.records || 0,
+                  predictions: m.predictions || 0,
+                  appointments: m.appointments || 0,
+                  consultations: m.consultations || 0,
+                  prescriptions: m.prescriptions || 0,
+                };
+              });
+              setFamilyMembers(mappedMembers);
+            }
+          }
+        })
+        .catch(() => {});
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [user, activeFamilyId]);
+
   // Refresh and History Navigation Synchronization
   useEffect(() => {
     const handlePopState = () => {

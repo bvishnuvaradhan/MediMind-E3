@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
 import {
   Building2,
+  Calendar,
 } from 'lucide-react';
 import { chairmanService } from '../../../services/chairmanService';
 import { BarChart, BulletChart } from '../../common/charts';
 
 export function HospitalPerformanceView() {
   const [performance, setPerformance] = useState([]);
+  const [dateRange, setDateRange] = useState('All Time');
 
   useEffect(() => {
     async function load() {
@@ -14,7 +15,7 @@ export function HospitalPerformanceView() {
       setPerformance(data);
     }
     load();
-  }, []);
+  }, [dateRange]);
 
   const totalDoctors = performance.reduce((sum, h) => sum + (Number(h.doctorsCount) || 0), 0);
   const totalVisits = performance.reduce((sum, h) => sum + (Number(h.appointmentsCount) || 0), 0);
@@ -41,6 +42,23 @@ export function HospitalPerformanceView() {
             </p>
             <h1>Hospital Performance Comparison</h1>
             <p>Comparative operational KPIs, patient satisfaction indices, and clinical throughput across the hospital network.</p>
+          </div>
+        </div>
+
+        {/* Standardized Date Range Selector */}
+        <div className="view-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: 'var(--chair-card)', padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--chair-border)' }}>
+            <Calendar size={15} style={{ color: 'var(--chair-sapphire)' }} />
+            <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--chair-muted)' }}>Range:</span>
+            <select
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
+              style={{ background: 'transparent', border: 'none', fontSize: '13px', fontWeight: '600', color: 'var(--chair-text)', cursor: 'pointer', outline: 'none' }}
+            >
+              {['All Time', 'Last 3 Months', 'Last 6 Months', 'Last 1 Year', 'Custom Range'].map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
           </div>
         </div>
       </div>

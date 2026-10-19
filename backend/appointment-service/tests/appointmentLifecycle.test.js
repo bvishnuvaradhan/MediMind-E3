@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
+import { jest } from '@jest/globals';
 import app from '../src/app.js';
 import Appointment from '../src/models/Appointment.js';
+import { internalServices } from '../src/utils/internalServices.js';
 
 const TEST_DB_URI = 'mongodb://127.0.0.1:27017/medimind_appointment_test';
 const JWT_SECRET = process.env.JWT_SECRET || 'medimind_jwt_secret_development_key_change_in_production';
@@ -19,6 +21,17 @@ beforeAll(async () => {
   hospitalId = new mongoose.Types.ObjectId();
   departmentId = new mongoose.Types.ObjectId();
   familyMemberId = new mongoose.Types.ObjectId();
+
+  jest.spyOn(internalServices, 'verifyFamilyMember').mockImplementation(async ({ user, memberId }) => ({
+    valid: true,
+    member: {
+      _id: memberId,
+      id: memberId,
+      name: 'Test Member',
+      fullName: 'Test Member',
+      familyId: user?.referenceId || user?.familyId,
+    },
+  }));
 
   familyToken = jwt.sign(
     { userId: new mongoose.Types.ObjectId().toString(), role: 'FAMILY', referenceId: new mongoose.Types.ObjectId().toString() },

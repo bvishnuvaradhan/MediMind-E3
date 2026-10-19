@@ -23,6 +23,17 @@ const getDayRange = (date) => {
 
 const isValidTime = (t) => /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(t);
 
+const apptCache = new Map();
+const APPT_CACHE_TTL_MS = 6000;
+
+function getCacheKey(user, query) {
+  return `${user?.role || ''}_${user?.userId || ''}_${user?.referenceId || ''}_${JSON.stringify(query || {})}`;
+}
+
+function invalidateApptCache() {
+  apptCache.clear();
+}
+
 export const appointmentService = {
   /**
    * Helper to resolve doctor, member, department, and hospital metadata
@@ -122,6 +133,102 @@ export const appointmentService = {
   },
 
   /**
+   * Bulk-enriches a list of appointment documents using batch queries instead of N*4 individual findOnes
+   */
+  async _enrichAppointmentsBulk(appointments) {
+    if (!appointments || appointments.length === 0) return [];
+
+    const jsonList = appointments.map((a) => (typeof a.toPublicJSON === 'function' ? a.toPublicJSON() : a));
+
+    try {
+      const docIds = new Set();
+      const memberIds = new Set();
+      const hospIds = new Set();
+      const deptIds = new Set();
+
+      for (const a of jsonList) {
+        const did = a.doctor_id || a.doctorId;
+        if (did && mongoose.Types.ObjectId.isValid(did)) docIds.add(did.toString());
+        const mid = a.family_member_id || a.familyMemberId;
+        if (mid && mongoose.Types.ObjectId.isValid(mid)) memberIds.add(mid.toString());
+        const hid = a.hospital_id || a.hospitalId;
+        if (hid && mongoose.Types.ObjectId.isValid(hid)) hospIds.add(hid.toString());
+        const depId = a.department_id || a.departmentId;
+        if (depId && mongoose.Types.ObjectId.isValid(depId)) deptIds.add(depId.toString());
+      }
+
+      const docDb = mongoose.connection.useDb(process.env.DOCTOR_DB_NAME || 'medimind_doctor');
+      const famDb = mongoose.connection.useDb(process.env.FAMILY_DB_NAME || 'medimind_family');
+      const hospDb = mongoose.connection.useDb(process.env.HOSPITAL_DB_NAME || 'medimind_hospital');
+
+      const [docs, members, hosps, depts] = await Promise.all([
+        docIds.size > 0
+          ? docDb.collection('doctors').find({ _id: { $in: Array.from(docIds).map((id) => new mongoose.Types.ObjectId(id)) } }).toArray()
+          : [],
+        memberIds.size > 0
+          ? famDb.collection('familymembers').find({ _id: { $in: Array.from(memberIds).map((id) => new mongoose.Types.ObjectId(id)) } }).toArray()
+          : [],
+        hospIds.size > 0
+          ? hospDb.collection('hospitals').find({ _id: { $in: Array.from(hospIds).map((id) => new mongoose.Types.ObjectId(id)) } }).toArray()
+          : [],
+        deptIds.size > 0
+          ? hospDb.collection('departments').find({ _id: { $in: Array.from(deptIds).map((id) => new mongoose.Types.ObjectId(id)) } }).toArray()
+          : [],
+      ]);
+
+      const docMap = new Map(docs.map((d) => [d._id.toString(), d.full_name || d.name || '']));
+      const memberMap = new Map(
+        members.map((m) => {
+          let age = m.age || 35;
+          if (m.dob) {
+            const diff = Date.now() - new Date(m.dob).getTime();
+            age = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+          }
+          return [
+            m._id.toString(),
+            {
+              name: m.full_name || m.name || '',
+              gender: m.gender || 'Male',
+              age,
+            },
+          ];
+        })
+      );
+      const hospMap = new Map(hosps.map((h) => [h._id.toString(), h.name || '']));
+      const deptMap = new Map(depts.map((d) => [d._id.toString(), d.name || '']));
+
+      return jsonList.map((json) => {
+        const did = (json.doctor_id || json.doctorId || '').toString();
+        const mid = (json.family_member_id || json.familyMemberId || '').toString();
+        const hid = (json.hospital_id || json.hospitalId || '').toString();
+        const depId = (json.department_id || json.departmentId || '').toString();
+
+        const memInfo = memberMap.get(mid);
+        const docName = docMap.get(did) || json.doctorName || 'Dr. Attending Doctor';
+        const patientName = memInfo?.name || json.patientName || 'Family Member';
+        const patientGender = memInfo?.gender || json.patientGender || 'Male';
+        const patientAge = memInfo?.age ?? json.patientAge ?? 35;
+        const departmentName = deptMap.get(depId) || json.departmentName || 'Orthopedics';
+        const hospitalName = hospMap.get(hid) || json.hospitalName || 'MediMind Central Hospital';
+        const token = json.token || `OPD-${(json.id || json._id).toString().slice(-4).toUpperCase()}`;
+
+        return {
+          ...json,
+          doctorName,
+          patientName,
+          patientGender,
+          patientAge,
+          departmentName,
+          hospitalName,
+          token,
+        };
+      });
+    } catch {
+      return await Promise.all(jsonList.map((a) => this._enrichAppointment(a)));
+    }
+  },
+
+  /**
    * Book a new appointment
    */
   async bookAppointment(user, payload) {
@@ -215,6 +322,19 @@ export const appointmentService = {
         err.statusCode = 409;
         throw err;
       }
+
+      // Authorization check: Caller must be authorized to rebook this original appointment
+      if (user.role === 'FAMILY') {
+        const origMemberCheck = await internalServices.verifyFamilyMember({
+          user,
+          memberId: originalAppointmentDoc.family_member_id,
+        });
+        if (!origMemberCheck.valid) {
+          const err = new Error(origMemberCheck.message || 'Access forbidden: original appointment does not belong to your family');
+          err.statusCode = origMemberCheck.statusCode || 403;
+          throw err;
+        }
+      }
     }
 
     // 4. Doctor validation & department/hospital extraction
@@ -269,32 +389,53 @@ export const appointmentService = {
     // 6. Generate appointment token
     const token = `OPD-${Math.floor(100 + Math.random() * 900)}`;
 
-    // 7. Create Appointment
-    const newAppointment = await Appointment.create({
-      family_member_id: familyMemberId,
-      doctor_id: doctorId,
-      hospital_id: hospitalId,
-      department_id: departmentId,
-      appointment_date: appointmentDate,
-      start_time: startTime,
-      end_time: endTime,
-      reason,
-      status: 'BOOKED',
-      appointment_type: appointmentType,
-      ai_prediction_id: aiPredictionId,
-      token,
-      original_appointment_id: originalAppointmentId || null,
-    });
+    // 7. Create Appointment with DB uniqueness error handling
+    let newAppointment;
+    try {
+      newAppointment = await Appointment.create({
+        family_member_id: familyMemberId,
+        doctor_id: doctorId,
+        hospital_id: hospitalId,
+        department_id: departmentId,
+        appointment_date: appointmentDate,
+        start_time: startTime,
+        end_time: endTime,
+        reason,
+        status: 'BOOKED',
+        appointment_type: appointmentType,
+        ai_prediction_id: aiPredictionId,
+        token,
+        original_appointment_id: originalAppointmentId || null,
+      });
+    } catch (createErr) {
+      if (createErr.code === 11000) {
+        const err = new Error('The selected doctor already has an appointment booked for this time slot');
+        err.statusCode = 409;
+        throw err;
+      }
+      throw createErr;
+    }
 
-    // 8. Link original appointment if rebooking (atomic concurrency check)
+    // 8. Link original appointment if rebooking (atomic conditional update)
     if (originalAppointmentDoc) {
       const atomicLink = await Appointment.findOneAndUpdate(
-        { _id: originalAppointmentDoc._id, replacement_appointment_id: null },
+        {
+          _id: originalAppointmentDoc._id,
+          status: 'CANCELLED',
+          $or: [
+            { replacement_appointment_id: null },
+            { replacement_appointment_id: { $exists: false } },
+          ],
+        },
         { replacement_appointment_id: newAppointment._id }
       );
       if (!atomicLink) {
         // Concurrency race: Another request just rebooked this appointment
-        await Appointment.findByIdAndDelete(newAppointment._id);
+        try {
+          await Appointment.findByIdAndDelete(newAppointment._id);
+        } catch (cleanupErr) {
+          console.error('Failed to cleanup orphaned replacement appointment:', cleanupErr.message);
+        }
         const err = new Error('Original cancelled appointment has already been rebooked');
         err.statusCode = 409;
         throw err;
@@ -343,6 +484,7 @@ export const appointmentService = {
       console.warn('Booking notification creation warning (ignored):', notifErr.message);
     }
 
+    invalidateApptCache();
     return await this._enrichAppointment(newAppointment);
   },
 
@@ -350,6 +492,12 @@ export const appointmentService = {
    * List appointments with role-based scoping and query filters
    */
   async getAppointments(user, query = {}) {
+    const cacheKey = getCacheKey(user, query);
+    const cached = apptCache.get(cacheKey);
+    if (cached && Date.now() - cached.time < APPT_CACHE_TTL_MS) {
+      return cached.data;
+    }
+
     const filter = {};
 
     // 1. Role-based scoping
@@ -450,8 +598,15 @@ export const appointmentService = {
       }
     }
 
-    const appointments = await Appointment.find(filter).sort({ appointment_date: 1, start_time: 1 });
-    return await Promise.all(appointments.map((a) => this._enrichAppointment(a)));
+    let queryExec = Appointment.find(filter).sort({ appointment_date: 1, start_time: 1 });
+    if (query.limit && !isNaN(parseInt(query.limit))) {
+      const lim = parseInt(query.limit);
+      if (lim > 0) queryExec = queryExec.limit(lim);
+    }
+    const appointments = await queryExec;
+    const enriched = await this._enrichAppointmentsBulk(appointments);
+    apptCache.set(cacheKey, { time: Date.now(), data: enriched });
+    return enriched;
   },
 
   /**
@@ -615,8 +770,18 @@ export const appointmentService = {
     appointment.start_time = newStartTime;
     appointment.end_time = newEndTime;
     appointment.status = 'RESCHEDULED';
-    await appointment.save();
+    try {
+      await appointment.save();
+    } catch (saveErr) {
+      if (saveErr.code === 11000) {
+        const err = new Error('The selected doctor already has an appointment booked for this time slot');
+        err.statusCode = 409;
+        throw err;
+      }
+      throw saveErr;
+    }
 
+    invalidateApptCache();
     return await this._enrichAppointment(appointment);
   },
 
@@ -738,6 +903,7 @@ export const appointmentService = {
       }
     }
 
+    invalidateApptCache();
     return await this._enrichAppointment(appointment);
   },
 
@@ -803,6 +969,7 @@ export const appointmentService = {
     appointment.status = 'COMPLETED';
     await appointment.save();
 
+    invalidateApptCache();
     return await this._enrichAppointment(appointment);
   },
 
@@ -880,6 +1047,7 @@ export const appointmentService = {
     }
     await appointment.save();
 
+    invalidateApptCache();
     return await this._enrichAppointment(appointment);
   },
 

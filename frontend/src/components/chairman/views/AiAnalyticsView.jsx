@@ -10,20 +10,22 @@ import {
   Stethoscope,
   ShieldCheck,
   Brain,
+  Calendar,
 } from 'lucide-react';
 import { chairmanService } from '../../../services/chairmanService';
 import { LineChart, BarChart, RadarChart } from '../../common/charts';
 
 export function AiAnalyticsView() {
   const [aiData, setAiData] = useState(null);
+  const [dateRange, setDateRange] = useState('All Time');
 
   useEffect(() => {
     async function load() {
-      const data = await chairmanService.getAiAnalytics();
+      const data = await chairmanService.getAiAnalytics(dateRange);
       setAiData(data);
     }
     load();
-  }, []);
+  }, [dateRange]);
 
   if (!aiData) return <div className="loading-state">Loading AI Analytics...</div>;
 
@@ -33,6 +35,93 @@ export function AiAnalyticsView() {
   const diabetesMod = modules?.diabetes || {};
   const heartMod = modules?.heartDisease || {};
   const generalMod = modules?.generalHealth || {};
+
+  const dateOptions = ['All Time', 'Last 3 Months', 'Last 6 Months', 'Last 1 Year', 'Custom Range'];
+
+  // Dynamic grid column layout based on active modules count:
+  // 3 -> 1x3, 4 -> 2x2, 6 -> 2x3, 9 -> 3x3, 12 -> 3x4
+  const getGridTemplateColumns = (count) => {
+    switch (count) {
+      case 3:
+        return 'repeat(3, minmax(0, 1fr))';
+      case 4:
+        return 'repeat(2, minmax(0, 1fr))';
+      case 6:
+        return 'repeat(3, minmax(0, 1fr))';
+      case 9:
+        return 'repeat(3, minmax(0, 1fr))';
+      case 12:
+        return 'repeat(4, minmax(0, 1fr))';
+      default:
+        return count % 3 === 0
+          ? 'repeat(3, minmax(0, 1fr))'
+          : count % 2 === 0
+          ? 'repeat(2, minmax(0, 1fr))'
+          : 'repeat(auto-fit, minmax(280px, 1fr))';
+    }
+  };
+
+  const serviceList = [
+    {
+      key: 'fracture',
+      icon: Activity,
+      colorClass: 'blue',
+      iconBg: '#dbeafe',
+      iconColor: '#2563eb',
+      data: fractureMod,
+      stats: [
+        {
+          label: 'Fracture Detected',
+          value: `${fractureMod.detectedCount || 251} runs (${Math.round(((fractureMod.detectedCount || 251) * 100) / (fractureMod.totalRuns || 412))}%)`,
+          color: '#dc2626',
+        },
+        {
+          label: 'Normal / Negative',
+          value: `${fractureMod.normalCount || 161} runs (${Math.round(((fractureMod.normalCount || 161) * 100) / (fractureMod.totalRuns || 412))}%)`,
+          color: '#16a34a',
+        },
+      ],
+    },
+    {
+      key: 'diabetes',
+      icon: Stethoscope,
+      colorClass: 'teal',
+      iconBg: '#ccfbf1',
+      iconColor: '#0f766e',
+      data: diabetesMod,
+      stats: [
+        { label: 'High Risk', value: `${diabetesMod.highRiskCount || 80} runs`, color: '#dc2626' },
+        { label: 'Moderate Risk', value: `${diabetesMod.moderateRiskCount || 88} runs`, color: '#d97706' },
+        { label: 'Low Risk', value: `${diabetesMod.lowRiskCount || 103} runs`, color: '#16a34a' },
+      ],
+    },
+    {
+      key: 'heartDisease',
+      icon: HeartPulse,
+      colorClass: 'indigo',
+      iconBg: '#ede9fe',
+      iconColor: '#7c3aed',
+      data: heartMod,
+      stats: [
+        { label: 'High Risk', value: `${heartMod.highRiskCount || 72} runs`, color: '#dc2626' },
+        { label: 'Moderate Risk', value: `${heartMod.moderateRiskCount || 82} runs`, color: '#d97706' },
+        { label: 'Low Risk', value: `${heartMod.lowRiskCount || 103} runs`, color: '#16a34a' },
+      ],
+    },
+    {
+      key: 'generalHealth',
+      icon: Brain,
+      colorClass: 'amber',
+      iconBg: '#fef3c7',
+      iconColor: '#d97706',
+      data: generalMod,
+      stats: [
+        { label: 'High Risk / Urgent', value: `${generalMod.highRiskCount || 85} runs`, color: '#dc2626' },
+        { label: 'Moderate Risk', value: `${generalMod.moderateRiskCount || 134} runs`, color: '#d97706' },
+        { label: 'Routine / Healthy', value: `${generalMod.lowRiskCount || 142} runs`, color: '#16a34a' },
+      ],
+    },
+  ];
 
   const radarData = [
     { name: 'Fracture Detection', values: [98.4, 98.1, 98.8, 99.9], color: '#2563eb' },
@@ -63,242 +152,129 @@ export function AiAnalyticsView() {
             <p>Aggregate performance, inference volume, latency, and calibration metrics for all 4 MediMind clinical AI modules.</p>
           </div>
         </div>
+
+        {/* Standardized Date Range Selector */}
+        <div className="view-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: 'var(--chair-card)', padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--chair-border)' }}>
+            <Calendar size={15} style={{ color: 'var(--chair-sapphire)' }} />
+            <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--chair-muted)' }}>Range:</span>
+            <select
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
+              style={{ background: 'transparent', border: 'none', fontSize: '13px', fontWeight: '600', color: 'var(--chair-text)', cursor: 'pointer', outline: 'none' }}
+            >
+              {dateOptions.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
-      {/* Aggregate Model KPIs for all 4 Modules */}
-      <div className="stats-grid cols-5">
+      {/* Aggregate Model KPIs for all 4 Modules (1,301 total) */}
+      <div className="stats-grid cols-5" style={{ marginBottom: '24px' }}>
         <div className="stat-card">
           <p>Total Model Inferences</p>
-          <h3 style={{ marginTop: '8px' }}>{totalPredictions || 540}</h3>
-          <span className="stat-delta">+24% vs last month</span>
+          <h3 style={{ marginTop: '8px' }}>{totalPredictions || 1301}</h3>
+          <span className="stat-delta">100% Appointment Linked</span>
         </div>
         <div className="stat-card">
           <p>🦴 Fracture Detection (CNN)</p>
-          <h3 style={{ marginTop: '8px' }}>{fractureMod.totalRuns || 165}</h3>
+          <h3 style={{ marginTop: '8px' }}>{fractureMod.totalRuns || 412}</h3>
           <small style={{ color: 'var(--chair-muted)' }}>Avg Confidence: {fractureMod.avgConfidence || '98.2%'}</small>
         </div>
         <div className="stat-card">
           <p>🩺 Diabetes Risk (ML)</p>
-          <h3 style={{ marginTop: '8px' }}>{diabetesMod.totalRuns || 142}</h3>
+          <h3 style={{ marginTop: '8px' }}>{diabetesMod.totalRuns || 271}</h3>
           <small style={{ color: 'var(--chair-muted)' }}>Avg Confidence: {diabetesMod.avgConfidence || '95.4%'}</small>
         </div>
         <div className="stat-card">
           <p>❤️ Heart Disease Risk (ML)</p>
-          <h3 style={{ marginTop: '8px' }}>{heartMod.totalRuns || 138}</h3>
+          <h3 style={{ marginTop: '8px' }}>{heartMod.totalRuns || 257}</h3>
           <small style={{ color: 'var(--chair-muted)' }}>Avg Confidence: {heartMod.avgConfidence || '96.8%'}</small>
         </div>
         <div className="stat-card">
           <p>🧠 General Health (NLP)</p>
-          <h3 style={{ marginTop: '8px' }}>{generalMod.totalRuns || 95}</h3>
+          <h3 style={{ marginTop: '8px' }}>{generalMod.totalRuns || 361}</h3>
           <small style={{ color: 'var(--chair-muted)' }}>Avg Confidence: {generalMod.avgConfidence || '94.5%'}</small>
         </div>
       </div>
 
-      {/* Deep Dive into all 4 Clinical AI Modules */}
-      <h2 style={{ fontSize: '18px', fontFamily: 'Plus Jakarta Sans', margin: '28px 0 16px' }}>
-        Active Diagnostic Service Specifications & Model Health
-      </h2>
+      {/* Deep Dive into all Clinical AI Modules with Dynamic Responsive Grid */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '28px 0 16px', flexWrap: 'wrap', gap: '8px' }}>
+        <h2 style={{ fontSize: '18px', fontFamily: 'Plus Jakarta Sans', margin: 0 }}>
+          Active Diagnostic Service Specifications & Model Health ({serviceList.length} Active Services)
+        </h2>
+        <span style={{ fontSize: '12px', color: 'var(--chair-muted)' }}>
+          Grid Layout: {serviceList.length === 4 ? '2x2 Matrix' : `${serviceList.length} Columns`}
+        </span>
+      </div>
 
-      <div className="ai-services-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-        {/* Module 1: Fracture Detection */}
-        <div className="ai-service-card">
-          <div className="ai-service-header">
-            <div className="ai-service-icon blue">
-              <Activity size={22} />
-            </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '15px', fontFamily: 'Plus Jakarta Sans' }}>
-                {fractureMod.name || 'Fracture Detection AI'}
-              </h3>
-              <span style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>
-                Department: {fractureMod.department || 'Orthopedics'}
-              </span>
-            </div>
-          </div>
+      <div
+        className="ai-services-grid"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: getGridTemplateColumns(serviceList.length),
+          gap: '20px',
+        }}
+      >
+        {serviceList.map((svc) => {
+          const mod = svc.data;
+          const SvcIcon = svc.icon;
+          return (
+            <div className="ai-service-card" key={svc.key}>
+              <div className="ai-service-header">
+                <div className={`ai-service-icon ${svc.colorClass}`} style={{ backgroundColor: svc.iconBg, color: svc.iconColor }}>
+                  <SvcIcon size={22} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '15px', fontFamily: 'Plus Jakarta Sans' }}>
+                    {mod.name || 'AI Diagnostic Service'}
+                  </h3>
+                  <span style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>
+                    Department: {mod.department || 'Clinical Care'}
+                  </span>
+                </div>
+              </div>
 
-          <div style={{ fontSize: '11.5px', color: 'var(--chair-muted)', margin: '12px 0', lineHeight: 1.45 }}>
-            Architecture: <b>{fractureMod.modelArchitecture || 'ResNet-50 Deep CNN'}</b>
-          </div>
+              <div style={{ fontSize: '11.5px', color: 'var(--chair-muted)', margin: '12px 0', lineHeight: 1.45 }}>
+                Architecture: <b>{mod.modelArchitecture || 'Deep Learning / Ensemble ML'}</b>
+              </div>
 
-          <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'var(--chair-bg)', marginBottom: '14px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-              <span>Fracture Detected:</span>
-              <strong>{fractureMod.detectedCount || 101} runs (61%)</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-              <span>Normal / Negative:</span>
-              <strong>{fractureMod.normalCount || 64} runs (39%)</strong>
-            </div>
-          </div>
+              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'var(--chair-bg)', marginBottom: '14px' }}>
+                {svc.stats.map((st, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: '12px',
+                      marginBottom: i < svc.stats.length - 1 ? '4px' : '0',
+                    }}
+                  >
+                    <span>{st.label}:</span>
+                    <strong style={{ color: st.color || 'inherit' }}>{st.value}</strong>
+                  </div>
+                ))}
+              </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', textAlign: 'center', paddingTop: '10px', borderTop: '1px solid var(--chair-border)', fontSize: '10.5px' }}>
-            <div>
-              <span style={{ color: 'var(--chair-muted)' }}>ACCURACY</span>
-              <div style={{ fontWeight: 700, fontSize: '12.5px', marginTop: '2px' }}>{fractureMod.accuracy || fractureMod.modelAccuracy || '98.4%'}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', textAlign: 'center', paddingTop: '10px', borderTop: '1px solid var(--chair-border)', fontSize: '10.5px' }}>
+                <div>
+                  <span style={{ color: 'var(--chair-muted)' }}>ACCURACY</span>
+                  <div style={{ fontWeight: 700, fontSize: '12.5px', marginTop: '2px' }}>{mod.accuracy || mod.modelAccuracy || '95%'}</div>
+                </div>
+                <div>
+                  <span style={{ color: 'var(--chair-muted)' }}>LATENCY</span>
+                  <div style={{ fontWeight: 700, fontSize: '12.5px', marginTop: '2px' }}>{mod.latency || mod.avgInferenceLatency || '25ms'}</div>
+                </div>
+                <div>
+                  <span style={{ color: 'var(--chair-muted)' }}>STATUS</span>
+                  <div style={{ fontWeight: 700, fontSize: '12.5px', color: '#16a34a', marginTop: '2px' }}>{mod.status || 'Active'}</div>
+                </div>
+              </div>
             </div>
-            <div>
-              <span style={{ color: 'var(--chair-muted)' }}>LATENCY</span>
-              <div style={{ fontWeight: 700, fontSize: '12.5px', marginTop: '2px' }}>{fractureMod.latency || fractureMod.avgInferenceLatency || '34ms'}</div>
-            </div>
-            <div>
-              <span style={{ color: 'var(--chair-muted)' }}>STATUS</span>
-              <div style={{ fontWeight: 700, fontSize: '12.5px', color: '#16a34a', marginTop: '2px' }}>Active</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Module 2: Diabetes Risk */}
-        <div className="ai-service-card">
-          <div className="ai-service-header">
-            <div className="ai-service-icon teal">
-              <Stethoscope size={22} />
-            </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '15px', fontFamily: 'Plus Jakarta Sans' }}>
-                {diabetesMod.name || 'Diabetes Risk Predictor'}
-              </h3>
-              <span style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>
-                Department: {diabetesMod.department || 'Diabetology & Endocrinology'}
-              </span>
-            </div>
-          </div>
-
-          <div style={{ fontSize: '11.5px', color: 'var(--chair-muted)', margin: '12px 0', lineHeight: 1.45 }}>
-            Architecture: <b>{diabetesMod.modelArchitecture || 'Gradient Boosted Decision Trees (XGBoost)'}</b>
-          </div>
-
-          <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'var(--chair-bg)', marginBottom: '14px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-              <span>High Risk:</span>
-              <strong style={{ color: '#dc2626' }}>{diabetesMod.highRiskCount || 42} runs</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-              <span>Moderate Risk:</span>
-              <strong style={{ color: '#d97706' }}>{diabetesMod.moderateRiskCount || 46} runs</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-              <span>Low Risk:</span>
-              <strong style={{ color: '#16a34a' }}>{diabetesMod.lowRiskCount || 54} runs</strong>
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', textAlign: 'center', paddingTop: '10px', borderTop: '1px solid var(--chair-border)', fontSize: '10.5px' }}>
-            <div>
-              <span style={{ color: 'var(--chair-muted)' }}>ACCURACY</span>
-              <div style={{ fontWeight: 700, fontSize: '12.5px', marginTop: '2px' }}>{diabetesMod.accuracy || diabetesMod.modelAccuracy || '94.2%'}</div>
-            </div>
-            <div>
-              <span style={{ color: 'var(--chair-muted)' }}>LATENCY</span>
-              <div style={{ fontWeight: 700, fontSize: '12.5px', marginTop: '2px' }}>{diabetesMod.latency || diabetesMod.avgInferenceLatency || '12ms'}</div>
-            </div>
-            <div>
-              <span style={{ color: 'var(--chair-muted)' }}>STATUS</span>
-              <div style={{ fontWeight: 700, fontSize: '12.5px', color: '#16a34a', marginTop: '2px' }}>Active</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Module 3: Heart Disease Risk */}
-        <div className="ai-service-card">
-          <div className="ai-service-header">
-            <div className="ai-service-icon indigo">
-              <HeartPulse size={22} />
-            </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '15px', fontFamily: 'Plus Jakarta Sans' }}>
-                {heartMod.name || 'Heart Disease Risk Stratifier'}
-              </h3>
-              <span style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>
-                Department: {heartMod.department || 'Cardiology'}
-              </span>
-            </div>
-          </div>
-
-          <div style={{ fontSize: '11.5px', color: 'var(--chair-muted)', margin: '12px 0', lineHeight: 1.45 }}>
-            Architecture: <b>{heartMod.modelArchitecture || 'Ensemble Neural Network & Random Forest'}</b>
-          </div>
-
-          <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'var(--chair-bg)', marginBottom: '14px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-              <span>High Risk:</span>
-              <strong style={{ color: '#dc2626' }}>{heartMod.highRiskCount || 38} runs</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-              <span>Moderate Risk:</span>
-              <strong style={{ color: '#d97706' }}>{heartMod.moderateRiskCount || 41} runs</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-              <span>Low Risk:</span>
-              <strong style={{ color: '#16a34a' }}>{heartMod.lowRiskCount || 59} runs</strong>
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', textAlign: 'center', paddingTop: '10px', borderTop: '1px solid var(--chair-border)', fontSize: '10.5px' }}>
-            <div>
-              <span style={{ color: 'var(--chair-muted)' }}>ACCURACY</span>
-              <div style={{ fontWeight: 700, fontSize: '12.5px', marginTop: '2px' }}>{heartMod.accuracy || heartMod.modelAccuracy || '95.7%'}</div>
-            </div>
-            <div>
-              <span style={{ color: 'var(--chair-muted)' }}>LATENCY</span>
-              <div style={{ fontWeight: 700, fontSize: '12.5px', marginTop: '2px' }}>{heartMod.latency || heartMod.avgInferenceLatency || '18ms'}</div>
-            </div>
-            <div>
-              <span style={{ color: 'var(--chair-muted)' }}>STATUS</span>
-              <div style={{ fontWeight: 700, fontSize: '12.5px', color: '#16a34a', marginTop: '2px' }}>Active</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Module 4: General Health Assessment */}
-        <div className="ai-service-card">
-          <div className="ai-service-header">
-            <div className="ai-service-icon amber" style={{ backgroundColor: '#fef3c7', color: '#d97706' }}>
-              <Brain size={22} />
-            </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '15px', fontFamily: 'Plus Jakarta Sans' }}>
-                {generalMod.name || 'General Health Assessment AI'}
-              </h3>
-              <span style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>
-                Department: {generalMod.department || 'General Medicine & Triage'}
-              </span>
-            </div>
-          </div>
-
-          <div style={{ fontSize: '11.5px', color: 'var(--chair-muted)', margin: '12px 0', lineHeight: 1.45 }}>
-            Architecture: <b>{generalMod.modelArchitecture || 'Transformer / Clinical NLP (BERT-Clinical)'}</b>
-          </div>
-
-          <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'var(--chair-bg)', marginBottom: '14px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-              <span>High Risk / Urgent:</span>
-              <strong style={{ color: '#dc2626' }}>{generalMod.highRiskCount || 22} runs</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-              <span>Moderate Risk:</span>
-              <strong style={{ color: '#d97706' }}>{generalMod.moderateRiskCount || 36} runs</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-              <span>Routine / Healthy:</span>
-              <strong style={{ color: '#16a34a' }}>{generalMod.lowRiskCount || 37} runs</strong>
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', textAlign: 'center', paddingTop: '10px', borderTop: '1px solid var(--chair-border)', fontSize: '10.5px' }}>
-            <div>
-              <span style={{ color: 'var(--chair-muted)' }}>ACCURACY</span>
-              <div style={{ fontWeight: 700, fontSize: '12.5px', marginTop: '2px' }}>{generalMod.accuracy || generalMod.modelAccuracy || '93.1%'}</div>
-            </div>
-            <div>
-              <span style={{ color: 'var(--chair-muted)' }}>LATENCY</span>
-              <div style={{ fontWeight: 700, fontSize: '12.5px', marginTop: '2px' }}>{generalMod.latency || generalMod.avgInferenceLatency || '42ms'}</div>
-            </div>
-            <div>
-              <span style={{ color: 'var(--chair-muted)' }}>STATUS</span>
-              <div style={{ fontWeight: 700, fontSize: '12.5px', color: '#16a34a', marginTop: '2px' }}>Active</div>
-            </div>
-          </div>
-        </div>
+          );
+        })}
       </div>
 
       {/* Visual Analytics 2-Column Balanced Layout */}
@@ -429,10 +405,10 @@ export function AiAnalyticsView() {
             <tbody>
               <tr>
                 <td>
-                  <strong>MediMind Central Hospital</strong>
-                  <div style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>Multi-Specialty Facility</div>
+                  <strong>Aarogyam Multispeciality Hospital</strong>
+                  <div style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>Multi-Specialty Facility (Hyderabad)</div>
                 </td>
-                <td><span className="badge badge-info">HOSP-001</span></td>
+                <td><span className="badge badge-info">MM-HYD-01</span></td>
                 <td><span className="badge badge-active">Active</span></td>
                 <td><span className="badge badge-active">Active</span></td>
                 <td><span className="badge badge-active">Active</span></td>
@@ -441,22 +417,22 @@ export function AiAnalyticsView() {
               </tr>
               <tr>
                 <td>
-                  <strong>City Care Hospital</strong>
-                  <div style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>Community Healthcare Center</div>
+                  <strong>Nexora Advanced Care Hospital</strong>
+                  <div style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>Tertiary Academic Center (Hyderabad)</div>
                 </td>
-                <td><span className="badge badge-info">HOSP-002</span></td>
+                <td><span className="badge badge-info">MM-HYD-02</span></td>
                 <td><span className="badge badge-active">Active</span></td>
                 <td><span className="badge badge-active">Active</span></td>
                 <td><span className="badge badge-active">Active</span></td>
-                <td><span className="badge badge-pending">Not Deployed</span></td>
-                <td><strong style={{ color: '#d97706' }}>3 of 4 Modules (75%)</strong></td>
+                <td><span className="badge badge-active">Active</span></td>
+                <td><strong>4 of 4 Modules (100%)</strong></td>
               </tr>
               <tr>
                 <td>
-                  <strong>Apex Institute of Medical Sciences</strong>
-                  <div style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>Tertiary Academic Center</div>
+                  <strong>Harborview Medical Centre</strong>
+                  <div style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>Super-Specialty Center (Mumbai)</div>
                 </td>
-                <td><span className="badge badge-info">HOSP-003</span></td>
+                <td><span className="badge badge-info">MM-MUM-03</span></td>
                 <td><span className="badge badge-active">Active</span></td>
                 <td><span className="badge badge-active">Active</span></td>
                 <td><span className="badge badge-active">Active</span></td>

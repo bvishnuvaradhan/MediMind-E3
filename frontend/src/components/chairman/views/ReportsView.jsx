@@ -134,7 +134,7 @@ export function ReportsView({ announce }) {
       </div>
 
       {/* Available Report Catalog Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '28px' }}>
+      <div className="reports-catalog-grid">
         {availableReports.map((rep) => {
           const Icon = rep.icon;
           const isSelected = reportType === rep.id;

@@ -17,11 +17,14 @@ export const errorHandler = (err, req, res, _next) => {
   }
 
   if (err.code === 11000) {
-    const field = Object.keys(err.keyPattern || {})[0] || 'field';
+    const isSlotConflict = err.keyPattern && (err.keyPattern.doctor_id || err.keyPattern.start_time);
+    const message = isSlotConflict
+      ? 'The selected doctor already has an appointment booked for this time slot'
+      : 'Duplicate resource: An appointment with this field already exists.';
     return res.status(409).json({
       success: false,
-      message: `Duplicate resource: An appointment with this ${field} already exists.`,
-      errors: { [field]: 'Must be unique' },
+      message,
+      errors: err.keyPattern || {},
     });
   }
 

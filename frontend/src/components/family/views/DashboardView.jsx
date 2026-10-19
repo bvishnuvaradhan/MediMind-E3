@@ -33,6 +33,14 @@ export function DashboardView({
 }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Deduplicate family members by id or unique name key
+  const uniqueMembers = familyMembers.filter((item, idx, arr) => {
+    const key = item.id || item._id || `${item.name}-${item.fullName}`;
+    return arr.findIndex(m => (m.id || m._id || `${m.name}-${m.fullName}`) === key) === idx;
+  });
+
+  const displayedMembers = uniqueMembers.slice(0, 3);
+
   // 1. All Appointments across the family
   const familyTitle = activeFamily?.name
     ? activeFamily.name.replace(' Account', '')
@@ -70,7 +78,7 @@ export function DashboardView({
             {familyTitle} Health Workspace <span>✦</span>
           </h1>
           <p className="subheading">
-            Centralized health management, AI decision support, and specialist care for all {familyMembers.length} family members.
+            Centralized health management, AI decision support, and specialist care for all {uniqueMembers.length} family members.
           </p>
         </div>
       </section>
@@ -83,95 +91,219 @@ export function DashboardView({
             <p>Select any member to inspect their dedicated health records, history, and medical telemetry</p>
           </div>
           <button className="text-button" onClick={() => navigate('Family members')}>
-            Manage members ({familyMembers.length}) <ArrowUpRight size={15} />
+            Manage members ({uniqueMembers.length}) <ArrowUpRight size={15} />
           </button>
         </div>
 
-        <div className="member-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '14px' }}>
-          {familyMembers.map((item, index) => {
-            const itemDisplayName = item.fullName || item.name;
-            const itemRelation = item.relationship || item.relation || 'Member';
-            const memberRecs = records.filter((r) => matchesFamilyMember(r, item));
-            const memberPreds = predictionHistory.filter((p) => matchesFamilyMember(p, item));
-            const isNewMember = memberRecs.length === 0 && memberPreds.length === 0;
-
-            return (
-              <div
-                className="member-card"
-                key={`${item.id || item.name}-${index}`}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  padding: '16px 18px',
-                  borderRadius: '12px',
-                  backgroundColor: 'var(--family-card)',
-                  border: '1px solid var(--family-border)',
-                  boxShadow: 'var(--family-shadow-sm)',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  textAlign: 'left',
-                }}
-                onClick={() => {
-                  navigate('Member profile', { member: item });
-                  announce(`Viewing profile for ${itemDisplayName}`);
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '12px' }}>
-                  <div className={`avatar avatar-${item.tone || 'coral'}`}>{item.initials}</div>
-                  {isNewMember ? (
-                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', backgroundColor: '#f1f5f9', color: '#64748b', fontWeight: '600' }}>
-                      New Profile
-                    </span>
-                  ) : (
-                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', backgroundColor: '#ecfdf5', color: '#059669', fontWeight: '600' }}>
-                      Active
-                    </span>
-                  )}
-                </div>
-
-                <div className="member-info" style={{ width: '100%', marginBottom: '12px' }}>
-                  <strong style={{ fontSize: '15px', display: 'block', color: 'var(--family-ink)', marginBottom: '2px' }}>
-                    {itemDisplayName}
-                  </strong>
-                  <span style={{ fontSize: '12.5px', color: 'var(--family-muted)', display: 'block' }}>
-                    {itemRelation} · Age {item.age || 'N/A'} {item.bloodGroup ? `· ${item.bloodGroup}` : ''}
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingTop: '10px', borderTop: '1px solid var(--family-border)', fontSize: '12px', color: 'var(--family-subtle)' }}>
-                  <span>{memberRecs.length} record{memberRecs.length !== 1 ? 's' : ''}</span>
-                  <span style={{ color: 'var(--family-primary)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                    View profile <ArrowUpRight size={13} />
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-
-          <button
-            className="member-card add-card"
+        {uniqueMembers.length === 0 ? (
+          <div
+            className="empty-state-card"
             style={{
+              padding: '36px 24px',
+              textAlign: 'center',
+              backgroundColor: 'var(--family-card)',
+              borderRadius: '12px',
+              border: '1px dashed var(--family-border)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '16px 18px',
-              borderRadius: '12px',
-              border: '2px dashed var(--family-border)',
-              backgroundColor: 'transparent',
-              cursor: 'pointer',
-              minHeight: '140px',
+              gap: '12px',
             }}
-            onClick={() => navigate('Family members')}
           >
-            <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: 'var(--family-soft)', display: 'grid', placeItems: 'center', color: 'var(--family-primary)', marginBottom: '8px' }}>
-              <Plus size={18} />
+            <div
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--family-soft)',
+                display: 'grid',
+                placeItems: 'center',
+                color: 'var(--family-primary)',
+              }}
+            >
+              <UsersRound size={24} />
             </div>
-            <strong style={{ fontSize: '13.5px', color: 'var(--family-ink)' }}>Add Family Member</strong>
-            <span style={{ fontSize: '11.5px', color: 'var(--family-muted)' }}>Authorize new profile</span>
-          </button>
-        </div>
+            <div>
+              <h3 style={{ fontSize: '16px', margin: '0 0 6px', color: 'var(--family-ink)' }}>
+                No Family Members Registered
+              </h3>
+              <p style={{ margin: 0, fontSize: '13px', color: 'var(--family-muted)', maxWidth: '420px' }}>
+                You have not registered any family members yet. Add family members to manage their health records, track appointments, and access clinical AI diagnostic tools.
+              </p>
+            </div>
+            <button
+              className="primary-button"
+              style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+              onClick={() => navigate('Family members')}
+            >
+              <Plus size={16} />
+              <span>Add First Family Member</span>
+            </button>
+          </div>
+        ) : (
+          <>
+            <div
+              className="member-cards"
+              style={{
+                display: 'flex',
+                flexWrap: 'nowrap',
+                overflowX: 'auto',
+                gap: '14px',
+                paddingBottom: '8px',
+              }}
+            >
+              {displayedMembers.map((item, index) => {
+                const itemDisplayName = item.fullName || item.name;
+                const itemRelation = item.relationship || item.relation || 'Member';
+                const memberRecs = records.filter((r) => matchesFamilyMember(r, item));
+                const memberPreds = predictionHistory.filter((p) => matchesFamilyMember(p, item));
+                const isNewMember = memberRecs.length === 0 && memberPreds.length === 0;
+
+                return (
+                  <div
+                    className="member-card"
+                    key={`${item.id || item.name}-${index}`}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      padding: '16px 18px',
+                      borderRadius: '12px',
+                      backgroundColor: 'var(--family-card)',
+                      border: '1px solid var(--family-border)',
+                      boxShadow: 'var(--family-shadow-sm)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      textAlign: 'left',
+                      flex: '0 0 260px',
+                      minWidth: '240px',
+                    }}
+                    onClick={() => {
+                      navigate('Member profile', { member: item });
+                      announce(`Viewing profile for ${itemDisplayName}`);
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '12px' }}>
+                      <div className={`avatar avatar-${item.tone || 'coral'}`}>{item.initials}</div>
+                      {isNewMember ? (
+                        <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', backgroundColor: '#f1f5f9', color: '#64748b', fontWeight: '600' }}>
+                          New Profile
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', backgroundColor: '#ecfdf5', color: '#059669', fontWeight: '600' }}>
+                          Active
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="member-info" style={{ width: '100%', marginBottom: '12px' }}>
+                      <strong style={{ fontSize: '15px', display: 'block', color: 'var(--family-ink)', marginBottom: '2px' }}>
+                        {itemDisplayName}
+                      </strong>
+                      <span style={{ fontSize: '12.5px', color: 'var(--family-muted)', display: 'block' }}>
+                        {itemRelation} · Age {item.age || 'N/A'} {item.bloodGroup ? `· ${item.bloodGroup}` : ''}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingTop: '10px', borderTop: '1px solid var(--family-border)', fontSize: '12px', color: 'var(--family-subtle)' }}>
+                      <span>{memberRecs.length} record{memberRecs.length !== 1 ? 's' : ''}</span>
+                      <span style={{ color: 'var(--family-primary)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                        View profile <ArrowUpRight size={13} />
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {uniqueMembers.length > 3 && (
+                <button
+                  type="button"
+                  className="view-more-card"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '16px 18px',
+                    borderRadius: '12px',
+                    border: '1px solid var(--family-border)',
+                    backgroundColor: 'var(--family-soft)',
+                    cursor: 'pointer',
+                    minHeight: '140px',
+                    flex: '0 0 190px',
+                    minWidth: '180px',
+                    textAlign: 'center',
+                  }}
+                  onClick={() => {
+                    navigate('Family members');
+                    announce(`Navigating to Family members page to view all ${uniqueMembers.length} members`);
+                  }}
+                >
+                  <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: 'var(--family-card)', display: 'grid', placeItems: 'center', color: 'var(--family-primary)', marginBottom: '8px' }}>
+                    <UsersRound size={18} />
+                  </div>
+                  <strong style={{ fontSize: '13.5px', color: 'var(--family-ink)' }}>
+                    View more
+                  </strong>
+                  <span style={{ fontSize: '11.5px', color: 'var(--family-muted)' }}>
+                    +{uniqueMembers.length - 3} more member{uniqueMembers.length - 3 !== 1 ? 's' : ''}
+                  </span>
+                </button>
+              )}
+
+              <button
+                className="member-card add-card"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '16px 18px',
+                  borderRadius: '12px',
+                  border: '2px dashed var(--family-border)',
+                  backgroundColor: 'transparent',
+                  cursor: 'pointer',
+                  minHeight: '140px',
+                  flex: '0 0 180px',
+                  minWidth: '180px',
+                }}
+                onClick={() => navigate('Family members')}
+              >
+                <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: 'var(--family-soft)', display: 'grid', placeItems: 'center', color: 'var(--family-primary)', marginBottom: '8px' }}>
+                  <Plus size={18} />
+                </div>
+                <strong style={{ fontSize: '13.5px', color: 'var(--family-ink)' }}>Add Family Member</strong>
+                <span style={{ fontSize: '11.5px', color: 'var(--family-muted)' }}>Authorize new profile</span>
+              </button>
+            </div>
+
+            {uniqueMembers.length > 3 && (
+              <div style={{ marginTop: '12px', textAlign: 'center' }}>
+                <button
+                  type="button"
+                  className="text-button"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 18px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--family-border)',
+                    backgroundColor: 'var(--family-card)',
+                    color: 'var(--family-primary)',
+                    fontWeight: '600',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => navigate('Family members')}
+                >
+                  View more ({uniqueMembers.length - 3} more) <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </section>
 
       {/* 3. Mid Grid: Appointments & AI Decision Support Hub */}
