@@ -1,0 +1,16 @@
+{
+  "total_predictions": 1301,
+  "categories": {
+    "Fracture Detection": 412,
+    "Diabetes Risk": 271,
+    "Heart Disease Risk": 257,
+    "General Health": 361
+  },
+  "valid_member_associations": 1301,
+  "total_appointments": 2849,
+  "walk_ins_exempt": 0,
+  "booked_appointments": 2849,
+  "appointments_linked_to_predictions": 0,
+  "predictions_linked_to_appointments": 1301,
+  "dangling_prediction_references": 1301
+}

@@ -1,0 +1,917 @@
+[
+  {
+    "index": 1,
+    "account_id": "6ac85a18074c2bc731a76398",
+    "email": "chairman@medimind.org",
+    "role": "CHAIRMAN",
+    "expected_name": "Dr. Rajeshwar Rao",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "title_verified": true,
+      "latency_ms": 1468,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 2,
+    "account_id": "6ac85a19074c2bc731a76399",
+    "email": "chairman@medimind.com",
+    "role": "CHAIRMAN",
+    "expected_name": "Dr. Nandita Sengupta",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "title_verified": true,
+      "latency_ms": 1845,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 3,
+    "account_id": "6ac85a19074c2bc731a7639a",
+    "email": "admin@aarogyam.hospital",
+    "role": "HOSPITAL_ADMIN",
+    "expected_name": "Vikram Aditya",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "role_verified": true,
+      "latency_ms": 2110,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 4,
+    "account_id": "6ac85a19074c2bc731a7639b",
+    "email": "admin.operations@aarogyam.hospital",
+    "role": "HOSPITAL_ADMIN",
+    "expected_name": "Sunita Reddy",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "role_verified": true,
+      "latency_ms": 1904,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 5,
+    "account_id": "6ac85a19074c2bc731a7639c",
+    "email": "admin@nexora.hospital",
+    "role": "HOSPITAL_ADMIN",
+    "expected_name": "Harish Chandra",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "role_verified": true,
+      "latency_ms": 1941,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 6,
+    "account_id": "6ac85a19074c2bc731a7639d",
+    "email": "admin@harborview.hospital",
+    "role": "HOSPITAL_ADMIN",
+    "expected_name": "Cyrus Mistry",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "role_verified": true,
+      "latency_ms": 1581,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 7,
+    "account_id": "6ac85a19074c2bc731a7639e",
+    "email": "arun.prakash@aarogyam.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Arun Prakash",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1715,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 8,
+    "account_id": "6ac85a19074c2bc731a763a0",
+    "email": "meenakshi.sundaram@aarogyam.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Meenakshi Sundaram",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1482,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 9,
+    "account_id": "6ac85a19074c2bc731a763a2",
+    "email": "ks.murthy@aarogyam.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. K. S. Murthy",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1698,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 10,
+    "account_id": "6ac85a19074c2bc731a763a4",
+    "email": "pradeep.varma@nexora.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Pradeep Varma",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1554,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 11,
+    "account_id": "6ac85a19074c2bc731a763a6",
+    "email": "shalini.rao@nexora.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Shalini Rao",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1791,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 12,
+    "account_id": "6ac85a19074c2bc731a763a8",
+    "email": "anirudh.kulkarni@nexora.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Anirudh Kulkarni",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1445,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 13,
+    "account_id": "6ac85a19074c2bc731a763aa",
+    "email": "rameshwar.deshmukh@nexora.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Rameshwar Deshmukh",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1651,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 14,
+    "account_id": "6ac85a19074c2bc731a763ac",
+    "email": "farhan.contractor@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Farhan Contractor",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1922,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 15,
+    "account_id": "6ac85a1a074c2bc731a763ae",
+    "email": "boman.irani@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Boman Irani",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1637,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 16,
+    "account_id": "6ac85a1a074c2bc731a763b0",
+    "email": "zarir.udwadia@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Zarir Udwadia",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1681,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 17,
+    "account_id": "6ac85a1a074c2bc731a763b2",
+    "email": "tehemton.shroff@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Tehemton Shroff",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1644,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 18,
+    "account_id": "6ac85a1a074c2bc731a763b4",
+    "email": "hoshang.master@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Hoshang Master",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1702,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 19,
+    "account_id": "6ac85a1a074c2bc731a763b6",
+    "email": "pervin.wadia@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Pervin Wadia",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1882,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 20,
+    "account_id": "6ac85a1a074c2bc731a763b8",
+    "email": "anita.merchant@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Anita Merchant",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "dept_verified": true,
+      "latency_ms": 1679,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 21,
+    "account_id": "6ac85a1a074c2bc731a763ba",
+    "email": "dr.rahul.sharma@aarogyam.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Rahul Sharma",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1672,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 22,
+    "account_id": "6ac85a1a074c2bc731a763bc",
+    "email": "dr.sneha.reddy@aarogyam.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Sneha Reddy",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1675,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 23,
+    "account_id": "6ac85a1a074c2bc731a763be",
+    "email": "dr.vikram.joshi@aarogyam.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Vikram Joshi",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1693,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 24,
+    "account_id": "6ac85a1a074c2bc731a763c0",
+    "email": "dr.ananya.roy@aarogyam.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Ananya Roy",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1652,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 25,
+    "account_id": "6ac85a1a074c2bc731a763c2",
+    "email": "dr.arjun.patel@aarogyam.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Arjun Patel",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1596,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 26,
+    "account_id": "6ac85a1a074c2bc731a763c4",
+    "email": "dr.deepak.verma@aarogyam.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Deepak Verma",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1636,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 27,
+    "account_id": "6ac85a1a074c2bc731a763c6",
+    "email": "dr.karthik.iyer@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Karthik Iyer",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1851,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 28,
+    "account_id": "6ac85a1b074c2bc731a763c8",
+    "email": "dr.pooja.hegde@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Pooja Hegde",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1692,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 29,
+    "account_id": "6ac85a1b074c2bc731a763ca",
+    "email": "dr.sanjay.gupta@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Sanjay Gupta",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1557,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 30,
+    "account_id": "6ac85a1b074c2bc731a763cc",
+    "email": "dr.meera.nambiar@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Meera Nambiar",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1710,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 31,
+    "account_id": "6ac85a1b074c2bc731a763ce",
+    "email": "dr.harish.rao@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Harish Rao",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1610,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 32,
+    "account_id": "6ac85a1b074c2bc731a763d0",
+    "email": "dr.kavita.nair@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Kavita Nair",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1645,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 33,
+    "account_id": "6ac85a1b074c2bc731a763d2",
+    "email": "dr.suresh.menon@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Suresh Menon",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1479,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 34,
+    "account_id": "6ac85a1b074c2bc731a763d4",
+    "email": "dr.radhika.swaminathan@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Radhika Swaminathan",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1729,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 35,
+    "account_id": "6ac85a1b074c2bc731a763d6",
+    "email": "dr.rohinton.mistry@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Rohinton Mistry",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1778,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 36,
+    "account_id": "6ac85a1b074c2bc731a763d8",
+    "email": "dr.adil.bharucha@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Adil Bharucha",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1506,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 37,
+    "account_id": "6ac85a1b074c2bc731a763da",
+    "email": "dr.neville.tata@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Neville Tata",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1440,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 38,
+    "account_id": "6ac85a1b074c2bc731a763dc",
+    "email": "dr.cyrus.poonawalla@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Cyrus Poonawalla",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1508,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 39,
+    "account_id": "6ac85a1b074c2bc731a763de",
+    "email": "dr.diana.edulji@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Diana Edulji",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1505,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 40,
+    "account_id": "6ac85a1b074c2bc731a763e0",
+    "email": "dr.darius.batliwala@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Darius Batliwala",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1513,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 41,
+    "account_id": "6ac85a1c074c2bc731a763e2",
+    "email": "dr.freny.cooper@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Freny Cooper",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1561,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 42,
+    "account_id": "6ac85a1c074c2bc731a763e4",
+    "email": "dr.jamshed.dalal@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Jamshed Dalal",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1722,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 43,
+    "account_id": "6ac85a1c074c2bc731a763e6",
+    "email": "dr.shirin.daruwala@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Shirin Daruwala",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1415,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 44,
+    "account_id": "6ac85a1c074c2bc731a763e8",
+    "email": "dr.kavasji.jamshed@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Kavasji Jamshed",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1422,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 45,
+    "account_id": "6ac85a1c074c2bc731a763ea",
+    "email": "dr.mahrukh.billimoria@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Mahrukh Billimoria",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1701,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 46,
+    "account_id": "6ac85a1c074c2bc731a763ec",
+    "email": "dr.noshirwan.guzder@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Noshirwan Guzder",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1507,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 47,
+    "account_id": "6ac85a1c074c2bc731a763ee",
+    "email": "dr.pheroza.godrej@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Pheroza Godrej",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1524,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 48,
+    "account_id": "6ac85a1c074c2bc731a763f0",
+    "email": "dr.ratan.vakil@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Ratan Vakil",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1585,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 49,
+    "account_id": "6ac85a1c074c2bc731a763f2",
+    "email": "dr.shenaz.treasury@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Shenaz Treasury",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "doctor_verified": true,
+      "latency_ms": 1587,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 50,
+    "account_id": "6ac85a1c074c2bc731a763f4",
+    "email": "rohan.kapoor@example.com",
+    "role": "FAMILY",
+    "expected_name": "Kapoor Family",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "displayed_members_count": 8,
+      "expected_members_count": 8,
+      "invariant_passed": true,
+      "exact_count_matched": true,
+      "latency_ms": 1690,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 51,
+    "account_id": "6ac85a1c074c2bc731a763fe",
+    "email": "ravi.sharma@example.com",
+    "role": "FAMILY",
+    "expected_name": "Sharma Family",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "displayed_members_count": 2,
+      "expected_members_count": 2,
+      "invariant_passed": true,
+      "exact_count_matched": true,
+      "latency_ms": 1660,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 52,
+    "account_id": "6ac85a1c074c2bc731a76402",
+    "email": "vikram.patel@example.com",
+    "role": "FAMILY",
+    "expected_name": "Patel Family",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "displayed_members_count": 6,
+      "expected_members_count": 6,
+      "invariant_passed": true,
+      "exact_count_matched": true,
+      "latency_ms": 1732,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 53,
+    "account_id": "6ac85a1c074c2bc731a7640a",
+    "email": "kiran.reddy@example.com",
+    "role": "FAMILY",
+    "expected_name": "Reddy Family",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "displayed_members_count": 3,
+      "expected_members_count": 3,
+      "invariant_passed": true,
+      "exact_count_matched": true,
+      "latency_ms": 1611,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 54,
+    "account_id": "6ac85a1d074c2bc731a7640f",
+    "email": "siddharth.menon@example.com",
+    "role": "FAMILY",
+    "expected_name": "Menon Family",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "displayed_members_count": 4,
+      "expected_members_count": 4,
+      "invariant_passed": true,
+      "exact_count_matched": true,
+      "latency_ms": 1776,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 55,
+    "account_id": "6ac85a1d074c2bc731a76415",
+    "email": "debashis.mukherjee@example.com",
+    "role": "FAMILY",
+    "expected_name": "Mukherjee Family",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "displayed_members_count": 2,
+      "expected_members_count": 2,
+      "invariant_passed": true,
+      "exact_count_matched": true,
+      "latency_ms": 1965,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 56,
+    "account_id": "6ac85a1d074c2bc731a76419",
+    "email": "amit.banerjee@example.com",
+    "role": "FAMILY",
+    "expected_name": "Banerjee Family",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "displayed_members_count": 7,
+      "expected_members_count": 7,
+      "invariant_passed": true,
+      "exact_count_matched": true,
+      "latency_ms": 1685,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 57,
+    "account_id": "6ac85a1d074c2bc731a76422",
+    "email": "rajesh.kulkarni@example.com",
+    "role": "FAMILY",
+    "expected_name": "Kulkarni Family",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "displayed_members_count": 3,
+      "expected_members_count": 3,
+      "invariant_passed": true,
+      "exact_count_matched": true,
+      "latency_ms": 2128,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 58,
+    "account_id": "6ac85a1d074c2bc731a76427",
+    "email": "venkat.raman@example.com",
+    "role": "FAMILY",
+    "expected_name": "Raman Family",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "displayed_members_count": 5,
+      "expected_members_count": 5,
+      "invariant_passed": true,
+      "exact_count_matched": true,
+      "latency_ms": 1817,
+      "console_errors": 0
+    }
+  },
+  {
+    "index": 59,
+    "account_id": "6ac85a1d074c2bc731a7642e",
+    "email": "manpreet.singh@example.com",
+    "role": "FAMILY",
+    "expected_name": "Singh Family",
+    "status": "PASS",
+    "failure_reason": "",
+    "details": {
+      "shell_verified": true,
+      "displayed_members_count": 4,
+      "expected_members_count": 4,
+      "invariant_passed": true,
+      "exact_count_matched": true,
+      "latency_ms": 1816,
+      "console_errors": 0
+    }
+  }
+]

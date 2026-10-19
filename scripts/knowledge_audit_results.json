@@ -1,0 +1,17 @@
+{
+  "total_articles": 39,
+  "published_count": 39,
+  "departments_total": 13,
+  "departments_covered": 7,
+  "articles_per_department": {
+    "Orthopedics & Trauma": 9,
+    "Diabetology": 6,
+    "Cardiology": 9,
+    "General Medicine": 6,
+    "Diabetology & Endocrinology": 3,
+    "Internal Medicine": 3,
+    "Preventive & Family Medicine": 3
+  },
+  "orphaned_articles_count": 0,
+  "unique_titles_count": 21
+}

@@ -1,0 +1,1084 @@
+[
+  {
+    "email": "chairman@medimind.org",
+    "role": "CHAIRMAN",
+    "expected_name": "Dr. Rajeshwar Rao",
+    "expected_id": "6ac85a18074c2bc731a76398",
+    "db_exists": true,
+    "db_role": "CHAIRMAN",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a18074c2bc731a76398",
+    "role_details": {
+      "scope": "Global Platform Owner"
+    }
+  },
+  {
+    "email": "chairman@medimind.com",
+    "role": "CHAIRMAN",
+    "expected_name": "Dr. Nandita Sengupta",
+    "expected_id": "6ac85a19074c2bc731a76399",
+    "db_exists": true,
+    "db_role": "CHAIRMAN",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a19074c2bc731a76399",
+    "role_details": {
+      "scope": "Global Platform Owner"
+    }
+  },
+  {
+    "email": "admin@aarogyam.hospital",
+    "role": "HOSPITAL_ADMIN",
+    "expected_name": "Vikram Aditya",
+    "expected_id": "6ac85a19074c2bc731a7639a",
+    "db_exists": true,
+    "db_role": "HOSPITAL_ADMIN",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a19074c2bc731a7639a",
+    "role_details": {
+      "hospital_id": "6ac85a18074c2bc731a76381",
+      "hospital_name": "Aarogyam Multispeciality Hospital"
+    }
+  },
+  {
+    "email": "admin.operations@aarogyam.hospital",
+    "role": "HOSPITAL_ADMIN",
+    "expected_name": "Sunita Reddy",
+    "expected_id": "6ac85a19074c2bc731a7639b",
+    "db_exists": true,
+    "db_role": "HOSPITAL_ADMIN",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a19074c2bc731a7639b",
+    "role_details": {
+      "hospital_id": "6ac85a18074c2bc731a76381",
+      "hospital_name": "Aarogyam Multispeciality Hospital"
+    }
+  },
+  {
+    "email": "admin@nexora.hospital",
+    "role": "HOSPITAL_ADMIN",
+    "expected_name": "Harish Chandra",
+    "expected_id": "6ac85a19074c2bc731a7639c",
+    "db_exists": true,
+    "db_role": "HOSPITAL_ADMIN",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a19074c2bc731a7639c",
+    "role_details": {
+      "hospital_id": "6ac85a18074c2bc731a76383",
+      "hospital_name": "Nexora Advanced Care Hospital"
+    }
+  },
+  {
+    "email": "admin@harborview.hospital",
+    "role": "HOSPITAL_ADMIN",
+    "expected_name": "Cyrus Mistry",
+    "expected_id": "6ac85a19074c2bc731a7639d",
+    "db_exists": true,
+    "db_role": "HOSPITAL_ADMIN",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a19074c2bc731a7639d",
+    "role_details": {
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "hospital_name": "Harborview Medical Centre"
+    }
+  },
+  {
+    "email": "arun.prakash@aarogyam.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Arun Prakash",
+    "expected_id": "6ac85a19074c2bc731a7639e",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a19074c2bc731a7639e",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a7638b",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76381"
+    }
+  },
+  {
+    "email": "meenakshi.sundaram@aarogyam.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Meenakshi Sundaram",
+    "expected_id": "6ac85a19074c2bc731a763a0",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a19074c2bc731a763a0",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a7638c",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76381"
+    }
+  },
+  {
+    "email": "ks.murthy@aarogyam.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. K. S. Murthy",
+    "expected_id": "6ac85a19074c2bc731a763a2",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a19074c2bc731a763a2",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a7638d",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76381"
+    }
+  },
+  {
+    "email": "pradeep.varma@nexora.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Pradeep Varma",
+    "expected_id": "6ac85a19074c2bc731a763a4",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a19074c2bc731a763a4",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a7638e",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76383"
+    }
+  },
+  {
+    "email": "shalini.rao@nexora.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Shalini Rao",
+    "expected_id": "6ac85a19074c2bc731a763a6",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a19074c2bc731a763a6",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a7638f",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76383"
+    }
+  },
+  {
+    "email": "anirudh.kulkarni@nexora.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Anirudh Kulkarni",
+    "expected_id": "6ac85a19074c2bc731a763a8",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a19074c2bc731a763a8",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a76390",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76383"
+    }
+  },
+  {
+    "email": "rameshwar.deshmukh@nexora.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Rameshwar Deshmukh",
+    "expected_id": "6ac85a19074c2bc731a763aa",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a19074c2bc731a763aa",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a76391",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76383"
+    }
+  },
+  {
+    "email": "farhan.contractor@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Farhan Contractor",
+    "expected_id": "6ac85a19074c2bc731a763ac",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a19074c2bc731a763ac",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a76392",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76385"
+    }
+  },
+  {
+    "email": "boman.irani@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Boman Irani",
+    "expected_id": "6ac85a1a074c2bc731a763ae",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1a074c2bc731a763ae",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a76392",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76385"
+    }
+  },
+  {
+    "email": "zarir.udwadia@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Zarir Udwadia",
+    "expected_id": "6ac85a1a074c2bc731a763b0",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1a074c2bc731a763b0",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a76393",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76385"
+    }
+  },
+  {
+    "email": "tehemton.shroff@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Tehemton Shroff",
+    "expected_id": "6ac85a1a074c2bc731a763b2",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1a074c2bc731a763b2",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a76394",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76385"
+    }
+  },
+  {
+    "email": "hoshang.master@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Hoshang Master",
+    "expected_id": "6ac85a1a074c2bc731a763b4",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1a074c2bc731a763b4",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a76395",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76385"
+    }
+  },
+  {
+    "email": "pervin.wadia@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Pervin Wadia",
+    "expected_id": "6ac85a1a074c2bc731a763b6",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1a074c2bc731a763b6",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a76396",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76385"
+    }
+  },
+  {
+    "email": "anita.merchant@harborview.hospital",
+    "role": "DEPARTMENT_HEAD",
+    "expected_name": "Dr. Anita Merchant",
+    "expected_id": "6ac85a1a074c2bc731a763b8",
+    "db_exists": true,
+    "db_role": "DEPARTMENT_HEAD",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1a074c2bc731a763b8",
+    "role_details": {
+      "department_id": "6ac85a18074c2bc731a76397",
+      "head_name": null,
+      "department_name": null,
+      "hospital_id": "6ac85a18074c2bc731a76385"
+    }
+  },
+  {
+    "email": "dr.rahul.sharma@aarogyam.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Rahul Sharma",
+    "expected_id": "6ac85a1a074c2bc731a763ba",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1a074c2bc731a763ba",
+    "role_details": {
+      "doctor_id": "6ac85a1a074c2bc731a763bb",
+      "doctor_name": "Dr. Rahul Sharma",
+      "specialty": "Orthopedics & Trauma",
+      "hospital_id": "6ac85a18074c2bc731a76381",
+      "department_id": "6ac85a18074c2bc731a7638b"
+    }
+  },
+  {
+    "email": "dr.sneha.reddy@aarogyam.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Sneha Reddy",
+    "expected_id": "6ac85a1a074c2bc731a763bc",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1a074c2bc731a763bc",
+    "role_details": {
+      "doctor_id": "6ac85a1a074c2bc731a763bd",
+      "doctor_name": "Dr. Sneha Reddy",
+      "specialty": "Orthopedics & Trauma",
+      "hospital_id": "6ac85a18074c2bc731a76381",
+      "department_id": "6ac85a18074c2bc731a7638b"
+    }
+  },
+  {
+    "email": "dr.vikram.joshi@aarogyam.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Vikram Joshi",
+    "expected_id": "6ac85a1a074c2bc731a763be",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1a074c2bc731a763be",
+    "role_details": {
+      "doctor_id": "6ac85a1a074c2bc731a763bf",
+      "doctor_name": "Dr. Vikram Joshi",
+      "specialty": "Diabetology",
+      "hospital_id": "6ac85a18074c2bc731a76381",
+      "department_id": "6ac85a18074c2bc731a7638c"
+    }
+  },
+  {
+    "email": "dr.ananya.roy@aarogyam.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Ananya Roy",
+    "expected_id": "6ac85a1a074c2bc731a763c0",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1a074c2bc731a763c0",
+    "role_details": {
+      "doctor_id": "6ac85a1a074c2bc731a763c1",
+      "doctor_name": "Dr. Ananya Roy",
+      "specialty": "Diabetology",
+      "hospital_id": "6ac85a18074c2bc731a76381",
+      "department_id": "6ac85a18074c2bc731a7638c"
+    }
+  },
+  {
+    "email": "dr.arjun.patel@aarogyam.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Arjun Patel",
+    "expected_id": "6ac85a1a074c2bc731a763c2",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1a074c2bc731a763c2",
+    "role_details": {
+      "doctor_id": "6ac85a1a074c2bc731a763c3",
+      "doctor_name": "Dr. Arjun Patel",
+      "specialty": "Cardiology",
+      "hospital_id": "6ac85a18074c2bc731a76381",
+      "department_id": "6ac85a18074c2bc731a7638d"
+    }
+  },
+  {
+    "email": "dr.deepak.verma@aarogyam.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Deepak Verma",
+    "expected_id": "6ac85a1a074c2bc731a763c4",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1a074c2bc731a763c4",
+    "role_details": {
+      "doctor_id": "6ac85a1a074c2bc731a763c5",
+      "doctor_name": "Dr. Deepak Verma",
+      "specialty": "Cardiology",
+      "hospital_id": "6ac85a18074c2bc731a76381",
+      "department_id": "6ac85a18074c2bc731a7638d"
+    }
+  },
+  {
+    "email": "dr.karthik.iyer@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Karthik Iyer",
+    "expected_id": "6ac85a1a074c2bc731a763c6",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1a074c2bc731a763c6",
+    "role_details": {
+      "doctor_id": "6ac85a1a074c2bc731a763c7",
+      "doctor_name": "Dr. Karthik Iyer",
+      "specialty": "Orthopedics & Trauma",
+      "hospital_id": "6ac85a18074c2bc731a76383",
+      "department_id": "6ac85a18074c2bc731a7638e"
+    }
+  },
+  {
+    "email": "dr.pooja.hegde@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Pooja Hegde",
+    "expected_id": "6ac85a1b074c2bc731a763c8",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1b074c2bc731a763c8",
+    "role_details": {
+      "doctor_id": "6ac85a1b074c2bc731a763c9",
+      "doctor_name": "Dr. Pooja Hegde",
+      "specialty": "Orthopedics & Trauma",
+      "hospital_id": "6ac85a18074c2bc731a76383",
+      "department_id": "6ac85a18074c2bc731a7638e"
+    }
+  },
+  {
+    "email": "dr.sanjay.gupta@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Sanjay Gupta",
+    "expected_id": "6ac85a1b074c2bc731a763ca",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1b074c2bc731a763ca",
+    "role_details": {
+      "doctor_id": "6ac85a1b074c2bc731a763cb",
+      "doctor_name": "Dr. Sanjay Gupta",
+      "specialty": "Diabetology",
+      "hospital_id": "6ac85a18074c2bc731a76383",
+      "department_id": "6ac85a18074c2bc731a7638f"
+    }
+  },
+  {
+    "email": "dr.meera.nambiar@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Meera Nambiar",
+    "expected_id": "6ac85a1b074c2bc731a763cc",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1b074c2bc731a763cc",
+    "role_details": {
+      "doctor_id": "6ac85a1b074c2bc731a763cd",
+      "doctor_name": "Dr. Meera Nambiar",
+      "specialty": "Diabetology",
+      "hospital_id": "6ac85a18074c2bc731a76383",
+      "department_id": "6ac85a18074c2bc731a7638f"
+    }
+  },
+  {
+    "email": "dr.harish.rao@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Harish Rao",
+    "expected_id": "6ac85a1b074c2bc731a763ce",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1b074c2bc731a763ce",
+    "role_details": {
+      "doctor_id": "6ac85a1b074c2bc731a763cf",
+      "doctor_name": "Dr. Harish Rao",
+      "specialty": "Cardiology",
+      "hospital_id": "6ac85a18074c2bc731a76383",
+      "department_id": "6ac85a18074c2bc731a76390"
+    }
+  },
+  {
+    "email": "dr.kavita.nair@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Kavita Nair",
+    "expected_id": "6ac85a1b074c2bc731a763d0",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1b074c2bc731a763d0",
+    "role_details": {
+      "doctor_id": "6ac85a1b074c2bc731a763d1",
+      "doctor_name": "Dr. Kavita Nair",
+      "specialty": "Cardiology",
+      "hospital_id": "6ac85a18074c2bc731a76383",
+      "department_id": "6ac85a18074c2bc731a76390"
+    }
+  },
+  {
+    "email": "dr.suresh.menon@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Suresh Menon",
+    "expected_id": "6ac85a1b074c2bc731a763d2",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1b074c2bc731a763d2",
+    "role_details": {
+      "doctor_id": "6ac85a1b074c2bc731a763d3",
+      "doctor_name": "Dr. Suresh Menon",
+      "specialty": "General Medicine",
+      "hospital_id": "6ac85a18074c2bc731a76383",
+      "department_id": "6ac85a18074c2bc731a76391"
+    }
+  },
+  {
+    "email": "dr.radhika.swaminathan@nexora.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Radhika Swaminathan",
+    "expected_id": "6ac85a1b074c2bc731a763d4",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1b074c2bc731a763d4",
+    "role_details": {
+      "doctor_id": "6ac85a1b074c2bc731a763d5",
+      "doctor_name": "Dr. Radhika Swaminathan",
+      "specialty": "General Medicine",
+      "hospital_id": "6ac85a18074c2bc731a76383",
+      "department_id": "6ac85a18074c2bc731a76391"
+    }
+  },
+  {
+    "email": "dr.rohinton.mistry@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Rohinton Mistry",
+    "expected_id": "6ac85a1b074c2bc731a763d6",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1b074c2bc731a763d6",
+    "role_details": {
+      "doctor_id": "6ac85a1b074c2bc731a763d7",
+      "doctor_name": "Dr. Rohinton Mistry",
+      "specialty": "Orthopedics & Trauma",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76392"
+    }
+  },
+  {
+    "email": "dr.adil.bharucha@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Adil Bharucha",
+    "expected_id": "6ac85a1b074c2bc731a763d8",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1b074c2bc731a763d8",
+    "role_details": {
+      "doctor_id": "6ac85a1b074c2bc731a763d9",
+      "doctor_name": "Dr. Adil Bharucha",
+      "specialty": "Orthopedics & Trauma",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76392"
+    }
+  },
+  {
+    "email": "dr.neville.tata@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Neville Tata",
+    "expected_id": "6ac85a1b074c2bc731a763da",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1b074c2bc731a763da",
+    "role_details": {
+      "doctor_id": "6ac85a1b074c2bc731a763db",
+      "doctor_name": "Dr. Neville Tata",
+      "specialty": "Orthopedics & Trauma",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76392"
+    }
+  },
+  {
+    "email": "dr.cyrus.poonawalla@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Cyrus Poonawalla",
+    "expected_id": "6ac85a1b074c2bc731a763dc",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1b074c2bc731a763dc",
+    "role_details": {
+      "doctor_id": "6ac85a1b074c2bc731a763dd",
+      "doctor_name": "Dr. Cyrus Poonawalla",
+      "specialty": "Orthopedics & Trauma",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76392"
+    }
+  },
+  {
+    "email": "dr.diana.edulji@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Diana Edulji",
+    "expected_id": "6ac85a1b074c2bc731a763de",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1b074c2bc731a763de",
+    "role_details": {
+      "doctor_id": "6ac85a1b074c2bc731a763df",
+      "doctor_name": "Dr. Diana Edulji",
+      "specialty": "Orthopedics & Trauma",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76392"
+    }
+  },
+  {
+    "email": "dr.darius.batliwala@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Darius Batliwala",
+    "expected_id": "6ac85a1b074c2bc731a763e0",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1b074c2bc731a763e0",
+    "role_details": {
+      "doctor_id": "6ac85a1b074c2bc731a763e1",
+      "doctor_name": "Dr. Darius Batliwala",
+      "specialty": "Diabetology & Endocrinology",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76393"
+    }
+  },
+  {
+    "email": "dr.freny.cooper@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Freny Cooper",
+    "expected_id": "6ac85a1c074c2bc731a763e2",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1c074c2bc731a763e2",
+    "role_details": {
+      "doctor_id": "6ac85a1c074c2bc731a763e3",
+      "doctor_name": "Dr. Freny Cooper",
+      "specialty": "Diabetology & Endocrinology",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76393"
+    }
+  },
+  {
+    "email": "dr.jamshed.dalal@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Jamshed Dalal",
+    "expected_id": "6ac85a1c074c2bc731a763e4",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1c074c2bc731a763e4",
+    "role_details": {
+      "doctor_id": "6ac85a1c074c2bc731a763e5",
+      "doctor_name": "Dr. Jamshed Dalal",
+      "specialty": "Cardiology",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76394"
+    }
+  },
+  {
+    "email": "dr.shirin.daruwala@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Shirin Daruwala",
+    "expected_id": "6ac85a1c074c2bc731a763e6",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1c074c2bc731a763e6",
+    "role_details": {
+      "doctor_id": "6ac85a1c074c2bc731a763e7",
+      "doctor_name": "Dr. Shirin Daruwala",
+      "specialty": "Cardiology",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76394"
+    }
+  },
+  {
+    "email": "dr.kavasji.jamshed@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Kavasji Jamshed",
+    "expected_id": "6ac85a1c074c2bc731a763e8",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1c074c2bc731a763e8",
+    "role_details": {
+      "doctor_id": "6ac85a1c074c2bc731a763e9",
+      "doctor_name": "Dr. Kavasji Jamshed",
+      "specialty": "General Medicine",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76395"
+    }
+  },
+  {
+    "email": "dr.mahrukh.billimoria@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Mahrukh Billimoria",
+    "expected_id": "6ac85a1c074c2bc731a763ea",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1c074c2bc731a763ea",
+    "role_details": {
+      "doctor_id": "6ac85a1c074c2bc731a763eb",
+      "doctor_name": "Dr. Mahrukh Billimoria",
+      "specialty": "General Medicine",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76395"
+    }
+  },
+  {
+    "email": "dr.noshirwan.guzder@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Noshirwan Guzder",
+    "expected_id": "6ac85a1c074c2bc731a763ec",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1c074c2bc731a763ec",
+    "role_details": {
+      "doctor_id": "6ac85a1c074c2bc731a763ed",
+      "doctor_name": "Dr. Noshirwan Guzder",
+      "specialty": "Internal Medicine",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76396"
+    }
+  },
+  {
+    "email": "dr.pheroza.godrej@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Pheroza Godrej",
+    "expected_id": "6ac85a1c074c2bc731a763ee",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1c074c2bc731a763ee",
+    "role_details": {
+      "doctor_id": "6ac85a1c074c2bc731a763ef",
+      "doctor_name": "Dr. Pheroza Godrej",
+      "specialty": "Internal Medicine",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76396"
+    }
+  },
+  {
+    "email": "dr.ratan.vakil@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Ratan Vakil",
+    "expected_id": "6ac85a1c074c2bc731a763f0",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1c074c2bc731a763f0",
+    "role_details": {
+      "doctor_id": "6ac85a1c074c2bc731a763f1",
+      "doctor_name": "Dr. Ratan Vakil",
+      "specialty": "Preventive & Family Medicine",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76397"
+    }
+  },
+  {
+    "email": "dr.shenaz.treasury@harborview.hospital",
+    "role": "DOCTOR",
+    "expected_name": "Dr. Shenaz Treasury",
+    "expected_id": "6ac85a1c074c2bc731a763f2",
+    "db_exists": true,
+    "db_role": "DOCTOR",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1c074c2bc731a763f2",
+    "role_details": {
+      "doctor_id": "6ac85a1c074c2bc731a763f3",
+      "doctor_name": "Dr. Shenaz Treasury",
+      "specialty": "Preventive & Family Medicine",
+      "hospital_id": "6ac85a18074c2bc731a76385",
+      "department_id": "6ac85a18074c2bc731a76397"
+    }
+  },
+  {
+    "email": "rohan.kapoor@example.com",
+    "role": "FAMILY",
+    "expected_name": "Kapoor Family",
+    "expected_id": "6ac85a1c074c2bc731a763f4",
+    "db_exists": true,
+    "db_role": "FAMILY",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1c074c2bc731a763f4",
+    "role_details": {
+      "family_name": "Kapoor Family",
+      "family_id_str": "FAM-001",
+      "api_member_count": 8,
+      "db_member_count": 8,
+      "members": [
+        "Rohan Kapoor",
+        "Priya Kapoor",
+        "Aarav Kapoor",
+        "Ananya Kapoor",
+        "Ram Kapoor",
+        "Kausalya Kapoor",
+        "Sameer Kapoor",
+        "Neha Kapoor"
+      ]
+    }
+  },
+  {
+    "email": "ravi.sharma@example.com",
+    "role": "FAMILY",
+    "expected_name": "Sharma Family",
+    "expected_id": "6ac85a1c074c2bc731a763fe",
+    "db_exists": true,
+    "db_role": "FAMILY",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1c074c2bc731a763fe",
+    "role_details": {
+      "family_name": "Sharma Family",
+      "family_id_str": "FAM-002",
+      "api_member_count": 2,
+      "db_member_count": 2,
+      "members": [
+        "Ravi Sharma",
+        "Sunita Sharma"
+      ]
+    }
+  },
+  {
+    "email": "vikram.patel@example.com",
+    "role": "FAMILY",
+    "expected_name": "Patel Family",
+    "expected_id": "6ac85a1c074c2bc731a76402",
+    "db_exists": true,
+    "db_role": "FAMILY",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1c074c2bc731a76402",
+    "role_details": {
+      "family_name": "Patel Family",
+      "family_id_str": "FAM-003",
+      "api_member_count": 6,
+      "db_member_count": 6,
+      "members": [
+        "Vikram Patel",
+        "Meena Patel",
+        "Dhruv Patel",
+        "Diya Patel",
+        "Kantilal Patel",
+        "Hansa Patel"
+      ]
+    }
+  },
+  {
+    "email": "kiran.reddy@example.com",
+    "role": "FAMILY",
+    "expected_name": "Reddy Family",
+    "expected_id": "6ac85a1c074c2bc731a7640a",
+    "db_exists": true,
+    "db_role": "FAMILY",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1c074c2bc731a7640a",
+    "role_details": {
+      "family_name": "Reddy Family",
+      "family_id_str": "FAM-004",
+      "api_member_count": 3,
+      "db_member_count": 3,
+      "members": [
+        "Kiran Reddy",
+        "Swapna Reddy",
+        "Vihaan Reddy"
+      ]
+    }
+  },
+  {
+    "email": "siddharth.menon@example.com",
+    "role": "FAMILY",
+    "expected_name": "Menon Family",
+    "expected_id": "6ac85a1d074c2bc731a7640f",
+    "db_exists": true,
+    "db_role": "FAMILY",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1d074c2bc731a7640f",
+    "role_details": {
+      "family_name": "Menon Family",
+      "family_id_str": "FAM-005",
+      "api_member_count": 4,
+      "db_member_count": 4,
+      "members": [
+        "Siddharth Menon",
+        "Lakshmi Menon",
+        "Aryan Menon",
+        "Ananya Menon"
+      ]
+    }
+  },
+  {
+    "email": "debashis.mukherjee@example.com",
+    "role": "FAMILY",
+    "expected_name": "Mukherjee Family",
+    "expected_id": "6ac85a1d074c2bc731a76415",
+    "db_exists": true,
+    "db_role": "FAMILY",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1d074c2bc731a76415",
+    "role_details": {
+      "family_name": "Mukherjee Family",
+      "family_id_str": "FAM-006",
+      "api_member_count": 2,
+      "db_member_count": 2,
+      "members": [
+        "Debashis Mukherjee",
+        "Sharmila Mukherjee"
+      ]
+    }
+  },
+  {
+    "email": "amit.banerjee@example.com",
+    "role": "FAMILY",
+    "expected_name": "Banerjee Family",
+    "expected_id": "6ac85a1d074c2bc731a76419",
+    "db_exists": true,
+    "db_role": "FAMILY",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1d074c2bc731a76419",
+    "role_details": {
+      "family_name": "Banerjee Family",
+      "family_id_str": "FAM-007",
+      "api_member_count": 7,
+      "db_member_count": 7,
+      "members": [
+        "Amit Banerjee",
+        "Rupa Banerjee",
+        "Sourav Banerjee",
+        "Shreya Banerjee",
+        "Pranab Banerjee",
+        "Gita Banerjee",
+        "Tanushree Banerjee"
+      ]
+    }
+  },
+  {
+    "email": "rajesh.kulkarni@example.com",
+    "role": "FAMILY",
+    "expected_name": "Kulkarni Family",
+    "expected_id": "6ac85a1d074c2bc731a76422",
+    "db_exists": true,
+    "db_role": "FAMILY",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1d074c2bc731a76422",
+    "role_details": {
+      "family_name": "Kulkarni Family",
+      "family_id_str": "FAM-008",
+      "api_member_count": 3,
+      "db_member_count": 3,
+      "members": [
+        "Rajesh Kulkarni",
+        "Vaishali Kulkarni",
+        "Tanmay Kulkarni"
+      ]
+    }
+  },
+  {
+    "email": "venkat.raman@example.com",
+    "role": "FAMILY",
+    "expected_name": "Raman Family",
+    "expected_id": "6ac85a1d074c2bc731a76427",
+    "db_exists": true,
+    "db_role": "FAMILY",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1d074c2bc731a76427",
+    "role_details": {
+      "family_name": "Raman Family",
+      "family_id_str": "FAM-009",
+      "api_member_count": 5,
+      "db_member_count": 5,
+      "members": [
+        "Venkat Raman",
+        "Sowmya Raman",
+        "Aditya Raman",
+        "Nitya Raman",
+        "Kalyani Raman"
+      ]
+    }
+  },
+  {
+    "email": "manpreet.singh@example.com",
+    "role": "FAMILY",
+    "expected_name": "Singh Family",
+    "expected_id": "6ac85a1d074c2bc731a7642e",
+    "db_exists": true,
+    "db_role": "FAMILY",
+    "login_ok": true,
+    "error_msg": "",
+    "api_user_id": "6ac85a1d074c2bc731a7642e",
+    "role_details": {
+      "family_name": "Singh Family",
+      "family_id_str": "FAM-010",
+      "api_member_count": 4,
+      "db_member_count": 4,
+      "members": [
+        "Manpreet Singh",
+        "Jaspreet Kaur",
+        "Gurkeerat Singh",
+        "Simran Kaur"
+      ]
+    }
+  }
+]

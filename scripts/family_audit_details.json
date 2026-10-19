@@ -1,0 +1,454 @@
+[
+  {
+    "family_mongo_id": "6ac85a1c074c2bc731a763f5",
+    "family_name": "Kapoor Family",
+    "email": "rohan.kapoor@example.com",
+    "mobile": "+91 98765 43210",
+    "status": "ACTIVE",
+    "actual_member_count": 8,
+    "members": [
+      {
+        "member_id": "6ac85a1c074c2bc731a763f6",
+        "name": "Rohan Kapoor",
+        "gender": "MALE",
+        "blood_group": "A+",
+        "dob": "1982-04-12",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1c074c2bc731a763f7",
+        "name": "Priya Kapoor",
+        "gender": "FEMALE",
+        "blood_group": "B+",
+        "dob": "1985-08-23",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1c074c2bc731a763f8",
+        "name": "Aarav Kapoor",
+        "gender": "MALE",
+        "blood_group": "A+",
+        "dob": "2010-11-15",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1c074c2bc731a763f9",
+        "name": "Ananya Kapoor",
+        "gender": "FEMALE",
+        "blood_group": "B+",
+        "dob": "2014-06-05",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1c074c2bc731a763fa",
+        "name": "Ram Kapoor",
+        "gender": "MALE",
+        "blood_group": "O+",
+        "dob": "1952-01-20",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1c074c2bc731a763fb",
+        "name": "Kausalya Kapoor",
+        "gender": "FEMALE",
+        "blood_group": "O+",
+        "dob": "1955-09-14",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1c074c2bc731a763fc",
+        "name": "Sameer Kapoor",
+        "gender": "MALE",
+        "blood_group": "A-",
+        "dob": "1988-03-30",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1c074c2bc731a763fd",
+        "name": "Neha Kapoor",
+        "gender": "FEMALE",
+        "blood_group": "AB+",
+        "dob": "1990-12-18",
+        "conditions_count": 0
+      }
+    ]
+  },
+  {
+    "family_mongo_id": "6ac85a1c074c2bc731a763ff",
+    "family_name": "Sharma Family",
+    "email": "ravi.sharma@example.com",
+    "mobile": "+91 98765 43220",
+    "status": "ACTIVE",
+    "actual_member_count": 2,
+    "members": [
+      {
+        "member_id": "6ac85a1c074c2bc731a76400",
+        "name": "Ravi Sharma",
+        "gender": "MALE",
+        "blood_group": "B+",
+        "dob": "1978-05-19",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1c074c2bc731a76401",
+        "name": "Sunita Sharma",
+        "gender": "FEMALE",
+        "blood_group": "O+",
+        "dob": "1981-09-08",
+        "conditions_count": 0
+      }
+    ]
+  },
+  {
+    "family_mongo_id": "6ac85a1c074c2bc731a76403",
+    "family_name": "Patel Family",
+    "email": "vikram.patel@example.com",
+    "mobile": "+91 98765 43230",
+    "status": "ACTIVE",
+    "actual_member_count": 6,
+    "members": [
+      {
+        "member_id": "6ac85a1c074c2bc731a76404",
+        "name": "Vikram Patel",
+        "gender": "MALE",
+        "blood_group": "O+",
+        "dob": "1975-02-14",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1c074c2bc731a76405",
+        "name": "Meena Patel",
+        "gender": "FEMALE",
+        "blood_group": "A+",
+        "dob": "1979-07-22",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1c074c2bc731a76406",
+        "name": "Dhruv Patel",
+        "gender": "MALE",
+        "blood_group": "O+",
+        "dob": "2005-10-10",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1c074c2bc731a76407",
+        "name": "Diya Patel",
+        "gender": "FEMALE",
+        "blood_group": "A+",
+        "dob": "2008-03-17",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1c074c2bc731a76408",
+        "name": "Kantilal Patel",
+        "gender": "MALE",
+        "blood_group": "B+",
+        "dob": "1948-12-05",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1c074c2bc731a76409",
+        "name": "Hansa Patel",
+        "gender": "FEMALE",
+        "blood_group": "B+",
+        "dob": "1951-04-11",
+        "conditions_count": 0
+      }
+    ]
+  },
+  {
+    "family_mongo_id": "6ac85a1c074c2bc731a7640b",
+    "family_name": "Reddy Family",
+    "email": "kiran.reddy@example.com",
+    "mobile": "+91 98765 43240",
+    "status": "ACTIVE",
+    "actual_member_count": 3,
+    "members": [
+      {
+        "member_id": "6ac85a1d074c2bc731a7640c",
+        "name": "Kiran Reddy",
+        "gender": "MALE",
+        "blood_group": "AB+",
+        "dob": "1984-06-25",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a7640d",
+        "name": "Swapna Reddy",
+        "gender": "FEMALE",
+        "blood_group": "O+",
+        "dob": "1987-11-30",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a7640e",
+        "name": "Vihaan Reddy",
+        "gender": "MALE",
+        "blood_group": "AB+",
+        "dob": "2016-08-14",
+        "conditions_count": 0
+      }
+    ]
+  },
+  {
+    "family_mongo_id": "6ac85a1d074c2bc731a76410",
+    "family_name": "Menon Family",
+    "email": "siddharth.menon@example.com",
+    "mobile": "+91 98765 43250",
+    "status": "ACTIVE",
+    "actual_member_count": 4,
+    "members": [
+      {
+        "member_id": "6ac85a1d074c2bc731a76411",
+        "name": "Siddharth Menon",
+        "gender": "MALE",
+        "blood_group": "A+",
+        "dob": "1980-09-12",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a76412",
+        "name": "Lakshmi Menon",
+        "gender": "FEMALE",
+        "blood_group": "A+",
+        "dob": "1983-01-28",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a76413",
+        "name": "Aryan Menon",
+        "gender": "MALE",
+        "blood_group": "A+",
+        "dob": "2011-04-09",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a76414",
+        "name": "Ananya Menon",
+        "gender": "FEMALE",
+        "blood_group": "O+",
+        "dob": "2015-12-03",
+        "conditions_count": 0
+      }
+    ]
+  },
+  {
+    "family_mongo_id": "6ac85a1d074c2bc731a76416",
+    "family_name": "Mukherjee Family",
+    "email": "debashis.mukherjee@example.com",
+    "mobile": "+91 98765 43260",
+    "status": "ACTIVE",
+    "actual_member_count": 2,
+    "members": [
+      {
+        "member_id": "6ac85a1d074c2bc731a76417",
+        "name": "Debashis Mukherjee",
+        "gender": "MALE",
+        "blood_group": "B+",
+        "dob": "1972-03-15",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a76418",
+        "name": "Sharmila Mukherjee",
+        "gender": "FEMALE",
+        "blood_group": "B+",
+        "dob": "1976-10-20",
+        "conditions_count": 0
+      }
+    ]
+  },
+  {
+    "family_mongo_id": "6ac85a1d074c2bc731a7641a",
+    "family_name": "Banerjee Family",
+    "email": "amit.banerjee@example.com",
+    "mobile": "+91 98765 43270",
+    "status": "ACTIVE",
+    "actual_member_count": 7,
+    "members": [
+      {
+        "member_id": "6ac85a1d074c2bc731a7641b",
+        "name": "Amit Banerjee",
+        "gender": "MALE",
+        "blood_group": "O+",
+        "dob": "1979-11-02",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a7641c",
+        "name": "Rupa Banerjee",
+        "gender": "FEMALE",
+        "blood_group": "A+",
+        "dob": "1982-04-16",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a7641d",
+        "name": "Sourav Banerjee",
+        "gender": "MALE",
+        "blood_group": "O+",
+        "dob": "2006-08-21",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a7641e",
+        "name": "Shreya Banerjee",
+        "gender": "FEMALE",
+        "blood_group": "A+",
+        "dob": "2012-02-14",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a7641f",
+        "name": "Pranab Banerjee",
+        "gender": "MALE",
+        "blood_group": "B+",
+        "dob": "1950-06-18",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a76420",
+        "name": "Gita Banerjee",
+        "gender": "FEMALE",
+        "blood_group": "O+",
+        "dob": "1954-01-25",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a76421",
+        "name": "Tanushree Banerjee",
+        "gender": "FEMALE",
+        "blood_group": "AB+",
+        "dob": "1986-07-09",
+        "conditions_count": 0
+      }
+    ]
+  },
+  {
+    "family_mongo_id": "6ac85a1d074c2bc731a76423",
+    "family_name": "Kulkarni Family",
+    "email": "rajesh.kulkarni@example.com",
+    "mobile": "+91 98765 43280",
+    "status": "ACTIVE",
+    "actual_member_count": 3,
+    "members": [
+      {
+        "member_id": "6ac85a1d074c2bc731a76424",
+        "name": "Rajesh Kulkarni",
+        "gender": "MALE",
+        "blood_group": "A+",
+        "dob": "1983-05-07",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a76425",
+        "name": "Vaishali Kulkarni",
+        "gender": "FEMALE",
+        "blood_group": "B+",
+        "dob": "1986-09-11",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a76426",
+        "name": "Tanmay Kulkarni",
+        "gender": "MALE",
+        "blood_group": "A+",
+        "dob": "2017-03-24",
+        "conditions_count": 0
+      }
+    ]
+  },
+  {
+    "family_mongo_id": "6ac85a1d074c2bc731a76428",
+    "family_name": "Raman Family",
+    "email": "venkat.raman@example.com",
+    "mobile": "+91 98765 43290",
+    "status": "ACTIVE",
+    "actual_member_count": 5,
+    "members": [
+      {
+        "member_id": "6ac85a1d074c2bc731a76429",
+        "name": "Venkat Raman",
+        "gender": "MALE",
+        "blood_group": "B+",
+        "dob": "1977-08-14",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a7642a",
+        "name": "Sowmya Raman",
+        "gender": "FEMALE",
+        "blood_group": "O+",
+        "dob": "1981-12-01",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a7642b",
+        "name": "Aditya Raman",
+        "gender": "MALE",
+        "blood_group": "B+",
+        "dob": "2007-05-18",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a7642c",
+        "name": "Nitya Raman",
+        "gender": "FEMALE",
+        "blood_group": "O+",
+        "dob": "2013-09-29",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a7642d",
+        "name": "Kalyani Raman",
+        "gender": "FEMALE",
+        "blood_group": "A+",
+        "dob": "1953-11-10",
+        "conditions_count": 0
+      }
+    ]
+  },
+  {
+    "family_mongo_id": "6ac85a1d074c2bc731a7642f",
+    "family_name": "Singh Family",
+    "email": "manpreet.singh@example.com",
+    "mobile": "+91 98765 43300",
+    "status": "ACTIVE",
+    "actual_member_count": 4,
+    "members": [
+      {
+        "member_id": "6ac85a1d074c2bc731a76430",
+        "name": "Manpreet Singh",
+        "gender": "MALE",
+        "blood_group": "O+",
+        "dob": "1985-02-28",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a76431",
+        "name": "Jaspreet Kaur",
+        "gender": "FEMALE",
+        "blood_group": "A+",
+        "dob": "1988-06-15",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a76432",
+        "name": "Gurkeerat Singh",
+        "gender": "MALE",
+        "blood_group": "O+",
+        "dob": "2014-10-04",
+        "conditions_count": 0
+      },
+      {
+        "member_id": "6ac85a1d074c2bc731a76433",
+        "name": "Simran Kaur",
+        "gender": "FEMALE",
+        "blood_group": "A+",
+        "dob": "2018-07-20",
+        "conditions_count": 0
+      }
+    ]
+  }
+]

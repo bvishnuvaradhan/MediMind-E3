@@ -1,0 +1,19 @@
+{
+  "workbook_file": "Documents/MediMind_Role_Credentials.xlsx",
+  "total_workbook_accounts": 59,
+  "sheet_breakdown": {
+    "Family": 10,
+    "Doctor": 29,
+    "Department Head": 14,
+    "Hospital Admin": 4,
+    "Chairman": 2
+  },
+  "duplicates_in_workbook": [],
+  "db_users_count": 59,
+  "matched_count": 59,
+  "missing_in_db": [],
+  "extra_in_db": [],
+  "role_mismatches": [],
+  "secondary_staff_workbook_found": false,
+  "secondary_staff_workbooks": []
+}
