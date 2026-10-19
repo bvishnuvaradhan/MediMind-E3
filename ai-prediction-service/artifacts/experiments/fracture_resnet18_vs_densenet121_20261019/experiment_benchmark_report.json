@@ -1,0 +1,628 @@
+{
+  "experiment_title": "MediMind Fracture Detection: ResNet-18 vs DenseNet-121 Optimization Benchmark",
+  "experiment_date": "2026-10-19",
+  "dataset_name": "FracAtlas Cleaned (Pure Fracture Detection)",
+  "hardware_environment": {
+    "device": "CPU",
+    "pytorch_version": "2.14.1+cpu"
+  },
+  "dataset_split": {
+    "train_samples": 2844,
+    "val_samples": 610,
+    "test_samples": 614,
+    "leakage_prevention": "Patient-level atomic clustering; 0 patient overlap across partitions",
+    "class_distribution": {
+      "train_fractured": 494,
+      "val_fractured": 102,
+      "test_fractured": 119
+    }
+  },
+  "models": {
+    "baseline_resnet18": {
+      "name": "Frozen Production Baseline (ResNet-18 v2)",
+      "architecture": "ResNet-18",
+      "weights_source": "ImageNet-pretrained (Frozen Production)",
+      "checkpoint_path": "D:\\projects\\MediMind\\ai-prediction-service\\artifacts\\fracture_v2\\best_model.pt",
+      "sha256": "ac0d2e720c9ec67f7e2eeda7c8c2fcbb374c78c6b7e9bb4b9dd26772d4869d60",
+      "artifact_size_mb": 42.71,
+      "latency_cpu": {
+        "mean_ms": 76.82,
+        "median_p50_ms": 73.67,
+        "p95_ms": 107.17
+      },
+      "validation_threshold": 0.26,
+      "validation_metrics": {
+        "accuracy": 0.7623,
+        "recall": 0.9314,
+        "sensitivity": 0.9314,
+        "specificity": 0.7283,
+        "precision": 0.4077,
+        "ppv": 0.4077,
+        "npv": 0.9814,
+        "f1_score": 0.5672,
+        "roc_auc": 0.9041,
+        "pr_auc": 0.724,
+        "brier_score": 0.0948,
+        "expected_calibration_error": 0.0913
+      },
+      "test_metrics": {
+        "accuracy": 0.7622,
+        "recall": 0.8655,
+        "sensitivity": 0.8655,
+        "specificity": 0.7374,
+        "precision": 0.4421,
+        "ppv": 0.4421,
+        "npv": 0.958,
+        "f1_score": 0.5852,
+        "roc_auc": 0.8751,
+        "pr_auc": 0.6891,
+        "brier_score": 0.1117,
+        "expected_calibration_error": 0.0894
+      },
+      "test_confusion_matrix": {
+        "true_positives": 103,
+        "false_positives": 130,
+        "true_negatives": 365,
+        "false_negatives": 16
+      },
+      "test_subgroups": {
+        "anatomy_hand": {
+          "accuracy": 0.631,
+          "recall": 0.9452,
+          "sensitivity": 0.9452,
+          "specificity": 0.5028,
+          "precision": 0.4367,
+          "ppv": 0.4367,
+          "npv": 0.9574,
+          "f1_score": 0.5974,
+          "roc_auc": 0.8306,
+          "pr_auc": 0.6366,
+          "brier_score": 0.1745,
+          "expected_calibration_error": 0.156,
+          "count": 252
+        },
+        "anatomy_leg": {
+          "accuracy": 0.8397,
+          "recall": 0.75,
+          "sensitivity": 0.75,
+          "specificity": 0.8545,
+          "precision": 0.4583,
+          "ppv": 0.4583,
+          "npv": 0.9542,
+          "f1_score": 0.569,
+          "roc_auc": 0.8735,
+          "pr_auc": 0.7205,
+          "brier_score": 0.0741,
+          "expected_calibration_error": 0.0518,
+          "count": 312
+        },
+        "anatomy_hip": {
+          "accuracy": 0.9333,
+          "recall": 1.0,
+          "sensitivity": 1.0,
+          "specificity": 0.931,
+          "precision": 0.3333,
+          "ppv": 0.3333,
+          "npv": 1.0,
+          "f1_score": 0.5,
+          "roc_auc": 1.0,
+          "pr_auc": 1.0,
+          "brier_score": 0.0141,
+          "expected_calibration_error": 0.0485,
+          "count": 30
+        },
+        "no_hardware": {
+          "accuracy": 0.7521,
+          "recall": 0.8316,
+          "sensitivity": 0.8316,
+          "specificity": 0.7368,
+          "precision": 0.378,
+          "ppv": 0.378,
+          "npv": 0.9579,
+          "f1_score": 0.5197,
+          "roc_auc": 0.8551,
+          "pr_auc": 0.6072,
+          "brier_score": 0.1128,
+          "expected_calibration_error": 0.1011,
+          "count": 589
+        },
+        "hardware_present": {
+          "accuracy": 1.0,
+          "recall": 1.0,
+          "sensitivity": 1.0,
+          "specificity": 1.0,
+          "precision": 1.0,
+          "ppv": 1.0,
+          "npv": 1.0,
+          "f1_score": 1.0,
+          "roc_auc": 1.0,
+          "pr_auc": 1.0,
+          "brier_score": 0.0853,
+          "expected_calibration_error": 0.1994,
+          "count": 25
+        }
+      },
+      "gradcam_cases": {
+        "TP": {
+          "image_id": "IMG0000025.jpg",
+          "patient_id": "PAT_FA_00012",
+          "anatomy": "hand",
+          "hardware": 0,
+          "ground_truth": 1,
+          "predicted_prob": 0.8697,
+          "central_anatomical_focus_ratio": 0.4492,
+          "shortcut_or_border_artifact_detected": false
+        },
+        "TN": {
+          "image_id": "IMG0000008.jpg",
+          "patient_id": "PAT_FA_00004",
+          "anatomy": "leg",
+          "hardware": 0,
+          "ground_truth": 0,
+          "predicted_prob": 0.0413,
+          "central_anatomical_focus_ratio": 0.1334,
+          "shortcut_or_border_artifact_detected": true
+        },
+        "FP": {
+          "image_id": "IMG0000016.jpg",
+          "patient_id": "PAT_FA_00008",
+          "anatomy": "hand",
+          "hardware": 0,
+          "ground_truth": 0,
+          "predicted_prob": 0.9828,
+          "central_anatomical_focus_ratio": 0.176,
+          "shortcut_or_border_artifact_detected": true
+        },
+        "FN": {
+          "image_id": "IMG0000207.jpg",
+          "patient_id": "PAT_FA_00103",
+          "anatomy": "hand",
+          "hardware": 0,
+          "ground_truth": 1,
+          "predicted_prob": 0.1207,
+          "central_anatomical_focus_ratio": 0.0,
+          "shortcut_or_border_artifact_detected": true
+        }
+      }
+    },
+    "approach_a_optimized_resnet18": {
+      "name": "Approach A: Optimized ResNet-18",
+      "architecture": "ResNet-18",
+      "weights_source": "ImageNet-pretrained + 2-Stage Conservative Fine-Tuning",
+      "checkpoint_path": "D:\\projects\\MediMind\\ai-prediction-service\\artifacts\\experiments\\fracture_resnet18_vs_densenet121_20261019\\candidate_a_optimized_resnet18.pt",
+      "sha256": "079454ebe9b59d31e66c7f187e6913a2a0e6d6ee973bacac5ff46cae5f165dc4",
+      "artifact_size_mb": 42.71,
+      "latency_cpu": {
+        "mean_ms": 66.77,
+        "median_p50_ms": 64.87,
+        "p95_ms": 80.11
+      },
+      "training_time_seconds": 1865.04,
+      "training_history": [
+        {
+          "stage": 1,
+          "epoch": 1,
+          "train_loss": 1.1747,
+          "val_loss": 1.1059,
+          "val_roc_auc": 0.6483,
+          "val_pr_auc": 0.2824,
+          "duration_seconds": 249.36
+        },
+        {
+          "stage": 1,
+          "epoch": 2,
+          "train_loss": 1.0645,
+          "val_loss": 1.0163,
+          "val_roc_auc": 0.7348,
+          "val_pr_auc": 0.4006,
+          "duration_seconds": 254.05
+        },
+        {
+          "stage": 2,
+          "epoch": 3,
+          "train_loss": 0.8469,
+          "val_loss": 0.7795,
+          "val_roc_auc": 0.8748,
+          "val_pr_auc": 0.6553,
+          "duration_seconds": 338.58
+        },
+        {
+          "stage": 2,
+          "epoch": 4,
+          "train_loss": 0.5793,
+          "val_loss": 0.731,
+          "val_roc_auc": 0.8949,
+          "val_pr_auc": 0.6997,
+          "duration_seconds": 345.54
+        },
+        {
+          "stage": 2,
+          "epoch": 5,
+          "train_loss": 0.4082,
+          "val_loss": 0.7389,
+          "val_roc_auc": 0.8861,
+          "val_pr_auc": 0.7026,
+          "duration_seconds": 343.6
+        },
+        {
+          "stage": 2,
+          "epoch": 6,
+          "train_loss": 0.2973,
+          "val_loss": 0.7762,
+          "val_roc_auc": 0.8956,
+          "val_pr_auc": 0.7142,
+          "duration_seconds": 333.24
+        }
+      ],
+      "validation_threshold": 0.17,
+      "validation_metrics": {
+        "accuracy": 0.777,
+        "recall": 0.8725,
+        "sensitivity": 0.8725,
+        "specificity": 0.7579,
+        "precision": 0.4198,
+        "ppv": 0.4198,
+        "npv": 0.9673,
+        "f1_score": 0.5669,
+        "roc_auc": 0.8956,
+        "pr_auc": 0.7142,
+        "brier_score": 0.0937,
+        "expected_calibration_error": 0.0631
+      },
+      "test_metrics": {
+        "accuracy": 0.7541,
+        "recall": 0.8403,
+        "sensitivity": 0.8403,
+        "specificity": 0.7333,
+        "precision": 0.431,
+        "ppv": 0.431,
+        "npv": 0.9503,
+        "f1_score": 0.5698,
+        "roc_auc": 0.8696,
+        "pr_auc": 0.722,
+        "brier_score": 0.1114,
+        "expected_calibration_error": 0.0927
+      },
+      "test_confusion_matrix": {
+        "true_positives": 100,
+        "false_positives": 132,
+        "true_negatives": 363,
+        "false_negatives": 19
+      },
+      "test_subgroups": {
+        "anatomy_hand": {
+          "accuracy": 0.5952,
+          "recall": 0.9041,
+          "sensitivity": 0.9041,
+          "specificity": 0.4693,
+          "precision": 0.4099,
+          "ppv": 0.4099,
+          "npv": 0.9231,
+          "f1_score": 0.5641,
+          "roc_auc": 0.828,
+          "pr_auc": 0.7243,
+          "brier_score": 0.1847,
+          "expected_calibration_error": 0.1636,
+          "count": 252
+        },
+        "anatomy_leg": {
+          "accuracy": 0.8526,
+          "recall": 0.75,
+          "sensitivity": 0.75,
+          "specificity": 0.8694,
+          "precision": 0.4853,
+          "ppv": 0.4853,
+          "npv": 0.9549,
+          "f1_score": 0.5893,
+          "roc_auc": 0.8504,
+          "pr_auc": 0.7207,
+          "brier_score": 0.0665,
+          "expected_calibration_error": 0.0549,
+          "count": 312
+        },
+        "anatomy_hip": {
+          "accuracy": 0.9333,
+          "recall": 1.0,
+          "sensitivity": 1.0,
+          "specificity": 0.931,
+          "precision": 0.3333,
+          "ppv": 0.3333,
+          "npv": 1.0,
+          "f1_score": 0.5,
+          "roc_auc": 1.0,
+          "pr_auc": 1.0,
+          "brier_score": 0.0096,
+          "expected_calibration_error": 0.0386,
+          "count": 30
+        },
+        "no_hardware": {
+          "accuracy": 0.747,
+          "recall": 0.8105,
+          "sensitivity": 0.8105,
+          "specificity": 0.7348,
+          "precision": 0.3702,
+          "ppv": 0.3702,
+          "npv": 0.9528,
+          "f1_score": 0.5083,
+          "roc_auc": 0.8502,
+          "pr_auc": 0.6539,
+          "brier_score": 0.1114,
+          "expected_calibration_error": 0.1007,
+          "count": 589
+        },
+        "hardware_present": {
+          "accuracy": 0.92,
+          "recall": 0.9583,
+          "sensitivity": 0.9583,
+          "specificity": 0.0,
+          "precision": 0.9583,
+          "ppv": 0.9583,
+          "npv": 0.0,
+          "f1_score": 0.9583,
+          "roc_auc": 0.9167,
+          "pr_auc": 0.9966,
+          "brier_score": 0.1092,
+          "expected_calibration_error": 0.1712,
+          "count": 25
+        }
+      },
+      "gradcam_cases": {
+        "TP": {
+          "image_id": "IMG0000025.jpg",
+          "patient_id": "PAT_FA_00012",
+          "anatomy": "hand",
+          "hardware": 0,
+          "ground_truth": 1,
+          "predicted_prob": 0.965,
+          "central_anatomical_focus_ratio": 0.5491,
+          "shortcut_or_border_artifact_detected": false
+        },
+        "TN": {
+          "image_id": "IMG0000008.jpg",
+          "patient_id": "PAT_FA_00004",
+          "anatomy": "leg",
+          "hardware": 0,
+          "ground_truth": 0,
+          "predicted_prob": 0.0429,
+          "central_anatomical_focus_ratio": 0.1698,
+          "shortcut_or_border_artifact_detected": true
+        },
+        "FP": {
+          "image_id": "IMG0000016.jpg",
+          "patient_id": "PAT_FA_00008",
+          "anatomy": "hand",
+          "hardware": 0,
+          "ground_truth": 0,
+          "predicted_prob": 0.9505,
+          "central_anatomical_focus_ratio": 0.2437,
+          "shortcut_or_border_artifact_detected": true
+        },
+        "FN": {
+          "image_id": "IMG0000207.jpg",
+          "patient_id": "PAT_FA_00103",
+          "anatomy": "hand",
+          "hardware": 0,
+          "ground_truth": 1,
+          "predicted_prob": 0.1688,
+          "central_anatomical_focus_ratio": 0.0108,
+          "shortcut_or_border_artifact_detected": true
+        }
+      }
+    },
+    "approach_b_densenet121": {
+      "name": "Approach B: DenseNet-121 Transfer Learning",
+      "architecture": "DenseNet-121",
+      "weights_source": "ImageNet-pretrained + 2-Stage Progressive Unfreezing",
+      "checkpoint_path": "D:\\projects\\MediMind\\ai-prediction-service\\artifacts\\experiments\\fracture_resnet18_vs_densenet121_20261019\\candidate_b_densenet121.pt",
+      "sha256": "b8c81a050670f1f6e1f45f677eca5acb3abfed326309e5acf4991ac9a07ed39c",
+      "artifact_size_mb": 27.11,
+      "latency_cpu": {
+        "mean_ms": 226.25,
+        "median_p50_ms": 226.69,
+        "p95_ms": 263.9
+      },
+      "training_time_seconds": 2752.2,
+      "training_history": [
+        {
+          "stage": 1,
+          "epoch": 1,
+          "train_loss": 1.1048,
+          "val_loss": 1.0139,
+          "val_roc_auc": 0.7694,
+          "val_pr_auc": 0.4201,
+          "duration_seconds": 524.84
+        },
+        {
+          "stage": 1,
+          "epoch": 2,
+          "train_loss": 1.0165,
+          "val_loss": 0.9638,
+          "val_roc_auc": 0.7805,
+          "val_pr_auc": 0.4391,
+          "duration_seconds": 480.83
+        },
+        {
+          "stage": 2,
+          "epoch": 3,
+          "train_loss": 0.8901,
+          "val_loss": 0.8088,
+          "val_roc_auc": 0.8439,
+          "val_pr_auc": 0.5992,
+          "duration_seconds": 605.03
+        },
+        {
+          "stage": 2,
+          "epoch": 4,
+          "train_loss": 0.7208,
+          "val_loss": 0.8184,
+          "val_roc_auc": 0.8562,
+          "val_pr_auc": 0.6289,
+          "duration_seconds": 596.06
+        },
+        {
+          "stage": 2,
+          "epoch": 5,
+          "train_loss": 0.6486,
+          "val_loss": 0.7663,
+          "val_roc_auc": 0.8652,
+          "val_pr_auc": 0.6332,
+          "duration_seconds": 544.11
+        }
+      ],
+      "validation_threshold": 0.21,
+      "validation_metrics": {
+        "accuracy": 0.6426,
+        "recall": 0.9118,
+        "sensitivity": 0.9118,
+        "specificity": 0.5886,
+        "precision": 0.3079,
+        "ppv": 0.3079,
+        "npv": 0.9708,
+        "f1_score": 0.4604,
+        "roc_auc": 0.8652,
+        "pr_auc": 0.6332,
+        "brier_score": 0.1203,
+        "expected_calibration_error": 0.133
+      },
+      "test_metrics": {
+        "accuracy": 0.6205,
+        "recall": 0.8824,
+        "sensitivity": 0.8824,
+        "specificity": 0.5576,
+        "precision": 0.3241,
+        "ppv": 0.3241,
+        "npv": 0.9517,
+        "f1_score": 0.474,
+        "roc_auc": 0.8452,
+        "pr_auc": 0.6524,
+        "brier_score": 0.1353,
+        "expected_calibration_error": 0.1337
+      },
+      "test_confusion_matrix": {
+        "true_positives": 105,
+        "false_positives": 219,
+        "true_negatives": 276,
+        "false_negatives": 14
+      },
+      "test_subgroups": {
+        "anatomy_hand": {
+          "accuracy": 0.4643,
+          "recall": 0.9452,
+          "sensitivity": 0.9452,
+          "specificity": 0.2682,
+          "precision": 0.345,
+          "ppv": 0.345,
+          "npv": 0.9231,
+          "f1_score": 0.5055,
+          "roc_auc": 0.7906,
+          "pr_auc": 0.6369,
+          "brier_score": 0.2083,
+          "expected_calibration_error": 0.2103,
+          "count": 252
+        },
+        "anatomy_leg": {
+          "accuracy": 0.7308,
+          "recall": 0.7727,
+          "sensitivity": 0.7727,
+          "specificity": 0.7239,
+          "precision": 0.3148,
+          "ppv": 0.3148,
+          "npv": 0.951,
+          "f1_score": 0.4474,
+          "roc_auc": 0.8474,
+          "pr_auc": 0.6648,
+          "brier_score": 0.0889,
+          "expected_calibration_error": 0.0772,
+          "count": 312
+        },
+        "anatomy_hip": {
+          "accuracy": 0.7,
+          "recall": 1.0,
+          "sensitivity": 1.0,
+          "specificity": 0.6897,
+          "precision": 0.1,
+          "ppv": 0.1,
+          "npv": 1.0,
+          "f1_score": 0.1818,
+          "roc_auc": 1.0,
+          "pr_auc": 1.0,
+          "brier_score": 0.0461,
+          "expected_calibration_error": 0.1457,
+          "count": 30
+        },
+        "no_hardware": {
+          "accuracy": 0.6095,
+          "recall": 0.8737,
+          "sensitivity": 0.8737,
+          "specificity": 0.5587,
+          "precision": 0.2757,
+          "ppv": 0.2757,
+          "npv": 0.9583,
+          "f1_score": 0.4192,
+          "roc_auc": 0.8333,
+          "pr_auc": 0.5907,
+          "brier_score": 0.1343,
+          "expected_calibration_error": 0.1507,
+          "count": 589
+        },
+        "hardware_present": {
+          "accuracy": 0.88,
+          "recall": 0.9167,
+          "sensitivity": 0.9167,
+          "specificity": 0.0,
+          "precision": 0.9565,
+          "ppv": 0.9565,
+          "npv": 0.0,
+          "f1_score": 0.9362,
+          "roc_auc": 0.75,
+          "pr_auc": 0.9889,
+          "brier_score": 0.1584,
+          "expected_calibration_error": 0.2706,
+          "count": 25
+        }
+      },
+      "gradcam_cases": {
+        "TP": {
+          "image_id": "IMG0000025.jpg",
+          "patient_id": "PAT_FA_00012",
+          "anatomy": "hand",
+          "hardware": 0,
+          "ground_truth": 1,
+          "predicted_prob": 0.7946,
+          "central_anatomical_focus_ratio": 0.4463,
+          "shortcut_or_border_artifact_detected": false
+        },
+        "TN": {
+          "image_id": "IMG0000056.jpg",
+          "patient_id": "PAT_FA_00028",
+          "anatomy": "leg",
+          "hardware": 0,
+          "ground_truth": 0,
+          "predicted_prob": 0.2017,
+          "central_anatomical_focus_ratio": 0.0,
+          "shortcut_or_border_artifact_detected": true
+        },
+        "FP": {
+          "image_id": "IMG0000008.jpg",
+          "patient_id": "PAT_FA_00004",
+          "anatomy": "leg",
+          "hardware": 0,
+          "ground_truth": 0,
+          "predicted_prob": 0.328,
+          "central_anatomical_focus_ratio": 0.3561,
+          "shortcut_or_border_artifact_detected": false
+        },
+        "FN": {
+          "image_id": "IMG0001191.jpg",
+          "patient_id": "PAT_FA_00595",
+          "anatomy": "leg",
+          "hardware": 0,
+          "ground_truth": 1,
+          "predicted_prob": 0.1163,
+          "central_anatomical_focus_ratio": 0.0,
+          "shortcut_or_border_artifact_detected": true
+        }
+      }
+    }
+  }
+}

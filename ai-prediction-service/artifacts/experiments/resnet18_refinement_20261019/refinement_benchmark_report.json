@@ -1,0 +1,348 @@
+{
+  "title": "MediMind ResNet-18 Advanced Refinement Experiment Benchmark",
+  "date": "2026-10-19",
+  "hardware": "CPU (8 cores)",
+  "selected_refinement_configuration": "ref_3_conservative_aug",
+  "validation_experiments_ledger": {
+    "ref_1a_layer4_only": {
+      "exp_name": "ref_1a_layer4_only",
+      "best_val_auc": 0.8926,
+      "optimal_threshold": 0.05,
+      "val_metrics": {
+        "accuracy": 0.6951,
+        "recall": 0.9314,
+        "sensitivity": 0.9314,
+        "specificity": 0.6476,
+        "precision": 0.3467,
+        "ppv": 0.3467,
+        "npv": 0.9792,
+        "f1_score": 0.5053,
+        "roc_auc": 0.8926,
+        "pr_auc": 0.6991,
+        "brier_score": 0.0927,
+        "expected_calibration_error": 0.0601
+      },
+      "training_history": [
+        {
+          "stage": 2,
+          "epoch": 3,
+          "train_loss": 0.8562,
+          "val_loss": 0.8738,
+          "val_roc_auc": 0.8775,
+          "val_pr_auc": 0.6628,
+          "duration_seconds": 270.49
+        },
+        {
+          "stage": 2,
+          "epoch": 4,
+          "train_loss": 0.6137,
+          "val_loss": 0.8178,
+          "val_roc_auc": 0.8874,
+          "val_pr_auc": 0.685,
+          "duration_seconds": 243.33
+        },
+        {
+          "stage": 2,
+          "epoch": 5,
+          "train_loss": 0.439,
+          "val_loss": 0.8332,
+          "val_roc_auc": 0.8849,
+          "val_pr_auc": 0.6817,
+          "duration_seconds": 232.75
+        },
+        {
+          "stage": 2,
+          "epoch": 6,
+          "train_loss": 0.3264,
+          "val_loss": 0.8824,
+          "val_roc_auc": 0.8926,
+          "val_pr_auc": 0.6991,
+          "duration_seconds": 258.81
+        }
+      ]
+    },
+    "ref_1b_plateau_scheduler": {
+      "exp_name": "ref_1b_plateau_scheduler",
+      "best_val_auc": 0.8917,
+      "optimal_threshold": 0.16,
+      "val_metrics": {
+        "accuracy": 0.782,
+        "recall": 0.8922,
+        "sensitivity": 0.8922,
+        "specificity": 0.7598,
+        "precision": 0.4272,
+        "ppv": 0.4272,
+        "npv": 0.9723,
+        "f1_score": 0.5778,
+        "roc_auc": 0.8917,
+        "pr_auc": 0.6923,
+        "brier_score": 0.0942,
+        "expected_calibration_error": 0.058
+      },
+      "training_history": [
+        {
+          "stage": 2,
+          "epoch": 3,
+          "train_loss": 0.8483,
+          "val_loss": 0.8594,
+          "val_roc_auc": 0.8753,
+          "val_pr_auc": 0.6611,
+          "duration_seconds": 280.75
+        },
+        {
+          "stage": 2,
+          "epoch": 4,
+          "train_loss": 0.6062,
+          "val_loss": 0.8139,
+          "val_roc_auc": 0.8917,
+          "val_pr_auc": 0.6923,
+          "duration_seconds": 253.05
+        },
+        {
+          "stage": 2,
+          "epoch": 5,
+          "train_loss": 0.4403,
+          "val_loss": 0.8947,
+          "val_roc_auc": 0.869,
+          "val_pr_auc": 0.6636,
+          "duration_seconds": 318.97
+        },
+        {
+          "stage": 2,
+          "epoch": 6,
+          "train_loss": 0.3694,
+          "val_loss": 1.2264,
+          "val_roc_auc": 0.8837,
+          "val_pr_auc": 0.6826,
+          "duration_seconds": 286.28
+        }
+      ]
+    },
+    "ref_2_focal_loss": {
+      "exp_name": "ref_2_focal_loss",
+      "best_val_auc": 0.8942,
+      "optimal_threshold": 0.18,
+      "val_metrics": {
+        "accuracy": 0.7049,
+        "recall": 0.9412,
+        "sensitivity": 0.9412,
+        "specificity": 0.6575,
+        "precision": 0.3556,
+        "ppv": 0.3556,
+        "npv": 0.9824,
+        "f1_score": 0.5161,
+        "roc_auc": 0.8942,
+        "pr_auc": 0.7048,
+        "brier_score": 0.0908,
+        "expected_calibration_error": 0.0767
+      },
+      "training_history": [
+        {
+          "stage": 2,
+          "epoch": 3,
+          "train_loss": 0.2477,
+          "val_loss": 0.2664,
+          "val_roc_auc": 0.8654,
+          "val_pr_auc": 0.6376,
+          "duration_seconds": 266.75
+        },
+        {
+          "stage": 2,
+          "epoch": 4,
+          "train_loss": 0.1821,
+          "val_loss": 0.2869,
+          "val_roc_auc": 0.8881,
+          "val_pr_auc": 0.6815,
+          "duration_seconds": 292.76
+        },
+        {
+          "stage": 2,
+          "epoch": 5,
+          "train_loss": 0.1211,
+          "val_loss": 0.23,
+          "val_roc_auc": 0.8845,
+          "val_pr_auc": 0.6846,
+          "duration_seconds": 311.91
+        },
+        {
+          "stage": 2,
+          "epoch": 6,
+          "train_loss": 0.0799,
+          "val_loss": 0.3078,
+          "val_roc_auc": 0.8942,
+          "val_pr_auc": 0.7048,
+          "duration_seconds": 346.56
+        }
+      ]
+    },
+    "ref_3_conservative_aug": {
+      "exp_name": "ref_3_conservative_aug",
+      "best_val_auc": 0.9144,
+      "optimal_threshold": 0.06,
+      "val_metrics": {
+        "accuracy": 0.7951,
+        "recall": 0.9118,
+        "sensitivity": 0.9118,
+        "specificity": 0.7717,
+        "precision": 0.445,
+        "ppv": 0.445,
+        "npv": 0.9776,
+        "f1_score": 0.5981,
+        "roc_auc": 0.9144,
+        "pr_auc": 0.746,
+        "brier_score": 0.0782,
+        "expected_calibration_error": 0.0374
+      },
+      "training_history": [
+        {
+          "stage": 2,
+          "epoch": 3,
+          "train_loss": 0.8509,
+          "val_loss": 0.8252,
+          "val_roc_auc": 0.8794,
+          "val_pr_auc": 0.6826,
+          "duration_seconds": 270.03
+        },
+        {
+          "stage": 2,
+          "epoch": 4,
+          "train_loss": 0.5826,
+          "val_loss": 0.9206,
+          "val_roc_auc": 0.8878,
+          "val_pr_auc": 0.6583,
+          "duration_seconds": 248.09
+        },
+        {
+          "stage": 2,
+          "epoch": 5,
+          "train_loss": 0.4483,
+          "val_loss": 0.7909,
+          "val_roc_auc": 0.913,
+          "val_pr_auc": 0.7295,
+          "duration_seconds": 250.7
+        },
+        {
+          "stage": 2,
+          "epoch": 6,
+          "train_loss": 0.3018,
+          "val_loss": 0.9505,
+          "val_roc_auc": 0.9144,
+          "val_pr_auc": 0.746,
+          "duration_seconds": 339.63
+        }
+      ]
+    }
+  },
+  "calibration_analysis": {
+    "validation_raw_ece": 0.0374,
+    "validation_calibrated_ece": 0.0,
+    "validation_raw_brier": 0.0782,
+    "validation_calibrated_brier": 0.0712
+  },
+  "robustness_audit": {
+    "standard_test_auc": 0.8675,
+    "border_masked_test_auc": 0.8686,
+    "border_mask_auc_drop": -0.0011,
+    "gaussian_noise_test_auc": 0.7641,
+    "gaussian_noise_auc_drop": 0.1034,
+    "border_shortcut_detected": false
+  },
+  "benchmark_comparison": {
+    "frozen_production_baseline": {
+      "name": "Frozen Production Baseline (ResNet-18 v2)",
+      "checkpoint": "D:\\projects\\MediMind\\ai-prediction-service\\artifacts\\fracture_v2\\best_model.pt",
+      "sha256": "ac0d2e720c9ec67f7e2eeda7c8c2fcbb374c78c6b7e9bb4b9dd26772d4869d60",
+      "threshold": 0.26,
+      "metrics": {
+        "accuracy": 0.7622,
+        "recall": 0.8655,
+        "sensitivity": 0.8655,
+        "specificity": 0.7374,
+        "precision": 0.4421,
+        "ppv": 0.4421,
+        "npv": 0.958,
+        "f1_score": 0.5852,
+        "roc_auc": 0.8751,
+        "pr_auc": 0.6891,
+        "brier_score": 0.1117,
+        "expected_calibration_error": 0.0894
+      },
+      "confusion_matrix": {
+        "true_positives": 103,
+        "false_positives": 130,
+        "true_negatives": 365,
+        "false_negatives": 16
+      },
+      "latency_cpu": {
+        "mean_ms": 43.51,
+        "median_p50_ms": 42.63,
+        "p95_ms": 52.62
+      },
+      "size_mb": 42.71
+    },
+    "previous_optimized_candidate_a": {
+      "name": "Approach A (ResNet-18 Optimized v1)",
+      "checkpoint": "D:\\projects\\MediMind\\ai-prediction-service\\artifacts\\experiments\\fracture_resnet18_vs_densenet121_20261019\\candidate_a_optimized_resnet18.pt",
+      "sha256": "079454ebe9b59d31e66c7f187e6913a2a0e6d6ee973bacac5ff46cae5f165dc4",
+      "threshold": 0.17,
+      "metrics": {
+        "accuracy": 0.7541,
+        "recall": 0.8403,
+        "sensitivity": 0.8403,
+        "specificity": 0.7333,
+        "precision": 0.431,
+        "ppv": 0.431,
+        "npv": 0.9503,
+        "f1_score": 0.5698,
+        "roc_auc": 0.8696,
+        "pr_auc": 0.722,
+        "brier_score": 0.1114,
+        "expected_calibration_error": 0.0927
+      },
+      "confusion_matrix": {
+        "true_positives": 100,
+        "false_positives": 132,
+        "true_negatives": 363,
+        "false_negatives": 19
+      },
+      "latency_cpu": {
+        "mean_ms": 41.42,
+        "median_p50_ms": 39.43,
+        "p95_ms": 44.81
+      },
+      "size_mb": 42.71
+    },
+    "new_refined_candidate": {
+      "name": "Approach A Refined (ref_3_conservative_aug)",
+      "checkpoint": "D:\\projects\\MediMind\\ai-prediction-service\\artifacts\\experiments\\resnet18_refinement_20261019\\candidate_refined_resnet18.pt",
+      "sha256": "5e6e1cdd3f28080c8d2b3f6370379df9a67058e42f7fd62acb8d4848abb18b8e",
+      "threshold": 0.06,
+      "metrics": {
+        "accuracy": 0.7492,
+        "recall": 0.8487,
+        "sensitivity": 0.8487,
+        "specificity": 0.7253,
+        "precision": 0.4262,
+        "ppv": 0.4262,
+        "npv": 0.9523,
+        "f1_score": 0.5674,
+        "roc_auc": 0.8675,
+        "pr_auc": 0.7071,
+        "brier_score": 0.0988,
+        "expected_calibration_error": 0.055
+      },
+      "confusion_matrix": {
+        "true_positives": 101,
+        "false_positives": 136,
+        "true_negatives": 359,
+        "false_negatives": 18
+      },
+      "latency_cpu": {
+        "mean_ms": 40.48,
+        "median_p50_ms": 40.33,
+        "p95_ms": 43.9
+      },
+      "size_mb": 42.71
+    }
+  }
+}
