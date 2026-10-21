@@ -118,6 +118,9 @@ function getInitialUser() {
     if (stored) {
       const parsed = JSON.parse(stored);
       if (parsed && parsed.role) {
+        if (parsed.token && typeof localStorage !== 'undefined' && !localStorage.getItem('medimind_jwt_token')) {
+          localStorage.setItem('medimind_jwt_token', parsed.token);
+        }
         return parsed;
       }
     }
@@ -297,22 +300,9 @@ export function AuthProvider({ children }) {
         // ignore
       }
     }
-    if (targetRole === 'DOCTOR') {
-      setUser(DEFAULT_DOCTOR);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DOCTOR));
-    } else if (targetRole === 'DEPARTMENT_HEAD') {
-      setUser(DEFAULT_DEPARTMENT_HEAD);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DEPARTMENT_HEAD));
-    } else if (targetRole === 'HOSPITAL_ADMIN') {
-      setUser(DEFAULT_HOSPITAL_ADMIN);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_HOSPITAL_ADMIN));
-    } else if (targetRole === 'CHAIRMAN') {
-      setUser(DEFAULT_CHAIRMAN);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_CHAIRMAN));
-    } else {
-      setUser(DEFAULT_FAMILY);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_FAMILY));
-    }
+    const switchedUser = resolveUserProfile(targetRole);
+    setUser(switchedUser);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(switchedUser));
   };
 
   return (

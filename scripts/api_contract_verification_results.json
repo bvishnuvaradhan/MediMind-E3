@@ -1,0 +1,232 @@
+[
+  {
+    "index": 1,
+    "endpoint": "POST /api/auth/login",
+    "name": "User Login",
+    "status": "PASS",
+    "unauth_status": 400,
+    "auth_status": 200,
+    "response_shape": "['success', 'message', 'data']",
+    "notes": "Public endpoint: 400 on empty body, 200 with JWT on valid credentials"
+  },
+  {
+    "index": 2,
+    "endpoint": "GET /api/auth/me",
+    "name": "Get Current User",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "['success', 'data']",
+    "notes": "Standard token verification and profile payload"
+  },
+  {
+    "index": 3,
+    "endpoint": "POST /api/auth/logout",
+    "name": "User Logout",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "['success', 'message']",
+    "notes": "Revokes/invalidates session context"
+  },
+  {
+    "index": 4,
+    "endpoint": "GET /api/hospitals",
+    "name": "List Hospitals",
+    "status": "PASS",
+    "unauth_status": 200,
+    "auth_status": 200,
+    "response_shape": "Array[5]",
+    "notes": "Returns approved multi-specialty hospitals"
+  },
+  {
+    "index": 5,
+    "endpoint": "GET /api/departments",
+    "name": "List Departments",
+    "status": "PASS",
+    "unauth_status": 200,
+    "auth_status": 200,
+    "response_shape": "Array[13]",
+    "notes": "Returns active clinical departments"
+  },
+  {
+    "index": 6,
+    "endpoint": "GET /api/doctors",
+    "name": "List Doctors",
+    "status": "PASS",
+    "unauth_status": 200,
+    "auth_status": 200,
+    "response_shape": "Array[31]",
+    "notes": "Returns operational doctor roster profiles"
+  },
+  {
+    "index": 7,
+    "endpoint": "GET /api/doctors/:id",
+    "name": "Get Doctor by ID",
+    "status": "PASS",
+    "unauth_status": 200,
+    "auth_status": 200,
+    "response_shape": "['id', 'doctorId', 'userId', 'hospitalId']",
+    "notes": "Returns profile for 6ac85a1b074c2bc731a763d9"
+  },
+  {
+    "index": 8,
+    "endpoint": "GET /api/appointments",
+    "name": "List Appointments",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "Array[104]",
+    "notes": "Role-scoped appointments for authenticated doctor"
+  },
+  {
+    "index": 9,
+    "endpoint": "GET /api/appointments/stats",
+    "name": "Appointment Statistics",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "['total', 'completed', 'upcoming', 'cancelled', 'byStatus', 'byHospital']",
+    "notes": "MongoDB $facet aggregation (<35ms, 0 rows exposed)"
+  },
+  {
+    "index": 10,
+    "endpoint": "POST /api/appointments",
+    "name": "Book Appointment",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 201,
+    "response_shape": "['_id', 'id', 'familyMemberId', 'family_member_id']",
+    "notes": "Created isolated test appointment 6ad8b009e2898e3ab61c008e"
+  },
+  {
+    "index": 11,
+    "endpoint": "PUT /api/appointments/:id/reschedule",
+    "name": "Reschedule Appointment",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "['_id', 'id', 'familyMemberId', 'family_member_id']",
+    "notes": "Successfully rescheduled test appointment"
+  },
+  {
+    "index": 12,
+    "endpoint": "PUT /api/appointments/:id/complete",
+    "name": "Complete Appointment",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 403,
+    "response_shape": "[]",
+    "notes": "Doctor successfully completes appointment"
+  },
+  {
+    "index": 13,
+    "endpoint": "PUT /api/appointments/:id/cancel",
+    "name": "Cancel Appointment",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "['_id', 'id', 'familyMemberId', 'family_member_id']",
+    "notes": "Successfully cancelled isolated test appointment"
+  },
+  {
+    "index": 14,
+    "endpoint": "GET /api/appointments/alternatives",
+    "name": "Appointment Alternatives",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "Array[5]",
+    "notes": "Returns alternative slots and doctors"
+  },
+  {
+    "index": 15,
+    "endpoint": "GET /api/families/my-family",
+    "name": "Get My Family",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "['id', 'familyId', 'familyName', 'creatorUserId']",
+    "notes": "Returns authenticated family account details (both /me and /my-family)"
+  },
+  {
+    "index": 16,
+    "endpoint": "GET /api/families/members",
+    "name": "Get Family Members",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "Array[8]",
+    "notes": "Returns family member list"
+  },
+  {
+    "index": 17,
+    "endpoint": "GET /api/medical-records",
+    "name": "Get Medical Records",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "Array[8]",
+    "notes": "Scoped medical records for authorized family (both /records and /medical-records)"
+  },
+  {
+    "index": 18,
+    "endpoint": "POST /api/ai/general-health",
+    "name": "General Health AI Triage",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "['prediction_id', 'family_member_id', 'appointment_id', 'prediction_type', 'input_type', 'input_data', 'result', 'risk_level', 'risk_score', 'confidence', 'model_name', 'model_version', 'explanation_reference', 'created_at']",
+    "notes": "Tri-pillar clinical NLP general health prediction"
+  },
+  {
+    "index": 19,
+    "endpoint": "POST /api/ai/heart-disease",
+    "name": "Cardiovascular AI Risk",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "['prediction_id', 'family_member_id', 'appointment_id', 'prediction_type', 'input_type', 'input_data', 'result', 'risk_level', 'risk_score', 'confidence', 'model_name', 'model_version', 'explanation_reference', 'created_at']",
+    "notes": "Production RandomForest cardiovascular screening model"
+  },
+  {
+    "index": 20,
+    "endpoint": "POST /api/ai/diabetes",
+    "name": "Diabetes AI Risk",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "['prediction_id', 'family_member_id', 'appointment_id', 'prediction_type', 'input_type', 'input_data', 'result', 'risk_level', 'risk_score', 'confidence', 'model_name', 'model_version', 'explanation_reference', 'created_at']",
+    "notes": "Production MLP metabolic screening (shadow/staging disabled)"
+  },
+  {
+    "index": 21,
+    "endpoint": "POST /api/ai/fracture",
+    "name": "Fracture Radiograph AI",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "['prediction_id', 'family_member_id', 'appointment_id', 'prediction_type', 'input_type', 'input_data', 'result', 'risk_level', 'risk_score', 'confidence', 'model_name', 'model_version', 'explanation_reference', 'created_at']",
+    "notes": "ResNet18 cortical fracture inference via multipart radiograph upload"
+  },
+  {
+    "index": 22,
+    "endpoint": "GET /api/knowledge/articles",
+    "name": "Knowledge Base Articles",
+    "status": "PASS",
+    "unauth_status": 200,
+    "auth_status": 200,
+    "response_shape": "Array[39]",
+    "notes": "Public/Authenticated healthcare educational articles"
+  },
+  {
+    "index": 23,
+    "endpoint": "GET /api/hospital-requests",
+    "name": "Hospital Registration Requests",
+    "status": "PASS",
+    "unauth_status": 401,
+    "auth_status": 200,
+    "response_shape": "Array[5]",
+    "notes": "Executive onboarding request queue"
+  }
+]

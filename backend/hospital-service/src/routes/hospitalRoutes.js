@@ -22,5 +22,7 @@ router.get('/', optionalAuth, hospitalController.list);
 router.post('/', authenticate, requireChairman, hospitalController.create);
 router.get('/:hospitalId', optionalAuth, hospitalController.getById);
 router.put('/:hospitalId', authenticate, requireHospitalAdminOrChairman, hospitalController.update);
+router.put('/:hospitalId/approve', authenticate, requireChairman, hospitalController.approve);
+router.post('/:hospitalId/approve', authenticate, requireChairman, hospitalController.approve);
 
 export default router;

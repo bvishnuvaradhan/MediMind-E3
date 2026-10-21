@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { appointmentController } from '../controllers/appointmentController.js';
-import { authenticate } from '../middleware/authMiddleware.js';
+import { authenticate, requireRole } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
@@ -15,9 +15,14 @@ router.put('/notifications/:notificationId/read', authenticate, appointmentContr
 router.get('/alternatives', authenticate, appointmentController.getAlternatives);
 router.get('/:appointmentId/alternatives', authenticate, appointmentController.getAlternatives);
 
+// Reports endpoints (Owner Portal / Hospital Admin) - Must be before /:appointmentId
+router.get('/reports/preview', authenticate, requireRole('CHAIRMAN', 'HOSPITAL_ADMIN'), appointmentController.getReportPreview);
+router.get('/reports/export-excel', authenticate, requireRole('CHAIRMAN', 'HOSPITAL_ADMIN'), appointmentController.exportReportExcel);
+
 // Protected routes (All appointment operations require authentication)
 router.post('/', authenticate, appointmentController.bookAppointment);
 router.get('/', authenticate, appointmentController.getAppointments);
+router.get('/stats', authenticate, appointmentController.getStats);
 router.get('/:appointmentId', authenticate, appointmentController.getAppointmentById);
 router.put('/:appointmentId/reschedule', authenticate, appointmentController.rescheduleAppointment);
 router.put('/:appointmentId/cancel', authenticate, appointmentController.cancelAppointment);

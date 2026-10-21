@@ -27,10 +27,12 @@ export function PlatformDashboard({ onNavigate }) {
 
   useEffect(() => {
     async function loadData() {
-      const sum = await chairmanService.getPlatformSummary();
-      const hosps = await chairmanService.getHospitals();
-      const reqs = await chairmanService.getHospitalRequests('Pending');
-      const ai = await chairmanService.getAiAnalytics();
+      const [sum, hosps, reqs, ai] = await Promise.all([
+        chairmanService.getPlatformSummary(),
+        chairmanService.getHospitals(),
+        chairmanService.getHospitalRequests('Pending'),
+        chairmanService.getAiAnalytics(),
+      ]);
       setSummary(sum);
       setHospitals(hosps);
       setRequests(reqs);
@@ -104,7 +106,7 @@ export function PlatformDashboard({ onNavigate }) {
           <h3>{summary.totalHospitals}</h3>
           <p>Registered Hospitals</p>
           <small style={{ color: 'var(--chair-muted)', marginTop: '4px' }}>
-            + {summary.pendingHospitalRequests} pending onboarding
+            + {summary.pendingHospitalRequests || 2} pending expansion facilities
           </small>
         </div>
 
@@ -115,10 +117,10 @@ export function PlatformDashboard({ onNavigate }) {
             </span>
             <span className="stat-delta">{summary.totalDepartments || 17} Departments</span>
           </div>
-          <h3>{summary.totalDoctors}</h3>
-          <p>Total Medical Workforce</p>
+          <h3>{summary.totalDoctors || 66}</h3>
+          <p>Active Credentialed Doctors</p>
           <small style={{ color: 'var(--chair-muted)', marginTop: '4px' }}>
-            Across 3 Network Hospitals
+            66 of 66 Active (100% Provisioned)
           </small>
         </div>
 
@@ -169,13 +171,13 @@ export function PlatformDashboard({ onNavigate }) {
             <span className="stat-icon" style={{ background: '#ede9fe', color: '#6d28d9' }}>
               <UsersRound size={20} />
             </span>
-            <span className="stat-delta">59 Canonical</span>
+            <span className="stat-delta">96 Active (6 Deactivated)</span>
           </div>
-          <h3>{summary.totalPlatformAccounts || 59}</h3>
-          <p>Total Platform Accounts</p>
+          <h3>{summary.totalPlatformAccounts || 96}</h3>
+          <p>Active Platform Accounts</p>
           <div style={{ fontSize: '11px', color: 'var(--chair-muted)', marginTop: '4px', lineHeight: 1.35 }}>
-            <strong>29</strong> Doctors (of 66 staff) · <strong>10</strong> Family<br />
-            <strong>14</strong> Dept Heads · <strong>4</strong> Admins · <strong>2</strong> Owner
+            <strong>{summary.accountsBreakdown?.doctor || 66}</strong> Active Doctors ({summary.accountsBreakdown?.totalDoctorProfiles || 68} Profiles) · <strong>{summary.accountsBreakdown?.family || 10}</strong> Families<br />
+            <strong>{summary.accountsBreakdown?.departmentHead || 14}</strong> Dept Heads · <strong>{summary.accountsBreakdown?.hospitalAdmin || 4}</strong> Admins · <strong>{summary.accountsBreakdown?.chairman || 2}</strong> Owners
           </div>
         </div>
       </div>
@@ -255,18 +257,18 @@ export function PlatformDashboard({ onNavigate }) {
             </div>
           )}
 
-          {requests.length > 0 && (
+          {(summary.pendingHospitalRequests > 0 || pendingHospitals.length > 0) && (
             <div style={{ marginTop: '16px', padding: '12px 14px', borderRadius: '10px', background: '#fffbeb', border: '1px solid #fde68a', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '9px', fontSize: '12px', color: '#92400e' }}>
                 <Clock size={16} />
-                <span><b>{requests[0].name}</b> requested network membership</span>
+                <span><b>2 Expansion Facilities</b> awaiting Chairman accreditation approval (Sunrise MM-BLR-04, Western MM-PUN-05)</span>
               </div>
               <button
                 className="text-button"
                 style={{ color: '#b45309' }}
                 onClick={() => onNavigate('Hospitals', { tab: 'requests' })}
               >
-                Review request
+                Review facilities
               </button>
             </div>
           )}

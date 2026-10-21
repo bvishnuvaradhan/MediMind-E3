@@ -17,6 +17,7 @@ router.get('/access/doctor/me', authenticate, requireRole('DOCTOR'), recordAcces
 // Medical Record routes
 router.post('/upload', authenticate, medicalRecordController.uploadRecord);
 router.post('/', authenticate, medicalRecordController.uploadRecord);
+router.get('/', authenticate, medicalRecordController.getRecords);
 router.get('/member/:memberId', authenticate, medicalRecordController.getRecordsByMember);
 router.get('/:recordId', authenticate, medicalRecordController.getRecordById);
 router.put('/:recordId', authenticate, medicalRecordController.updateRecord);

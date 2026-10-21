@@ -64,14 +64,14 @@ export function FamilyAccountsView() {
         <div className="stat-card">
           <p>Total Covered Members</p>
           <h3 style={{ marginTop: '8px' }}>
-            {families.reduce((acc, f) => acc + f.membersCount, 0)}
+            {families.reduce((acc, f) => acc + (Number(f.membersCount) || 0), 0)}
           </h3>
           <small style={{ color: 'var(--chair-muted)' }}>Individual health profiles</small>
         </div>
         <div className="stat-card">
           <p>Health Documents Stored</p>
           <h3 style={{ marginTop: '8px' }}>
-            {families.reduce((acc, f) => acc + f.totalRecordsUploaded, 0)}
+            {families.reduce((acc, f) => acc + (Number(f.totalRecordsUploaded) || 0), 0)}
           </h3>
           <small style={{ color: 'var(--chair-muted)' }}>Secured under family vault</small>
         </div>

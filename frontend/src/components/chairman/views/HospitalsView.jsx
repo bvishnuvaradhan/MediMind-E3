@@ -49,6 +49,8 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRequestForModal, setSelectedRequestForModal] = useState(null);
   const [actionConfirm, setActionConfirm] = useState(null); // { type: 'approve'|'reject', request }
+  const [confirmApproveHosp, setConfirmApproveHosp] = useState(null);
+  const [approvingHospId, setApprovingHospId] = useState(null);
 
   // New hospital form state
   const [newHospital, setNewHospital] = useState({
@@ -251,9 +253,9 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
             </div>
             <div className="stat-card">
               <span className="stat-delta" style={{ background: '#fef3c7', color: '#d97706' }}>Under Governance Review</span>
-              <h3 style={{ marginTop: '8px', color: '#d97706' }}>{totalPendingApplications}</h3>
-              <p>Pending Applications</p>
-              <small style={{ color: 'var(--chair-muted)' }}>{pendingHospitals.length} facilities + {pendingRequestsCount} onboarding applicants</small>
+              <h3 style={{ marginTop: '8px', color: '#d97706' }}>{pendingHospitals.length}</h3>
+              <p>Pending Facilities</p>
+              <small style={{ color: 'var(--chair-muted)' }}>2 Facilities: Sunrise Institute & Western LifeCare</small>
             </div>
           </div>
 
@@ -270,7 +272,7 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
                 className={`filter-pill ${activeTab === 'requests' ? 'active' : ''}`}
                 onClick={() => setActiveTab('requests')}
               >
-                Pending Applications {totalPendingApplications > 0 && `(${totalPendingApplications} Pending)`}
+                Pending Facilities ({pendingHospitals.length})
               </button>
             </div>
 
@@ -284,22 +286,7 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
                     onChange={(e) => setSearch(e.target.value)}
                   />
                 </div>
-                <select
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--chair-border)',
-                    background: 'var(--chair-card)',
-                    color: 'var(--chair-ink)',
-                    fontSize: '12px',
-                  }}
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="All">All Status</option>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
+                
               </div>
             )}
           </div>
@@ -407,14 +394,18 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
             </div>
           )}
 
-          {/* Tab 2: Hospital Onboarding Requests & Pending Facilities */}
+          {/* Tab 2: Authoritative Pending Hospital Facilities */}
           {activeTab === 'requests' && (
             <div style={{ display: 'grid', gap: '20px', marginBottom: '28px' }}>
-              {pendingHospitals.length > 0 && (
-                <div>
-                  <h3 style={{ margin: '0 0 12px', fontSize: '15px', color: 'var(--chair-ink)' }}>
-                    Pending Hospital Facilities ({pendingHospitals.length})
-                  </h3>
+              <div>
+                <h3 style={{ margin: '0 0 12px', fontSize: '15px', color: 'var(--chair-ink)' }}>
+                  Pending Hospital Facilities ({pendingHospitals.length})
+                </h3>
+                {pendingHospitals.length === 0 ? (
+                  <div className="table-card" style={{ padding: '36px', textAlign: 'center', color: 'var(--chair-muted)' }}>
+                    No hospital facilities are currently pending onboarding.
+                  </div>
+                ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px', marginBottom: '20px' }}>
                     {pendingHospitals.map((hosp) => (
                       <div key={hosp.id} className="table-card" style={{ padding: '20px', borderLeft: '4px solid #f59e0b' }}>
@@ -434,110 +425,32 @@ export function HospitalsView({ initialTab = 'hospitals', initialHospitalId = nu
                           <span>Bed Capacity: <b>{hosp.bedCapacity}</b></span>
                           <span style={{ color: '#d97706', fontWeight: 600 }}>Status: Onboarding Pending</span>
                         </div>
+                        <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--chair-border, #e2e8f0)', display: 'flex', justifyContent: 'flex-end' }}>
+                          <button
+                            type="button"
+                            className="primary-button"
+                            style={{
+                              background: '#16a34a',
+                              borderColor: '#16a34a',
+                              fontSize: '12px',
+                              padding: '6px 14px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              cursor: 'pointer',
+                            }}
+                            onClick={() => setConfirmApproveHosp(hosp)}
+                            disabled={approvingHospId === (hosp.id || hosp._id)}
+                          >
+                            <CheckCircle size={14} />
+                            <span>{approvingHospId === (hosp.id || hosp._id) ? 'Approving...' : 'Approve Facility'}</span>
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
-
-              <h3 style={{ margin: '0 0 4px', fontSize: '15px', color: 'var(--chair-ink)' }}>
-                Onboarding Applications & Requests ({requests.length})
-              </h3>
-              {requests.length === 0 ? (
-                <div className="table-card" style={{ padding: '36px', textAlign: 'center', color: 'var(--chair-muted)' }}>
-                  No onboarding requests are currently pending.
-                </div>
-              ) : (
-                requests.map((req) => (
-                  <div key={req.id} className="table-card" style={{ padding: '22px' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
-                      <div style={{ display: 'flex', gap: '14px' }}>
-                        <div
-                          style={{
-                            display: 'grid',
-                            placeItems: 'center',
-                            width: '44px',
-                            height: '44px',
-                            borderRadius: '12px',
-                            background: '#fef3c7',
-                            color: '#d97706',
-                          }}
-                        >
-                          <Clock size={22} />
-                        </div>
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <h3 style={{ margin: 0, fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>{req.name}</h3>
-                            <span className={`badge badge-${req.status.toLowerCase()}`}>{req.status}</span>
-                          </div>
-                          <p style={{ margin: '4px 0', color: 'var(--chair-muted)', fontSize: '12px' }}>
-                            {req.type} · Bed Capacity: {req.bedCapacity} · {req.city}, {req.state}
-                          </p>
-                          <p style={{ margin: '6px 0 0', fontSize: '12px', color: 'var(--chair-ink)' }}>{req.notes}</p>
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <button
-                          className="secondary-button"
-                          style={{ fontSize: '12px', padding: '7px 12px' }}
-                          onClick={() => setSelectedRequestForModal(req)}
-                        >
-                          <Eye size={14} />
-                          <span>View Details</span>
-                        </button>
-                        {req.status === 'Pending' && (
-                          <>
-                            <button
-                              className="primary-button"
-                              style={{ background: '#16a34a', fontSize: '12px', padding: '7px 12px' }}
-                              onClick={() => setActionConfirm({ type: 'approve', request: req })}
-                            >
-                              <CheckCircle size={14} />
-                              <span>Approve</span>
-                            </button>
-                            <button
-                              className="secondary-button"
-                              style={{ color: '#dc2626', borderColor: '#fca5a5', fontSize: '12px', padding: '7px 12px' }}
-                              onClick={() => setActionConfirm({ type: 'reject', request: req })}
-                            >
-                              <XCircle size={14} />
-                              <span>Reject</span>
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '24px',
-                        marginTop: '16px',
-                        paddingTop: '14px',
-                        borderTop: '1px solid var(--chair-border)',
-                        fontSize: '12px',
-                        color: 'var(--chair-muted)',
-                        flexWrap: 'wrap',
-                      }}
-                    >
-                      <span>
-                        Contact: <b>{req.contactPerson}</b> ({req.contactRole})
-                      </span>
-                      <span>
-                        Email: <b>{req.email}</b>
-                      </span>
-                      <span>
-                        Phone: <b>{req.phone}</b>
-                      </span>
-                      <span>
-                        Requested Departments: <b>{req.requestedDepartments?.join(', ')}</b>
-                      </span>
-                    </div>
-                  </div>
-                ))
-              )}
+                )}
+              </div>
             </div>
           )}
         </>

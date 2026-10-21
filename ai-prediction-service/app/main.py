@@ -7,6 +7,7 @@ from app.api.v1.general_health import router as general_health_router
 from app.api.v1.heart_disease import router as heart_disease_router
 from app.api.v1.diabetes import router as diabetes_router
 from app.api.v1.fracture import router as fracture_router
+from app.api.v1.analytics import router as analytics_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -32,7 +33,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API v1 Routers
+# Include API v1 Routers (specific static routes before parameterized routes)
+app.include_router(analytics_router)
 app.include_router(general_health_router)
 app.include_router(heart_disease_router)
 app.include_router(diabetes_router)

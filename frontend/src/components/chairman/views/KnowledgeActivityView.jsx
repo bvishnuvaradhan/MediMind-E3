@@ -30,6 +30,7 @@ export function KnowledgeActivityView() {
   const [selectedAuthor, setSelectedAuthor] = useState('All');
   const [selectedPeriod, setSelectedPeriod] = useState('All');
   const [selectedArticle, setSelectedArticle] = useState(null);
+  const [activeTab, setActiveTab] = useState('all'); // 'all' | 'published' | 'protocols' | 'review'
 
   useEffect(() => {
     async function load() {
@@ -86,6 +87,15 @@ export function KnowledgeActivityView() {
   // Combined Multi-Filter Logic (AND behavior)
   const filtered = useMemo(() => {
     return articles.filter((a) => {
+      // Tab filter
+      if (activeTab === 'published') {
+        if (isUnderPeerReview(a) || isProtocolOrSop(a)) return false;
+      } else if (activeTab === 'protocols') {
+        if (!isProtocolOrSop(a)) return false;
+      } else if (activeTab === 'review') {
+        if (!isUnderPeerReview(a)) return false;
+      }
+
       // Search
       if (search.trim()) {
         const q = search.trim().toLowerCase();
@@ -145,7 +155,7 @@ export function KnowledgeActivityView() {
 
       return true;
     });
-  }, [articles, search, selectedHospital, selectedDept, selectedStatus, selectedAuthor, selectedPeriod]);
+  }, [articles, activeTab, search, selectedHospital, selectedDept, selectedStatus, selectedAuthor, selectedPeriod]);
 
   const isFiltered =
     search.trim() !== '' ||
@@ -164,22 +174,34 @@ export function KnowledgeActivityView() {
     setSelectedPeriod('All');
   };
 
-  const totalPublished = useMemo(() => articles.filter((a) => a.status === 'Published').length, [articles]);
+  const isProtocolOrSop = (a) => {
+    const cat = (a.category || '').toLowerCase();
+    const tags = Array.isArray(a.tags) ? a.tags.map(t => t.toLowerCase()) : [];
+    return cat === 'clinical protocols & sops' || cat.includes('protocol') || cat.includes('sop') || tags.some(t => t.includes('protocol') || t.includes('sop') || t.includes('guideline'));
+  };
+
+  const isUnderPeerReview = (a) => {
+    const st = (a.status || '').toUpperCase();
+    return st === 'UNDER REVIEW' || st === 'IN_REVIEW' || st === 'UNDER_REVIEW' || st === 'CHANGES REQUESTED' || st === 'CHANGES_REQUESTED' || st === 'SUBMITTED';
+  };
+
   const pendingReviews = useMemo(
-    () => articles.filter((a) => a.status === 'Under Review' || a.status === 'Changes Requested').length,
+    () => articles.filter(isUnderPeerReview).length,
     [articles]
   );
-  const uniqueAuthors = useMemo(
-    () => new Set(articles.map((a) => a.author).filter(Boolean)).size,
-    [articles]
-  );
+
   const guidelinesCount = useMemo(
-    () =>
-      articles.filter(
-        (a) =>
-          (a.category || '').toLowerCase().includes('clinical') ||
-          (a.tags || []).some((t) => t.toLowerCase().includes('protocol') || t.toLowerCase().includes('guideline'))
-      ).length,
+    () => articles.filter(isProtocolOrSop).length,
+    [articles]
+  );
+
+  const totalPublishedResearch = useMemo(
+    () => articles.filter(a => !isUnderPeerReview(a) && !isProtocolOrSop(a)).length,
+    [articles]
+  );
+
+  const uniqueAuthors = useMemo(
+    () => new Set(articles.map((a) => a.author || a.authorName || a.author_name).filter(Boolean)).size,
     [articles]
   );
 
@@ -242,7 +264,7 @@ export function KnowledgeActivityView() {
             </span>
             <span className="stat-delta">Publicly Active</span>
           </div>
-          <h3>{totalPublished}</h3>
+          <h3>{totalPublishedResearch}</h3>
           <p>Published Articles</p>
           <small style={{ color: 'var(--chair-muted)', marginTop: '4px' }}>
             {uniqueAuthors} contributing clinician authors
@@ -276,6 +298,44 @@ export function KnowledgeActivityView() {
             Standardized clinical pathways
           </small>
         </div>
+      </div>
+
+      {/* Category & Workflow Navigation Tabs */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          className={`filter-pill ${activeTab === 'all' ? 'active' : ''}`}
+          onClick={() => setActiveTab('all')}
+        >
+          All Knowledge Items ({articles.length})
+        </button>
+        <button
+          type="button"
+          className={`filter-pill ${activeTab === 'published' ? 'active' : ''}`}
+          onClick={() => setActiveTab('published')}
+        >
+          Published Articles ({totalPublishedResearch})
+        </button>
+        <button
+          type="button"
+          className={`filter-pill ${activeTab === 'protocols' ? 'active' : ''}`}
+          onClick={() => setActiveTab('protocols')}
+        >
+          Clinical Protocols & SOPs ({guidelinesCount})
+        </button>
+        <button
+          type="button"
+          className={`filter-pill ${activeTab === 'review' ? 'active' : ''}`}
+          onClick={() => setActiveTab('review')}
+          style={{ position: 'relative' }}
+        >
+          Review Queue ({pendingReviews})
+          {pendingReviews > 0 && (
+            <span style={{ marginLeft: '6px', background: '#f59e0b', color: '#fff', padding: '1px 6px', borderRadius: '10px', fontSize: '10px', fontWeight: 700 }}>
+              {pendingReviews}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* Multi-Filter & Search Panel */}

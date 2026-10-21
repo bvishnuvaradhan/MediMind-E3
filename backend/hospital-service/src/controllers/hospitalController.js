@@ -49,4 +49,12 @@ export const hospitalController = {
       next(error);
     }
   },
+  approve: async (req, res, next) => {
+    try {
+      const data = await hospitalService.approveHospital(req.params.hospitalId, req.user);
+      return successResponse(res, 200, 'Hospital facility approved successfully', data);
+    } catch (error) {
+      next(error);
+    }
+  },
 };

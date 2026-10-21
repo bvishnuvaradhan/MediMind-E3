@@ -18,6 +18,7 @@ export function HospitalAdminsView({ initialAction = null, announce }) {
   const [admins, setAdmins] = useState([]);
   const [hospitals, setHospitals] = useState([]);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(initialAction === 'create');
   const [statusToggleConfirm, setStatusToggleConfirm] = useState(null);
@@ -93,13 +94,26 @@ export function HospitalAdminsView({ initialAction = null, announce }) {
     }
   };
 
+  const activeCount = admins.filter((a) => (a.status || '').toLowerCase() === 'active').length;
+  const deactivatedCount = admins.filter((a) => {
+    const st = (a.status || '').toLowerCase();
+    return st === 'deactivated' || st === 'inactive';
+  }).length;
+
   const filteredAdmins = admins.filter((a) => {
     const s = search.toLowerCase();
-    return (
+    const matchesSearch =
       a.name.toLowerCase().includes(s) ||
       a.email.toLowerCase().includes(s) ||
-      a.hospitalName.toLowerCase().includes(s)
-    );
+      (a.hospitalName || '').toLowerCase().includes(s);
+
+    const st = (a.status || '').toLowerCase();
+    const isActive = st === 'active';
+    const isDeactivated = st === 'deactivated' || st === 'inactive';
+
+    if (statusFilter === 'Active') return matchesSearch && isActive;
+    if (statusFilter === 'Deactivated') return matchesSearch && isDeactivated;
+    return matchesSearch;
   });
 
   return (
@@ -126,19 +140,42 @@ export function HospitalAdminsView({ initialAction = null, announce }) {
         </div>
       </div>
 
-      {/* Search and summary */}
-      <div className="filter-bar">
-        <div className="chairman-search">
-          <Search size={15} />
-          <input
-            placeholder="Search by name, email, or hospital..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+      {/* Search, Status Filter Pills and summary */}
+      <div className="filter-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <div className="filter-pills" style={{ display: 'flex', gap: '6px' }}>
+            <button
+              className={`filter-pill ${statusFilter === 'All' ? 'active' : ''}`}
+              onClick={() => setStatusFilter('All')}
+            >
+              All ({admins.length})
+            </button>
+            <button
+              className={`filter-pill ${statusFilter === 'Active' ? 'active' : ''}`}
+              onClick={() => setStatusFilter('Active')}
+            >
+              Active ({activeCount})
+            </button>
+            <button
+              className={`filter-pill ${statusFilter === 'Deactivated' ? 'active' : ''}`}
+              onClick={() => setStatusFilter('Deactivated')}
+            >
+              Deactivated ({deactivatedCount})
+            </button>
+          </div>
+
+          <div className="chairman-search">
+            <Search size={15} />
+            <input
+              placeholder="Search by name, email, or hospital..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
         </div>
 
         <div style={{ fontSize: '13px', color: 'var(--chair-muted)' }}>
-          Showing <b>{filteredAdmins.length}</b> administrators
+          Showing <b>{filteredAdmins.length}</b> of <b>{admins.length}</b> administrators ({activeCount} Active, {deactivatedCount} Deactivated)
         </div>
       </div>
 
@@ -203,7 +240,11 @@ export function HospitalAdminsView({ initialAction = null, announce }) {
                     <td>{adm.createdAt}</td>
                     <td>{adm.lastLogin}</td>
                     <td>
-                      <span className={`badge badge-${adm.status.toLowerCase()}`}>{adm.status}</span>
+                      {adm.status?.toLowerCase() === 'active' ? (
+                        <span className="badge" style={{ background: '#dcfce7', color: '#166534', border: '1px solid #bbf7d0', fontWeight: 600 }}>Active</span>
+                      ) : (
+                        <span className="badge" style={{ background: '#fee2e2', color: '#991b1b', border: '1px solid #fecaca', fontWeight: 600 }}>Deactivated</span>
+                      )}
                     </td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

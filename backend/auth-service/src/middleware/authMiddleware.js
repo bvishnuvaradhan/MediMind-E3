@@ -40,3 +40,32 @@ export const authenticate = (req, res, next) => {
     });
   }
 };
+
+export const optionalAuth = (req, res, next) => {
+  const internalSecret = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+  const providedInternalSecret = req.headers['x-internal-service-secret'];
+
+  if (providedInternalSecret && providedInternalSecret === internalSecret) {
+    const userId = req.headers['x-user-id'];
+    const role = req.headers['x-user-role'];
+    const referenceId = req.headers['x-user-reference-id'];
+    if (userId && role) {
+      req.user = { userId, role, referenceId };
+      return next();
+    }
+  }
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return next();
+  }
+
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = verifyToken(token);
+    req.user = decoded;
+    next();
+  } catch {
+    return next();
+  }
+};

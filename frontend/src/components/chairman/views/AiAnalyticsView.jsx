@@ -36,7 +36,7 @@ export function AiAnalyticsView() {
   const heartMod = modules?.heartDisease || {};
   const generalMod = modules?.generalHealth || {};
 
-  const dateOptions = ['All Time', 'Last 3 Months', 'Last 6 Months', 'Last 1 Year', 'Custom Range'];
+  const dateOptions = ['All Time', 'Oct 2026', 'Sep 2026', 'Aug 2026', 'Last 3 Months'];
 
   // Dynamic grid column layout based on active modules count:
   // 3 -> 1x3, 4 -> 2x2, 6 -> 2x3, 9 -> 3x3, 12 -> 3x4
@@ -288,7 +288,7 @@ export function AiAnalyticsView() {
                 Monthly Clinical Prediction Volume Trajectory
               </h3>
               <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
-                Five-month progression across all 4 clinical AI modules (May – Sep 2026)
+                Platform progression across all 4 clinical AI modules (Aug – Oct 2026)
               </p>
             </div>
 
@@ -412,8 +412,8 @@ export function AiAnalyticsView() {
                 <td><span className="badge badge-active">Active</span></td>
                 <td><span className="badge badge-active">Active</span></td>
                 <td><span className="badge badge-active">Active</span></td>
-                <td><span className="badge badge-active">Active</span></td>
-                <td><strong>4 of 4 Modules (100%)</strong></td>
+                <td><span className="badge badge-inactive" style={{ background: '#f1f5f9', color: '#64748b' }}>Not Deployed</span></td>
+                <td><strong>3 of 4 Modules (75%)</strong></td>
               </tr>
               <tr>
                 <td>

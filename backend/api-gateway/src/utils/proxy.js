@@ -92,15 +92,25 @@ export const forwardRequest = (targetServiceUrl) => {
       if (contentType) {
         res.setHeader('content-type', contentType);
       }
-
-      const data = await response.json().catch(() => null);
+      const contentDisposition = response.headers.get('content-disposition');
+      if (contentDisposition) {
+        res.setHeader('content-disposition', contentDisposition);
+      }
 
       res.status(response.status);
-      if (data) {
-        res.json(data);
-      } else {
-        res.end();
+
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json().catch(() => null);
+        if (data) {
+          return res.json(data);
+        }
       }
+
+      // Handle binary file streams (e.g. Excel .xlsx, PDF, images)
+      const arrayBuf = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuf);
+      res.setHeader('content-length', buffer.length);
+      return res.end(buffer);
     } catch (error) {
       if (error.name === 'TimeoutError' || error.name === 'AbortError') {
         return res.status(504).json({

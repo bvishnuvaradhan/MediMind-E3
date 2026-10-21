@@ -19,16 +19,16 @@ export const authService = {
       throw err;
     }
 
+    if (user.status !== 'ACTIVE') {
+      const err = new Error('Account is inactive or suspended');
+      err.statusCode = 403;
+      throw err;
+    }
+
     const isMatch = await verifyPassword(password, user.password_hash);
     if (!isMatch) {
       const err = new Error('Invalid email or password');
       err.statusCode = 401;
-      throw err;
-    }
-
-    if (user.status !== 'ACTIVE') {
-      const err = new Error('Account is inactive or suspended');
-      err.statusCode = 403;
       throw err;
     }
 

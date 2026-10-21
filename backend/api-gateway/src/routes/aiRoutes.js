@@ -48,6 +48,9 @@ router.get('/health', async (req, res, next) => {
   }
 });
 
+// Platform-wide aggregate AI analytics (CHAIRMAN, HOSPITAL_ADMIN, DEPARTMENT_HEAD, DOCTOR)
+router.get('/analytics', verifyJwt, requireRole('CHAIRMAN', 'HOSPITAL_ADMIN', 'DEPARTMENT_HEAD', 'DOCTOR'), proxyAi);
+
 // Protected inference and prediction history routes (clinical access for FAMILY and DOCTOR)
 router.use(verifyJwt, requireRole('FAMILY', 'DOCTOR'), proxyAi);
 

@@ -12,6 +12,7 @@ router.get('/health', familyController.health);
 
 // Protected routes: Family account operations
 router.get('/me', authenticateFamily, familyController.getMyFamily);
+router.get('/my-family', authenticateFamily, familyController.getMyFamily);
 router.put('/me', authenticateFamily, familyController.updateMyFamily);
 
 export default router;

@@ -273,4 +273,96 @@ export const hospitalService = {
       createdAt: hospital.created_at,
     };
   },
+  approveHospital: async (hospitalId, user) => {
+    // 1. Role enforcement: Chairman only
+    if (!user || user.role !== 'CHAIRMAN') {
+      const err = new Error('Access forbidden: only Chairman can approve hospital facilities');
+      err.statusCode = 403;
+      throw err;
+    }
+
+    let hospital;
+    if (mongoose.Types.ObjectId.isValid(hospitalId)) {
+      hospital = await Hospital.findById(hospitalId);
+    } else {
+      hospital = await Hospital.findOne({ code: hospitalId });
+    }
+
+    if (!hospital) {
+      const err = new Error('Hospital facility not found');
+      err.statusCode = 404;
+      throw err;
+    }
+
+    // 2. Lifecycle validation: must be PENDING
+    if (hospital.status !== 'PENDING') {
+      const err = new Error(`Cannot approve facility: facility status is already ${hospital.status}`);
+      err.statusCode = 400;
+      throw err;
+    }
+
+    // 3. Update status to ACTIVE
+    hospital.status = 'ACTIVE';
+    hospital.approved_by = user.userId ? new mongoose.Types.ObjectId(user.userId) : null;
+    hospital.approved_at = new Date();
+    await hospital.save();
+
+    // 4. Sync linked HospitalRequest if found
+    try {
+      const HospitalRequest = mongoose.models.HospitalRequest || mongoose.model('HospitalRequest');
+      if (HospitalRequest) {
+        await HospitalRequest.updateMany(
+          {
+            $or: [
+              { code: hospital.code },
+              { name: hospital.name },
+              { created_hospital_id: hospital._id },
+            ],
+            status: 'PENDING',
+          },
+          {
+            $set: {
+              status: 'APPROVED',
+              decision_by: user.userId ? new mongoose.Types.ObjectId(user.userId) : null,
+              decision_at: new Date(),
+              created_hospital_id: hospital._id,
+            },
+          }
+        );
+      }
+    } catch {
+      // ignore
+    }
+
+    // 5. Ensure at least default clinical departments exist for newly approved hospital
+    try {
+      const existingDepts = await Department.countDocuments({ hospital_id: hospital._id });
+      if (existingDepts === 0) {
+        const defaultDepts = [
+          'Orthopedics & Trauma',
+          'Diabetology & Endocrinology',
+          'Cardiology',
+          'General Medicine',
+        ];
+        for (const deptName of defaultDepts) {
+          await Department.create({
+            hospital_id: hospital._id,
+            name: deptName,
+            status: 'ACTIVE',
+          });
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    return {
+      id: hospital._id.toString(),
+      hospitalId: hospital._id.toString(),
+      name: hospital.name,
+      code: hospital.code,
+      status: hospital.status,
+      approvedAt: hospital.approved_at,
+    };
+  },
 };

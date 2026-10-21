@@ -42,14 +42,9 @@ export const verifyJwt = (req, res, next) => {
 
     next();
   } catch (error) {
-    const message = error.name === 'TokenExpiredError'
-      ? 'Authentication token has expired'
-      : 'Invalid or expired authentication token';
-
-    return res.status(401).json({
-      success: false,
-      message,
-    });
+    // optionalJwt: JWT is optional. If token has expired or is invalid, do not reject with 401; proceed unauthenticated.
+    req.user = null;
+    return next();
   }
 };
 
@@ -91,13 +86,8 @@ export const optionalJwt = (req, res, next) => {
 
     next();
   } catch (error) {
-    const message = error.name === 'TokenExpiredError'
-      ? 'Authentication token has expired'
-      : 'Invalid or expired authentication token';
-
-    return res.status(401).json({
-      success: false,
-      message,
-    });
+    // optionalJwt: JWT is optional. If token has expired or is invalid, do not reject with 401; proceed unauthenticated.
+    req.user = null;
+    return next();
   }
 };

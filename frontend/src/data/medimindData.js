@@ -327,7 +327,7 @@ export const hospitalAdmins = [
   {
     "id": "6ac85a19074c2bc731a7639c",
     "hospitalId": "6ac85a18074c2bc731a76383",
-    "hospitalName": "Aarogyam Multispeciality Hospital",
+    "hospitalName": "Nexora Advanced Care Hospital",
     "name": "Harish Chandra",
     "email": "admin@nexora.hospital",
     "phone": "+91 80 2345 6789",
@@ -341,7 +341,7 @@ export const hospitalAdmins = [
   {
     "id": "6ac85a19074c2bc731a7639d",
     "hospitalId": "6ac85a18074c2bc731a76385",
-    "hospitalName": "Aarogyam Multispeciality Hospital",
+    "hospitalName": "Harborview Medical Centre",
     "name": "Cyrus Mistry",
     "email": "admin@harborview.hospital",
     "phone": "+91 80 2345 6789",
@@ -351,6 +351,20 @@ export const hospitalAdmins = [
     "lastLogin": "Today, 09:15 AM",
     "avatarInitials": "CM",
     "avatarTone": "sapphire"
+  },
+  {
+    "id": "6ad8a9212f5518857e372bd6",
+    "hospitalId": "6ac85a18074c2bc731a76385",
+    "hospitalName": "Harborview Medical Centre",
+    "name": "Demo Admin (Harborview - Inactive)",
+    "email": "demo.admin.harborview@medimind.test",
+    "phone": "+91 22 2654 3210",
+    "status": "Deactivated",
+    "role": "Hospital Administrator (Demo - Deactivated)",
+    "createdAt": "21 Oct 2026",
+    "lastLogin": "Never (Deactivated)",
+    "avatarInitials": "DA",
+    "avatarTone": "amber"
   }
 ];
 

@@ -47,6 +47,18 @@ export const appointmentController = {
   },
 
   /**
+   * Get appointment aggregation statistics
+   */
+  async getStats(req, res, next) {
+    try {
+      const stats = await appointmentService.getStats(req.user, req.query);
+      return successResponse(res, 200, 'Appointment stats retrieved successfully', stats);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
    * Get single appointment
    */
   async getAppointmentById(req, res, next) {
@@ -140,6 +152,29 @@ export const appointmentController = {
   /**
    * Mark notification as read
    */
+  /**
+   * Owner Portal Reports: Preview doctor and appointment report
+   */
+  async getReportPreview(req, res, next) {
+    try {
+      const preview = await appointmentService.getReportPreview(req.user, req.query);
+      return successResponse(res, 200, 'Report preview generated successfully', preview);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * Owner Portal Reports: Export doctor and appointment Excel report (.xlsx)
+   */
+  async exportReportExcel(req, res, next) {
+    try {
+      await appointmentService.exportReportExcel(req.user, req.query, res);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async markNotificationRead(req, res, next) {
     try {
       const { notificationId } = req.params;

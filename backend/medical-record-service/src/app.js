@@ -22,6 +22,7 @@ app.get('/api/records/health', medicalRecordController.health);
 
 // Mount Routes under /api
 app.use('/api/records', medicalRecordRoutes);
+app.use('/api/medical-records', medicalRecordRoutes);
 app.use('/api/consultations', consultationRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/record-access', medicalRecordRoutes);

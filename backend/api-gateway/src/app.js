@@ -74,6 +74,7 @@ app.use('/api/hospital-requests', hospitalRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/records', recordRoutes);
+app.use('/api/medical-records', recordRoutes);
 app.use('/api/consultations', recordRoutes);
 app.use('/api/prescriptions', recordRoutes);
 app.use('/api/record-access', recordRoutes);
