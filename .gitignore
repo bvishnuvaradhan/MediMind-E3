@@ -44,6 +44,8 @@ ai-prediction-service/artifacts/fracture_v2/experiment5_localization/dataset/ima
 ai-prediction-service/artifacts/fracture_v2/experiment5_localization/runs/
 ai-prediction-service/artifacts/fracture_v2/experiment7_multiview/*.pt
 ai-prediction-service/artifacts/fracture_v2/experiment8_multiview_localized/*.pt
+ai-prediction-service/artifacts/experiments/benchmark_four_approaches_20261019/
+ai-prediction-service/artifacts/experiments/mlp_optimization_20261019/
 backend/scripts/*-results.json
 *.cache
 
