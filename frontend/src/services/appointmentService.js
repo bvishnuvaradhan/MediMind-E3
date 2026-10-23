@@ -35,9 +35,41 @@ export const appointmentService = {
         return [];
       }
       const data = await res.json();
-      return data.success && Array.isArray(data.data) ? data.data : [];
+      return data.success ? (Array.isArray(data.data) ? data.data : (Array.isArray(data.data?.items) ? data.data.items : [])) : [];
     } catch {
       return [];
+    }
+  },
+
+  /**
+   * Fetch appointments with pagination metadata
+   */
+  async getAppointmentsPaginated(params = {}) {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, val]) => {
+      if (val !== undefined && val !== null && val !== '') {
+        query.append(key, val);
+      }
+    });
+
+    const url = `/api/appointments${query.toString() ? `?${query.toString()}` : ''}`;
+    try {
+      const res = await fetch(url, {
+        headers: getAuthHeaders(),
+      });
+      if (!res.ok) {
+        return { items: [], total: 0, page: 1, limit: 50, totalPages: 0 };
+      }
+      const data = await res.json();
+      if (data.success && data.data) {
+        if (Array.isArray(data.data)) {
+          return { items: data.data, total: data.data.length, page: 1, limit: data.data.length, totalPages: 1 };
+        }
+        return data.data;
+      }
+      return { items: [], total: 0, page: 1, limit: 50, totalPages: 0 };
+    } catch {
+      return { items: [], total: 0, page: 1, limit: 50, totalPages: 0 };
     }
   },
 
@@ -114,7 +146,7 @@ export const appointmentService = {
         return [];
       }
       const data = await res.json();
-      return data.success && Array.isArray(data.data) ? data.data : [];
+      return data.success ? (Array.isArray(data.data) ? data.data : (Array.isArray(data.data?.items) ? data.data.items : [])) : [];
     } catch {
       return [];
     }

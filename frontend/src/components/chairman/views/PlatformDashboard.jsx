@@ -173,7 +173,7 @@ export function PlatformDashboard({ onNavigate }) {
             <span className="stat-icon" style={{ background: '#ede9fe', color: '#6d28d9' }}>
               <UsersRound size={20} />
             </span>
-            <span className="stat-delta">96 Active (6 Deactivated)</span>
+            <span className="stat-delta">{summary.totalPlatformAccounts || 96} Active ({summary.accountsBreakdown?.totalInactiveDemoProfiles || 2} Demo Inactive)</span>
           </div>
           <h3>{summary.totalPlatformAccounts || 96}</h3>
           <p>Active Platform Accounts</p>

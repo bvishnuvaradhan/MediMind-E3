@@ -99,17 +99,6 @@ async def get_ai_analytics(
 
     monthly_volume = [monthly_map[k] for k in sorted(monthly_map.keys())]
 
-    # Fallback to verified baseline monthly data if database returned empty
-    if not monthly_volume and not (start_date or end_date):
-        monthly_volume = [
-            {"month": "Aug 2026", "monthKey": "2026-08", "fracture": 165, "diabetes": 115, "heart": 101, "general": 158, "total": 539},
-            {"month": "Sep 2026", "monthKey": "2026-09", "fracture": 175, "diabetes": 111, "heart": 113, "general": 144, "total": 543},
-            {"month": "Oct 2026", "monthKey": "2026-10", "fracture": 75, "diabetes": 48, "heart": 46, "general": 62, "total": 231},
-        ]
-        total_count = 1313
-        linked_count = 1301
-        standalone_count = 12
-
     modules = {
         "fracture": {
             "id": "fracture-detection",
