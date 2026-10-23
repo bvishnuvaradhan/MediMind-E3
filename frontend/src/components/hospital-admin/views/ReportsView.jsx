@@ -15,11 +15,6 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [reportingPeriod, setReportingPeriod] = useState('This Month');
-  const [fromDate, setFromDate] = useState('2026-09-01');
-  const [toDate, setToDate] = useState('2026-09-25');
-
-  const isCustomRange = reportingPeriod === 'Custom Range';
-  const isDateRangeInvalid = isCustomRange && fromDate && toDate && fromDate > toDate;
 
   // Filter reports by category, search term, and period context
   const filteredReports = reports.filter((rep) => {
@@ -63,13 +58,7 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
           archivedRecords: '210,500',
           label: 'Calendar Year 2026',
         };
-      case 'Custom Range':
-        return {
-          totalGenerated: isDateRangeInvalid ? 0 : 9,
-          auditCompliance: isDateRangeInvalid ? 'N/A' : '98.6%',
-          archivedRecords: isDateRangeInvalid ? '0' : '24,300',
-          label: isDateRangeInvalid ? 'Invalid Range' : `${fromDate} to ${toDate}`,
-        };
+
       case 'This Month':
       default:
         return {
@@ -122,33 +111,8 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
               <option value="This Quarter">This Quarter</option>
               <option value="Last Quarter">Last Quarter</option>
               <option value="This Year">This Year</option>
-              <option value="Custom Range">Custom Range</option>
             </select>
 
-            {isCustomRange && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <label style={{ fontSize: '12px', color: 'var(--ha-text-muted)' }}>From:</label>
-                  <input
-                    type="date"
-                    className="ha-input"
-                    style={{ padding: '4px 8px', fontSize: '12px', width: '135px' }}
-                    value={fromDate}
-                    onChange={(e) => setFromDate(e.target.value)}
-                  />
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <label style={{ fontSize: '12px', color: 'var(--ha-text-muted)' }}>To:</label>
-                  <input
-                    type="date"
-                    className="ha-input"
-                    style={{ padding: '4px 8px', fontSize: '12px', width: '135px' }}
-                    value={toDate}
-                    onChange={(e) => setToDate(e.target.value)}
-                  />
-                </div>
-              </div>
-            )}
           </div>
 
           <div style={{ fontSize: '12px', color: 'var(--ha-text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -157,13 +121,6 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
           </div>
         </div>
 
-        {/* Date Validation Error Warning */}
-        {isDateRangeInvalid && (
-          <div style={{ marginTop: '12px', padding: '8px 12px', borderRadius: '6px', backgroundColor: 'var(--ha-error-bg)', color: 'var(--ha-error)', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <AlertTriangle size={15} />
-            <span>Invalid Custom Date Range: <strong>From Date</strong> must be earlier than or equal to <strong>To Date</strong>.</span>
-          </div>
-        )}
       </div>
 
       {/* Compliance & Summary Metrics for Selected Period */}

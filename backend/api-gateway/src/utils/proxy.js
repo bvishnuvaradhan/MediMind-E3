@@ -68,10 +68,12 @@ export const forwardRequest = (targetServiceUrl) => {
         delete headers['x-user-hospital-id'];
       }
 
+      const isExportOrReport = req.originalUrl?.includes('export') || req.originalUrl?.includes('reports');
+      const timeoutMs = isExportOrReport ? 120000 : 30000; // 120s for exports/reports, 30s standard
       const options = {
         method: req.method,
         headers,
-        signal: AbortSignal.timeout(10000), // 10 second timeout
+        signal: AbortSignal.timeout(timeoutMs),
       };
 
       if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {

@@ -930,6 +930,8 @@ export const chairmanService = {
               author: a.author || a.authorName || a.author_name || 'Dr. Medical Contributor',
               hospital: a.hospital || a.hospitalName || a.hospital_name || 'MediMind Network Hospital',
               department: a.department || a.departmentName || a.department_name || 'General Medicine',
+              publishedDate: a.publishedDate || (a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null) || (a.submittedAt ? new Date(a.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null) || (a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'),
+              date: a.date || (a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null) || (a.submittedAt ? new Date(a.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null) || (a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'),
             }));
         }
       }
@@ -979,6 +981,7 @@ export const chairmanService = {
     if (filters.startDate) params.append('startDate', filters.startDate);
     if (filters.endDate) params.append('endDate', filters.endDate);
     if (filters.search) params.append('search', filters.search);
+    if (filters.reportType) params.append('reportType', filters.reportType);
     if (filters.page) params.append('page', filters.page);
     if (filters.limit) params.append('limit', filters.limit);
 
@@ -1011,6 +1014,7 @@ export const chairmanService = {
     if (filters.startDate) params.append('startDate', filters.startDate);
     if (filters.endDate) params.append('endDate', filters.endDate);
     if (filters.search) params.append('search', filters.search);
+    if (filters.reportType) params.append('reportType', filters.reportType);
 
 
     const res = await fetch(`/api/appointments/reports/export-excel?${params.toString()}`, {

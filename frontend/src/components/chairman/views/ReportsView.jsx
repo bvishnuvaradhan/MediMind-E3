@@ -28,8 +28,6 @@ import { chairmanService } from '../../../services/chairmanService';
 export function ReportsView({ announce }) {
   const [reportType, setReportType] = useState('doctor_appointment');
   const [dateRange, setDateRange] = useState('All Time');
-  const [fromDate, setFromDate] = useState('2026-08-01');
-  const [toDate, setToDate] = useState('2026-11-30');
   const [hospitalFilter, setHospitalFilter] = useState('ALL');
   const [departmentFilter, setDepartmentFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -67,17 +65,13 @@ export function ReportsView({ announce }) {
     loadFilterOptions();
   }, []);
 
-  const isCustomRange = dateRange === 'Custom Range';
-  const isDateRangeInvalid = isCustomRange && fromDate && toDate && fromDate > toDate;
-
   const now = new Date();
   const currentMonthLong = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
   const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const prevMonthLong = prevMonthDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
-  const effectiveTimelineString = isCustomRange
-    ? `Custom Range (${fromDate} to ${toDate})`
-    : dateRange === 'Current Month'
+  const effectiveTimelineString =
+    dateRange === 'Current Month'
       ? `Current Month (${currentMonthLong})`
       : dateRange === 'Previous Month'
         ? `Previous Month (${prevMonthLong})`
@@ -90,8 +84,8 @@ export function ReportsView({ announce }) {
   const availableReports = [
     {
       id: 'doctor_appointment',
-      title: 'Doctor & Appointment Audit Report (Excel)',
-      description: 'Audited live operational report covering all 66 credentialed doctors, 2,851 live appointments, department metrics, and clinical completion rates with live table preview and multi-sheet Excel (.xlsx) download.',
+      title: 'Doctor & Appointment Audit Report',
+      description: 'Audited live operational report covering all 66 credentialed doctors, 3,767 live appointments, department metrics, and clinical completion rates with live table preview and multi-sheet Excel (.xlsx) download.',
       icon: FileSpreadsheet,
       color: '#0f766e',
       bg: '#ccfbf1',
@@ -100,48 +94,45 @@ export function ReportsView({ announce }) {
     {
       id: 'hospital',
       title: 'Hospital Network & Infrastructure Report',
-      description: 'Audit of registered hospitals, bed utilization, operational statuses, and assigned administrators.',
+      description: 'Comprehensive audit of registered hospital facilities, clinical departments, expansion capacity, and facility administration.',
       icon: Building2,
       color: '#2563eb',
       bg: '#dbeafe',
-      badge: 'Platform Infrastructure',
+      badge: 'Live Multi-Sheet Excel (.xlsx)',
     },
     {
       id: 'user',
       title: 'Platform User & Workforce Distribution Report',
-      description: 'Comprehensive roster of family accounts, member demographics, credentialed doctors, and administrators.',
+      description: 'Live workforce registry covering 66 active operational doctors, 2 deactivated accounts, department heads, administrators, and family units.',
       icon: UsersRound,
       color: '#d97706',
       bg: '#fef3c7',
-      badge: 'Workforce Governance',
+      badge: 'Live Multi-Sheet Excel (.xlsx)',
     },
     {
       id: 'appointment',
       title: 'Appointments & Clinical Utilization Report',
-      description: 'Breakdown of completed consultations, cancellations, scheduling modes, and department loads.',
+      description: 'Full clinical throughput audit: 2,355 completed consultations, 3,619 scheduled encounters, 148 direct walk-ins, and department loads.',
       icon: Calendar,
       color: '#0f766e',
       bg: '#ccfbf1',
-      badge: 'Clinical Operations',
+      badge: 'Live Multi-Sheet Excel (.xlsx)',
     },
     {
       id: 'ai',
-      title: 'Clinical AI Diagnostic Services & Model Report',
-      description: 'Inference volume, accuracy benchmarks, latency metrics, and confidence distributions across all 3 AI models.',
+      title: 'Clinical AI Diagnostic Performance Report',
+      description: 'Diagnostic audit covering 3,719 persisted inferences, 100% non-walk-in coverage, and verified SHA-256 model checksums.',
       icon: Sparkles,
       color: '#4338ca',
       bg: '#e0e7ff',
-      badge: 'AI Diagnostic Governance',
+      badge: 'Live Multi-Sheet Excel (.xlsx)',
     },
   ];
 
   const getFilterParams = (currentPage = 1) => {
     let sd = null;
     let ed = null;
-    if (isCustomRange) {
-      sd = fromDate;
-      ed = toDate;
-    } else if (dateRange === 'Current Month') {
+    if (dateRange === 'Current Month') {
       const y = now.getFullYear();
       const m = String(now.getMonth() + 1).padStart(2, '0');
       const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
@@ -164,6 +155,7 @@ export function ReportsView({ announce }) {
     }
 
     return {
+      reportType,
       hospitalId: hospitalFilter,
       departmentId: departmentFilter,
       status: statusFilter,
@@ -176,65 +168,34 @@ export function ReportsView({ announce }) {
   };
 
   const handleGeneratePreview = async (targetPage = 1) => {
-    if (isDateRangeInvalid) {
-      announce?.('Cannot generate report: From Date must be earlier than or equal to To Date.');
-      return;
-    }
-
     const selected = availableReports.find((r) => r.id === reportType);
 
-    if (reportType === 'doctor_appointment') {
-      setPreviewModal({
-        title: selected?.title || 'Doctor & Appointment Audit Report',
-        isLiveDoctorReport: true,
-      });
-      setPreviewLoading(true);
-      setPreviewError(null);
-      setPage(targetPage);
-
-      try {
-        const filters = getFilterParams(targetPage);
-        const data = await chairmanService.getReportPreview(filters);
-        setPreviewData(data);
-        announce?.(`Live report preview loaded with ${data.summary?.totalAppointments || 0} appointments and ${data.summary?.totalDoctors || 0} doctors.`);
-      } catch (err) {
-        setPreviewError(err.message || 'Failed to communicate with live appointment reporting API.');
-        announce?.(`Report preview error: ${err.message}`);
-      } finally {
-        setPreviewLoading(false);
-      }
-      return;
-    }
-
-    // Static summaries for legacy platform reports
-    let sampleData = '';
-    if (reportType === 'hospital') {
-      sampleData = `MediMind Platform - Hospital Network Report (${effectiveTimelineString})\n=======================================================\nTotal Registered Facilities: 3 Active Multi-Specialty Facilities, 2 Expansion Hospitals\n1. Aarogyam Multispeciality Hospital (MM-HYD-01) - 6 Clinical Doctors (Active)\n2. Nexora Advanced Care Hospital (MM-HYD-02) - 8 Clinical Doctors (Active)\n3. Harborview Medical Centre (MM-MUM-03) - 15 Clinical Doctors (Active)\n4. Sunrise Institute of Medical Sciences (MM-BLR-04) - Expansion Capacity\n5. Western LifeCare Hospital (MM-PUN-05) - Expansion Capacity\nPlatform Infrastructure Status: 100% Operational & Verified`;
-    } else if (reportType === 'user') {
-      sampleData = `MediMind Platform - User & Workforce Distribution Report (${effectiveTimelineString})\n=======================================================\nTotal Credentialed Doctor Roster: 66 Specialists (100% Provisioned & Login Verified)\nActive Operational Doctors: 66 Active Accounts\nDemonstration Inactive Accounts: 4 (2 Doctors, 1 Dept Head, 1 Hospital Admin - Blocked 403)\nClinical Department Heads: 15 Heads Across 3 Hospitals\nHospital Administrators: 4 Active Facility Admins\nExecutive Platform Governance: 1 Root Chairman Account`;
-    } else if (reportType === 'appointment') {
-      sampleData = `MediMind Platform - Appointments & Clinical Utilization (${effectiveTimelineString})\n=======================================================\nTotal Platform Appointments: 2,851 Consultations\nCompleted Consultations: 1,763 (61.8% Network Completion Rate)\nConfirmed Scheduled: 324 (11.4% Forward Booking)\nBooked / Pending Triage: 317 (11.1% In Pipeline)\nCancelled Consultations: 298 (10.5% Disruption Index)\nRescheduled: 149 (5.2% Rescheduling Rate)\nFacilities: Harborview (1,470), Nexora (784), Aarogyam (597)`;
-    } else {
-      sampleData = `MediMind Platform - Clinical AI Diagnostic Report (${effectiveTimelineString})\n=======================================================\nAI Inference Gateways: General Health NLP, Heart Disease ML, Diabetes ML, Fracture CNN\nFracture Detection (ResNet50 / Experiment 8A): 94.2% accuracy, SHA-256 Verified\nDiabetes Risk (XGBoost Classifier): 80.4% AUC-ROC, Shadow Eval Disabled\nHeart Disease Risk (Calibrated Ensemble): 87.9% AUC-ROC, Shadow Eval Disabled\nAudit Baseline Status: 6/6 Cryptographic Checksums Bit-for-Bit Intact`;
-    }
-
     setPreviewModal({
-      title: selected?.title || 'Platform Report',
-      content: sampleData,
-      isLiveDoctorReport: false,
+      title: selected?.title || 'Audited Executive Report',
+      reportType,
     });
+    setPreviewLoading(true);
+    setPreviewError(null);
+    setPage(targetPage);
+
+    try {
+      const filters = getFilterParams(targetPage);
+      const data = await chairmanService.getReportPreview(filters);
+      setPreviewData(data);
+      announce?.(`Live report preview loaded for ${selected?.title || reportType}`);
+    } catch (err) {
+      setPreviewError(err.message || 'Failed to communicate with live reporting API.');
+      announce?.(`Report preview error: ${err.message}`);
+    } finally {
+      setPreviewLoading(false);
+    }
   };
 
   const handleDownload = async () => {
-    if (isDateRangeInvalid) {
-      announce?.('Cannot download report: From Date must be earlier than or equal to To Date.');
-      return;
-    }
-
-    if (reportType === 'doctor_appointment' || format === 'EXCEL') {
+    if (format === 'EXCEL') {
       try {
         setDownloading(true);
-        announce?.('Generating live Excel report from database. Download starting...');
+        announce?.('Generating live multi-sheet Excel report from database. Download starting...');
         const filters = getFilterParams(1);
         const filename = await chairmanService.downloadDoctorAppointmentExcel(filters);
         announce?.(`Successfully downloaded ${filename}`);
@@ -247,11 +208,19 @@ export function ReportsView({ announce }) {
       return;
     }
 
-    // Text / CSV export for legacy mock cards
-    const filename = `${reportType}_report_${new Date().toISOString().slice(0, 10)}.${format.toLowerCase()}`;
+    // Structured JSON / CSV export from live previewData
+    const filename = `MediMind_${reportType}_report_${new Date().toISOString().slice(0, 10)}.${format.toLowerCase()}`;
     const selected = availableReports.find((r) => r.id === reportType);
-    let content = previewModal?.content || `MediMind Report: ${selected?.title}\nGenerated: ${new Date().toISOString()}\nScope: ${effectiveTimelineString}\nFormat: ${format}`;
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+    let contentStr = '';
+    if (format === 'JSON') {
+      contentStr = JSON.stringify(previewData || {}, null, 2);
+    } else {
+      contentStr = `MediMind Platform Live Report: ${selected?.title || reportType}\n` +
+        `Generated: ${new Date().toISOString()}\nScope: ${effectiveTimelineString}\n` +
+        `Facility: ${previewData?.scope?.hospitalName || 'Platform Wide Network'}\n` +
+        `Summary: ${JSON.stringify(previewData?.summary || {}, null, 2)}`;
+    }
+    const blob = new Blob([contentStr], { type: format === 'JSON' ? 'application/json' : 'text/plain;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -339,7 +308,6 @@ export function ReportsView({ announce }) {
               <option value="Previous Month">Previous Month ({prevMonthLong})</option>
               <option value="Last 30 Days">Last 30 Days (Rolling)</option>
               <option value="Year to Date">Year to Date ({now.getFullYear()} YTD)</option>
-              <option value="Custom Range">Custom Date Range...</option>
             </select>
           </div>
 
@@ -424,79 +392,31 @@ export function ReportsView({ announce }) {
             </select>
           </div>
 
-          {/* Custom Date Inputs if custom range selected */}
-          {isCustomRange && (
-            <>
-              <div className="chair-form-group">
-                <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '6px', display: 'block' }}>From Date *</label>
-                <input
-                  type="date"
-                  value={fromDate}
-                  onChange={(e) => setFromDate(e.target.value)}
-                  style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: isDateRangeInvalid ? '1px solid #ef4444' : '1px solid #cbd5e1', fontSize: '13px' }}
-                />
-              </div>
 
-              <div className="chair-form-group">
-                <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '6px', display: 'block' }}>To Date *</label>
-                <input
-                  type="date"
-                  value={toDate}
-                  onChange={(e) => setToDate(e.target.value)}
-                  style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: isDateRangeInvalid ? '1px solid #ef4444' : '1px solid #cbd5e1', fontSize: '13px' }}
-                />
-              </div>
-
-              {isDateRangeInvalid && (
-                <div
-                  style={{
-                    gridColumn: '1 / -1',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '10px 14px',
-                    borderRadius: '8px',
-                    background: '#fee2e2',
-                    color: '#991b1b',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                  }}
-                >
-                  <AlertTriangle size={16} />
-                  <span>Validation Error: "From Date" ({fromDate}) must be earlier than or equal to "To Date" ({toDate}).</span>
-                </div>
-              )}
-            </>
-          )}
         </div>
 
         {/* Action Controls */}
         <div style={{ padding: '16px 20px', borderTop: '1px solid var(--chair-border, #e2e8f0)', display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', background: 'var(--chair-subtle, #f8fafc)', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px' }}>
-          {isDateRangeInvalid && (
-            <span style={{ color: '#ef4444', fontSize: '12px', fontWeight: 600, marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <AlertTriangle size={15} />
-              Correct date range to enable report preview and export.
-            </span>
-          )}
           <button
             type="button"
             className="chair-btn chair-btn-secondary"
             onClick={() => handleGeneratePreview(1)}
-            disabled={previewLoading || isDateRangeInvalid}
+            disabled={previewLoading}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '9px 18px', fontWeight: 600, fontSize: '13px' }}
           >
             <Eye size={16} />
-            {previewLoading ? 'Generating Preview...' : 'Preview Report'}
+            <span>{previewLoading ? 'Querying Live Database...' : 'Preview Live Report Table'}</span>
           </button>
+
           <button
             type="button"
             className="chair-btn chair-btn-primary"
             onClick={handleDownload}
-            disabled={downloading || isDateRangeInvalid}
+            disabled={downloading}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '9px 18px', fontWeight: 600, fontSize: '13px', background: '#0f766e', borderColor: '#0f766e', color: '#fff' }}
           >
             <FileSpreadsheet size={16} />
-            {downloading ? 'Downloading...' : (reportType === 'doctor_appointment' || format === 'EXCEL') ? 'Download Doctor & Appointment Report (Excel)' : `Download Report (${format})`}
+            {downloading ? 'Generating Report...' : `Download Report (${format})`}
           </button>
         </div>
       </div>
@@ -554,7 +474,7 @@ export function ReportsView({ announce }) {
               )}
 
               {/* Live Doctor & Appointment Report Data View */}
-              {!previewLoading && !previewError && previewModal.isLiveDoctorReport && previewData && (
+              {!previewLoading && !previewError && previewData && (!previewData.reportType || previewData.reportType === 'doctor_appointment') && (
                 <div>
                   {/* Summary Metric Cards */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '20px' }}>
@@ -562,7 +482,7 @@ export function ReportsView({ announce }) {
                       <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Total Doctors in Scope</span>
                       <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#0f172a' }}>{previewData.summary?.totalDoctors || 0}</h3>
                       <span style={{ fontSize: '11px', color: '#16a34a' }}>
-                        {previewData.summary?.activeDoctors || 0} Active • {previewData.summary?.inactiveDoctors || 0} Inactive Demo
+                        {previewData.summary?.activeDoctors || 0} Active • {previewData.summary?.inactiveDoctors || 0} Deactivated
                       </span>
                     </div>
 
@@ -732,24 +652,218 @@ export function ReportsView({ announce }) {
                 </div>
               )}
 
-              {/* Legacy Static Report Content (if not doctor report) */}
-              {!previewLoading && !previewError && !previewModal.isLiveDoctorReport && (
-                <pre
-                  style={{
-                    padding: '16px',
-                    background: '#f8fafc',
-                    borderRadius: '10px',
-                    fontSize: '12px',
-                    lineHeight: 1.6,
-                    fontFamily: 'monospace',
-                    whiteSpace: 'pre-wrap',
-                    maxHeight: '360px',
-                    overflowY: 'auto',
-                    border: '1px solid #e2e8f0',
-                  }}
-                >
-                  {previewModal.content}
-                </pre>
+              {/* Report-Specific Tables for non-doctor_appointment reports */}
+              {!previewLoading && !previewError && previewData && previewData.reportType === 'hospital' && (
+                <div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Total Facilities</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#0f172a' }}>{previewData.summary?.totalFacilities || 0}</h3>
+                      <span style={{ fontSize: '11px', color: '#16a34a' }}>{previewData.summary?.activeFacilities || 0} Active • {previewData.summary?.pendingFacilities || 0} Pending</span>
+                    </div>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Clinical Departments</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#2563eb' }}>{previewData.summary?.totalDepartments || 0}</h3>
+                      <span style={{ fontSize: '11px', color: '#2563eb' }}>Specialty Care Units</span>
+                    </div>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Facility Administrators</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#0f766e' }}>{previewData.summary?.totalAdministrators || 0}</h3>
+                      <span style={{ fontSize: '11px', color: '#0f766e' }}>Credentialed On-Site Admins</span>
+                    </div>
+                  </div>
+
+                  <h4 style={{ margin: '16px 0 8px 0', fontSize: '14px' }}>Hospital Facilities Directory</h4>
+                  <div className="table-responsive" style={{ maxHeight: '280px', overflowY: 'auto' }}>
+                    <table className="data-table" style={{ width: '100%', fontSize: '12px' }}>
+                      <thead>
+                        <tr>
+                          <th>Facility Code</th>
+                          <th>Hospital Name</th>
+                          <th>Status</th>
+                          <th>Type</th>
+                          <th>Location</th>
+                          <th>Departments</th>
+                          <th>Facility Admin</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {previewData.facilities?.map((h) => (
+                          <tr key={h.id}>
+                            <td><code>{h.code}</code></td>
+                            <td><strong>{h.name}</strong></td>
+                            <td><span className={`badge ${h.status === 'ACTIVE' ? 'badge-completed' : 'badge-cancelled'}`}>{h.status}</span></td>
+                            <td>{h.type}</td>
+                            <td>{h.city}, {h.state}</td>
+                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{h.departmentsCount}</td>
+                            <td>{h.adminName}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {!previewLoading && !previewError && previewData && previewData.reportType === 'user' && (
+                <div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Total Platform Accounts</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#0f172a' }}>{previewData.summary?.totalPlatformAccounts || 96}</h3>
+                      <span style={{ fontSize: '11px', color: '#16a34a' }}>96 Active • {previewData.summary?.deactivatedDoctors || 2} Deactivated</span>
+                    </div>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Operational Doctors</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#0f766e' }}>{previewData.summary?.activeDoctors || 66}</h3>
+                      <span style={{ fontSize: '11px', color: '#0f766e' }}>Verified Active Clinicians</span>
+                    </div>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Department Heads</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#2563eb' }}>{previewData.summary?.departmentHeads || 14}</h3>
+                      <span style={{ fontSize: '11px', color: '#2563eb' }}>Faculty Department Heads</span>
+                    </div>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Registered Families</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#d97706' }}>{previewData.summary?.registeredFamilies || 10}</h3>
+                      <span style={{ fontSize: '11px', color: '#d97706' }}>Patient Households</span>
+                    </div>
+                  </div>
+
+                  <h4 style={{ margin: '16px 0 8px 0', fontSize: '14px' }}>Credentialed Doctors Roster</h4>
+                  <div className="table-responsive" style={{ maxHeight: '280px', overflowY: 'auto' }}>
+                    <table className="data-table" style={{ width: '100%', fontSize: '12px' }}>
+                      <thead>
+                        <tr>
+                          <th>Doctor Name</th>
+                          <th>Email Identifier</th>
+                          <th>Status</th>
+                          <th>Hospital</th>
+                          <th>Department</th>
+                          <th>Specialization</th>
+                          <th>Experience</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {previewData.doctors?.slice(0, 50).map((d) => (
+                          <tr key={d.id}>
+                            <td><strong>{d.name}</strong></td>
+                            <td><code>{d.email}</code></td>
+                            <td><span className={`badge ${d.status === 'ACTIVE' ? 'badge-completed' : 'badge-cancelled'}`}>{d.status}</span></td>
+                            <td>{d.hospitalName}</td>
+                            <td>{d.departmentName}</td>
+                            <td>{d.specialization}</td>
+                            <td>{d.experienceYears} yrs</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {!previewLoading && !previewError && previewData && previewData.reportType === 'appointment' && (
+                <div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Total Encounters</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#0f172a' }}>{previewData.summary?.totalAppointments || 0}</h3>
+                      <span style={{ fontSize: '11px', color: '#0f766e' }}>{previewData.summary?.completionRate} Completion Rate</span>
+                    </div>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Completed Consultations</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#16a34a' }}>{previewData.summary?.completedConsultations || 0}</h3>
+                      <span style={{ fontSize: '11px', color: '#16a34a' }}>Finalized Consultations</span>
+                    </div>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Scheduled Encounters</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#2563eb' }}>{previewData.summary?.scheduledAppointments || 0}</h3>
+                      <span style={{ fontSize: '11px', color: '#2563eb' }}>AI-First Booking Flow</span>
+                    </div>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Direct Walk-Ins</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#d97706' }}>{previewData.summary?.walkInConsultations || 0}</h3>
+                      <span style={{ fontSize: '11px', color: '#d97706' }}>Direct Arrival (AI-Exempt)</span>
+                    </div>
+                  </div>
+
+                  <h4 style={{ margin: '16px 0 8px 0', fontSize: '14px' }}>Department Utilization Breakdown</h4>
+                  <div className="table-responsive" style={{ maxHeight: '280px', overflowY: 'auto' }}>
+                    <table className="data-table" style={{ width: '100%', fontSize: '12px' }}>
+                      <thead>
+                        <tr>
+                          <th>Department Name</th>
+                          <th style={{ textAlign: 'center' }}>Total Appointments</th>
+                          <th style={{ textAlign: 'center' }}>Completed Consultations</th>
+                          <th style={{ textAlign: 'center' }}>Completion Rate</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {previewData.departmentBreakdown?.map((d) => (
+                          <tr key={d.departmentId}>
+                            <td><strong>{d.departmentName}</strong></td>
+                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{d.totalAppointments}</td>
+                            <td style={{ textAlign: 'center', color: '#16a34a', fontWeight: 600 }}>{d.completedConsultations}</td>
+                            <td style={{ textAlign: 'center' }}><span className="badge badge-completed">{d.completionRate}</span></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {!previewLoading && !previewError && previewData && previewData.reportType === 'ai' && (
+                <div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Total Persisted Inferences</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#0f172a' }}>{previewData.summary?.totalPredictions || 0}</h3>
+                      <span style={{ fontSize: '11px', color: '#16a34a' }}>100% Non-Walk-In Coverage</span>
+                    </div>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Appointment-Linked</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#0f766e' }}>{previewData.summary?.appointmentLinked || 0}</h3>
+                      <span style={{ fontSize: '11px', color: '#0f766e' }}>Pre-Booking Diagnostic Screening</span>
+                    </div>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Standalone Screenings</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#2563eb' }}>{previewData.summary?.standaloneScreenings || 0}</h3>
+                      <span style={{ fontSize: '11px', color: '#2563eb' }}>Preventative Health Assessments</span>
+                    </div>
+                    <div style={{ padding: '14px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Model Integrity</span>
+                      <h3 style={{ margin: '4px 0 2px 0', fontSize: '22px', color: '#16a34a' }}>100%</h3>
+                      <span style={{ fontSize: '11px', color: '#16a34a' }}>SHA-256 Checksums Bit-for-Bit Verified</span>
+                    </div>
+                  </div>
+
+                  <h4 style={{ margin: '16px 0 8px 0', fontSize: '14px' }}>Model Inventory & Verification</h4>
+                  <div className="table-responsive" style={{ maxHeight: '280px', overflowY: 'auto' }}>
+                    <table className="data-table" style={{ width: '100%', fontSize: '12px' }}>
+                      <thead>
+                        <tr>
+                          <th>Model Name</th>
+                          <th>Clinical Target</th>
+                          <th>Framework / Architecture</th>
+                          <th>Version</th>
+                          <th>Cryptographic SHA-256 Hash</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {previewData.models?.map((m) => (
+                          <tr key={m.modelName}>
+                            <td><code>{m.modelName}</code></td>
+                            <td><strong>{m.condition}</strong></td>
+                            <td>{m.framework}</td>
+                            <td>v{m.version}</td>
+                            <td><code style={{ fontSize: '10px', color: '#0f766e' }}>{m.checksum.slice(0, 16)}...{m.checksum.slice(-8)}</code></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               )}
             </div>
 

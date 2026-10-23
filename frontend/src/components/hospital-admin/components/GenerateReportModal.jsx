@@ -6,8 +6,6 @@ export function GenerateReportModal({ onClose, onGenerate }) {
     title: 'Comprehensive Appointment & Consultation Throughput Report',
     category: 'Appointments',
     period: 'This Month',
-    fromDate: '2026-09-01',
-    toDate: '2026-09-25',
     format: 'PDF / CSV',
     summary: 'Aggregated operational metrics including appointment volumes, department throughput, doctor workload, and AI triaging statistics.',
   });
@@ -42,26 +40,9 @@ export function GenerateReportModal({ onClose, onGenerate }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (formData.period === 'Custom Range') {
-      if (!formData.fromDate || !formData.toDate) {
-        setError('Both From Date and To Date are required for Custom Range.');
-        return;
-      }
-      if (formData.fromDate > formData.toDate) {
-        setError('From Date must be earlier than or equal to To Date.');
-        return;
-      }
-    }
     setError('');
-
-    const finalPeriod =
-      formData.period === 'Custom Range'
-        ? `${formData.fromDate} to ${formData.toDate}`
-        : formData.period;
-
     onGenerate({
       ...formData,
-      period: finalPeriod,
     });
   };
 
@@ -126,7 +107,6 @@ export function GenerateReportModal({ onClose, onGenerate }) {
                     <option value="This Quarter">This Quarter</option>
                     <option value="Last Quarter">Last Quarter</option>
                     <option value="This Year">This Year</option>
-                    <option value="Custom Range">Custom Range</option>
                   </select>
                 </div>
                 <div className="ha-form-group">
@@ -142,31 +122,6 @@ export function GenerateReportModal({ onClose, onGenerate }) {
                   </select>
                 </div>
               </div>
-
-              {formData.period === 'Custom Range' && (
-                <div className="ha-form-row">
-                  <div className="ha-form-group">
-                    <label>From Date</label>
-                    <input
-                      type="date"
-                      className="ha-input"
-                      value={formData.fromDate}
-                      onChange={(e) => setFormData({ ...formData, fromDate: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="ha-form-group">
-                    <label>To Date</label>
-                    <input
-                      type="date"
-                      className="ha-input"
-                      value={formData.toDate}
-                      onChange={(e) => setFormData({ ...formData, toDate: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-              )}
 
               <div className="ha-form-group">
                 <label>Scope & Executive Summary</label>
