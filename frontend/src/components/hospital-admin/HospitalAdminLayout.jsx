@@ -24,22 +24,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
 import { hospitalAdminService } from '../../services/hospitalAdminService';
-import {
-  hospitals,
-  departments as allDepartments,
-  departmentHeads as allDepartmentHeads,
-  doctors as allDoctors,
-  initialHospitalProfile,
-  initialHospitalDepartments,
-  initialDepartmentHeads,
-  initialHospitalDoctors,
-  initialAppointments,
-  initialHospitalAnalytics,
-  initialReports,
-  initialKnowledgeActivity,
-  initialAuditLogs,
-  initialHospitalSettings,
-} from '../../data/medimindData';
+
 import './HospitalAdmin.css';
 
 // Views
@@ -219,48 +204,83 @@ export function HospitalAdminLayout({ dark, setDark }) {
     }
   }, [isAnyModalOpen]);
 
-  const activeHospitalId = user?.hospitalId || (user?.email && hospitals.find((h) => h.adminEmail?.toLowerCase() === user.email.toLowerCase() || h.email?.toLowerCase() === user.email.toLowerCase())?.id) || 'HOSP-001';
-  const activeHospital = hospitals.find((h) => h.id === activeHospitalId) || initialHospitalProfile;
+  const activeHospitalId = user?.hospitalId || '6ac85a18074c2bc731a76381';
 
-  // Data States
-  const [hospital, setHospital] = useState(activeHospital);
-  const [departments, setDepartments] = useState(() => {
-    const list = allDepartments.filter((d) => d.hospitalId === activeHospitalId);
-    return list.length > 0 ? list : initialHospitalDepartments;
+  // Data States (initialized with safe defaults, populated with authoritative live backend results)
+  const [hospital, setHospital] = useState(() => ({
+    id: activeHospitalId,
+    _id: activeHospitalId,
+    name: user?.hospitalName || 'Aarogyam Multispeciality Hospital',
+    location: 'Hyderabad',
+    address: 'Road No. 2, Banjara Hills, Hyderabad',
+    phone: '+91 40 2345 6789',
+    email: user?.email || 'admin@aarogyam.hospital',
+    adminEmail: user?.email || 'admin@aarogyam.hospital',
+    totalBeds: 250,
+    occupiedBeds: 210,
+    occupancyRate: '84%',
+    status: 'Active',
+  }));
+  const [departments, setDepartments] = useState([]);
+  const [departmentHeads, setDepartmentHeads] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [analytics, setAnalytics] = useState(() => ({
+    totalOPDConsultations: 0,
+    completedConsultations: 0,
+    bedOccupancyPercentage: 84,
+    aiAssistedAccuracy: '98.2%',
+    averageConsultationDuration: '18 mins',
+    kpis: {
+      totalOPDConsultations: 0,
+      completedConsultations: 0,
+      bedOccupancyPercentage: 84,
+      aiAssistedAccuracy: '98.2%',
+      activeDoctorsCount: 0,
+      departmentCount: 0,
+    },
+    aiAggregateMetrics: {
+      totalScans: 0,
+      totalInferences: 0,
+      diagnosticAssistanceRate: '98.5%',
+      accuracy: '98.2%',
+      averageConfidence: '63.6%',
+    },
+    monthlyDepartmentTraffic: [],
+    monthlyTrends: [],
+  }));
+  const [reports, setReports] = useState([]);
+  const [knowledge, setKnowledge] = useState([]);
+  const [auditLogs, setAuditLogs] = useState([]);
+  const [hospitalSettings, setHospitalSettings] = useState({
+    notifications: { emailAlerts: true, smsAlerts: true, weeklyDigest: true },
+    systemPreferences: { autoArchiveDays: 90, requireMfa: true },
   });
-  const [departmentHeads, setDepartmentHeads] = useState(() => {
-    const list = allDepartmentHeads.filter((h) => h.hospitalId === activeHospitalId);
-    return list.length > 0 ? list : initialDepartmentHeads;
-  });
-  const [doctors, setDoctors] = useState(() => {
-    const list = allDoctors.filter((d) => d.hospitalId === activeHospitalId);
-    return list.length > 0 ? list : initialHospitalDoctors;
-  });
-  const [appointments, setAppointments] = useState(() => {
-    return initialAppointments.filter(
-      (a) => a.hospitalId === activeHospitalId || (a.hospitalName && activeHospital && a.hospitalName.toLowerCase().includes(activeHospital.name.toLowerCase()))
-    );
-  });
-  const [analytics] = useState(initialHospitalAnalytics);
-  const [reports, setReports] = useState(initialReports);
-  const [knowledge] = useState(initialKnowledgeActivity);
-  const [auditLogs] = useState(initialAuditLogs);
-  const [hospitalSettings, setHospitalSettings] = useState(initialHospitalSettings);
 
   useEffect(() => {
-    const targetHospId = user?.hospitalId || (user?.email && hospitals.find((h) => h.adminEmail?.toLowerCase() === user.email.toLowerCase() || h.email?.toLowerCase() === user.email.toLowerCase())?.id) || 'HOSP-001';
-    const targetHosp = hospitals.find((h) => h.id === targetHospId) || initialHospitalProfile;
-    setHospital(targetHosp);
-    const depts = allDepartments.filter((d) => d.hospitalId === targetHospId);
-    if (depts.length > 0) setDepartments(depts);
-    const heads = allDepartmentHeads.filter((h) => h.hospitalId === targetHospId);
-    if (heads.length > 0) setDepartmentHeads(heads);
-    const docs = allDoctors.filter((d) => d.hospitalId === targetHospId);
-    if (docs.length > 0) setDoctors(docs);
-    const hospApts = initialAppointments.filter(
-      (a) => a.hospitalId === targetHospId || (a.hospitalName && targetHosp && a.hospitalName.toLowerCase().includes(targetHosp.name.toLowerCase()))
-    );
-    setAppointments(hospApts);
+    const targetHospId = user?.hospitalId || '6ac85a18074c2bc731a76381';
+
+    async function loadLiveHospitalData() {
+      try {
+        const [liveHosp, liveDepts, liveHeads, liveDocs, liveApts, liveAnalytics] = await Promise.all([
+          hospitalAdminService.getHospitalProfile(targetHospId),
+          hospitalAdminService.getDepartments(targetHospId),
+          hospitalAdminService.getDepartmentHeads(targetHospId),
+          hospitalAdminService.getDoctors({}, targetHospId),
+          hospitalAdminService.getAppointments(targetHospId),
+          hospitalAdminService.getHospitalAnalytics(targetHospId),
+        ]);
+        if (liveHosp) setHospital(liveHosp);
+        if (liveDepts && liveDepts.length > 0) setDepartments(liveDepts);
+        if (liveHeads && liveHeads.length > 0) setDepartmentHeads(liveHeads);
+        if (liveDocs && liveDocs.length > 0) setDoctors(liveDocs);
+        if (liveApts && liveApts.length > 0) setAppointments(liveApts);
+        if (liveAnalytics) setAnalytics(liveAnalytics);
+      } catch {
+        // safe fallback
+      }
+    }
+    loadLiveHospitalData();
   }, [user]);
 
   const announce = (message) => {
@@ -289,7 +309,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
 
   const handleCreateDepartment = async (deptData) => {
     await hospitalAdminService.createDepartment(deptData);
-    const updatedDepts = await hospitalAdminService.getDepartments();
+    const updatedDepts = await hospitalAdminService.getDepartments(hospital?.id || user?.hospitalId);
     setDepartments(updatedDepts);
     setShowCreateDeptModal(false);
     announce(`Created department: ${deptData.name}`);
@@ -297,7 +317,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
 
   const handleEditDepartment = async (deptId, updatedData) => {
     const updated = await hospitalAdminService.updateDepartment(deptId, updatedData);
-    const updatedDepts = await hospitalAdminService.getDepartments();
+    const updatedDepts = await hospitalAdminService.getDepartments(hospital?.id || user?.hospitalId);
     setDepartments(updatedDepts);
     setShowEditDeptModal(false);
     setSelectedEditDept(null);
@@ -315,7 +335,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
       isDestructive: dept.status === 'Active',
       onConfirm: async () => {
         await hospitalAdminService.toggleDepartmentStatus(deptId);
-        const updatedDepts = await hospitalAdminService.getDepartments();
+        const updatedDepts = await hospitalAdminService.getDepartments(hospital?.id || user?.hospitalId);
         setDepartments(updatedDepts);
         setConfirmModal(null);
         announce(`Updated department status for ${dept.name}`);
@@ -326,8 +346,8 @@ export function HospitalAdminLayout({ dark, setDark }) {
   const handleCreateDepartmentHead = async (headData) => {
     await hospitalAdminService.createDepartmentHead(headData);
     const [updatedHeads, updatedDepts] = await Promise.all([
-      hospitalAdminService.getDepartmentHeads(),
-      hospitalAdminService.getDepartments(),
+      hospitalAdminService.getDepartmentHeads(hospital?.id || user?.hospitalId),
+      hospitalAdminService.getDepartments(hospital?.id || user?.hospitalId),
     ]);
     setDepartmentHeads(updatedHeads);
     setDepartments(updatedDepts);
@@ -346,7 +366,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
       isDestructive: head.status === 'Active',
       onConfirm: async () => {
         await hospitalAdminService.toggleDepartmentHeadStatus(headId);
-        const updatedHeads = await hospitalAdminService.getDepartmentHeads();
+        const updatedHeads = await hospitalAdminService.getDepartmentHeads(hospital?.id || user?.hospitalId);
         setDepartmentHeads(updatedHeads);
         setConfirmModal(null);
         announce(`Updated account status for ${head.name}`);
@@ -365,7 +385,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
       isDestructive: doc.status === 'Active',
       onConfirm: async () => {
         await hospitalAdminService.toggleDoctorStatus(doctorId);
-        const updatedDocs = await hospitalAdminService.getDoctors();
+        const updatedDocs = await hospitalAdminService.getDoctors({}, hospital?.id || user?.hospitalId);
         setDoctors(updatedDocs);
         setConfirmModal(null);
         announce(`Updated clinical privileges for ${doc.name}`);

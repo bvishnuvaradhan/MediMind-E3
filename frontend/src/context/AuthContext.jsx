@@ -17,7 +17,7 @@ function resolveUserProfile(role, email, apiUser = {}) {
     return {
       id: apiUser.userId || matched.userId || matched.id,
       userId: apiUser.userId || matched.userId || matched.id,
-      name: matched.name,
+      name: apiUser.name || matched.name,
       email: cleanEmail || matched.email,
       role: 'CHAIRMAN',
       title: matched.title || 'Chairman & Platform Owner',
@@ -32,7 +32,7 @@ function resolveUserProfile(role, email, apiUser = {}) {
   if (role === 'HOSPITAL_ADMIN') {
     const matched = hospitalAdmins.find((ha) => ha.email.toLowerCase() === cleanEmail || (apiUser.hospitalId && ha.hospitalId === apiUser.hospitalId)) ||
       (cleanEmail.includes('apexmetro') ? hospitalAdmins[1] : cleanEmail.includes('stjude') ? hospitalAdmins[2] : hospitalAdmins[0]);
-    const hosp = hospitals.find((h) => h.id === matched.hospitalId || h.adminEmail?.toLowerCase() === cleanEmail) || hospitals[0];
+    const hosp = hospitals.find((h) => h.id === (apiUser.hospitalId || matched.hospitalId) || h.adminEmail?.toLowerCase() === cleanEmail) || hospitals[0];
     return {
       id: apiUser.userId || matched.id,
       userId: apiUser.userId || matched.id,
@@ -40,8 +40,8 @@ function resolveUserProfile(role, email, apiUser = {}) {
       email: cleanEmail || matched.email,
       role: 'HOSPITAL_ADMIN',
       title: matched.role || 'Hospital Administrator',
-      hospitalId: matched.hospitalId || hosp.id,
-      hospitalName: hosp.name,
+      hospitalId: apiUser.hospitalId || matched.hospitalId || hosp.id,
+      hospitalName: apiUser.hospitalName || hosp.name,
       avatarInitials: matched.avatarInitials || 'HA',
       avatarTone: matched.avatarTone || 'sapphire',
       referenceId: apiUser.referenceId || matched.id,
@@ -59,10 +59,10 @@ function resolveUserProfile(role, email, apiUser = {}) {
       email: cleanEmail || matched.email,
       role: 'DEPARTMENT_HEAD',
       title: matched.title || `Head of ${matched.departmentName}`,
-      departmentId: matched.departmentId,
-      departmentName: matched.departmentName,
-      hospitalId: matched.hospitalId,
-      hospitalName: matched.hospitalName,
+      departmentId: apiUser.departmentId || matched.departmentId,
+      departmentName: apiUser.departmentName || matched.departmentName,
+      hospitalId: apiUser.hospitalId || matched.hospitalId,
+      hospitalName: apiUser.hospitalName || matched.hospitalName,
       avatarInitials: matched.avatarInitials || 'DH',
       avatarTone: matched.avatarTone || 'coral',
       referenceId: apiUser.referenceId || matched.id,
@@ -80,7 +80,7 @@ function resolveUserProfile(role, email, apiUser = {}) {
       email: cleanEmail || matched.email,
       role: 'DOCTOR',
       title: matched.title || 'Senior Consultant',
-      doctorId: matched.id,
+      doctorId: apiUser.doctorId || apiUser.referenceId || matched.id,
       departmentId: matched.departmentId,
       departmentName: matched.departmentName,
       hospitalId: matched.hospitalId,
@@ -103,8 +103,8 @@ function resolveUserProfile(role, email, apiUser = {}) {
     email: cleanEmail || matchedFamily.email,
     role: 'FAMILY',
     title: `${matchedFamily.name} Head`,
-    familyId: resolvedFamId,
-    familyName: matchedFamily.name,
+    familyId: apiUser.familyId || resolvedFamId,
+    familyName: apiUser.familyName || matchedFamily.name,
     avatarInitials: matchedFamily.primaryContact ? matchedFamily.primaryContact.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : 'FA',
     avatarTone: 'coral',
     referenceId: apiUser.referenceId || matchedFamily.id,

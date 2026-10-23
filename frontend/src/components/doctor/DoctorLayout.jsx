@@ -2,7 +2,6 @@ import React, { useState, useEffect, useTransition } from 'react';
 import './Doctor.css';
 import { doctorService } from '../../services/doctorService';
 import { useAuth } from '../../context/useAuth';
-import { doctors as allDoctors, appointments as globalAppointments, consultations as globalConsultations, prescriptions as globalPrescriptions, familyMembers } from '../../data/medimindData';
 
 // Views
 import DashboardView from './views/DashboardView';
@@ -162,7 +161,8 @@ export function DoctorLayout({ dark, setDark }) {
 
   const refreshDoctorAppointments = async () => {
     try {
-      const backendApts = await appointmentService.getAppointments();
+      const docId = user?.doctorId || user?.referenceId || '6ac85a1a074c2bc731a763bb';
+      const backendApts = await appointmentService.getAppointments({ doctorId: docId });
       if (backendApts && backendApts.length > 0) {
         const mapped = backendApts.map((a) => {
           const rawDate = a.appointment_date ? new Date(a.appointment_date) : null;
@@ -175,12 +175,12 @@ export function DoctorLayout({ dark, setDark }) {
             id: a._id || a.id,
             _id: a._id || a.id,
             token: a.token || `OPD-${(a._id || a.id).toString().slice(-4).toUpperCase()}`,
-            patientId: a.family_member_id || a.familyMemberId,
-            memberId: a.family_member_id || a.familyMemberId,
+            patientId: a.family_member_id || a.familyMemberId || `pat_${(a._id || a.id).toString().slice(-4)}`,
+            memberId: a.family_member_id || a.familyMemberId || `pat_${(a._id || a.id).toString().slice(-4)}`,
             patientName: a.patientName || 'Family Patient',
             patientAge: a.patientAge || 35,
             patientGender: a.patientGender || 'Male',
-            doctorId: a.doctor_id || a.doctorId,
+            doctorId: a.doctor_id || a.doctorId || docId,
             doctorName: a.doctorName || user?.name || 'Dr. Attending Physician',
             department: a.departmentName || user?.departmentName || 'Orthopedics',
             hospital: a.hospitalName || 'MediMind Central Hospital',
@@ -191,13 +191,11 @@ export function DoctorLayout({ dark, setDark }) {
             status: a.status === 'CANCELLED' ? 'Cancelled' : a.status === 'COMPLETED' ? 'Completed' : 'Confirmed',
             cancellationReason: a.cancellation_reason,
             isWalkIn: a.appointment_type === 'WALK_IN',
+            aiPredictionId: a.prediction_id || null,
           };
         });
 
-        setAppointments((prev) => {
-          const seenIds = new Set(mapped.map((m) => m.id));
-          return [...mapped, ...prev.filter((a) => !seenIds.has(a.id))];
-        });
+        setAppointments(mapped);
       }
     } catch {
       // safe fallback
@@ -207,6 +205,7 @@ export function DoctorLayout({ dark, setDark }) {
   // Load initial doctor data
   useEffect(() => {
     async function loadData() {
+      const currentDocId = user?.doctorId || user?.referenceId || '6ac85a1a074c2bc731a763bb';
       const [
         prof,
         pats,
@@ -218,76 +217,36 @@ export function DoctorLayout({ dark, setDark }) {
         notifs,
         stts,
       ] = await Promise.all([
-        doctorService.getProfile(),
-        doctorService.getAuthorizedPatients(),
-        doctorService.getAppointments(),
-        doctorService.getConsultations(),
-        doctorService.getPrescriptions(),
+        doctorService.getProfile(currentDocId),
+        doctorService.getAuthorizedPatients({}, currentDocId),
+        doctorService.getAppointments({}, currentDocId),
+        doctorService.getConsultations({}, currentDocId),
+        doctorService.getPrescriptions({}, currentDocId),
         doctorService.getAccessHistory(),
         doctorService.getArticles(),
         doctorService.getNotifications(),
         doctorService.getSettings(),
       ]);
 
-      const matchedDoctor = (user && allDoctors.find((d) => d.email?.toLowerCase() === user.email?.toLowerCase() || d.id === user.doctorId || d.id === user.id)) || null;
-      const effectiveProfile = matchedDoctor
-        ? {
-            ...prof,
-            ...matchedDoctor,
-            name: user?.name || matchedDoctor.name,
-            email: user?.email || matchedDoctor.email,
-            avatarInitials: matchedDoctor.avatarInitials || user?.avatarInitials || 'MD',
-            title: matchedDoctor.title || user?.title || 'Senior Consultant',
-            departmentName: matchedDoctor.departmentName || user?.departmentName || prof?.departmentName,
-            hospitalName: matchedDoctor.hospitalName || user?.hospitalName || prof?.hospitalName,
-          }
-        : prof;
-      const currentDocId = matchedDoctor?.id || user?.doctorId || 'doc_001';
-      const currentDocName = matchedDoctor?.name || user?.name || '';
-      const currentDeptName = matchedDoctor?.departmentName || user?.departmentName || 'Orthopedics';
-
-      const allApts = globalAppointments?.length > 0 ? globalAppointments : apts;
-      const allCons = globalConsultations?.length > 0 ? globalConsultations : cons;
-      const allRxs = globalPrescriptions?.length > 0 ? globalPrescriptions : rxs;
-
-      const docAppointments = allApts.filter(
-        (a) => a.doctorId === currentDocId || (currentDocName && a.doctorName && a.doctorName.toLowerCase().includes(currentDocName.toLowerCase()))
-      );
-
-      const docConsultations = allCons.filter(
-        (c) => c.doctorId === currentDocId || (currentDocName && c.doctorName && c.doctorName.toLowerCase().includes(currentDocName.toLowerCase()))
-      );
-
-      const docPrescriptions = allRxs.filter(
-        (p) => p.doctorId === currentDocId || (currentDocName && p.doctorName && p.doctorName.toLowerCase().includes(currentDocName.toLowerCase()))
-      );
-
-      const aptPatientNames = new Set(docAppointments.map((a) => a.patientName).filter(Boolean));
-      const aptPatientIds = new Set(docAppointments.map((a) => a.patientId || a.memberId).filter(Boolean));
-      
-      const familyPatients = familyMembers.map(m => ({
-        ...m,
-        id: m.id,
-        name: m.name,
-      }));
-      const globalPatientsList = familyPatients.length > 0 ? familyPatients : pats;
-      
-      const docPatients = globalPatientsList.filter((p) => aptPatientIds.has(p.id) || aptPatientIds.has(p.memberId) || aptPatientNames.has(p.name));
-
-      const docArticles = (arts && arts.length > 0 ? arts : []).filter(
-        (a) => a.department === currentDeptName || a.departmentId === matchedDoctor?.departmentId
-      );
+      const effectiveProfile = {
+        ...prof,
+        name: user?.name || prof?.name || 'Dr. Attending Physician',
+        email: user?.email || prof?.email,
+        title: user?.title || prof?.title || 'Senior Consultant',
+        departmentName: user?.departmentName || prof?.departmentName || 'Orthopedics & Trauma',
+        hospitalName: user?.hospitalName || prof?.hospitalName || 'Aarogyam Multispeciality Hospital',
+        avatarInitials: user?.avatarInitials || prof?.avatarInitials || 'MD',
+      };
 
       setDoctorProfile(effectiveProfile);
-      setPatients(docPatients);
-      setAppointments(docAppointments);
-      setConsultations(docConsultations);
-      setPrescriptions(docPrescriptions);
+      setPatients(pats);
+      setAppointments(apts);
+      setConsultations(cons);
+      setPrescriptions(rxs);
       setAccessHistory(accs);
-      setArticles(docArticles.length > 0 ? docArticles : arts);
+      setArticles(arts);
       setNotifications(notifs);
       setSettings(stts);
-      await refreshDoctorAppointments();
     }
     loadData();
   }, [user]);

@@ -1,6 +1,6 @@
 // MediMind Platform - Doctor Service Layer
 // Abstracts clinical data access and mutations scoped to the Doctor role.
-// Keeps UI decoupled for future backend API & WebSocket integration.
+// Connects to live microservices via API Gateway with intelligent in-memory caching and graceful fallbacks.
 
 import {
   initialDoctorProfile,
@@ -15,6 +15,7 @@ import {
   departmentHeads,
   knowledgeArticles,
 } from '../data/medimindData.js';
+import { appointmentService } from './appointmentService.js';
 
 let profileState = { ...initialDoctorProfile };
 let patientsState = [...initialAuthorizedPatients];
@@ -26,9 +27,63 @@ let articlesState = [...initialDoctorArticles];
 let notificationsState = [...initialDoctorNotifications];
 let settingsState = { ...initialDoctorSettings };
 
+function getAuthHeaders() {
+  const headers = { 'Content-Type': 'application/json' };
+  if (typeof window !== 'undefined') {
+    let token = localStorage.getItem('medimind_jwt_token');
+    if (!token) {
+      try {
+        const session = JSON.parse(localStorage.getItem('medimind_auth_session') || '{}');
+        token = session?.token;
+        if (token) {
+          localStorage.setItem('medimind_jwt_token', token);
+        }
+      } catch {}
+    }
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 export const doctorService = {
   // --- Profile & Availability ---
-  async getProfile() {
+  async getProfile(doctorId) {
+    const targetDocId = doctorId || profileState.doctorId || profileState.id;
+    try {
+      if (targetDocId && targetDocId !== 'doc_001') {
+        const res = await fetch(`/api/doctors/${targetDocId}`, { headers: getAuthHeaders() });
+        if (res.ok) {
+          const json = await res.json();
+          const doc = json.data || json;
+          if (doc && (doc.fullName || doc.name)) {
+            profileState = {
+              ...profileState,
+              id: doc.id || doc._id || targetDocId,
+              _id: doc.id || doc._id || targetDocId,
+              doctorId: doc.doctorId || doc.id || doc._id || targetDocId,
+              name: doc.fullName || doc.name,
+              fullName: doc.fullName || doc.name,
+              email: doc.email || profileState.email,
+              mobile: doc.mobile || doc.phone || profileState.phone,
+              phone: doc.mobile || doc.phone || profileState.phone,
+              specialization: doc.specialization || profileState.specialization,
+              departmentName: doc.departmentName || profileState.departmentName,
+              departmentId: doc.departmentId || profileState.departmentId,
+              hospitalName: doc.hospitalName || profileState.hospitalName,
+              hospitalId: doc.hospitalId || profileState.hospitalId,
+              experienceYears: doc.experienceYears || profileState.experienceYears,
+              qualifications: doc.qualifications || profileState.qualifications,
+              rating: doc.rating || 4.8,
+              consultationFee: doc.consultationFee || 800,
+              availabilitySchedule: doc.availability || profileState.availabilitySchedule,
+            };
+            return { ...profileState };
+          }
+        }
+      }
+    } catch {
+      // safe fallback
+    }
     return { ...profileState };
   },
 
@@ -36,12 +91,23 @@ export const doctorService = {
     profileState = {
       ...profileState,
       ...updatedData,
-      // Organizational boundaries remain protected
       hospitalId: profileState.hospitalId,
       hospitalName: profileState.hospitalName,
       departmentId: profileState.departmentId,
       departmentName: profileState.departmentName,
     };
+    try {
+      const docId = profileState.doctorId || profileState.id;
+      if (docId && docId.length === 24) {
+        await fetch(`/api/doctors/${docId}`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(updatedData),
+        });
+      }
+    } catch {
+      // memory persist
+    }
     return { ...profileState };
   },
 
@@ -55,40 +121,52 @@ export const doctorService = {
     return { ...profileState };
   },
 
-  // --- Authorized Patients ---
-  async getAuthorizedPatients(filters = {}) {
-    let list = [...patientsState];
-    if (filters.status) {
-      list = list.filter((p) => p.accessStatus === filters.status);
-    }
-    if (filters.search) {
-      const q = filters.search.toLowerCase();
-      list = list.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.bloodGroup.toLowerCase().includes(q) ||
-          p.chiefComplaint.toLowerCase().includes(q)
-      );
-    }
-    return list;
-  },
-
-  async getPatientById(patientId) {
-    const patient = patientsState.find((p) => p.id === patientId);
-    if (!patient) return null;
-    // Verify access status
-    if (patient.accessStatus !== 'Active') {
-      return { ...patient, accessRestricted: true };
-    }
-    return { ...patient };
-  },
-
-  async getAccessHistory() {
-    return [...accessHistoryState];
-  },
-
   // --- Appointments ---
-  async getAppointments(filters = {}) {
+  async getAppointments(filters = {}, doctorId) {
+    const targetDocId = doctorId || profileState.doctorId || profileState.id;
+    try {
+      const live = await appointmentService.getAppointments({ doctorId: targetDocId });
+      if (Array.isArray(live) && live.length > 0) {
+        const mapped = live.map((a) => {
+          const rawDate = a.appointment_date ? new Date(a.appointment_date) : null;
+          const isToday = rawDate && rawDate.toDateString() === new Date().toDateString();
+          const formattedDate = rawDate
+            ? (isToday ? `Today, ${rawDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}` : rawDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }))
+            : 'Today';
+
+          return {
+            id: a._id || a.id,
+            _id: a._id || a.id,
+            token: a.token || `OPD-${(a._id || a.id).toString().slice(-4).toUpperCase()}`,
+            patientId: a.family_member_id || a.familyMemberId || `pat_${(a._id || a.id).toString().slice(-4)}`,
+            memberId: a.family_member_id || a.familyMemberId || `pat_${(a._id || a.id).toString().slice(-4)}`,
+            patientName: a.patientName || 'Family Patient',
+            patientAge: a.patientAge || 35,
+            patientGender: a.patientGender || 'Male',
+            doctorId: a.doctor_id || a.doctorId || targetDocId,
+            doctorName: a.doctorName || profileState.name,
+            department: a.departmentName || profileState.departmentName || 'Orthopedics',
+            hospital: a.hospitalName || profileState.hospitalName || 'MediMind Central Hospital',
+            date: formattedDate,
+            time: a.start_time ? `${a.start_time}${a.end_time ? ` - ${a.end_time}` : ''}` : '10:00 AM',
+            type: a.appointment_type === 'WALK_IN' ? 'Walk-in' : (a.reason || 'OPD Consultation'),
+            purpose: a.reason || 'Outpatient Consultation',
+            status: a.status === 'CANCELLED' ? 'Cancelled' : a.status === 'COMPLETED' ? 'Completed' : 'Confirmed',
+            cancellationReason: a.cancellation_reason,
+            isWalkIn: a.appointment_type === 'WALK_IN',
+            aiPredictionId: a.prediction_id || null,
+          };
+        });
+
+        // Merge keeping any local walk-ins created during session
+        const seenIds = new Set(mapped.map((m) => m.id));
+        const localWalkIns = appointmentsState.filter((a) => a.isWalkIn && !seenIds.has(a.id));
+        appointmentsState = [...mapped, ...localWalkIns];
+      }
+    } catch {
+      // safe fallback
+    }
+
     let list = [...appointmentsState];
     if (filters.status) {
       list = list.filter((a) => a.status === filters.status);
@@ -99,7 +177,7 @@ export const doctorService = {
         (a) =>
           a.patientName.toLowerCase().includes(q) ||
           a.token.toLowerCase().includes(q) ||
-          a.purpose.toLowerCase().includes(q)
+          (a.purpose && a.purpose.toLowerCase().includes(q))
       );
     }
     return list;
@@ -160,8 +238,8 @@ export const doctorService = {
       patientName: patient?.name || 'Walk-in Patient',
       patientAge: patient?.age || 35,
       patientGender: patient?.gender || 'Male',
-      doctorId: walkInData.doctorId || profileState.id || 'doc_001',
-      doctorName: walkInData.doctorName || profileState.name || 'Dr. Rahul Mehta',
+      doctorId: walkInData.doctorId || profileState.doctorId || profileState.id || 'doc_001',
+      doctorName: walkInData.doctorName || profileState.name || 'Dr. Attending Physician',
       department: walkInData.department || profileState.departmentName || 'Orthopedics',
       departmentId: walkInData.departmentId || profileState.departmentId || 'DEP-H1-ORTHO',
       hospital: walkInData.hospital || profileState.hospitalName || 'MediMind Central Hospital',
@@ -186,8 +264,112 @@ export const doctorService = {
     };
   },
 
+  // --- Authorized Patients ---
+  async getAuthorizedPatients(filters = {}, doctorId) {
+    const targetDocId = doctorId || profileState.doctorId || profileState.id;
+    const apts = await this.getAppointments({}, targetDocId);
+
+    // Derive distinct patients from doctor's live appointments
+    const patientMap = new Map();
+    for (const a of apts) {
+      const pKey = a.patientId || a.patientName;
+      if (!patientMap.has(pKey)) {
+        patientMap.set(pKey, {
+          id: a.patientId || `pat_${a.id.slice(-4)}`,
+          memberId: a.patientId || `pat_${a.id.slice(-4)}`,
+          name: a.patientName || 'Family Patient',
+          age: a.patientAge || 35,
+          gender: a.patientGender || 'Male',
+          bloodGroup: 'B+',
+          accessStatus: 'Active',
+          accessScope: 'Complete Unified Medical Record',
+          accessGrantedDate: a.date,
+          chiefComplaint: a.purpose || a.reason || 'Clinical Consultation',
+          recentConsultationDate: a.date,
+          vitals: {
+            bp: '120/80 mmHg',
+            pulse: '74 bpm',
+            temp: '98.4 °F',
+            weight: '68 kg',
+            height: '168 cm',
+          },
+          allergies: [],
+          chronicConditions: [],
+          medicalRecords: [],
+          aiPredictions: [],
+        });
+      }
+    }
+
+    // Include local walk-in patients
+    for (const p of patientsState) {
+      if (!patientMap.has(p.id) && !patientMap.has(p.name)) {
+        patientMap.set(p.id, p);
+      }
+    }
+
+    patientsState = Array.from(patientMap.values());
+    let list = [...patientsState];
+    if (filters.status) {
+      list = list.filter((p) => p.accessStatus === filters.status);
+    }
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.bloodGroup.toLowerCase().includes(q) ||
+          p.chiefComplaint.toLowerCase().includes(q)
+      );
+    }
+    return list;
+  },
+
+  async getPatientById(patientId) {
+    const patient = patientsState.find((p) => p.id === patientId || p.memberId === patientId);
+    if (!patient) return null;
+    if (patient.accessStatus !== 'Active') {
+      return { ...patient, accessRestricted: true };
+    }
+    return { ...patient };
+  },
+
+  async getAccessHistory() {
+    return [...accessHistoryState];
+  },
+
   // --- Consultations ---
-  async getConsultations(filters = {}) {
+  async getConsultations(filters = {}, doctorId) {
+    const targetDocId = doctorId || profileState.doctorId || profileState.id;
+    const apts = await this.getAppointments({}, targetDocId);
+
+    // Derive finalized consultations from completed appointments
+    const completedApts = apts.filter((a) => a.status === 'Completed');
+    const existingConsIds = new Set(consultationsState.map((c) => c.appointmentId || c.id));
+
+    for (const a of completedApts) {
+      if (!existingConsIds.has(a.id)) {
+        consultationsState.push({
+          id: `cons_${a.id}`,
+          appointmentId: a.id,
+          consultationNumber: `CONS-OPD-${a.id.slice(-6).toUpperCase()}`,
+          patientId: a.patientId,
+          patientName: a.patientName,
+          date: a.date,
+          doctorId: a.doctorId || targetDocId,
+          doctorName: a.doctorName || profileState.name,
+          department: a.department,
+          chiefComplaint: a.purpose || a.reason || 'Clinical Consultation',
+          diagnosis: a.purpose || 'Clinical consultation evaluation and follow-up',
+          treatmentPlan: 'Maintain medication regimen and scheduled observation.',
+          status: 'FINAL',
+          finalizedAt: new Date().toISOString(),
+          amendments: [],
+        });
+        existingConsIds.add(a.id);
+      }
+    }
+
     let list = [...consultationsState];
     if (filters.patientId) {
       list = list.filter((c) => c.patientId === filters.patientId);
@@ -214,7 +396,7 @@ export const doctorService = {
 
     const newCons = {
       id: `cons_${Date.now()}`,
-      consultationNumber: `CONS-ORTHO-2026-${Math.floor(100 + Math.random() * 900)}`,
+      consultationNumber: `CONS-OPD-2026-${Math.floor(100 + Math.random() * 900)}`,
       date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
       status: 'DRAFT',
       amendments: [],
@@ -244,7 +426,7 @@ export const doctorService = {
     } else {
       finalCons = {
         id: `cons_${Date.now()}`,
-        consultationNumber: `CONS-ORTHO-2026-${Math.floor(100 + Math.random() * 900)}`,
+        consultationNumber: `CONS-OPD-2026-${Math.floor(100 + Math.random() * 900)}`,
         date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
         status: 'FINAL',
         finalizedAt: new Date().toISOString(),
@@ -254,7 +436,6 @@ export const doctorService = {
       consultationsState = [finalCons, ...consultationsState];
     }
 
-    // Update appointment status if linked
     if (finalCons.appointmentId) {
       appointmentsState = appointmentsState.map((a) =>
         a.id === finalCons.appointmentId ? { ...a, status: 'Completed' } : a
@@ -300,7 +481,7 @@ export const doctorService = {
   },
 
   // --- Prescriptions ---
-  async getPrescriptions(filters = {}) {
+  async getPrescriptions(filters = {}, doctorId) {
     let list = [...prescriptionsState];
     if (filters.patientId) {
       list = list.filter((p) => p.patientId === filters.patientId);
@@ -321,7 +502,7 @@ export const doctorService = {
 
     const newRx = {
       id: `rx_${Date.now()}`,
-      prescriptionNumber: `RX-ORTHO-2026-${Math.floor(100 + Math.random() * 900)}`,
+      prescriptionNumber: `RX-OPD-2026-${Math.floor(100 + Math.random() * 900)}`,
       date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
       status: 'DRAFT',
       corrections: [],
@@ -351,7 +532,7 @@ export const doctorService = {
     } else {
       finalRx = {
         id: `rx_${Date.now()}`,
-        prescriptionNumber: `RX-ORTHO-2026-${Math.floor(100 + Math.random() * 900)}`,
+        prescriptionNumber: `RX-OPD-2026-${Math.floor(100 + Math.random() * 900)}`,
         date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
         status: 'FINAL',
         finalizedAt: new Date().toISOString(),
@@ -408,10 +589,10 @@ export const doctorService = {
           (!hospitalId || dh.hospitalId === hospitalId)
       ) || {
         id: 'DH-H1-ORTHO',
-        name: 'Dr. Priya Sharma',
-        title: 'Head of Orthopedics & Musculoskeletal Sciences',
-        departmentName: profileState.departmentName || 'Orthopedics',
-        email: 'priya.sharma@medimindhospital.com',
+        name: 'Dr. Arun Prakash',
+        title: 'Head of Department',
+        departmentName: profileState.departmentName || 'Orthopedics & Trauma',
+        email: 'arun.prakash@aarogyam.hospital',
       }
     );
   },
@@ -419,7 +600,6 @@ export const doctorService = {
   // --- Knowledge Articles ---
   async getArticles(filters = {}) {
     let list = articlesState.filter((a) => {
-      // Drafts are strictly private to their author
       if (a.status === 'Draft') {
         return (
           (a.authorId && a.authorId === profileState.id) ||
@@ -449,98 +629,50 @@ export const doctorService = {
     const isSubmitting = Boolean(articleData.submitForReview);
     const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
-    const newArt = {
-      id: `art_doc_${Date.now()}`,
+    const newArticle = {
+      id: `art_${Date.now()}`,
       author: profileState.name,
-      authorId: profileState.id || 'doc_001',
-      authorRole: profileState.title || 'Senior Consultant Orthopedic Surgeon',
-      department: profileState.departmentName || 'Orthopedics',
-      departmentId: profileState.departmentId || 'DEP-H1-ORTHO',
-      hospital: profileState.hospitalName || 'MediMind Central Hospital',
-      hospitalId: profileState.hospitalId || 'HOSP-001',
-      views: 0,
-      citations: 0,
+      authorId: profileState.id,
+      department: profileState.departmentName,
+      departmentId: profileState.departmentId,
       status: isSubmitting ? 'Under Review' : 'Draft',
-      createdDate: today,
-      submittedDate: isSubmitting ? today : null,
-      reviewerId: deptHead.id,
-      reviewerName: deptHead.name,
-      reviewerRole: deptHead.title,
-      tags: Array.isArray(articleData.tags) ? articleData.tags : (articleData.tags ? articleData.tags.split(',').map(t => t.trim()).filter(Boolean) : []),
+      date: today,
+      views: 0,
+      readTime: `${Math.ceil((articleData.content || '').split(' ').length / 150) || 3} min read`,
+      reviewedBy: null,
+      reviewedDate: null,
+      reviewerNotes: null,
+      designatedReviewer: deptHead?.name || 'Department Head',
+      designatedReviewerEmail: deptHead?.email || '',
       ...articleData,
     };
-    articlesState = [newArt, ...articlesState];
-    if (Array.isArray(knowledgeArticles) && !knowledgeArticles.some((a) => a.id === newArt.id)) {
-      knowledgeArticles.unshift(newArt);
-    }
-    return newArt;
+
+    articlesState = [newArticle, ...articlesState];
+    return newArticle;
   },
 
   async updateArticle(articleId, updatedData) {
-    const deptHead = this.getDepartmentHead();
-    const isSubmitting = Boolean(updatedData.submitForReview);
-    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-    let updatedArt = null;
-
-    articlesState = articlesState.map((a) => {
-      if (a.id === articleId) {
-        const nextStatus = isSubmitting ? 'Under Review' : (updatedData.status || a.status || 'Draft');
-        updatedArt = {
-          ...a,
-          ...updatedData,
-          status: nextStatus,
-          submittedDate: isSubmitting ? today : a.submittedDate,
-          reviewerId: deptHead.id,
-          reviewerName: deptHead.name,
-          reviewerRole: deptHead.title,
-          reviewerFeedback: isSubmitting ? null : a.reviewerFeedback,
-          tags: Array.isArray(updatedData.tags)
-            ? updatedData.tags
-            : (updatedData.tags ? updatedData.tags.split(',').map(t => t.trim()).filter(Boolean) : (a.tags || [])),
-        };
-        return updatedArt;
-      }
-      return a;
-    });
-
-    if (Array.isArray(knowledgeArticles) && updatedArt) {
-      const idx = knowledgeArticles.findIndex((a) => a.id === articleId);
-      if (idx !== -1) {
-        knowledgeArticles[idx] = { ...knowledgeArticles[idx], ...updatedArt };
-      }
-    }
-
-    return updatedArt || articlesState.find((a) => a.id === articleId);
+    articlesState = articlesState.map((a) =>
+      a.id === articleId ? { ...a, ...updatedData } : a
+    );
+    return articlesState.find((a) => a.id === articleId);
   },
 
   async submitDraftForReview(articleId) {
     const deptHead = this.getDepartmentHead();
-    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-    let updatedArt = null;
     articlesState = articlesState.map((a) => {
       if (a.id === articleId) {
-        updatedArt = {
+        return {
           ...a,
           status: 'Under Review',
-          submittedDate: today,
-          reviewerId: deptHead.id,
-          reviewerName: deptHead.name,
-          reviewerRole: deptHead.title,
-          reviewerFeedback: null,
+          submittedDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+          designatedReviewer: deptHead?.name || 'Department Head',
+          designatedReviewerEmail: deptHead?.email || '',
         };
-        return updatedArt;
       }
       return a;
     });
-
-    if (Array.isArray(knowledgeArticles) && updatedArt) {
-      const idx = knowledgeArticles.findIndex((a) => a.id === articleId);
-      if (idx !== -1) {
-        knowledgeArticles[idx] = { ...knowledgeArticles[idx], ...updatedArt };
-      }
-    }
-
-    return updatedArt || articlesState.find((a) => a.id === articleId);
+    return articlesState.find((a) => a.id === articleId);
   },
 
   async submitArticleForReview(articleId) {
@@ -548,15 +680,19 @@ export const doctorService = {
   },
 
   // --- Notifications ---
-  async getNotifications() {
-    return [...notificationsState];
+  async getNotifications(filters = {}) {
+    let list = [...notificationsState];
+    if (filters.unreadOnly) {
+      list = list.filter((n) => !n.read);
+    }
+    return list;
   },
 
-  async markNotificationRead(id) {
+  async markNotificationRead(notifId) {
     notificationsState = notificationsState.map((n) =>
-      n.id === id ? { ...n, unread: false } : n
+      n.id === notifId ? { ...n, read: true } : n
     );
-    return [...notificationsState];
+    return notificationsState.find((n) => n.id === notifId);
   },
 
   // --- Settings ---

@@ -31,6 +31,7 @@ import { CancelAppointmentModal } from './components/CancelAppointmentModal';
 import { AlternativeBookingModal } from './components/AlternativeBookingModal';
 import { UploadRecordModal } from './components/UploadRecordModal';
 import { appointmentService } from '../../services/appointmentService';
+import { familyService } from '../../services/familyService';
 import { DashboardView } from './views/DashboardView';
 import { MemberProfileView } from './views/MemberProfileView';
 import { FamilyMembersView } from './views/FamilyMembersView';
@@ -270,6 +271,18 @@ export function FamilyLayout({ dark, setDark }) {
       isMounted = false;
     };
   }, [user, activeFamilyId]);
+
+  useEffect(() => {
+    let isMounted = true;
+    familyService.getRecords().then((liveRecs) => {
+      if (isMounted && Array.isArray(liveRecs) && liveRecs.length > 0) {
+        setRecords(liveRecs);
+      }
+    }).catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   // Refresh and History Navigation Synchronization
   useEffect(() => {

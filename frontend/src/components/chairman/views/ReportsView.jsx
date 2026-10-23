@@ -78,14 +78,14 @@ export function ReportsView({ announce }) {
   const effectiveTimelineString = isCustomRange
     ? `Custom Range (${fromDate} to ${toDate})`
     : dateRange === 'Current Month'
-    ? `Current Month (${currentMonthLong})`
-    : dateRange === 'Previous Month'
-    ? `Previous Month (${prevMonthLong})`
-    : dateRange === 'Last 30 Days'
-    ? 'Last 30 Days (Rolling)'
-    : dateRange === 'Year to Date'
-    ? `Year to Date (${now.getFullYear()} YTD)`
-    : 'All-Time Cumulative';
+      ? `Current Month (${currentMonthLong})`
+      : dateRange === 'Previous Month'
+        ? `Previous Month (${prevMonthLong})`
+        : dateRange === 'Last 30 Days'
+          ? 'Last 30 Days (Rolling)'
+          : dateRange === 'Year to Date'
+            ? `Year to Date (${now.getFullYear()} YTD)`
+            : 'All-Time Cumulative';
 
   const availableReports = [
     {
@@ -269,9 +269,6 @@ export function ReportsView({ announce }) {
       <div className="chair-view-header">
         <div>
           <h1 className="chair-title">Reports & Audit Exports</h1>
-          <p className="chair-subtitle">
-            Executive data export engine with live MongoDB aggregations, multi-sheet Excel (.xlsx) workbooks, and tenant role-scoping
-          </p>
         </div>
       </div>
 
@@ -292,10 +289,10 @@ export function ReportsView({ announce }) {
               <div
                 key={rep.id}
                 onClick={() => {
-                setReportType(rep.id);
-                setPreviewData(null);
-                setPreviewModal(null);
-              }}
+                  setReportType(rep.id);
+                  setPreviewData(null);
+                  setPreviewModal(null);
+                }}
                 style={{
                   border: isSelected ? `2px solid ${rep.color}` : '1px solid var(--chair-border, #e2e8f0)',
                   background: isSelected ? 'rgba(15, 118, 110, 0.04)' : 'var(--chair-card, #ffffff)',

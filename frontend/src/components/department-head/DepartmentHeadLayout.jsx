@@ -2,7 +2,6 @@ import React, { useState, useEffect, useTransition } from 'react';
 import './DepartmentHead.css';
 import { departmentHeadService } from '../../services/departmentHeadService';
 import { useAuth } from '../../context/useAuth';
-import { departmentHeads, departments, doctors as allDoctors } from '../../data/medimindData';
 
 // Views
 import DashboardView from './views/DashboardView';
@@ -111,6 +110,7 @@ export function DepartmentHeadLayout({ dark, setDark }) {
   // Load initial data
   useEffect(() => {
     async function loadData() {
+      const targetDeptId = user?.departmentId || '6ac85a18074c2bc731a7638b';
       const [
         prof,
         dept,
@@ -121,52 +121,34 @@ export function DepartmentHeadLayout({ dark, setDark }) {
         arts,
         stt,
       ] = await Promise.all([
-        departmentHeadService.getProfile(),
-        departmentHeadService.getDepartmentInfo(),
-        departmentHeadService.getDoctors(),
-        departmentHeadService.getAppointments(),
-        departmentHeadService.getAnalytics(),
-        departmentHeadService.getDoctorPerformance(),
-        departmentHeadService.getArticles(),
+        departmentHeadService.getProfile(user),
+        departmentHeadService.getDepartmentInfo(targetDeptId),
+        departmentHeadService.getDoctors({}, targetDeptId),
+        departmentHeadService.getAppointments(targetDeptId),
+        departmentHeadService.getAnalytics(targetDeptId),
+        departmentHeadService.getDoctorPerformance(targetDeptId),
+        departmentHeadService.getArticles(targetDeptId),
         departmentHeadService.getSettings(),
       ]);
 
-      const matchedHead = (user && departmentHeads.find((dh) => dh.email?.toLowerCase() === user.email?.toLowerCase() || dh.id === user.id || dh.departmentId === user.departmentId)) || null;
-      const effectiveProfile = matchedHead
-        ? {
-            ...prof,
-            ...matchedHead,
-            name: user?.name || matchedHead.name,
-            email: user?.email || matchedHead.email,
-            avatarInitials: matchedHead.avatarInitials || user?.avatarInitials || 'DH',
-            title: matchedHead.title || user?.title || 'Head of Department',
-          }
-        : prof;
-
-      const matchedDept = matchedHead ? departments.find((d) => d.id === matchedHead.departmentId) : null;
-      const effectiveDept = matchedDept ? { ...dept, ...matchedDept } : dept;
-
-      const scopedDoctors = matchedHead
-        ? allDoctors.filter((d) => d.departmentId === matchedHead.departmentId)
-        : docs;
-
-      const targetDeptId = matchedHead?.departmentId || user?.departmentId || 'DEP-H1-ORTHO';
-      const targetDeptName = matchedDept?.name || matchedHead?.departmentName || 'Orthopedics';
-
-      const scopedAppointments = apts.filter(
-        (a) => a.departmentId === targetDeptId || (a.departmentName && a.departmentName.toLowerCase().includes(targetDeptName.toLowerCase())) || (a.department && a.department.toLowerCase().includes(targetDeptName.toLowerCase()))
-      );
-      const scopedArticles = arts.filter(
-        (a) => a.departmentId === targetDeptId || (a.department && a.department.toLowerCase().includes(targetDeptName.toLowerCase()))
-      );
+      const effectiveProfile = {
+        ...prof,
+        name: user?.name || prof?.name || 'Dr. Arun Prakash',
+        email: user?.email || prof?.email,
+        title: user?.title || prof?.title || 'Head of Department',
+        departmentId: targetDeptId,
+        departmentName: dept?.name || user?.departmentName || prof?.departmentName || 'Orthopedics & Trauma',
+        hospitalName: user?.hospitalName || prof?.hospitalName || 'Aarogyam Multispeciality Hospital',
+        avatarInitials: user?.avatarInitials || prof?.avatarInitials || 'DH',
+      };
 
       setProfile(effectiveProfile);
-      setDepartmentInfo(effectiveDept);
-      setDoctors(scopedDoctors.length > 0 ? scopedDoctors : docs);
-      setAppointments(scopedAppointments.length > 0 ? scopedAppointments : apts);
+      setDepartmentInfo(dept);
+      setDoctors(docs);
+      setAppointments(apts);
       setAnalytics(anlyt);
       setPerformance(perf);
-      setArticles(scopedArticles.length > 0 ? scopedArticles : arts);
+      setArticles(arts);
       setSettings(stt);
     }
     loadData();
