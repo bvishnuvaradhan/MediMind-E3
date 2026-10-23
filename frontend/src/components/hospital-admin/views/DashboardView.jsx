@@ -113,7 +113,7 @@ export function DashboardView({
         />
         <StatCard
           label="Today's Appointments"
-          value={todayAppointments.length || 14}
+          value={todayAppointments.length ?? 0}
           subtext="128 Total Bookings This Month"
           icon={Calendar}
           tone="teal"
@@ -121,7 +121,7 @@ export function DashboardView({
         />
         <StatCard
           label="AI Predictions (Aggregate)"
-          value={kpis.totalAiPredictions || 91}
+          value={kpis.totalAiPredictions ?? 0}
           subtext="97.2% Diagnostic Assistance Rate"
           icon={Sparkles}
           tone="warning"
@@ -204,7 +204,7 @@ export function DashboardView({
                   <div style={{ textAlign: 'right' }}>
                     <span className="ha-badge success">{dept.status}</span>
                     <div style={{ fontSize: '11px', color: 'var(--ha-text-muted)', marginTop: '4px' }}>
-                      {dept.activeAppointments || 12} Active Appts
+                      {dept.activeAppointments ?? 0} Active Appts
                     </div>
                   </div>
                 </div>
@@ -296,7 +296,7 @@ export function DashboardView({
               <strong style={{ fontSize: '12px' }}>Consultation Completion</strong>
             </div>
             <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--ha-text-primary)' }}>
-              {kpis.completedConsultations || 104} / 128
+              {kpis.completedConsultations ?? 0} / {kpis.totalAppointments ?? 0}
             </div>
             <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>81.2% monthly resolution</span>
           </div>
@@ -329,7 +329,7 @@ export function DashboardView({
               <strong style={{ fontSize: '12px' }}>AI Screening Triaged</strong>
             </div>
             <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--ha-text-primary)' }}>
-              {kpis.totalAiPredictions || 91}
+              {kpis.totalAiPredictions ?? 0}
             </div>
             <span style={{ fontSize: '11px', color: 'var(--ha-text-muted)' }}>31 Fracture · 29 Diabetes · 31 Heart</span>
           </div>

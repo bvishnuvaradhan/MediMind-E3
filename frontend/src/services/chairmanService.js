@@ -221,31 +221,38 @@ export const chairmanService = {
     const inactiveDocs = rawDocs.filter(d => (d.status || '').toUpperCase() === 'INACTIVE' || d.status === 'Inactive');
 
     const aiData = await chairmanService.getAiAnalytics().catch(() => null);
-    const livePredsCount = aiData?.totalInferences || (stats?.byHospitalPreds ? Object.values(stats.byHospitalPreds).reduce((a, b) => a + b, 0) : 1697);
+    const livePredsCount = aiData?.totalInferences || (stats?.byHospitalPreds ? Object.values(stats.byHospitalPreds).reduce((a, b) => a + b, 0) : 0);
+
+    const activeAdminCount = hospitalAdmins.filter(a => a.status === 'Active').length;
+    const activeDoctorCount = activeDocs.length;
+    const activeFamilyCount = familyAccounts.length;
+    const activeDeptHeadCount = 14;
+    const activeChairmanCount = 2;
+    const dynamicTotalPlatformAccounts = activeDoctorCount + activeFamilyCount + activeAdminCount + activeDeptHeadCount + activeChairmanCount;
 
     return {
       ...platformSummary,
-      totalHospitals: activeHospCount || 3,
+      totalHospitals: activeHospCount ?? 0,
       pendingHospitalRequests: pendingHospReqCount,
-      totalHospitalAdmins: hospitalAdmins.filter(a => a.status === 'Active').length,
-      totalDoctors: activeDocs.length || 66,
-      totalDepartments: rawDepts.length || 13,
-      totalFamilyAccounts: familyAccounts.length || 10,
+      totalHospitalAdmins: activeAdminCount,
+      totalDoctors: activeDoctorCount,
+      totalDepartments: rawDepts.length ?? 0,
+      totalFamilyAccounts: activeFamilyCount,
       totalAppointments: totalApts,
       completedAppointments: completedApts,
       upcomingAppointments: upcomingApts,
       cancelledAppointments: cancelledApts,
       totalAiPredictions: livePredsCount,
-      totalPlatformAccounts: 96,
+      totalPlatformAccounts: dynamicTotalPlatformAccounts,
       accountsBreakdown: {
-        total: 96,
-        doctor: activeDocs.length || 66,
-        family: familyAccounts.length || 10,
-        chairman: 2,
-        departmentHead: 14,
-        hospitalAdmin: 4,
-        totalDoctorProfiles: rawDocs.length || 68,
-        totalDeactivatedAccounts: inactiveDocs.length || 2,
+        total: dynamicTotalPlatformAccounts,
+        doctor: activeDoctorCount,
+        family: activeFamilyCount,
+        chairman: activeChairmanCount,
+        departmentHead: activeDeptHeadCount,
+        hospitalAdmin: activeAdminCount,
+        totalDoctorProfiles: rawDocs.length ?? 0,
+        totalDeactivatedAccounts: inactiveDocs.length ?? 0,
         totalHistoricalTestAccounts: 7,
         totalAuthAccounts: 105,
       },

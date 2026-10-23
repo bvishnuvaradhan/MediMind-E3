@@ -639,32 +639,35 @@ export const appointmentService = {
 
       departmentId = departmentId || doctor.department_id?._id || doctor.department_id || doctor.departmentId;
 
-    } else {
-
-      hospitalId = hospitalId || new mongoose.Types.ObjectId();
-
-      departmentId = departmentId || new mongoose.Types.ObjectId();
-
     }
 
-    if (!hospitalId || !departmentId) {
-      const err = new Error('Hospital ID and Department ID could not be resolved for doctor');
+    if (!hospitalId || !mongoose.Types.ObjectId.isValid(hospitalId)) {
+      const err = new Error('Invalid or missing hospitalId for appointment booking');
       err.statusCode = 400;
       throw err;
     }
 
-    if (hospitalId && mongoose.Types.ObjectId.isValid(hospitalId)) {
-      try {
-        const hospDb = mongoose.connection.useDb(process.env.HOSPITAL_DB_NAME || 'medimind_hospital');
-        const hospDoc = await hospDb.collection('hospitals').findOne({ _id: new mongoose.Types.ObjectId(hospitalId) });
-        if (hospDoc && (hospDoc.status || '').toUpperCase() !== 'ACTIVE') {
-          const err = new Error('Cannot book appointment: target hospital is pending approval or inactive');
-          err.statusCode = 400;
-          throw err;
-        }
-      } catch (hospCheckErr) {
-        if (hospCheckErr.statusCode === 400) throw hospCheckErr;
+    if (!departmentId || !mongoose.Types.ObjectId.isValid(departmentId)) {
+      const err = new Error('Invalid or missing departmentId for appointment booking');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    try {
+      const hospDb = mongoose.connection.useDb(process.env.HOSPITAL_DB_NAME || 'medimind_hospital');
+      const hospDoc = await hospDb.collection('hospitals').findOne({ _id: new mongoose.Types.ObjectId(hospitalId) });
+      if (!hospDoc) {
+        const err = new Error('Target hospital does not exist');
+        err.statusCode = 400;
+        throw err;
       }
+      if ((hospDoc.status || '').toUpperCase() !== 'ACTIVE') {
+        const err = new Error(`Cannot book appointment: target hospital is ${hospDoc.status || 'inactive'}`);
+        err.statusCode = 400;
+        throw err;
+      }
+    } catch (hospCheckErr) {
+      if (hospCheckErr.statusCode) throw hospCheckErr;
     }
 
     // 5. Double booking conflict check

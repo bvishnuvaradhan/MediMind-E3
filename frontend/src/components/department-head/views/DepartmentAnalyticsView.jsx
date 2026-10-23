@@ -98,7 +98,7 @@ export function DepartmentAnalyticsView({ analytics, departmentInfo, doctors = [
       <div className="dh-stat-grid">
         <StatCard
           label="Monthly Consultations"
-          value={departmentInfo?.totalMonthlyAppointments || 48}
+          value={departmentInfo?.totalMonthlyAppointments ?? 0}
           tone="indigo"
           change="+8.4% vs last month"
           changeType="positive"
@@ -111,7 +111,7 @@ export function DepartmentAnalyticsView({ analytics, departmentInfo, doctors = [
         />
         <StatCard
           label="Completed Consultations"
-          value={departmentInfo?.completedConsultations || 41}
+          value={departmentInfo?.completedConsultations ?? 0}
           tone="teal"
           change="85.4% completion"
           changeType="positive"

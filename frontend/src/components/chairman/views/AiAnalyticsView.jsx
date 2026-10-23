@@ -73,12 +73,12 @@ export function AiAnalyticsView() {
       stats: [
         {
           label: 'Fracture Detected',
-          value: `${fractureMod.detectedCount || 251} runs (${Math.round(((fractureMod.detectedCount || 251) * 100) / (fractureMod.totalRuns || 412))}%)`,
+          value: `${fractureMod.detectedCount ?? 0} runs (${fractureMod.totalRuns ? Math.round(((fractureMod.detectedCount ?? 0) * 100) / fractureMod.totalRuns) : 0}%)`,
           color: '#dc2626',
         },
         {
           label: 'Normal / Negative',
-          value: `${fractureMod.normalCount || 161} runs (${Math.round(((fractureMod.normalCount || 161) * 100) / (fractureMod.totalRuns || 412))}%)`,
+          value: `${fractureMod.normalCount ?? 0} runs (${fractureMod.totalRuns ? Math.round(((fractureMod.normalCount ?? 0) * 100) / fractureMod.totalRuns) : 0}%)`,
           color: '#16a34a',
         },
       ],
@@ -91,9 +91,9 @@ export function AiAnalyticsView() {
       iconColor: '#0f766e',
       data: diabetesMod,
       stats: [
-        { label: 'High Risk', value: `${diabetesMod.highRiskCount || 80} runs`, color: '#dc2626' },
-        { label: 'Moderate Risk', value: `${diabetesMod.moderateRiskCount || 88} runs`, color: '#d97706' },
-        { label: 'Low Risk', value: `${diabetesMod.lowRiskCount || 103} runs`, color: '#16a34a' },
+        { label: 'High Risk', value: `${diabetesMod.highRiskCount ?? 0} runs`, color: '#dc2626' },
+        { label: 'Moderate Risk', value: `${diabetesMod.moderateRiskCount ?? 0} runs`, color: '#d97706' },
+        { label: 'Low Risk', value: `${diabetesMod.lowRiskCount ?? 0} runs`, color: '#16a34a' },
       ],
     },
     {
@@ -104,9 +104,9 @@ export function AiAnalyticsView() {
       iconColor: '#7c3aed',
       data: heartMod,
       stats: [
-        { label: 'High Risk', value: `${heartMod.highRiskCount || 72} runs`, color: '#dc2626' },
-        { label: 'Moderate Risk', value: `${heartMod.moderateRiskCount || 82} runs`, color: '#d97706' },
-        { label: 'Low Risk', value: `${heartMod.lowRiskCount || 103} runs`, color: '#16a34a' },
+        { label: 'High Risk', value: `${heartMod.highRiskCount ?? 0} runs`, color: '#dc2626' },
+        { label: 'Moderate Risk', value: `${heartMod.moderateRiskCount ?? 0} runs`, color: '#d97706' },
+        { label: 'Low Risk', value: `${heartMod.lowRiskCount ?? 0} runs`, color: '#16a34a' },
       ],
     },
     {
@@ -117,9 +117,9 @@ export function AiAnalyticsView() {
       iconColor: '#d97706',
       data: generalMod,
       stats: [
-        { label: 'High Risk / Urgent', value: `${generalMod.highRiskCount || 85} runs`, color: '#dc2626' },
-        { label: 'Moderate Risk', value: `${generalMod.moderateRiskCount || 134} runs`, color: '#d97706' },
-        { label: 'Routine / Healthy', value: `${generalMod.lowRiskCount || 142} runs`, color: '#16a34a' },
+        { label: 'High Risk / Urgent', value: `${generalMod.highRiskCount ?? 0} runs`, color: '#dc2626' },
+        { label: 'Moderate Risk', value: `${generalMod.moderateRiskCount ?? 0} runs`, color: '#d97706' },
+        { label: 'Routine / Healthy', value: `${generalMod.lowRiskCount ?? 0} runs`, color: '#16a34a' },
       ],
     },
   ];

@@ -347,10 +347,14 @@ export const doctorService = {
     }
 
     if (!targetHospitalId || !mongoose.Types.ObjectId.isValid(targetHospitalId)) {
-      targetHospitalId = new mongoose.Types.ObjectId(targetHospitalId || undefined);
+      const err = new Error('Invalid or missing hospitalId parameter');
+      err.statusCode = 400;
+      throw err;
     }
     if (!targetDepartmentId || !mongoose.Types.ObjectId.isValid(targetDepartmentId)) {
-      targetDepartmentId = new mongoose.Types.ObjectId(targetDepartmentId || undefined);
+      const err = new Error('Invalid or missing departmentId parameter');
+      err.statusCode = 400;
+      throw err;
     }
 
     // Verify target hospital exists and is ACTIVE
@@ -359,11 +363,11 @@ export const doctorService = {
       const hospDoc = await hospitalConn.collection('hospitals').findOne({ _id: new mongoose.Types.ObjectId(targetHospitalId) });
       if (!hospDoc) {
         const err = new Error('Target hospital does not exist');
-        err.statusCode = 404;
+        err.statusCode = 400;
         throw err;
       }
       if ((hospDoc.status || '').toUpperCase() !== 'ACTIVE') {
-        const err = new Error('Cannot assign doctor: hospital is pending approval or inactive');
+        const err = new Error(`Cannot assign doctor: hospital is ${hospDoc.status || 'inactive'}`);
         err.statusCode = 400;
         throw err;
       }

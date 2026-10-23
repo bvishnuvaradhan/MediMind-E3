@@ -105,10 +105,10 @@ export function PlatformDashboard({ onNavigate }) {
             </span>
             <span className="stat-delta">Network</span>
           </div>
-          <h3>{summary.totalHospitals}</h3>
+          <h3>{summary.totalHospitals ?? 0}</h3>
           <p>Registered Hospitals</p>
           <small style={{ color: 'var(--chair-muted)', marginTop: '4px' }}>
-            + {summary.pendingHospitalRequests || 2} pending expansion facilities
+            + {summary.pendingHospitalRequests ?? 0} pending expansion facilities
           </small>
         </div>
 
@@ -117,12 +117,12 @@ export function PlatformDashboard({ onNavigate }) {
             <span className="stat-icon" style={{ background: '#ccfbf1', color: '#0f766e' }}>
               <Stethoscope size={20} />
             </span>
-            <span className="stat-delta">{summary.totalDepartments || 17} Departments</span>
+            <span className="stat-delta">{summary.totalDepartments ?? 0} Departments</span>
           </div>
-          <h3>{summary.totalDoctors || 66}</h3>
+          <h3>{summary.totalDoctors ?? 0}</h3>
           <p>Active Credentialed Doctors</p>
           <small style={{ color: 'var(--chair-muted)', marginTop: '4px' }}>
-            {summary.totalDoctors || 66} Operational Doctors ({summary.accountsBreakdown?.totalDeactivatedAccounts || 0} Deactivated Doctor Accounts)
+            {summary.totalDoctors ?? 0} Operational Doctors ({summary.accountsBreakdown?.totalDeactivatedAccounts ?? 0} Deactivated Doctor Accounts)
           </small>
         </div>
 
@@ -131,12 +131,12 @@ export function PlatformDashboard({ onNavigate }) {
             <span className="stat-icon" style={{ background: '#fef3c7', color: '#d97706' }}>
               <UsersRound size={20} />
             </span>
-            <span className="stat-delta">{summary.totalFamilyMembers || 29} Members</span>
+            <span className="stat-delta">{summary.totalFamilyMembers ?? 0} Members</span>
           </div>
-          <h3>{summary.totalFamilyAccounts}</h3>
+          <h3>{summary.totalFamilyAccounts ?? 0}</h3>
           <p>Family Accounts</p>
           <small style={{ color: 'var(--chair-muted)', marginTop: '4px' }}>
-            {summary.activeUsers || 29} active user sessions
+            {summary.activeUsers ?? 0} active user sessions
           </small>
         </div>
 
@@ -145,12 +145,12 @@ export function PlatformDashboard({ onNavigate }) {
             <span className="stat-icon" style={{ background: '#e0e7ff', color: '#4338ca' }}>
               <CalendarDays size={20} />
             </span>
-            <span className="stat-delta">{summary.completedAppointments} Completed</span>
+            <span className="stat-delta">{summary.completedAppointments ?? 0} Completed</span>
           </div>
-          <h3>{summary.totalAppointments}</h3>
+          <h3>{summary.totalAppointments ?? 0}</h3>
           <p>Platform Appointments</p>
           <small style={{ color: 'var(--chair-muted)', marginTop: '4px' }}>
-            {summary.upcomingAppointments} upcoming scheduled
+            {summary.upcomingAppointments ?? 0} upcoming scheduled
           </small>
         </div>
 
@@ -161,7 +161,7 @@ export function PlatformDashboard({ onNavigate }) {
             </span>
             <span className="stat-delta">95.6% Accuracy</span>
           </div>
-          <h3>{summary.totalAiPredictions}</h3>
+          <h3>{summary.totalAiPredictions ?? 0}</h3>
           <p>Clinical AI Predictions</p>
           <small style={{ color: 'var(--chair-muted)', marginTop: '4px' }}>
             4 Active Diagnostic Pipelines
@@ -173,12 +173,12 @@ export function PlatformDashboard({ onNavigate }) {
             <span className="stat-icon" style={{ background: '#ede9fe', color: '#6d28d9' }}>
               <UsersRound size={20} />
             </span>
-            <span className="stat-delta">{summary.totalPlatformAccounts || 96} Active ({summary.accountsBreakdown?.totalDeactivatedAccounts || 2} Deactivated)</span>
+            <span className="stat-delta">{summary.totalPlatformAccounts ?? 0} Active ({summary.accountsBreakdown?.totalDeactivatedAccounts ?? 0} Deactivated)</span>
           </div>
-          <h3>{summary.totalPlatformAccounts || 96}</h3>
+          <h3>{summary.totalPlatformAccounts ?? 0}</h3>
           <p>Active Platform Accounts</p>
           <div style={{ fontSize: '11px', color: 'var(--chair-muted)', marginTop: '4px', lineHeight: 1.35 }}>
-            <strong>{summary.totalDoctors || 66}</strong> Doctors · <strong>{summary.totalFamilyAccounts || 10}</strong> Families · <strong>{summary.accountsBreakdown?.departmentHead || 14}</strong> Dept Heads · <strong>{summary.accountsBreakdown?.hospitalAdmin || 4}</strong> Admins · <strong>{summary.accountsBreakdown?.chairman || 2}</strong> Owners
+            <strong>{summary.totalDoctors ?? 0}</strong> Doctors · <strong>{summary.totalFamilyAccounts ?? 0}</strong> Families · <strong>{summary.accountsBreakdown?.departmentHead ?? 0}</strong> Dept Heads · <strong>{summary.accountsBreakdown?.hospitalAdmin ?? 0}</strong> Admins · <strong>{summary.accountsBreakdown?.chairman ?? 0}</strong> Owners
           </div>
         </div>
       </div>
@@ -258,7 +258,7 @@ export function PlatformDashboard({ onNavigate }) {
             </div>
           )}
 
-          {(summary.pendingHospitalRequests > 0 || pendingHospitals.length > 0) && (
+          {(summary.pendingHospitalRequests > 0 || requests.length > 0) && (
             <div style={{ marginTop: '16px', padding: '12px 14px', borderRadius: '10px', background: '#fffbeb', border: '1px solid #fde68a', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '9px', fontSize: '12px', color: '#92400e' }}>
                 <Clock size={16} />
@@ -293,10 +293,10 @@ export function PlatformDashboard({ onNavigate }) {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {(() => {
-              const fRuns = aiData.modules?.fracture?.totalRuns || 165;
-              const dRuns = aiData.modules?.diabetes?.totalRuns || 142;
-              const hRuns = aiData.modules?.heartDisease?.totalRuns || 138;
-              const gRuns = aiData.modules?.generalHealth?.totalRuns || 95;
+              const fRuns = aiData.modules?.fracture?.totalRuns ?? 0;
+              const dRuns = aiData.modules?.diabetes?.totalRuns ?? 0;
+              const hRuns = aiData.modules?.heartDisease?.totalRuns ?? 0;
+              const gRuns = aiData.modules?.generalHealth?.totalRuns ?? 0;
               const total = fRuns + dRuns + hRuns + gRuns;
 
               const chartData = [

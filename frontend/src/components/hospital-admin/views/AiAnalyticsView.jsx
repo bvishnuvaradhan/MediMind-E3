@@ -13,10 +13,10 @@ export function AiAnalyticsView({ analytics = {}, hospital = null }) {
   const isHosp002 = hospital?.id === 'HOSP-002';
   const ai = analytics?.aiAggregateMetrics || analytics || {};
 
-  const fRuns = ai.fracturePredictions || 48;
-  const dRuns = ai.diabetesPredictions || 36;
-  const hRuns = ai.heartPredictions || ai.heartDiseasePredictions || 42;
-  const gRuns = isHosp002 ? 0 : (ai.generalHealthScreenings || 32);
+  const fRuns = ai.fracturePredictions ?? 0;
+  const dRuns = ai.diabetesPredictions ?? 0;
+  const hRuns = ai.heartPredictions ?? ai.heartDiseasePredictions ?? 0;
+  const gRuns = isHosp002 ? 0 : (ai.generalHealthScreenings ?? 0);
   const totalRuns = fRuns + dRuns + hRuns + gRuns;
 
   const aiDonutData = [
@@ -63,7 +63,7 @@ export function AiAnalyticsView({ analytics = {}, hospital = null }) {
       <div className="ha-stat-grid">
         <StatCard
           label="Total AI Diagnostic Inferences"
-          value={ai.totalScans || totalRuns || 158}
+          value={ai.totalScans ?? totalRuns ?? 0}
           subtext="Hospital-wide clinical inferences"
           icon={Brain}
           tone="primary"
@@ -212,11 +212,11 @@ export function AiAnalyticsView({ analytics = {}, hospital = null }) {
           <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
               <span style={{ color: 'var(--ha-text-muted)' }}>Normal / Intact Bone Scans:</span>
-              <strong>{ai.fractureDistribution?.normalOrLow || 30} (62.5%)</strong>
+              <strong>{ai.fractureDistribution?.normalOrLow ?? 0} (62.5%)</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
               <span style={{ color: 'var(--ha-text-muted)' }}>Fractures Identified & Flagged:</span>
-              <strong style={{ color: 'var(--ha-error)' }}>{ai.fractureDistribution?.fractureDetected || 18} (37.5%)</strong>
+              <strong style={{ color: 'var(--ha-error)' }}>{ai.fractureDistribution?.fractureDetected ?? 0} (37.5%)</strong>
             </div>
           </div>
         </div>
@@ -245,11 +245,11 @@ export function AiAnalyticsView({ analytics = {}, hospital = null }) {
           <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
               <span style={{ color: 'var(--ha-text-muted)' }}>Low Risk Cohort:</span>
-              <strong style={{ color: 'var(--ha-success)' }}>{ai.diabetesDistribution?.lowRisk || 18} (50.0%)</strong>
+              <strong style={{ color: 'var(--ha-success)' }}>{ai.diabetesDistribution?.lowRisk ?? 0} (50.0%)</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
               <span style={{ color: 'var(--ha-text-muted)' }}>Moderate / High Risk:</span>
-              <strong style={{ color: 'var(--ha-warning)' }}>{ai.diabetesDistribution?.moderateRisk || 18} (50.0%)</strong>
+              <strong style={{ color: 'var(--ha-warning)' }}>{ai.diabetesDistribution?.moderateRisk ?? 0} (50.0%)</strong>
             </div>
           </div>
         </div>
@@ -278,11 +278,11 @@ export function AiAnalyticsView({ analytics = {}, hospital = null }) {
           <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
               <span style={{ color: 'var(--ha-text-muted)' }}>Low Risk Profile:</span>
-              <strong style={{ color: 'var(--ha-success)' }}>{ai.heartDistribution?.lowRisk || 22} (52.4%)</strong>
+              <strong style={{ color: 'var(--ha-success)' }}>{ai.heartDistribution?.lowRisk ?? 0} (52.4%)</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
               <span style={{ color: 'var(--ha-text-muted)' }}>Moderate / High Alert:</span>
-              <strong style={{ color: 'var(--ha-error)' }}>{ai.heartDistribution?.highRisk || 20} (47.6%)</strong>
+              <strong style={{ color: 'var(--ha-error)' }}>{ai.heartDistribution?.highRisk ?? 0} (47.6%)</strong>
             </div>
           </div>
         </div>

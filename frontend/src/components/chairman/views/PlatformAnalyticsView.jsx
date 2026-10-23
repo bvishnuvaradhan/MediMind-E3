@@ -78,7 +78,7 @@ export function PlatformAnalyticsView() {
           name: f.name,
           email: f.email || f.primaryContact,
           role: 'Family Account',
-          specialty: `${f.membersCount || 4} Members`,
+          specialty: `${f.membersCount ?? 0} Members`,
           facility: f.city || 'Bengaluru',
           status: f.status === 'Active' ? 'Active' : 'Deactivated',
           authStatus: 'Authorized',
@@ -133,22 +133,22 @@ export function PlatformAnalyticsView() {
   if (!summary) return <div className="loading-state">Loading Platform Analytics...</div>;
 
   const totalUsers =
-    (summary.totalFamilyMembers || 29) +
+    (summary.totalFamilyMembers ?? 0) +
     summary.totalDoctors +
     summary.totalDepartmentHeads +
     summary.totalHospitalAdmins;
 
   const userData = [
-    { label: 'Family Members', value: summary.totalFamilyMembers || 29, color: '#f59e0b' },
-    { label: 'Doctors', value: summary.totalDoctors || 66, color: '#0f766e' },
-    { label: 'Department Heads', value: summary.totalDepartmentHeads || 14, color: '#2563eb' },
-    { label: 'Hospital Admins', value: summary.totalHospitalAdmins || 4, color: '#4338ca' },
+    { label: 'Family Members', value: summary.totalFamilyMembers ?? 0, color: '#f59e0b' },
+    { label: 'Doctors', value: summary.totalDoctors ?? 0, color: '#0f766e' },
+    { label: 'Department Heads', value: summary.totalDepartmentHeads ?? 0, color: '#2563eb' },
+    { label: 'Hospital Admins', value: summary.totalHospitalAdmins ?? 0, color: '#4338ca' },
   ];
 
-  const totalAppts = summary.totalAppointments || 128;
-  const compAppts = summary.completedAppointments || 96;
-  const upcomAppts = summary.upcomingAppointments || 24;
-  const cancAppts = summary.cancelledAppointments || 8;
+  const totalAppts = summary.totalAppointments ?? 0;
+  const compAppts = summary.completedAppointments ?? 0;
+  const upcomAppts = summary.upcomingAppointments ?? 0;
+  const cancAppts = summary.cancelledAppointments ?? 0;
 
   const apptData = [
     { label: 'Completed', value: compAppts, color: '#16a34a' },
@@ -221,7 +221,7 @@ export function PlatformAnalyticsView() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', paddingTop: '12px', borderTop: '1px solid var(--chair-border)', fontSize: '12px' }}>
             <div style={{ padding: '8px', background: 'var(--chair-bg)', borderRadius: '6px' }}>
               <span style={{ color: 'var(--chair-muted)', fontSize: '11px' }}>Families</span>
-              <div style={{ fontWeight: 700, marginTop: '2px' }}>{summary.totalFamilyAccounts} ({summary.totalFamilyMembers || 29} members)</div>
+              <div style={{ fontWeight: 700, marginTop: '2px' }}>{summary.totalFamilyAccounts} ({summary.totalFamilyMembers ?? 0} members)</div>
             </div>
             <div style={{ padding: '8px', background: 'var(--chair-bg)', borderRadius: '6px' }}>
               <span style={{ color: 'var(--chair-muted)', fontSize: '11px' }}>Clinical Staff</span>
