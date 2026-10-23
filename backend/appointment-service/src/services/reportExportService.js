@@ -265,15 +265,38 @@ export const reportExportService = {
     // REPORT TYPE: CLINICAL AI DIAGNOSTIC PERFORMANCE
     // -------------------------------------------------------------
     if (reportType === 'ai') {
+      // Build prediction-timestamp filter (created_at)
+      const aiFilter = {};
+      if (query.startDate || query.endDate) {
+        const start = query.startDate;
+        const end = query.endDate ? query.endDate + 'T23:59:59.999Z' : null;
+        const strCond = {};
+        if (start) strCond.$gte = start;
+        if (end) strCond.$lte = end;
+
+        const dtCond = {};
+        if (start) dtCond.$gte = new Date(start);
+        if (end) dtCond.$lte = new Date(end);
+
+        aiFilter.$or = [
+          { created_at: strCond },
+          { created_at: dtCond },
+        ];
+      }
+
+      const matchStage = Object.keys(aiFilter).length > 0 ? [{ $match: aiFilter }] : [];
+
       const [predTypeStats, riskStats, totalPreds, linkedPreds] = await Promise.all([
         aiCol.aggregate([
+          ...matchStage,
           { $group: { _id: '$prediction_type', count: { $sum: 1 }, avgScore: { $avg: '$risk_score' }, avgConfidence: { $avg: '$confidence' } } },
         ]).toArray(),
         aiCol.aggregate([
+          ...matchStage,
           { $group: { _id: '$risk_level', count: { $sum: 1 } } },
         ]).toArray(),
-        aiCol.countDocuments({}),
-        aiCol.countDocuments({ appointment_id: { $ne: null } }),
+        aiCol.countDocuments(aiFilter),
+        aiCol.countDocuments({ ...aiFilter, appointment_id: { $ne: null } }),
       ]);
 
       const standaloneCount = totalPreds - linkedPreds;
@@ -730,13 +753,35 @@ export const reportExportService = {
     else if (reportType === 'ai') {
       filename = `MediMind_AI_Diagnostic_Report_${timestamp}.xlsx`;
 
+      // Build prediction-timestamp filter (created_at)
+      const aiFilter = {};
+      if (query.startDate || query.endDate) {
+        const start = query.startDate;
+        const end = query.endDate ? query.endDate + 'T23:59:59.999Z' : null;
+        const strCond = {};
+        if (start) strCond.$gte = start;
+        if (end) strCond.$lte = end;
+
+        const dtCond = {};
+        if (start) dtCond.$gte = new Date(start);
+        if (end) dtCond.$lte = new Date(end);
+
+        aiFilter.$or = [
+          { created_at: strCond },
+          { created_at: dtCond },
+        ];
+      }
+
+      const matchStage = Object.keys(aiFilter).length > 0 ? [{ $match: aiFilter }] : [];
+
       const [predTypeStats, totalPreds, linkedPreds, samplePreds] = await Promise.all([
         aiCol.aggregate([
+          ...matchStage,
           { $group: { _id: '$prediction_type', count: { $sum: 1 }, avgScore: { $avg: '$risk_score' }, avgConfidence: { $avg: '$confidence' } } },
         ]).toArray(),
-        aiCol.countDocuments({}),
-        aiCol.countDocuments({ appointment_id: { $ne: null } }),
-        aiCol.find({}, {
+        aiCol.countDocuments(aiFilter),
+        aiCol.countDocuments({ ...aiFilter, appointment_id: { $ne: null } }),
+        aiCol.find(aiFilter, {
           projection: { prediction_id: 1, prediction_type: 1, appointment_id: 1, family_member_id: 1, risk_level: 1, risk_score: 1, confidence: 1, created_at: 1, model_name: 1 },
         }).sort({ created_at: -1 }).limit(1000).toArray(),
       ]);

@@ -1,3 +1,4 @@
+import { RELATIVE_PERIOD_OPTIONS, getRelativeDateRange } from "../../../utils/dateUtils";
 // MediMind Platform - AI Analytics (Chairman / Platform Owner)
 // Section 13 of PLATFORM OWNER.txt: Platform-wide aggregate clinical AI analytics
 // Strict Privacy: Model performance & aggregate distribution only; strictly NO individual patient scans or diagnosis records.
@@ -36,13 +37,7 @@ export function AiAnalyticsView() {
   const heartMod = modules?.heartDisease || {};
   const generalMod = modules?.generalHealth || {};
 
-  const now = new Date();
-  const currentMonthLabel = now.toLocaleString('en-US', { month: 'short', year: 'numeric' });
-  const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const prevMonthLabel = prevMonthDate.toLocaleString('en-US', { month: 'short', year: 'numeric' });
-  const prev2MonthDate = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-  const prev2MonthLabel = prev2MonthDate.toLocaleString('en-US', { month: 'short', year: 'numeric' });
-  const dateOptions = ['All Time', currentMonthLabel, prevMonthLabel, prev2MonthLabel, 'Last 3 Months'];
+  const dateOptions = RELATIVE_PERIOD_OPTIONS;
 
   // Dynamic grid column layout based on active modules count:
   // 3 -> 1x3, 4 -> 2x2, 6 -> 2x3, 9 -> 3x3, 12 -> 3x4
@@ -181,27 +176,27 @@ export function AiAnalyticsView() {
       <div className="stats-grid cols-5" style={{ marginBottom: '24px' }}>
         <div className="stat-card">
           <p>Total Model Inferences</p>
-          <h3 style={{ marginTop: '8px' }}>{totalPredictions || 1301}</h3>
+          <h3 style={{ marginTop: '8px' }}>{totalPredictions ?? 0}</h3>
           <span className="stat-delta">100% Appointment Linked</span>
         </div>
         <div className="stat-card">
           <p>🦴 Fracture Detection (CNN)</p>
-          <h3 style={{ marginTop: '8px' }}>{fractureMod.totalRuns || 412}</h3>
+          <h3 style={{ marginTop: '8px' }}>{fractureMod.totalRuns ?? 0}</h3>
           <small style={{ color: 'var(--chair-muted)' }}>Avg Confidence: {fractureMod.avgConfidence || '98.2%'}</small>
         </div>
         <div className="stat-card">
           <p>🩺 Diabetes Risk (ML)</p>
-          <h3 style={{ marginTop: '8px' }}>{diabetesMod.totalRuns || 271}</h3>
+          <h3 style={{ marginTop: '8px' }}>{diabetesMod.totalRuns ?? 0}</h3>
           <small style={{ color: 'var(--chair-muted)' }}>Avg Confidence: {diabetesMod.avgConfidence || '95.4%'}</small>
         </div>
         <div className="stat-card">
           <p>❤️ Heart Disease Risk (ML)</p>
-          <h3 style={{ marginTop: '8px' }}>{heartMod.totalRuns || 257}</h3>
+          <h3 style={{ marginTop: '8px' }}>{heartMod.totalRuns ?? 0}</h3>
           <small style={{ color: 'var(--chair-muted)' }}>Avg Confidence: {heartMod.avgConfidence || '96.8%'}</small>
         </div>
         <div className="stat-card">
           <p>🧠 General Health (NLP)</p>
-          <h3 style={{ marginTop: '8px' }}>{generalMod.totalRuns || 361}</h3>
+          <h3 style={{ marginTop: '8px' }}>{generalMod.totalRuns ?? 0}</h3>
           <small style={{ color: 'var(--chair-muted)' }}>Avg Confidence: {generalMod.avgConfidence || '94.5%'}</small>
         </div>
       </div>
@@ -294,7 +289,7 @@ export function AiAnalyticsView() {
                 Monthly Clinical Prediction Volume Trajectory
               </h3>
               <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
-                Platform progression across all 4 clinical AI modules (Aug – Oct 2026)
+                {dateRange === 'All Time' ? 'Platform progression across all clinical AI modules (All Recorded Months)' : `Platform progression across clinical AI modules (${getRelativeDateRange(dateRange).label})`}
               </p>
             </div>
 

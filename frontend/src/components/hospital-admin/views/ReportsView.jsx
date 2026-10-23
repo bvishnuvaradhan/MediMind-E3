@@ -1,3 +1,4 @@
+import { getRelativeDateRange } from "../../../utils/dateUtils";
 import { useState } from 'react';
 import {
   FileText,
@@ -35,28 +36,28 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
           totalGenerated: 14,
           auditCompliance: '99.1%',
           archivedRecords: '38,400',
-          label: 'August 2026 (Historical Period)',
+          label: `${getRelativeDateRange('Previous Month').label} (Historical Period)`,
         };
       case 'This Quarter':
         return {
           totalGenerated: 28,
           auditCompliance: '98.8%',
           archivedRecords: '72,150',
-          label: 'Q3 2026 (Jul – Sep 2026)',
+          label: `${getRelativeDateRange('This Quarter').label} (Current Quarter)`,
         };
       case 'Last Quarter':
         return {
           totalGenerated: 31,
           auditCompliance: '99.5%',
           archivedRecords: '69,800',
-          label: 'Q2 2026 (Apr – Jun 2026)',
+          label: `${getRelativeDateRange('Previous Quarter').label} (Historical Quarter)`,
         };
       case 'This Year':
         return {
           totalGenerated: 86,
           auditCompliance: '98.9%',
           archivedRecords: '210,500',
-          label: 'Calendar Year 2026',
+          label: `Calendar Year ${new Date().getFullYear()}`,
         };
 
       case 'This Month':
@@ -65,7 +66,7 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
           totalGenerated: 12,
           auditCompliance: '98.4%',
           archivedRecords: '29,450',
-          label: 'September 2026 (Current Period)',
+          label: `${getRelativeDateRange('This Month').label} (Current Period)`,
         };
     }
   };

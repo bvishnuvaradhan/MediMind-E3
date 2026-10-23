@@ -122,7 +122,7 @@ export function PlatformDashboard({ onNavigate }) {
           <h3>{summary.totalDoctors || 66}</h3>
           <p>Active Credentialed Doctors</p>
           <small style={{ color: 'var(--chair-muted)', marginTop: '4px' }}>
-            66 Operational Doctors (2 Deactivated Doctor Accounts)
+            {summary.totalDoctors || 66} Operational Doctors ({summary.accountsBreakdown?.totalDeactivatedAccounts || 0} Deactivated Doctor Accounts)
           </small>
         </div>
 
@@ -178,8 +178,7 @@ export function PlatformDashboard({ onNavigate }) {
           <h3>{summary.totalPlatformAccounts || 96}</h3>
           <p>Active Platform Accounts</p>
           <div style={{ fontSize: '11px', color: 'var(--chair-muted)', marginTop: '4px', lineHeight: 1.35 }}>
-            <strong>{summary.accountsBreakdown?.doctor || 66}</strong> Active Doctors ({summary.accountsBreakdown?.totalDoctorProfiles || 68} Profiles) · <strong>{summary.accountsBreakdown?.family || 10}</strong> Families<br />
-            <strong>{summary.accountsBreakdown?.departmentHead || 14}</strong> Dept Heads · <strong>{summary.accountsBreakdown?.hospitalAdmin || 4}</strong> Admins · <strong>{summary.accountsBreakdown?.chairman || 2}</strong> Owners
+            <strong>{summary.totalDoctors || 66}</strong> Doctors · <strong>{summary.totalFamilyAccounts || 10}</strong> Families · <strong>{summary.accountsBreakdown?.departmentHead || 14}</strong> Dept Heads · <strong>{summary.accountsBreakdown?.hospitalAdmin || 4}</strong> Admins · <strong>{summary.accountsBreakdown?.chairman || 2}</strong> Owners
           </div>
         </div>
       </div>

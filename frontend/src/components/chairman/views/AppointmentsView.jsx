@@ -140,7 +140,9 @@ export function AppointmentsView() {
                 Historical Monthly Volume Trend
               </h3>
               <p style={{ margin: 0, color: 'var(--chair-muted)', fontSize: '12px' }}>
-                Platform appointment volume trajectory (Aug – Oct 2026)
+                {analytics.historicalMonthlyTrends?.length > 1
+                  ? `Platform appointment volume trajectory (${analytics.historicalMonthlyTrends[0].month} – ${analytics.historicalMonthlyTrends[analytics.historicalMonthlyTrends.length - 1].month})`
+                  : 'Platform appointment volume trajectory across recorded periods'}
               </p>
             </div>
             <span style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', background: '#dcfce7', padding: '3px 8px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '3px' }}>
@@ -149,7 +151,7 @@ export function AppointmentsView() {
           </div>
 
           <LineChart
-            data={analytics.historicalMonthlyTrends.map((t) => ({
+            data={(analytics.historicalMonthlyTrends || []).map((t) => ({
               label: t.month.split(' ')[0],
               volume: t.volume,
               completed: t.completed,
@@ -166,8 +168,8 @@ export function AppointmentsView() {
           />
 
           <div style={{ marginTop: '16px', padding: '12px 14px', borderRadius: '10px', background: 'var(--chair-bg)', fontSize: '12px', color: 'var(--chair-muted)', display: 'flex', justifyContent: 'space-between' }}>
-            <span><b>May 2026 Baseline:</b> 62 visits</span>
-            <span><b>Sep 2026 Current:</b> 128 visits (+66 net gain)</span>
+            <span><b>{analytics.historicalMonthlyTrends?.[0]?.month || 'Initial Baseline'}:</b> {analytics.historicalMonthlyTrends?.[0]?.volume || 0} visits</span>
+            <span><b>{analytics.historicalMonthlyTrends?.[analytics.historicalMonthlyTrends?.length - 1]?.month || 'Current Period'}:</b> {analytics.historicalMonthlyTrends?.[analytics.historicalMonthlyTrends?.length - 1]?.volume || 0} visits ({((analytics.historicalMonthlyTrends?.[analytics.historicalMonthlyTrends?.length - 1]?.volume || 0) - (analytics.historicalMonthlyTrends?.[0]?.volume || 0)) >= 0 ? `+${(analytics.historicalMonthlyTrends?.[analytics.historicalMonthlyTrends?.length - 1]?.volume || 0) - (analytics.historicalMonthlyTrends?.[0]?.volume || 0)}` : (analytics.historicalMonthlyTrends?.[analytics.historicalMonthlyTrends?.length - 1]?.volume || 0) - (analytics.historicalMonthlyTrends?.[0]?.volume || 0)} net)</span>
           </div>
         </div>
 

@@ -1,3 +1,4 @@
+import { getRelativeDateRange } from "../utils/dateUtils.js";
 // MediMind Platform - Chairman Service Layer
 // Clean service abstraction isolating data management from React components.
 // Connects to live microservices via API Gateway with intelligent in-memory caching and graceful fallbacks.
@@ -127,7 +128,7 @@ async function fetchCachedDoctors() {
     return cache.doctors;
   }
   try {
-    const res = await fetch('/api/doctors', { headers: getAuthHeaders() });
+    const res = await fetch('/api/doctors?status=ALL', { headers: getAuthHeaders() });
     if (res.ok) {
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -216,17 +217,18 @@ export const chairmanService = {
     const activeHospCount = rawHosps.filter(h => (h.status || '').toUpperCase() === 'ACTIVE' || h.status === 'Active').length;
     const pendingHospReqCount = rawHosps.filter(h => (h.status || '').toUpperCase() === 'PENDING' || h.status === 'Pending').length || hospitalRequests.filter(r => r.status === 'Pending').length;
 
+    const activeDocs = rawDocs.filter(d => (d.status || '').toUpperCase() === 'ACTIVE' || d.status === 'Active');
+    const inactiveDocs = rawDocs.filter(d => (d.status || '').toUpperCase() === 'INACTIVE' || d.status === 'Inactive');
 
     const aiData = await chairmanService.getAiAnalytics().catch(() => null);
     const livePredsCount = aiData?.totalInferences || (stats?.byHospitalPreds ? Object.values(stats.byHospitalPreds).reduce((a, b) => a + b, 0) : 1697);
-
 
     return {
       ...platformSummary,
       totalHospitals: activeHospCount || 3,
       pendingHospitalRequests: pendingHospReqCount,
       totalHospitalAdmins: hospitalAdmins.filter(a => a.status === 'Active').length,
-      totalDoctors: rawDocs.filter(d => (d.status || '').toUpperCase() === 'ACTIVE').length || 66,
+      totalDoctors: activeDocs.length || 66,
       totalDepartments: rawDepts.length || 13,
       totalFamilyAccounts: familyAccounts.length || 10,
       totalAppointments: totalApts,
@@ -237,19 +239,23 @@ export const chairmanService = {
       totalPlatformAccounts: 96,
       accountsBreakdown: {
         total: 96,
-        doctor: 66,
-        family: 10,
+        doctor: activeDocs.length || 66,
+        family: familyAccounts.length || 10,
         chairman: 2,
         departmentHead: 14,
         hospitalAdmin: 4,
         totalDoctorProfiles: rawDocs.length || 68,
-        totalDeactivatedAccounts: 2,
+        totalDeactivatedAccounts: inactiveDocs.length || 2,
         totalHistoricalTestAccounts: 7,
         totalAuthAccounts: 105,
       },
     };
   },
 
+
+  getOperationalHospitals: async () => {
+    return chairmanService.getHospitals('Active');
+  },
 
   // Hospitals: Enriched with live department, doctor, and appointment metrics
   getHospitals: async (statusFilter = 'All') => {
@@ -737,9 +743,10 @@ export const chairmanService = {
         const previousMonthName = prevMonthDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
 
-        const octTrend = stats.monthlyTrends?.find(m => m.monthKey === '2026-10');
-        const sepTrend = stats.monthlyTrends?.find(m => m.monthKey === '2026-09');
-
+        const curKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const prevKey = `${prevMonthDate.getFullYear()}-${String(prevMonthDate.getMonth() + 1).padStart(2, '0')}`;
+        const curTrend = stats.monthlyTrends?.find(m => m.monthKey === curKey);
+        const prevTrend = stats.monthlyTrends?.find(m => m.monthKey === prevKey);
 
         return {
           ...appointmentAnalytics,
@@ -752,9 +759,9 @@ export const chairmanService = {
           cancellationRate,
           hospitalThroughput: dynamicThroughput.length > 0 ? dynamicThroughput : [],
           currentMonthName,
-          currentMonthVolume: octTrend?.volume || 0,
+          currentMonthVolume: curTrend?.volume || 0,
           previousMonthName,
-          previousMonthVolume: sepTrend?.volume || 0,
+          previousMonthVolume: prevTrend?.volume || 0,
           historicalMonthlyTrends: stats.monthlyTrends || [],
         };
       }
@@ -806,44 +813,9 @@ export const chairmanService = {
     try {
       let url = '/api/ai/analytics';
       if (dateRange && dateRange !== 'All Time') {
-        const now = new Date();
-        let sd = null;
-        let ed = null;
-        if (dateRange === 'Current Month') {
-          const y = now.getFullYear();
-          const m = String(now.getMonth() + 1).padStart(2, '0');
-          const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
-          sd = `${y}-${m}-01`;
-          ed = `${y}-${m}-${lastDay}`;
-        } else if (dateRange === 'Previous Month') {
-          const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-          const y = prev.getFullYear();
-          const m = String(prev.getMonth() + 1).padStart(2, '0');
-          const lastDay = new Date(y, prev.getMonth() + 1, 0).getDate();
-          sd = `${y}-${m}-01`;
-          ed = `${y}-${m}-${lastDay}`;
-        } else if (dateRange === 'Last 3 Months') {
-          const past = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-          const pastY = past.getFullYear();
-          const pastM = String(past.getMonth() + 1).padStart(2, '0');
-          const y = now.getFullYear();
-          const m = String(now.getMonth() + 1).padStart(2, '0');
-          const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
-          sd = `${pastY}-${pastM}-01`;
-          ed = `${y}-${m}-${lastDay}`;
-        } else {
-          const parsed = Date.parse(dateRange + ' 1');
-          if (!isNaN(parsed)) {
-            const d = new Date(parsed);
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            const lastDay = new Date(y, d.getMonth() + 1, 0).getDate();
-          sd = `${y}-${m}-01`;
-          ed = `${y}-${m}-${lastDay}`;
-          }
-        }
-        if (sd && ed) {
-          url += `?start_date=${sd}&end_date=${ed}`;
+        const { startDate, endDate } = getRelativeDateRange(dateRange);
+        if (startDate && endDate) {
+          url += `?start_date=${startDate}&end_date=${endDate}&period=${encodeURIComponent(dateRange)}`;
         }
       }
       const response = await fetch(url, { headers: getAuthHeaders() });

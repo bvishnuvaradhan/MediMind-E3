@@ -1,3 +1,4 @@
+import { getRelativeDateRange } from "../../../utils/dateUtils";
 import { useState } from 'react';
 import {
   TrendingUp,
@@ -25,7 +26,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
   // Period-based dynamic calculation
   const periodData = {
     CURRENT_MONTH: {
-      label: 'Current Month (Sep 2026)',
+      label: `This Month (${getRelativeDateRange('This Month').label})`,
       totalAppts: 128,
       completedAppts: 104,
       scheduledAppts: 18,
@@ -44,7 +45,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
       ],
     },
     LAST_MONTH: {
-      label: 'Last Month (Aug 2026)',
+      label: `Previous Month (${getRelativeDateRange('Previous Month').label})`,
       totalAppts: 122,
       completedAppts: 101,
       scheduledAppts: 16,
@@ -63,7 +64,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
       ],
     },
     Q3: {
-      label: 'Q3 2026 (Jul – Sep)',
+      label: `This Quarter (${getRelativeDateRange('This Quarter').label})`,
       totalAppts: 365,
       completedAppts: 301,
       scheduledAppts: 48,
@@ -82,7 +83,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
       ],
     },
     YTD: {
-      label: 'Year-to-Date 2026',
+      label: `Year-to-Date (${new Date().getFullYear()})`,
       totalAppts: 980,
       completedAppts: 824,
       scheduledAppts: 112,
@@ -112,13 +113,22 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
   const noShowRate = ((cancelledAppts / totalAppts) * 100).toFixed(1);
   const weeklyData = currentMetrics.weeklyData;
 
-  const monthlyTrends = analytics.monthlyTrends || [
-    { month: 'May 2026', appointments: 92, completed: 78, cancelled: 4, aiUsage: 64 },
-    { month: 'Jun 2026', appointments: 104, completed: 88, cancelled: 5, aiUsage: 73 },
-    { month: 'Jul 2026', appointments: 115, completed: 96, cancelled: 6, aiUsage: 81 },
-    { month: 'Aug 2026', appointments: 122, completed: 101, cancelled: 5, aiUsage: 86 },
-    { month: 'Sep 2026', appointments: 128, completed: 104, cancelled: 6, aiUsage: 91 },
-  ];
+  const monthlyTrends = analytics.monthlyTrends || (() => {
+    const list = [];
+    const now = new Date();
+    for (let i = 4; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const label = d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+      list.push({
+        month: label,
+        appointments: 92 + (4 - i) * 9,
+        completed: 78 + (4 - i) * 7,
+        cancelled: 4 + (i % 2),
+        aiUsage: 64 + (4 - i) * 7,
+      });
+    }
+    return list;
+  })();
 
   return (
     <div>
@@ -152,25 +162,25 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
             className={`ha-filter-pill ${period === 'CURRENT_MONTH' ? 'active' : ''}`}
             onClick={() => setPeriod('CURRENT_MONTH')}
           >
-            Current Month (Sep 2026)
+            This Month
           </button>
           <button
             className={`ha-filter-pill ${period === 'LAST_MONTH' ? 'active' : ''}`}
             onClick={() => setPeriod('LAST_MONTH')}
           >
-            Last Month (Aug 2026)
+            Previous Month
           </button>
           <button
             className={`ha-filter-pill ${period === 'Q3' ? 'active' : ''}`}
             onClick={() => setPeriod('Q3')}
           >
-            Q3 2026 (Jul – Sep)
+            This Quarter
           </button>
           <button
             className={`ha-filter-pill ${period === 'YTD' ? 'active' : ''}`}
             onClick={() => setPeriod('YTD')}
           >
-            Year-to-Date 2026
+            This Year
           </button>
         </div>
       </div>
@@ -215,7 +225,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
         <div className="ha-card-panel" style={{ margin: 0 }}>
           <div className="ha-card-panel-header">
             <div>
-              <h3>Monthly Operational Volume Trends (May – Sep 2026)</h3>
+              <h3>Monthly Operational Volume Trends ({monthlyTrends[0]?.month || 'Baseline'} – {monthlyTrends[monthlyTrends.length - 1]?.month || 'Current'})</h3>
               <p>Five-month trajectory of scheduled intake and completed consultations</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--ha-text-muted)' }}>

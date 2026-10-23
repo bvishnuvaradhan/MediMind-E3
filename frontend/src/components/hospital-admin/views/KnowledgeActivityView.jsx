@@ -1,3 +1,4 @@
+import { getCurrentMonthLabel, getPreviousMonthLabel } from "../../../utils/dateUtils";
 import { useState, useMemo } from 'react';
 import {
   BookOpen,
@@ -82,7 +83,9 @@ export function KnowledgeActivityView({
     return ['All', ...Array.from(authors).sort()];
   }, [hospitalArticles]);
 
-  const periodOptions = ['All', 'September 2026', 'Earlier 2026'];
+  const curMonth = getCurrentMonthLabel();
+  const prevMonth = getPreviousMonthLabel();
+  const periodOptions = ['All', curMonth, prevMonth, 'Earlier'];
 
   // 4. Combined Filtering (AND behavior)
   const filteredArticles = useMemo(() => {
@@ -128,16 +131,18 @@ export function KnowledgeActivityView({
       // Period filter
       if (selectedPeriod !== 'All') {
         const dateStr = art.publishedDate || art.date || art.createdDate || '';
-        if (selectedPeriod === 'September 2026') {
-          if (!dateStr.includes('Sep 2026')) return false;
-        } else if (selectedPeriod === 'Earlier 2026') {
-          if (dateStr.includes('Sep 2026')) return false;
+        if (selectedPeriod === curMonth) {
+          if (!dateStr.includes(curMonth)) return false;
+        } else if (selectedPeriod === prevMonth) {
+          if (!dateStr.includes(prevMonth)) return false;
+        } else if (selectedPeriod === 'Earlier') {
+          if (dateStr.includes(curMonth) || dateStr.includes(prevMonth)) return false;
         }
       }
 
       return true;
     });
-  }, [hospitalArticles, search, selectedDept, selectedStatus, selectedAuthor, selectedPeriod]);
+  }, [hospitalArticles, search, selectedDept, selectedStatus, selectedAuthor, selectedPeriod, curMonth, prevMonth]);
 
   // Dynamic statistics
   const totalPublishedCount = useMemo(

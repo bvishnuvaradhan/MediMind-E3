@@ -39,7 +39,7 @@ export function HospitalAdminsView({ initialAction = null, announce }) {
     let isMounted = true;
     Promise.all([
       chairmanService.getHospitalAdmins(),
-      chairmanService.getHospitals(),
+      chairmanService.getHospitals('Active'),
     ]).then(([a, h]) => {
       if (isMounted) {
         setAdmins(a);

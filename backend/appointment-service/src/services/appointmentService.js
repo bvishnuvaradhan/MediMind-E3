@@ -648,13 +648,23 @@ export const appointmentService = {
     }
 
     if (!hospitalId || !departmentId) {
-
       const err = new Error('Hospital ID and Department ID could not be resolved for doctor');
-
       err.statusCode = 400;
-
       throw err;
+    }
 
+    if (hospitalId && mongoose.Types.ObjectId.isValid(hospitalId)) {
+      try {
+        const hospDb = mongoose.connection.useDb(process.env.HOSPITAL_DB_NAME || 'medimind_hospital');
+        const hospDoc = await hospDb.collection('hospitals').findOne({ _id: new mongoose.Types.ObjectId(hospitalId) });
+        if (hospDoc && (hospDoc.status || '').toUpperCase() !== 'ACTIVE') {
+          const err = new Error('Cannot book appointment: target hospital is pending approval or inactive');
+          err.statusCode = 400;
+          throw err;
+        }
+      } catch (hospCheckErr) {
+        if (hospCheckErr.statusCode === 400) throw hospCheckErr;
+      }
     }
 
     // 5. Double booking conflict check

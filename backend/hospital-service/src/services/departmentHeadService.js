@@ -58,6 +58,12 @@ export const departmentHeadService = {
       throw err;
     }
 
+    if ((hospital.status || '').toUpperCase() !== 'ACTIVE') {
+      const err = new Error('Cannot assign department head: hospital is pending approval or inactive');
+      err.statusCode = 400;
+      throw err;
+    }
+
     // Verify department exists and belongs to this hospital
     let department;
     if (mongoose.Types.ObjectId.isValid(deptIdStr)) {

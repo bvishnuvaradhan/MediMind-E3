@@ -51,6 +51,12 @@ export const departmentService = {
       throw err;
     }
 
+    if ((hospital.status || '').toUpperCase() !== 'ACTIVE') {
+      const err = new Error('Cannot create department: hospital is pending approval or inactive');
+      err.statusCode = 400;
+      throw err;
+    }
+
     // Duplicate check within hospital
     const existing = await Department.findOne({
       hospital_id: hospital._id,

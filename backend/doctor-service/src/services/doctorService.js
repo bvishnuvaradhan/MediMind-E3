@@ -45,7 +45,9 @@ export const doctorService = {
     }
 
     // 4. Status filter (public & family browse ACTIVE doctors by default)
-    if (query.status && query.status !== 'All') {
+    if (query.status && query.status.toUpperCase() === 'ALL') {
+      // Return all doctors without status restriction
+    } else if (query.status) {
       filter.status = query.status.toUpperCase();
     } else if (!user || user.role === 'FAMILY' || user.role === 'DOCTOR') {
       filter.status = 'ACTIVE';
@@ -349,6 +351,24 @@ export const doctorService = {
     }
     if (!targetDepartmentId || !mongoose.Types.ObjectId.isValid(targetDepartmentId)) {
       targetDepartmentId = new mongoose.Types.ObjectId(targetDepartmentId || undefined);
+    }
+
+    // Verify target hospital exists and is ACTIVE
+    try {
+      const hospitalConn = mongoose.connection.useDb(process.env.HOSPITAL_DB_NAME || 'medimind_hospital');
+      const hospDoc = await hospitalConn.collection('hospitals').findOne({ _id: new mongoose.Types.ObjectId(targetHospitalId) });
+      if (!hospDoc) {
+        const err = new Error('Target hospital does not exist');
+        err.statusCode = 404;
+        throw err;
+      }
+      if ((hospDoc.status || '').toUpperCase() !== 'ACTIVE') {
+        const err = new Error('Cannot assign doctor: hospital is pending approval or inactive');
+        err.statusCode = 400;
+        throw err;
+      }
+    } catch (hospErr) {
+      if (hospErr.statusCode) throw hospErr;
     }
 
     // Generate provisional doctor ID for the reference linkage

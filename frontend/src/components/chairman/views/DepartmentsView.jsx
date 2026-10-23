@@ -35,7 +35,7 @@ export function DepartmentsView({ onNavigate: _onNavigate }) {
 
   useEffect(() => {
     async function load() {
-      const hosps = await chairmanService.getHospitals();
+      const hosps = await chairmanService.getHospitals('Active');
       setHospitals(hosps);
       const deps = await chairmanService.getDepartments(selectedHospitalId);
       setDepartments(deps);

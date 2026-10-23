@@ -1,3 +1,4 @@
+import { getCurrentCycleText } from "../../../utils/dateUtils";
 import React from 'react';
 import StatCard from '../components/StatCard';
 import { BarChart, DonutChart, HeatmapChart } from '../../common/charts';
@@ -89,7 +90,7 @@ export function DepartmentAnalyticsView({ analytics, departmentInfo, doctors = [
               Outpatient volume patterns, inpatient bed occupancy, and department throughput metrics
             </p>
           </div>
-          <span className="dh-badge dh-badge-completed">Current Cycle: Oct 2026</span>
+          <span className="dh-badge dh-badge-completed">{getCurrentCycleText()}</span>
         </div>
       </div>
 
