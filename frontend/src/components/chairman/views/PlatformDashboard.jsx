@@ -41,11 +41,13 @@ export function PlatformDashboard({ onNavigate }) {
     loadData();
   }, []);
 
-  // Deduplicate hospitals and calculate displayed slice
-  const uniqueHospitals = hospitals.filter((hosp, idx, arr) => {
-    const key = hosp.id || hosp._id || hosp.code || hosp.name;
-    return arr.findIndex((h) => (h.id || h._id || h.code || h.name) === key) === idx;
-  });
+  // Exclude pending facilities and deduplicate active operational hospitals
+  const uniqueHospitals = hospitals
+    .filter((hosp) => (hosp.status || '').toLowerCase() === 'active')
+    .filter((hosp, idx, arr) => {
+      const key = hosp.id || hosp._id || hosp.code || hosp.name;
+      return arr.findIndex((h) => (h.id || h._id || h.code || h.name) === key) === idx;
+    });
 
   const displayedHospitals = expandedHospitals ? uniqueHospitals : uniqueHospitals.slice(0, 3);
 
@@ -120,7 +122,7 @@ export function PlatformDashboard({ onNavigate }) {
           <h3>{summary.totalDoctors || 66}</h3>
           <p>Active Credentialed Doctors</p>
           <small style={{ color: 'var(--chair-muted)', marginTop: '4px' }}>
-            66 of 66 Active (100% Provisioned)
+            66 Operational Doctors (2 Inactive Demo Profiles)
           </small>
         </div>
 

@@ -36,7 +36,13 @@ export function AiAnalyticsView() {
   const heartMod = modules?.heartDisease || {};
   const generalMod = modules?.generalHealth || {};
 
-  const dateOptions = ['All Time', 'Oct 2026', 'Sep 2026', 'Aug 2026', 'Last 3 Months'];
+  const now = new Date();
+  const currentMonthLabel = now.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+  const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const prevMonthLabel = prevMonthDate.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+  const prev2MonthDate = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+  const prev2MonthLabel = prev2MonthDate.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+  const dateOptions = ['All Time', currentMonthLabel, prevMonthLabel, prev2MonthLabel, 'Last 3 Months'];
 
   // Dynamic grid column layout based on active modules count:
   // 3 -> 1x3, 4 -> 2x2, 6 -> 2x3, 9 -> 3x3, 12 -> 3x4

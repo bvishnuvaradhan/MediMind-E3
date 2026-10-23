@@ -5,6 +5,7 @@ export const forwardRequest = (targetServiceUrl) => {
 
       const headers = { ...req.headers };
       delete headers.host;
+      delete headers.expect;
       if (req.method === 'GET' || req.method === 'HEAD' || req.body) {
         delete headers['content-length'];
       }

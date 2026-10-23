@@ -731,12 +731,44 @@ export const chairmanService = {
     try {
       let url = '/api/ai/analytics';
       if (dateRange && dateRange !== 'All Time') {
-        if (dateRange === 'Oct 2026' || dateRange === 'Current Month') {
-          url += '?start_date=2026-10-01&end_date=2026-10-31';
-        } else if (dateRange === 'Sep 2026') {
-          url += '?start_date=2026-09-01&end_date=2026-09-30';
-        } else if (dateRange === 'Aug 2026') {
-          url += '?start_date=2026-08-01&end_date=2026-08-31';
+        const now = new Date();
+        let sd = null;
+        let ed = null;
+        if (dateRange === 'Current Month') {
+          const y = now.getFullYear();
+          const m = String(now.getMonth() + 1).padStart(2, '0');
+          const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+          sd = `${y}-${m}-01`;
+          ed = `${y}-${m}-${lastDay}`;
+        } else if (dateRange === 'Previous Month') {
+          const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+          const y = prev.getFullYear();
+          const m = String(prev.getMonth() + 1).padStart(2, '0');
+          const lastDay = new Date(y, prev.getMonth() + 1, 0).getDate();
+          sd = `${y}-${m}-01`;
+          ed = `${y}-${m}-${lastDay}`;
+        } else if (dateRange === 'Last 3 Months') {
+          const past = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+          const pastY = past.getFullYear();
+          const pastM = String(past.getMonth() + 1).padStart(2, '0');
+          const y = now.getFullYear();
+          const m = String(now.getMonth() + 1).padStart(2, '0');
+          const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+          sd = `${pastY}-${pastM}-01`;
+          ed = `${y}-${m}-${lastDay}`;
+        } else {
+          const parsed = Date.parse(dateRange + ' 1');
+          if (!isNaN(parsed)) {
+            const d = new Date(parsed);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const lastDay = new Date(y, d.getMonth() + 1, 0).getDate();
+          sd = `${y}-${m}-01`;
+          ed = `${y}-${m}-${lastDay}`;
+          }
+        }
+        if (sd && ed) {
+          url += `?start_date=${sd}&end_date=${ed}`;
         }
       }
       const response = await fetch(url, { headers: getAuthHeaders() });
@@ -757,12 +789,13 @@ export const chairmanService = {
     ];
 
     let filteredMonthly = fullMonthly;
-    if (dateRange === 'Oct 2026') {
-      filteredMonthly = fullMonthly.filter(m => m.monthKey === '2026-10');
-    } else if (dateRange === 'Sep 2026') {
-      filteredMonthly = fullMonthly.filter(m => m.monthKey === '2026-09');
-    } else if (dateRange === 'Aug 2026') {
-      filteredMonthly = fullMonthly.filter(m => m.monthKey === '2026-08');
+    if (dateRange && dateRange !== 'All Time') {
+      const parsed = Date.parse(dateRange + ' 1');
+      if (!isNaN(parsed)) {
+        const d = new Date(parsed);
+        const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        filteredMonthly = fullMonthly.filter(m => m.monthKey === ym);
+      }
     }
 
     const totalInf = filteredMonthly.reduce((sum, m) => sum + m.total, 0);

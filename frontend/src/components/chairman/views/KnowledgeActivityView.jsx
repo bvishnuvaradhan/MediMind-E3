@@ -82,7 +82,13 @@ export function KnowledgeActivityView() {
     return ['All', ...Array.from(list).sort()];
   }, [articles]);
 
-  const periodOptions = ['All', 'September 2026', 'Earlier 2026'];
+  const now = new Date();
+  const currentMonthLong = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  const currentMonthShort = now.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+  const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const prevMonthShort = prevMonthDate.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+  const prevMonthLong = prevMonthDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  const periodOptions = ['All', currentMonthLong, prevMonthLong, 'Earlier'];
 
   // Combined Multi-Filter Logic (AND behavior)
   const filtered = useMemo(() => {
@@ -146,10 +152,12 @@ export function KnowledgeActivityView() {
       // Period filter
       if (selectedPeriod !== 'All') {
         const dateStr = a.publishedDate || a.date || a.createdDate || '';
-        if (selectedPeriod === 'September 2026') {
-          if (!dateStr.includes('Sep 2026')) return false;
-        } else if (selectedPeriod === 'Earlier 2026') {
-          if (dateStr.includes('Sep 2026')) return false;
+        if (selectedPeriod === currentMonthLong) {
+          if (!dateStr.includes(currentMonthShort) && !dateStr.includes(currentMonthLong)) return false;
+        } else if (selectedPeriod === prevMonthLong) {
+          if (!dateStr.includes(prevMonthShort) && !dateStr.includes(prevMonthLong)) return false;
+        } else if (selectedPeriod === 'Earlier') {
+          if (dateStr.includes(currentMonthShort) || dateStr.includes(prevMonthShort)) return false;
         }
       }
 

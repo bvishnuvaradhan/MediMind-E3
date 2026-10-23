@@ -189,7 +189,6 @@ export function HospitalAdminsView({ initialAction = null, announce }) {
                 <th>Assigned Hospital</th>
                 <th>Contact</th>
                 <th>Created Date</th>
-                <th>Last Login</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -197,7 +196,7 @@ export function HospitalAdminsView({ initialAction = null, announce }) {
             <tbody>
               {filteredAdmins.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', padding: '36px', color: 'var(--chair-muted)' }}>
+                  <td colSpan={6} style={{ textAlign: 'center', padding: '36px', color: 'var(--chair-muted)' }}>
                     No hospital administrators found.
                   </td>
                 </tr>
@@ -238,7 +237,6 @@ export function HospitalAdminsView({ initialAction = null, announce }) {
                       <div style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>{adm.phone}</div>
                     </td>
                     <td>{adm.createdAt}</td>
-                    <td>{adm.lastLogin}</td>
                     <td>
                       {adm.status?.toLowerCase() === 'active' ? (
                         <span className="badge" style={{ background: '#dcfce7', color: '#166534', border: '1px solid #bbf7d0', fontWeight: 600 }}>Active</span>

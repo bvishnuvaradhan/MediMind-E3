@@ -68,18 +68,21 @@ export function ReportsView({ announce }) {
   const isCustomRange = dateRange === 'Custom Range';
   const isDateRangeInvalid = isCustomRange && fromDate && toDate && fromDate > toDate;
 
+  const now = new Date();
+  const currentMonthLong = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const prevMonthLong = prevMonthDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+
   const effectiveTimelineString = isCustomRange
     ? `Custom Range (${fromDate} to ${toDate})`
-    : dateRange === 'Oct 2026'
-    ? 'Current Month (October 2026)'
-    : dateRange === 'Sep 2026'
-    ? 'Previous Month (September 2026)'
+    : dateRange === 'Current Month'
+    ? `Current Month (${currentMonthLong})`
+    : dateRange === 'Previous Month'
+    ? `Previous Month (${prevMonthLong})`
     : dateRange === 'Last 30 Days'
     ? 'Last 30 Days (Rolling)'
-    : dateRange === 'Q3 2026'
-    ? 'Q3 2026 (Jul - Sep 2026)'
     : dateRange === 'Year to Date'
-    ? 'Year to Date (2026 YTD)'
+    ? `Year to Date (${now.getFullYear()} YTD)`
     : 'All-Time Cumulative';
 
   const availableReports = [
@@ -136,23 +139,26 @@ export function ReportsView({ announce }) {
     if (isCustomRange) {
       sd = fromDate;
       ed = toDate;
-    } else if (dateRange === 'Oct 2026') {
-      sd = '2026-10-01';
-      ed = '2026-10-31';
-    } else if (dateRange === 'Sep 2026') {
-      sd = '2026-09-01';
-      ed = '2026-09-30';
-    } else if (dateRange === 'Q3 2026') {
-      sd = '2026-07-01';
-      ed = '2026-09-30';
+    } else if (dateRange === 'Current Month') {
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+      sd = `${y}-${m}-01`;
+      ed = `${y}-${m}-${lastDay}`;
+    } else if (dateRange === 'Previous Month') {
+      const y = prevMonthDate.getFullYear();
+      const m = String(prevMonthDate.getMonth() + 1).padStart(2, '0');
+      const lastDay = new Date(y, prevMonthDate.getMonth() + 1, 0).getDate();
+      sd = `${y}-${m}-01`;
+      ed = `${y}-${m}-${lastDay}`;
     } else if (dateRange === 'Last 30 Days') {
       const d = new Date();
       ed = d.toISOString().slice(0, 10);
       d.setDate(d.getDate() - 30);
       sd = d.toISOString().slice(0, 10);
     } else if (dateRange === 'Year to Date') {
-      sd = '2026-01-01';
-      ed = '2026-12-31';
+      sd = `${now.getFullYear()}-01-01`;
+      ed = `${now.getFullYear()}-12-31`;
     }
 
     return {
@@ -330,11 +336,10 @@ export function ReportsView({ announce }) {
               style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px' }}
             >
               <option value="All Time">All Time Cumulative (Full Dataset)</option>
-              <option value="Oct 2026">Current Month (October 2026)</option>
-              <option value="Sep 2026">Previous Month (September 2026)</option>
+              <option value="Current Month">Current Month ({currentMonthLong})</option>
+              <option value="Previous Month">Previous Month ({prevMonthLong})</option>
               <option value="Last 30 Days">Last 30 Days (Rolling)</option>
-              <option value="Q3 2026">Q3 2026 (Jul - Sep 2026)</option>
-              <option value="Year to Date">Year to Date (2026 YTD)</option>
+              <option value="Year to Date">Year to Date ({now.getFullYear()} YTD)</option>
               <option value="Custom Range">Custom Date Range...</option>
             </select>
           </div>
