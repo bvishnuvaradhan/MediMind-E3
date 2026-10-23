@@ -11,7 +11,12 @@ router = APIRouter(prefix="/api/ai", tags=["Analytics"])
 logger = logging.getLogger("ai_service.api.analytics")
 
 import datetime
+import time
 from typing import Tuple
+
+_ANALYTICS_CACHE: Dict[str, Any] = {}
+_ANALYTICS_CACHE_TIME: Dict[str, float] = {}
+CACHE_TTL = 30.0
 
 def get_relative_date_range(period: str, ref_date: Optional[datetime.date] = None) -> Tuple[Optional[str], Optional[str], str]:
     today = ref_date or datetime.date.today()
@@ -124,6 +129,11 @@ async def get_ai_analytics(
     elif effective_start or effective_end:
         period_label = f"{effective_start or ''} to {effective_end or ''}".strip()
 
+    cache_key = f"{effective_start}_{effective_end}_{period}"
+    now_ts = time.time()
+    if cache_key in _ANALYTICS_CACHE and (now_ts - _ANALYTICS_CACHE_TIME.get(cache_key, 0) < CACHE_TTL):
+        return _ANALYTICS_CACHE[cache_key]
+
     query: Dict[str, Any] = {}
     if effective_start or effective_end:
         sd_str = effective_start
@@ -155,7 +165,8 @@ async def get_ai_analytics(
         "created_at": 1,
         "model_name": 1,
         "prediction_type": 1,
-        "result": 1,
+        "result.possibleFracture": 1,
+        "result.risk_level": 1,
         "risk_level": 1,
     }
     try:
@@ -174,11 +185,42 @@ async def get_ai_analytics(
     avg_conf = (sum(confs) / len(confs)) if confs else 0.968
 
     monthly_map: Dict[str, Dict[str, Any]] = {}
+    upcoming_prescreenings: Dict[str, Any] = {
+        "total": 0,
+        "byModel": {
+            "fracture": 0,
+            "diabetes": 0,
+            "heart": 0,
+            "general": 0,
+        },
+        "label": "Upcoming Pre-Screenings (Prospective Triage)",
+    }
+    current_month_key = datetime.date.today().strftime("%Y-%m")
+
     for p in preds:
         ca = p.get("created_at") or ""
         ym = ca[:7] if isinstance(ca, str) else ca.strftime("%Y-%m")
         if not ym or len(ym) < 7:
             continue
+
+        m_name = (p.get("model_name") or "").lower()
+        p_type = (p.get("prediction_type") or "").upper()
+
+        if "fracture" in m_name or "FRACTURE" in p_type:
+            model_key = "fracture"
+        elif "diabetes" in m_name or "DIABETES" in p_type:
+            model_key = "diabetes"
+        elif "heart" in m_name or "HEART" in p_type:
+            model_key = "heart"
+        else:
+            model_key = "general"
+
+        # Strictly eliminate future months (e.g. November 2026 onwards) from historical volume trajectory
+        if ym > current_month_key:
+            upcoming_prescreenings["total"] += 1
+            upcoming_prescreenings["byModel"][model_key] += 1
+            continue
+
         if ym not in monthly_map:
             parts = ym.split("-")
             month_label = f"{MONTH_NAMES.get(parts[1], parts[1])} {parts[0]}" if len(parts) > 1 else ym
@@ -192,17 +234,7 @@ async def get_ai_analytics(
                 "total": 0,
             }
 
-        m_name = (p.get("model_name") or "").lower()
-        p_type = (p.get("prediction_type") or "").upper()
-
-        if "fracture" in m_name or "FRACTURE" in p_type:
-            monthly_map[ym]["fracture"] += 1
-        elif "diabetes" in m_name or "DIABETES" in p_type:
-            monthly_map[ym]["diabetes"] += 1
-        elif "heart" in m_name or "HEART" in p_type:
-            monthly_map[ym]["heart"] += 1
-        else:
-            monthly_map[ym]["general"] += 1
+        monthly_map[ym][model_key] += 1
         monthly_map[ym]["total"] += 1
 
     monthly_volume = [monthly_map[k] for k in sorted(monthly_map.keys())]
@@ -349,7 +381,7 @@ async def get_ai_analytics(
                 mod["lowRiskCount"] += 1
                 mod["normalCount"] += 1
 
-    return {
+    res_payload = {
         "success": True,
         "data": {
             "totalInferences": total_count,
@@ -363,6 +395,10 @@ async def get_ai_analytics(
                 "standaloneScreenings": standalone_count,
             },
             "monthlyVolume": monthly_volume,
+            "upcomingPreScreenings": upcoming_prescreenings,
             "modules": modules,
         },
     }
+    _ANALYTICS_CACHE[cache_key] = res_payload
+    _ANALYTICS_CACHE_TIME[cache_key] = now_ts
+    return res_payload

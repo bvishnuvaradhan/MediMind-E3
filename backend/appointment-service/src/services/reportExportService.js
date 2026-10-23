@@ -227,6 +227,25 @@ export const reportExportService = {
         completionRate: ds.count > 0 ? ((ds.completed / ds.count) * 100).toFixed(1) + '%' : '0.0%',
       }));
 
+      const targetHospitals = scope.hospitalId
+        ? hospitals.filter((h) => h._id.toString() === scope.hospitalId.toString())
+        : (match.hospital_id && !match.hospital_id['$in']
+            ? hospitals.filter((h) => h._id.toString() === match.hospital_id.toString())
+            : hospitals);
+
+      const hospitalOverview = targetHospitals.map((h) => {
+        const hId = h._id.toString();
+        const hDepts = departments.filter((d) => d.hospital_id?.toString() === hId);
+        return {
+          id: hId,
+          name: h.name,
+          code: h.code || 'MM-FAC',
+          city: h.city || 'Metro',
+          state: h.state || 'IN',
+          departmentsCount: hDepts.length,
+        };
+      });
+
       return {
         reportType: 'appointment',
         title: 'Appointments & Clinical Utilization Report',
@@ -239,9 +258,11 @@ export const reportExportService = {
           statusBreakdown,
           completionRate: totalFilteredAppts > 0 ? ((statusBreakdown.COMPLETED / totalFilteredAppts) * 100).toFixed(1) + '%' : '0.0%',
         },
+        hospitalOverview,
         departmentBreakdown,
         appointments: apptsPage.map((a) => ({
           appointmentId: a._id.toString(),
+          createdAt: a.created_at ? new Date(a.created_at).toISOString() : 'N/A',
           date: a.appointment_date ? new Date(a.appointment_date).toISOString() : 'N/A',
           status: a.status,
           type: a.appointment_type || 'BOOKED',
@@ -698,31 +719,118 @@ export const reportExportService = {
       s1.addRow({ metric: 'Rescheduled Consultations', value: appts.filter((a) => a.status === 'RESCHEDULED').length, context: 'Adjusted Clinical Schedules' });
       styleWorksheet(s1, headerFillBlue);
 
-      // Sheet 2: Department Utilization
-      const s2 = workbook.addWorksheet('Department Breakdown');
+      // Filter to only active hospitals in scope (strictly exclude pending facilities)
+      const targetHospitals = scope.hospitalId
+        ? hospitals.filter((h) => h._id.toString() === scope.hospitalId.toString())
+        : (match.hospital_id && !match.hospital_id['$in']
+            ? hospitals.filter((h) => h._id.toString() === match.hospital_id.toString())
+            : hospitals);
+
+      // Sheet 2: Hospital Overview
+      const s2 = workbook.addWorksheet('Hospital Overview');
       s2.columns = [
-        { header: 'Department ID', key: 'id', width: 28 },
-        { header: 'Department Name', key: 'name', width: 32 },
-        { header: 'Total Appointments', key: 'total', width: 22 },
+        { header: 'Hospital ID', key: 'id', width: 28 },
+        { header: 'Hospital Facility', key: 'name', width: 35 },
+        { header: 'Hospital Code', key: 'code', width: 18 },
+        { header: 'Location', key: 'location', width: 24 },
+        { header: 'Departments Count', key: 'deptCount', width: 20 },
+        { header: 'Total Appointments', key: 'totalAppts', width: 20 },
         { header: 'Completed Consultations', key: 'completed', width: 24 },
-        { header: 'Completion Rate (%)', key: 'rate', width: 22 },
+        { header: 'Scheduled / Booked', key: 'scheduled', width: 20 },
+        { header: 'Cancelled', key: 'cancelled', width: 16 },
+        { header: 'Completion Rate (%)', key: 'rate', width: 20 },
       ];
-      deptStats.forEach((ds) => {
+
+      targetHospitals.forEach((h) => {
+        const hId = h._id.toString();
+        const hAppts = appts.filter((a) => a.hospital_id?.toString() === hId);
+        const hDepts = departments.filter((d) => d.hospital_id?.toString() === hId);
+        const hCompleted = hAppts.filter((a) => a.status === 'COMPLETED').length;
+        const hScheduled = hAppts.filter((a) => a.status === 'BOOKED' || a.status === 'CONFIRMED').length;
+        const hCancelled = hAppts.filter((a) => a.status === 'CANCELLED' || a.status === 'CANCELED').length;
+        const hRate = hAppts.length > 0 ? ((hCompleted / hAppts.length) * 100).toFixed(1) + '%' : '0.0%';
+
         s2.addRow({
-          id: ds._id?.toString() || 'N/A',
-          name: sanitize(deptMap[ds._id?.toString()] || 'General Care'),
-          total: ds.count,
-          completed: ds.completed,
-          rate: ds.count > 0 ? ((ds.completed / ds.count) * 100).toFixed(1) + '%' : '0.0%',
+          id: hId,
+          name: sanitize(h.name),
+          code: sanitize(h.code || 'MM-FAC'),
+          location: sanitize((h.city || 'Metro') + ', ' + (h.state || 'IN')),
+          deptCount: hDepts.length,
+          totalAppts: hAppts.length,
+          completed: hCompleted,
+          scheduled: hScheduled,
+          cancelled: hCancelled,
+          rate: hRate,
         });
       });
-      styleWorksheet(s2, headerFillTeal);
+      styleWorksheet(s2, headerFillBlue);
 
-      // Sheet 3: Ledger
-      const s3 = workbook.addWorksheet('Appointments Ledger');
-      s3.columns = [
+      // Sheets 3+: Separate worksheet for each eligible active hospital with their respective departments
+      targetHospitals.forEach((h) => {
+        const hId = h._id.toString();
+        const sheetTitle = (h.name || 'Hospital').slice(0, 31);
+        const wsHosp = workbook.addWorksheet(sheetTitle);
+
+        wsHosp.columns = [
+          { header: 'Department ID', key: 'id', width: 28 },
+          { header: 'Department Name', key: 'name', width: 32 },
+          { header: 'Specialization', key: 'specialization', width: 30 },
+          { header: 'Total Appointments', key: 'total', width: 20 },
+          { header: 'Completed Consultations', key: 'completed', width: 24 },
+          { header: 'Scheduled / Booked', key: 'scheduled', width: 20 },
+          { header: 'Cancelled', key: 'cancelled', width: 16 },
+          { header: 'Completion Rate (%)', key: 'rate', width: 20 },
+        ];
+
+        const hDepts = departments.filter((d) => d.hospital_id?.toString() === hId);
+        const hAppts = appts.filter((a) => a.hospital_id?.toString() === hId);
+
+        hDepts.forEach((d) => {
+          const dId = d._id.toString();
+          const dAppts = hAppts.filter((a) => a.department_id?.toString() === dId);
+          const dCompleted = dAppts.filter((a) => a.status === 'COMPLETED').length;
+          const dScheduled = dAppts.filter((a) => a.status === 'BOOKED' || a.status === 'CONFIRMED').length;
+          const dCancelled = dAppts.filter((a) => a.status === 'CANCELLED' || a.status === 'CANCELED').length;
+          const dRate = dAppts.length > 0 ? ((dCompleted / dAppts.length) * 100).toFixed(1) + '%' : '0.0%';
+
+          wsHosp.addRow({
+            id: dId,
+            name: sanitize(d.name),
+            specialization: sanitize(d.specialization || d.name),
+            total: dAppts.length,
+            completed: dCompleted,
+            scheduled: dScheduled,
+            cancelled: dCancelled,
+            rate: dRate,
+          });
+        });
+
+        const hCompleted = hAppts.filter((a) => a.status === 'COMPLETED').length;
+        const hScheduled = hAppts.filter((a) => a.status === 'BOOKED' || a.status === 'CONFIRMED').length;
+        const hCancelled = hAppts.filter((a) => a.status === 'CANCELLED' || a.status === 'CANCELED').length;
+        const hRate = hAppts.length > 0 ? ((hCompleted / hAppts.length) * 100).toFixed(1) + '%' : '0.0%';
+
+        const summaryRow = wsHosp.addRow({
+          id: 'FACILITY TOTAL',
+          name: sanitize(h.name),
+          specialization: 'All Specializations',
+          total: hAppts.length,
+          completed: hCompleted,
+          scheduled: hScheduled,
+          cancelled: hCancelled,
+          rate: hRate,
+        });
+        summaryRow.font = { name: 'Segoe UI', size: 9, bold: true };
+
+        styleWorksheet(wsHosp, headerFillTeal);
+      });
+
+      // Sheet 4+ (Last Sheet): Appointments Ledger
+      const sLedger = workbook.addWorksheet('Appointments Ledger');
+      sLedger.columns = [
         { header: 'Appointment ID', key: 'id', width: 28 },
-        { header: 'Date & Time', key: 'date', width: 22 },
+        { header: 'Booking Creation Date', key: 'createdAt', width: 24 },
+        { header: 'Scheduled Date & Time', key: 'date', width: 24 },
         { header: 'Status', key: 'status', width: 16 },
         { header: 'Mode', key: 'type', width: 16 },
         { header: 'Attending Doctor', key: 'doc', width: 28 },
@@ -732,8 +840,9 @@ export const reportExportService = {
         { header: 'Reason / Clinical Note', key: 'reason', width: 45 },
       ];
       appts.forEach((a) => {
-        s3.addRow({
+        sLedger.addRow({
           id: a._id.toString(),
+          createdAt: a.created_at ? new Date(a.created_at).toISOString() : 'N/A',
           date: a.appointment_date ? new Date(a.appointment_date).toISOString() : 'N/A',
           status: sanitize(a.status),
           type: sanitize(a.appointment_type || 'BOOKED'),
@@ -744,7 +853,7 @@ export const reportExportService = {
           reason: sanitize(a.reason || 'Consultation'),
         });
       });
-      styleWorksheet(s3, headerFillBlue);
+      styleWorksheet(sLedger, headerFillBlue);
     }
 
     // -------------------------------------------------------------

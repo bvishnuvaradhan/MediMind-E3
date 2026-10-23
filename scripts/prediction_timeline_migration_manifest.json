@@ -1,0 +1,3009 @@
+{
+  "manifest_id": "manifest_timeline_migration_1792765188",
+  "generated_at": "2026-10-23T14:19:48.591092+00:00",
+  "dry_run": false,
+  "total_candidates": 300,
+  "total_targets": 300,
+  "records": [
+    {
+      "prediction_id": "6adb35e56c3fd1f3314ad32b",
+      "prediction_ref": "pred_a40ed6ebda68",
+      "appointment_id": "6ac85a3b074c2bc731a77174",
+      "original_created_at": "2026-11-30T16:15:00",
+      "new_created_at": "2026-11-25T16:30:00",
+      "scheduled_appointment_date": "2026-11-30T16:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e56c3fd1f3314ad32c",
+      "prediction_ref": "pred_9b423fc89f01",
+      "appointment_id": "6ac85a45074c2bc731a774d3",
+      "original_created_at": "2026-11-30T16:15:00",
+      "new_created_at": "2026-11-25T16:30:00",
+      "scheduled_appointment_date": "2026-11-30T16:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e56c3fd1f3314ad329",
+      "prediction_ref": "pred_db489d4ad551",
+      "appointment_id": "6ac85a27074c2bc731a768bb",
+      "original_created_at": "2026-11-30T14:45:00",
+      "new_created_at": "2026-11-24T15:00:00",
+      "scheduled_appointment_date": "2026-11-30T15:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e56c3fd1f3314ad32a",
+      "prediction_ref": "pred_9eb26ee4a2bd",
+      "appointment_id": "6ac85a3b074c2bc731a77290",
+      "original_created_at": "2026-11-30T14:45:00",
+      "new_created_at": "2026-11-27T15:00:00",
+      "scheduled_appointment_date": "2026-11-30T15:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e56c3fd1f3314ad328",
+      "prediction_ref": "pred_a25e02d4191c",
+      "appointment_id": "6ac85a4c074c2bc731a7780d",
+      "original_created_at": "2026-11-30T13:45:00",
+      "new_created_at": "2026-11-23T14:00:00",
+      "scheduled_appointment_date": "2026-11-30T14:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e56c3fd1f3314ad327",
+      "prediction_ref": "pred_0392985b65ac",
+      "appointment_id": "6ac85a3b074c2bc731a77288",
+      "original_created_at": "2026-11-30T11:45:00",
+      "new_created_at": "2026-11-26T12:00:00",
+      "scheduled_appointment_date": "2026-11-30T12:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad325",
+      "prediction_ref": "pred_49f5c39275e2",
+      "appointment_id": "6ac85a36074c2bc731a76f48",
+      "original_created_at": "2026-11-30T10:45:00",
+      "new_created_at": "2026-11-27T11:00:00",
+      "scheduled_appointment_date": "2026-11-30T11:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e56c3fd1f3314ad326",
+      "prediction_ref": "pred_05f03a939bdf",
+      "appointment_id": "6ac85a53074c2bc731a77d64",
+      "original_created_at": "2026-11-30T10:45:00",
+      "new_created_at": "2026-11-26T11:00:00",
+      "scheduled_appointment_date": "2026-11-30T11:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad322",
+      "prediction_ref": "pred_2f3274413d63",
+      "appointment_id": "6ac85a36074c2bc731a76e28",
+      "original_created_at": "2026-11-30T10:15:00",
+      "new_created_at": "2026-11-28T10:30:00",
+      "scheduled_appointment_date": "2026-11-30T10:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad323",
+      "prediction_ref": "pred_818a66144055",
+      "appointment_id": "6ac85a2c074c2bc731a76ae9",
+      "original_created_at": "2026-11-30T10:15:00",
+      "new_created_at": "2026-11-26T10:30:00",
+      "scheduled_appointment_date": "2026-11-30T10:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad324",
+      "prediction_ref": "pred_685290ec779d",
+      "appointment_id": "6ac85a53074c2bc731a78411",
+      "original_created_at": "2026-11-30T10:15:00",
+      "new_created_at": "2026-11-23T10:30:00",
+      "scheduled_appointment_date": "2026-11-30T10:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad31f",
+      "prediction_ref": "pred_35b4a7b31c77",
+      "appointment_id": "6ac85a2c074c2bc731a76af2",
+      "original_created_at": "2026-11-30T09:15:00",
+      "new_created_at": "2026-11-25T09:30:00",
+      "scheduled_appointment_date": "2026-11-30T09:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad320",
+      "prediction_ref": "pred_a2f0a5a3886a",
+      "appointment_id": "6ac85a3b074c2bc731a773ab",
+      "original_created_at": "2026-11-30T09:15:00",
+      "new_created_at": "2026-11-25T09:30:00",
+      "scheduled_appointment_date": "2026-11-30T09:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad321",
+      "prediction_ref": "pred_7f705ba04836",
+      "appointment_id": "6ac85a47074c2bc731a775d9",
+      "original_created_at": "2026-11-30T09:15:00",
+      "new_created_at": "2026-11-25T09:30:00",
+      "scheduled_appointment_date": "2026-11-30T09:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad31e",
+      "prediction_ref": "pred_91e5e60954f4",
+      "appointment_id": "6ac85a53074c2bc731a77e79",
+      "original_created_at": "2026-11-30T08:45:00",
+      "new_created_at": "2026-11-23T09:00:00",
+      "scheduled_appointment_date": "2026-11-30T09:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad31b",
+      "prediction_ref": "pred_f33d31deb89e",
+      "appointment_id": "6ac85a2c074c2bc731a76af0",
+      "original_created_at": "2026-11-27T16:15:00",
+      "new_created_at": "2026-11-25T16:30:00",
+      "scheduled_appointment_date": "2026-11-27T16:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad31c",
+      "prediction_ref": "pred_df0038bd336d",
+      "appointment_id": "6ac85a4a074c2bc731a776f6",
+      "original_created_at": "2026-11-27T16:15:00",
+      "new_created_at": "2026-11-20T16:30:00",
+      "scheduled_appointment_date": "2026-11-27T16:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad31d",
+      "prediction_ref": "pred_255924079cfe",
+      "appointment_id": "6ac85a53074c2bc731a77d69",
+      "original_created_at": "2026-11-27T16:15:00",
+      "new_created_at": "2026-11-20T16:30:00",
+      "scheduled_appointment_date": "2026-11-27T16:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad319",
+      "prediction_ref": "pred_3e46176691f4",
+      "appointment_id": "6ac85a36074c2bc731a76d19",
+      "original_created_at": "2026-11-27T15:45:00",
+      "new_created_at": "2026-11-23T16:00:00",
+      "scheduled_appointment_date": "2026-11-27T16:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad31a",
+      "prediction_ref": "pred_d1e77b886f27",
+      "appointment_id": "6ac85a53074c2bc731a782fc",
+      "original_created_at": "2026-11-27T15:45:00",
+      "new_created_at": "2026-11-24T16:00:00",
+      "scheduled_appointment_date": "2026-11-27T16:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad317",
+      "prediction_ref": "pred_98c9d8955e1e",
+      "appointment_id": "6ac85a4a074c2bc731a776f4",
+      "original_created_at": "2026-11-27T15:15:00",
+      "new_created_at": "2026-11-22T15:30:00",
+      "scheduled_appointment_date": "2026-11-27T15:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e46c3fd1f3314ad318",
+      "prediction_ref": "pred_30b8b025fc6f",
+      "appointment_id": "6ac85a53074c2bc731a77d65",
+      "original_created_at": "2026-11-27T15:15:00",
+      "new_created_at": "2026-11-23T15:30:00",
+      "scheduled_appointment_date": "2026-11-27T15:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad315",
+      "prediction_ref": "pred_c36528435981",
+      "appointment_id": "6ac85a3b074c2bc731a773a6",
+      "original_created_at": "2026-11-27T14:45:00",
+      "new_created_at": "2026-11-23T15:00:00",
+      "scheduled_appointment_date": "2026-11-27T15:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad316",
+      "prediction_ref": "pred_96e21388686d",
+      "appointment_id": "6ac85a50074c2bc731a77c59",
+      "original_created_at": "2026-11-27T14:45:00",
+      "new_created_at": "2026-11-25T15:00:00",
+      "scheduled_appointment_date": "2026-11-27T15:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad313",
+      "prediction_ref": "pred_11fbd8d1911b",
+      "appointment_id": "6ac85a23074c2bc731a76561",
+      "original_created_at": "2026-11-27T14:15:00",
+      "new_created_at": "2026-11-21T14:30:00",
+      "scheduled_appointment_date": "2026-11-27T14:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad314",
+      "prediction_ref": "pred_0ba3907ccb18",
+      "appointment_id": "6ac85a53074c2bc731a782f6",
+      "original_created_at": "2026-11-27T14:15:00",
+      "new_created_at": "2026-11-22T14:30:00",
+      "scheduled_appointment_date": "2026-11-27T14:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad312",
+      "prediction_ref": "pred_d16032612d4b",
+      "appointment_id": "6ac85a4c074c2bc731a77807",
+      "original_created_at": "2026-11-27T13:45:00",
+      "new_created_at": "2026-11-20T14:00:00",
+      "scheduled_appointment_date": "2026-11-27T14:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad310",
+      "prediction_ref": "pred_5a62dabc8f5a",
+      "appointment_id": "6ac85a4c074c2bc731a77805",
+      "original_created_at": "2026-11-27T11:45:00",
+      "new_created_at": "2026-11-21T12:00:00",
+      "scheduled_appointment_date": "2026-11-27T12:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad311",
+      "prediction_ref": "pred_c2f399b3fb42",
+      "appointment_id": "6ac85a53074c2bc731a7840d",
+      "original_created_at": "2026-11-27T11:45:00",
+      "new_created_at": "2026-11-21T12:00:00",
+      "scheduled_appointment_date": "2026-11-27T12:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad30e",
+      "prediction_ref": "pred_3cd574f03658",
+      "appointment_id": "6ac85a36074c2bc731a76f49",
+      "original_created_at": "2026-11-27T11:15:00",
+      "new_created_at": "2026-11-20T11:30:00",
+      "scheduled_appointment_date": "2026-11-27T11:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad30f",
+      "prediction_ref": "pred_214c1bc10279",
+      "appointment_id": "6ac85a3b074c2bc731a7728f",
+      "original_created_at": "2026-11-27T11:15:00",
+      "new_created_at": "2026-11-22T11:30:00",
+      "scheduled_appointment_date": "2026-11-27T11:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad30c",
+      "prediction_ref": "pred_574561f868f9",
+      "appointment_id": "6ac85a53074c2bc731a77d67",
+      "original_created_at": "2026-11-27T10:15:00",
+      "new_created_at": "2026-11-22T10:30:00",
+      "scheduled_appointment_date": "2026-11-27T10:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad30d",
+      "prediction_ref": "pred_4808d4d9066f",
+      "appointment_id": "6ac85a53074c2bc731a782f4",
+      "original_created_at": "2026-11-27T10:15:00",
+      "new_created_at": "2026-11-20T10:30:00",
+      "scheduled_appointment_date": "2026-11-27T10:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad30b",
+      "prediction_ref": "pred_e7f9d46a5a9f",
+      "appointment_id": "6ac85a4e074c2bc731a77a35",
+      "original_created_at": "2026-11-27T09:45:00",
+      "new_created_at": "2026-11-22T10:00:00",
+      "scheduled_appointment_date": "2026-11-27T10:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad309",
+      "prediction_ref": "pred_bf03550e84b4",
+      "appointment_id": "6ac85a4a074c2bc731a776ec",
+      "original_created_at": "2026-11-27T08:45:00",
+      "new_created_at": "2026-11-22T09:00:00",
+      "scheduled_appointment_date": "2026-11-27T09:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad30a",
+      "prediction_ref": "pred_0b07db1704ef",
+      "appointment_id": "6ac85a53074c2bc731a782f3",
+      "original_created_at": "2026-11-27T08:45:00",
+      "new_created_at": "2026-11-25T09:00:00",
+      "scheduled_appointment_date": "2026-11-27T09:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad308",
+      "prediction_ref": "pred_8674a826d577",
+      "appointment_id": "6ac85a2f074c2bc731a76c03",
+      "original_created_at": "2026-11-26T15:45:00",
+      "new_created_at": "2026-11-19T16:00:00",
+      "scheduled_appointment_date": "2026-11-26T16:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad307",
+      "prediction_ref": "pred_350a0b5191dd",
+      "appointment_id": "6ac85a4e074c2bc731a77b52",
+      "original_created_at": "2026-11-26T15:15:00",
+      "new_created_at": "2026-11-19T15:30:00",
+      "scheduled_appointment_date": "2026-11-26T15:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad305",
+      "prediction_ref": "pred_663c2c718b6e",
+      "appointment_id": "6ac85a27074c2bc731a768c1",
+      "original_created_at": "2026-11-26T13:45:00",
+      "new_created_at": "2026-11-22T14:00:00",
+      "scheduled_appointment_date": "2026-11-26T14:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad306",
+      "prediction_ref": "pred_e0c09fd5c0be",
+      "appointment_id": "6ac85a2f074c2bc731a76c06",
+      "original_created_at": "2026-11-26T13:45:00",
+      "new_created_at": "2026-11-24T14:00:00",
+      "scheduled_appointment_date": "2026-11-26T14:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad302",
+      "prediction_ref": "pred_617335ff0311",
+      "appointment_id": "6ac85a36074c2bc731a76e23",
+      "original_created_at": "2026-11-26T10:15:00",
+      "new_created_at": "2026-11-19T10:30:00",
+      "scheduled_appointment_date": "2026-11-26T10:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad303",
+      "prediction_ref": "pred_191253d59365",
+      "appointment_id": "6ac85a53074c2bc731a77d6b",
+      "original_created_at": "2026-11-26T10:15:00",
+      "new_created_at": "2026-11-20T10:30:00",
+      "scheduled_appointment_date": "2026-11-26T10:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad304",
+      "prediction_ref": "pred_9e3c1b2de78b",
+      "appointment_id": "6ac85a53074c2bc731a780cd",
+      "original_created_at": "2026-11-26T10:15:00",
+      "new_created_at": "2026-11-22T10:30:00",
+      "scheduled_appointment_date": "2026-11-26T10:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad301",
+      "prediction_ref": "pred_2d017f29aea7",
+      "appointment_id": "6ac85a47074c2bc731a775df",
+      "original_created_at": "2026-11-26T09:45:00",
+      "new_created_at": "2026-11-23T10:00:00",
+      "scheduled_appointment_date": "2026-11-26T10:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2ff",
+      "prediction_ref": "pred_d888a8a1114b",
+      "appointment_id": "6ac85a36074c2bc731a76f45",
+      "original_created_at": "2026-11-26T08:45:00",
+      "new_created_at": "2026-11-23T09:00:00",
+      "scheduled_appointment_date": "2026-11-26T09:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e36c3fd1f3314ad300",
+      "prediction_ref": "pred_4346ac286d28",
+      "appointment_id": "6ac85a4a074c2bc731a776ef",
+      "original_created_at": "2026-11-26T08:45:00",
+      "new_created_at": "2026-11-22T09:00:00",
+      "scheduled_appointment_date": "2026-11-26T09:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2fd",
+      "prediction_ref": "pred_f0ef910189ee",
+      "appointment_id": "6ac85a36074c2bc731a76d1b",
+      "original_created_at": "2026-11-25T16:15:00",
+      "new_created_at": "2026-11-20T16:30:00",
+      "scheduled_appointment_date": "2026-11-25T16:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2fe",
+      "prediction_ref": "pred_842f0e141f26",
+      "appointment_id": "6ac85a4c074c2bc731a77808",
+      "original_created_at": "2026-11-25T16:15:00",
+      "new_created_at": "2026-11-23T16:30:00",
+      "scheduled_appointment_date": "2026-11-25T16:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2fb",
+      "prediction_ref": "pred_7178ddc970db",
+      "appointment_id": "6ac85a45074c2bc731a774cb",
+      "original_created_at": "2026-11-25T15:45:00",
+      "new_created_at": "2026-11-21T16:00:00",
+      "scheduled_appointment_date": "2026-11-25T16:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2fc",
+      "prediction_ref": "pred_253123340576",
+      "appointment_id": "6ac85a53074c2bc731a77f9c",
+      "original_created_at": "2026-11-25T15:45:00",
+      "new_created_at": "2026-11-23T16:00:00",
+      "scheduled_appointment_date": "2026-11-25T16:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2fa",
+      "prediction_ref": "pred_10c4e5b5d13a",
+      "appointment_id": "6ac85a4e074c2bc731a77b4b",
+      "original_created_at": "2026-11-25T14:45:00",
+      "new_created_at": "2026-11-20T15:00:00",
+      "scheduled_appointment_date": "2026-11-25T15:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2f9",
+      "prediction_ref": "pred_575795837ae8",
+      "appointment_id": "6ac85a4e074c2bc731a77b50",
+      "original_created_at": "2026-11-25T14:15:00",
+      "new_created_at": "2026-11-18T14:30:00",
+      "scheduled_appointment_date": "2026-11-25T14:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2f8",
+      "prediction_ref": "pred_855a15649286",
+      "appointment_id": "6ac85a27074c2bc731a768bf",
+      "original_created_at": "2026-11-25T13:45:00",
+      "new_created_at": "2026-11-22T14:00:00",
+      "scheduled_appointment_date": "2026-11-25T14:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2f6",
+      "prediction_ref": "pred_50caa5e24a52",
+      "appointment_id": "6ac85a45074c2bc731a774cd",
+      "original_created_at": "2026-11-25T11:45:00",
+      "new_created_at": "2026-11-19T12:00:00",
+      "scheduled_appointment_date": "2026-11-25T12:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2f7",
+      "prediction_ref": "pred_50685481f975",
+      "appointment_id": "6ac85a47074c2bc731a775d7",
+      "original_created_at": "2026-11-25T11:45:00",
+      "new_created_at": "2026-11-19T12:00:00",
+      "scheduled_appointment_date": "2026-11-25T12:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2f5",
+      "prediction_ref": "pred_75e2ed375a9f",
+      "appointment_id": "6ac85a50074c2bc731a77c5b",
+      "original_created_at": "2026-11-25T10:45:00",
+      "new_created_at": "2026-11-21T11:00:00",
+      "scheduled_appointment_date": "2026-11-25T11:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2f4",
+      "prediction_ref": "pred_b5595d682ab6",
+      "appointment_id": "6ac85a47074c2bc731a775dd",
+      "original_created_at": "2026-11-25T10:15:00",
+      "new_created_at": "2026-11-20T10:30:00",
+      "scheduled_appointment_date": "2026-11-25T10:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2f3",
+      "prediction_ref": "pred_437b385ad123",
+      "appointment_id": "6ac85a26074c2bc731a7668d",
+      "original_created_at": "2026-11-25T09:45:00",
+      "new_created_at": "2026-11-18T10:00:00",
+      "scheduled_appointment_date": "2026-11-25T10:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2f0",
+      "prediction_ref": "pred_deb6aeb7fe5f",
+      "appointment_id": "6ac85a36074c2bc731a76f42",
+      "original_created_at": "2026-11-25T09:15:00",
+      "new_created_at": "2026-11-23T09:30:00",
+      "scheduled_appointment_date": "2026-11-25T09:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2f1",
+      "prediction_ref": "pred_035dfb07896d",
+      "appointment_id": "6ac85a3b074c2bc731a7728a",
+      "original_created_at": "2026-11-25T09:15:00",
+      "new_created_at": "2026-11-18T09:30:00",
+      "scheduled_appointment_date": "2026-11-25T09:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2f2",
+      "prediction_ref": "pred_5e385b802f49",
+      "appointment_id": "6ac85a4e074c2bc731a77b4d",
+      "original_created_at": "2026-11-25T09:15:00",
+      "new_created_at": "2026-11-19T09:30:00",
+      "scheduled_appointment_date": "2026-11-25T09:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e26c3fd1f3314ad2ef",
+      "prediction_ref": "pred_a1e28cbc6ce9",
+      "appointment_id": "6ac85a2a074c2bc731a769ce",
+      "original_created_at": "2026-11-25T08:45:00",
+      "new_created_at": "2026-11-21T09:00:00",
+      "scheduled_appointment_date": "2026-11-25T09:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2ee",
+      "prediction_ref": "pred_a2daf00d4e99",
+      "appointment_id": "6ac85a36074c2bc731a76f4b",
+      "original_created_at": "2026-11-24T16:15:00",
+      "new_created_at": "2026-11-17T16:30:00",
+      "scheduled_appointment_date": "2026-11-24T16:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2ed",
+      "prediction_ref": "pred_cd4ff5f3b57f",
+      "appointment_id": "6ac85a27074c2bc731a768b9",
+      "original_created_at": "2026-11-24T15:45:00",
+      "new_created_at": "2026-11-20T16:00:00",
+      "scheduled_appointment_date": "2026-11-24T16:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2e8",
+      "prediction_ref": "pred_a1015beb982e",
+      "appointment_id": "6ac85a2c074c2bc731a76aeb",
+      "original_created_at": "2026-11-24T15:15:00",
+      "new_created_at": "2026-11-21T15:30:00",
+      "scheduled_appointment_date": "2026-11-24T15:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2e9",
+      "prediction_ref": "pred_9b2e3babcbaa",
+      "appointment_id": "6ac85a4c074c2bc731a77809",
+      "original_created_at": "2026-11-24T15:15:00",
+      "new_created_at": "2026-11-22T15:30:00",
+      "scheduled_appointment_date": "2026-11-24T15:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2ea",
+      "prediction_ref": "pred_024e9100fba4",
+      "appointment_id": "6ac85a4e074c2bc731a77b48",
+      "original_created_at": "2026-11-24T15:15:00",
+      "new_created_at": "2026-11-19T15:30:00",
+      "scheduled_appointment_date": "2026-11-24T15:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2eb",
+      "prediction_ref": "pred_f83ed2f245b7",
+      "appointment_id": "6ac85a53074c2bc731a77f9a",
+      "original_created_at": "2026-11-24T15:15:00",
+      "new_created_at": "2026-11-20T15:30:00",
+      "scheduled_appointment_date": "2026-11-24T15:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2ec",
+      "prediction_ref": "pred_16962988ea36",
+      "appointment_id": "6ac85a53074c2bc731a77d66",
+      "original_created_at": "2026-11-24T15:15:00",
+      "new_created_at": "2026-11-19T15:30:00",
+      "scheduled_appointment_date": "2026-11-24T15:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2e6",
+      "prediction_ref": "pred_36c0106068c2",
+      "appointment_id": "6ac85a27074c2bc731a767a1",
+      "original_created_at": "2026-11-24T14:15:00",
+      "new_created_at": "2026-11-20T14:30:00",
+      "scheduled_appointment_date": "2026-11-24T14:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2e7",
+      "prediction_ref": "pred_b2377902a105",
+      "appointment_id": "6ac85a39074c2bc731a7705f",
+      "original_created_at": "2026-11-24T14:15:00",
+      "new_created_at": "2026-11-22T14:30:00",
+      "scheduled_appointment_date": "2026-11-24T14:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2e5",
+      "prediction_ref": "pred_4e81d26f80ec",
+      "appointment_id": "6ac85a23074c2bc731a76565",
+      "original_created_at": "2026-11-24T13:45:00",
+      "new_created_at": "2026-11-18T14:00:00",
+      "scheduled_appointment_date": "2026-11-24T14:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2e4",
+      "prediction_ref": "pred_b413c8a4d66a",
+      "appointment_id": "6ac85a2f074c2bc731a76c05",
+      "original_created_at": "2026-11-24T11:15:00",
+      "new_created_at": "2026-11-19T11:30:00",
+      "scheduled_appointment_date": "2026-11-24T11:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2e3",
+      "prediction_ref": "pred_f4e5cc47a054",
+      "appointment_id": "6ac85a50074c2bc731a77c58",
+      "original_created_at": "2026-11-24T10:45:00",
+      "new_created_at": "2026-11-17T11:00:00",
+      "scheduled_appointment_date": "2026-11-24T11:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2e0",
+      "prediction_ref": "pred_45e6df63610c",
+      "appointment_id": "6ac85a26074c2bc731a7668b",
+      "original_created_at": "2026-11-24T09:15:00",
+      "new_created_at": "2026-11-18T09:30:00",
+      "scheduled_appointment_date": "2026-11-24T09:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2e1",
+      "prediction_ref": "pred_4c899fa6316a",
+      "appointment_id": "6ac85a27074c2bc731a768be",
+      "original_created_at": "2026-11-24T09:15:00",
+      "new_created_at": "2026-11-22T09:30:00",
+      "scheduled_appointment_date": "2026-11-24T09:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2e2",
+      "prediction_ref": "pred_453f2e033af6",
+      "appointment_id": "6ac85a27074c2bc731a7679e",
+      "original_created_at": "2026-11-24T09:15:00",
+      "new_created_at": "2026-11-22T09:30:00",
+      "scheduled_appointment_date": "2026-11-24T09:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2df",
+      "prediction_ref": "pred_b59d23416b2d",
+      "appointment_id": "6ac85a53074c2bc731a77e7c",
+      "original_created_at": "2026-11-24T08:45:00",
+      "new_created_at": "2026-11-21T09:00:00",
+      "scheduled_appointment_date": "2026-11-24T09:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2de",
+      "prediction_ref": "pred_d45a78b19009",
+      "appointment_id": "6ac85a2a074c2bc731a769d3",
+      "original_created_at": "2026-11-23T15:45:00",
+      "new_created_at": "2026-11-21T16:00:00",
+      "scheduled_appointment_date": "2026-11-23T16:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e16c3fd1f3314ad2dd",
+      "prediction_ref": "pred_10c47433d220",
+      "appointment_id": "6ac85a4e074c2bc731a7791d",
+      "original_created_at": "2026-11-23T15:15:00",
+      "new_created_at": "2026-11-21T15:30:00",
+      "scheduled_appointment_date": "2026-11-23T15:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2db",
+      "prediction_ref": "pred_395e9772810b",
+      "appointment_id": "6ac85a4e074c2bc731a77b4f",
+      "original_created_at": "2026-11-23T14:45:00",
+      "new_created_at": "2026-11-19T15:00:00",
+      "scheduled_appointment_date": "2026-11-23T15:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2dc",
+      "prediction_ref": "pred_e6ff99ab5843",
+      "appointment_id": "6ac85a53074c2bc731a782fd",
+      "original_created_at": "2026-11-23T14:45:00",
+      "new_created_at": "2026-11-17T15:00:00",
+      "scheduled_appointment_date": "2026-11-23T15:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2d9",
+      "prediction_ref": "pred_d98df30c4bf0",
+      "appointment_id": "6ac85a23074c2bc731a7655f",
+      "original_created_at": "2026-11-23T14:15:00",
+      "new_created_at": "2026-11-19T14:30:00",
+      "scheduled_appointment_date": "2026-11-23T14:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2da",
+      "prediction_ref": "pred_5d0b43b1c4ae",
+      "appointment_id": "6ac85a53074c2bc731a77e75",
+      "original_created_at": "2026-11-23T14:15:00",
+      "new_created_at": "2026-11-21T14:30:00",
+      "scheduled_appointment_date": "2026-11-23T14:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2d7",
+      "prediction_ref": "pred_56235f71881e",
+      "appointment_id": "6ac85a4c074c2bc731a7780e",
+      "original_created_at": "2026-11-23T11:45:00",
+      "new_created_at": "2026-11-19T12:00:00",
+      "scheduled_appointment_date": "2026-11-23T12:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2d8",
+      "prediction_ref": "pred_050970254695",
+      "appointment_id": "6ac85a53074c2bc731a77d6a",
+      "original_created_at": "2026-11-23T11:45:00",
+      "new_created_at": "2026-11-20T12:00:00",
+      "scheduled_appointment_date": "2026-11-23T12:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2d6",
+      "prediction_ref": "pred_4d4a415ee613",
+      "appointment_id": "6ac85a4e074c2bc731a77a39",
+      "original_created_at": "2026-11-23T11:15:00",
+      "new_created_at": "2026-11-18T11:30:00",
+      "scheduled_appointment_date": "2026-11-23T11:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2d2",
+      "prediction_ref": "pred_aed1b0d5bc72",
+      "appointment_id": "6ac85a27074c2bc731a767a0",
+      "original_created_at": "2026-11-23T10:45:00",
+      "new_created_at": "2026-11-21T11:00:00",
+      "scheduled_appointment_date": "2026-11-23T11:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2d3",
+      "prediction_ref": "pred_bac8be53ec18",
+      "appointment_id": "6ac85a36074c2bc731a76d16",
+      "original_created_at": "2026-11-23T10:45:00",
+      "new_created_at": "2026-11-19T11:00:00",
+      "scheduled_appointment_date": "2026-11-23T11:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2d4",
+      "prediction_ref": "pred_867c5b58e210",
+      "appointment_id": "6ac85a3b074c2bc731a7728e",
+      "original_created_at": "2026-11-23T10:45:00",
+      "new_created_at": "2026-11-19T11:00:00",
+      "scheduled_appointment_date": "2026-11-23T11:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2d5",
+      "prediction_ref": "pred_9e2feb8f651a",
+      "appointment_id": "6ac85a53074c2bc731a782f7",
+      "original_created_at": "2026-11-23T10:45:00",
+      "new_created_at": "2026-11-19T11:00:00",
+      "scheduled_appointment_date": "2026-11-23T11:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2d0",
+      "prediction_ref": "pred_d2e6a36b322b",
+      "appointment_id": "6ac85a23074c2bc731a76563",
+      "original_created_at": "2026-11-23T10:15:00",
+      "new_created_at": "2026-11-21T10:30:00",
+      "scheduled_appointment_date": "2026-11-23T10:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2d1",
+      "prediction_ref": "pred_2d4376c2c154",
+      "appointment_id": "6ac85a36074c2bc731a76e26",
+      "original_created_at": "2026-11-23T10:15:00",
+      "new_created_at": "2026-11-17T10:30:00",
+      "scheduled_appointment_date": "2026-11-23T10:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2cf",
+      "prediction_ref": "pred_82359cc448d7",
+      "appointment_id": "6ac85a53074c2bc731a77fa3",
+      "original_created_at": "2026-11-23T09:45:00",
+      "new_created_at": "2026-11-19T10:00:00",
+      "scheduled_appointment_date": "2026-11-23T10:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2ce",
+      "prediction_ref": "pred_80ec42cd3f78",
+      "appointment_id": "6ac85a50074c2bc731a77c52",
+      "original_created_at": "2026-11-23T09:15:00",
+      "new_created_at": "2026-11-20T09:30:00",
+      "scheduled_appointment_date": "2026-11-23T09:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2cb",
+      "prediction_ref": "pred_1653a65d4f60",
+      "appointment_id": "6ac85a27074c2bc731a767a3",
+      "original_created_at": "2026-11-20T15:45:00",
+      "new_created_at": "2026-11-17T16:00:00",
+      "scheduled_appointment_date": "2026-11-20T16:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2cc",
+      "prediction_ref": "pred_bb4e069cef52",
+      "appointment_id": "6ac85a3b074c2bc731a77171",
+      "original_created_at": "2026-11-20T15:45:00",
+      "new_created_at": "2026-11-13T16:00:00",
+      "scheduled_appointment_date": "2026-11-20T16:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2cd",
+      "prediction_ref": "pred_77686af5b528",
+      "appointment_id": "6ac85a53074c2bc731a781d2",
+      "original_created_at": "2026-11-20T15:45:00",
+      "new_created_at": "2026-11-13T16:00:00",
+      "scheduled_appointment_date": "2026-11-20T16:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35e06c3fd1f3314ad2ca",
+      "prediction_ref": "pred_15b93568c264",
+      "appointment_id": "6ac85a4e074c2bc731a7791e",
+      "original_created_at": "2026-11-20T15:15:00",
+      "new_created_at": "2026-11-16T15:30:00",
+      "scheduled_appointment_date": "2026-11-20T15:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2c9",
+      "prediction_ref": "pred_0da951677d86",
+      "appointment_id": "6ac85a4e074c2bc731a77b4e",
+      "original_created_at": "2026-11-20T14:45:00",
+      "new_created_at": "2026-11-16T15:00:00",
+      "scheduled_appointment_date": "2026-11-20T15:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2c8",
+      "prediction_ref": "pred_f04fc9f14902",
+      "appointment_id": "6ac85a3b074c2bc731a7716c",
+      "original_created_at": "2026-11-20T14:15:00",
+      "new_created_at": "2026-11-17T14:30:00",
+      "scheduled_appointment_date": "2026-11-20T14:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2c6",
+      "prediction_ref": "pred_d37044cefba7",
+      "appointment_id": "6ac85a45074c2bc731a774d0",
+      "original_created_at": "2026-11-20T13:45:00",
+      "new_created_at": "2026-11-14T14:00:00",
+      "scheduled_appointment_date": "2026-11-20T14:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2c7",
+      "prediction_ref": "pred_23f371605a59",
+      "appointment_id": "6ac85a50074c2bc731a77c55",
+      "original_created_at": "2026-11-20T13:45:00",
+      "new_created_at": "2026-11-17T14:00:00",
+      "scheduled_appointment_date": "2026-11-20T14:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2c4",
+      "prediction_ref": "pred_331fb6b43302",
+      "appointment_id": "6ac85a3b074c2bc731a7716b",
+      "original_created_at": "2026-11-20T11:45:00",
+      "new_created_at": "2026-11-16T12:00:00",
+      "scheduled_appointment_date": "2026-11-20T12:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2c5",
+      "prediction_ref": "pred_763dc57206bf",
+      "appointment_id": "6ac85a3b074c2bc731a773a8",
+      "original_created_at": "2026-11-20T11:45:00",
+      "new_created_at": "2026-11-14T12:00:00",
+      "scheduled_appointment_date": "2026-11-20T12:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2c3",
+      "prediction_ref": "pred_882425f386cc",
+      "appointment_id": "6ac85a50074c2bc731a77c5a",
+      "original_created_at": "2026-11-20T10:45:00",
+      "new_created_at": "2026-11-14T11:00:00",
+      "scheduled_appointment_date": "2026-11-20T11:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2bf",
+      "prediction_ref": "pred_8dffcd38880d",
+      "appointment_id": "6ac85a3b074c2bc731a77176",
+      "original_created_at": "2026-11-20T10:15:00",
+      "new_created_at": "2026-11-15T10:30:00",
+      "scheduled_appointment_date": "2026-11-20T10:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2c0",
+      "prediction_ref": "pred_a1abb6bfcc52",
+      "appointment_id": "6ac85a47074c2bc731a775d4",
+      "original_created_at": "2026-11-20T10:15:00",
+      "new_created_at": "2026-11-18T10:30:00",
+      "scheduled_appointment_date": "2026-11-20T10:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2c1",
+      "prediction_ref": "pred_2c8b9e170981",
+      "appointment_id": "6ac85a53074c2bc731a77d6c",
+      "original_created_at": "2026-11-20T10:15:00",
+      "new_created_at": "2026-11-13T10:30:00",
+      "scheduled_appointment_date": "2026-11-20T10:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2c2",
+      "prediction_ref": "pred_95b8e479c362",
+      "appointment_id": "6ac85a53074c2bc731a77f9e",
+      "original_created_at": "2026-11-20T10:15:00",
+      "new_created_at": "2026-11-17T10:30:00",
+      "scheduled_appointment_date": "2026-11-20T10:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2bd",
+      "prediction_ref": "pred_139d5c52b2df",
+      "appointment_id": "6ac85a2f074c2bc731a76c00",
+      "original_created_at": "2026-11-20T09:15:00",
+      "new_created_at": "2026-11-18T09:30:00",
+      "scheduled_appointment_date": "2026-11-20T09:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2be",
+      "prediction_ref": "pred_b29f70b543ea",
+      "appointment_id": "6ac85a53074c2bc731a77e78",
+      "original_created_at": "2026-11-20T09:15:00",
+      "new_created_at": "2026-11-13T09:30:00",
+      "scheduled_appointment_date": "2026-11-20T09:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35df6c3fd1f3314ad2bc",
+      "prediction_ref": "pred_39235f36e29e",
+      "appointment_id": "6ac85a47074c2bc731a775da",
+      "original_created_at": "2026-11-20T08:45:00",
+      "new_created_at": "2026-11-17T09:00:00",
+      "scheduled_appointment_date": "2026-11-20T09:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2bb",
+      "prediction_ref": "pred_b035c3c67543",
+      "appointment_id": "6ac85a2f074c2bc731a76bfd",
+      "original_created_at": "2026-11-19T16:15:00",
+      "new_created_at": "2026-11-13T16:30:00",
+      "scheduled_appointment_date": "2026-11-19T16:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2ba",
+      "prediction_ref": "pred_d0182193d667",
+      "appointment_id": "6ac85a53074c2bc731a781d4",
+      "original_created_at": "2026-11-19T15:45:00",
+      "new_created_at": "2026-11-17T16:00:00",
+      "scheduled_appointment_date": "2026-11-19T16:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2b9",
+      "prediction_ref": "pred_7e577f2fcbc8",
+      "appointment_id": "6ac85a2a074c2bc731a769ca",
+      "original_created_at": "2026-11-19T15:15:00",
+      "new_created_at": "2026-11-15T15:30:00",
+      "scheduled_appointment_date": "2026-11-19T15:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2b6",
+      "prediction_ref": "pred_d160433d8bf9",
+      "appointment_id": "6ac85a23074c2bc731a76569",
+      "original_created_at": "2026-11-19T14:45:00",
+      "new_created_at": "2026-11-13T15:00:00",
+      "scheduled_appointment_date": "2026-11-19T15:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2b7",
+      "prediction_ref": "pred_111991243d06",
+      "appointment_id": "6ac85a50074c2bc731a77c56",
+      "original_created_at": "2026-11-19T14:45:00",
+      "new_created_at": "2026-11-14T15:00:00",
+      "scheduled_appointment_date": "2026-11-19T15:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2b8",
+      "prediction_ref": "pred_bc4cbd8f9bbd",
+      "appointment_id": "6ac85a53074c2bc731a77e73",
+      "original_created_at": "2026-11-19T14:45:00",
+      "new_created_at": "2026-11-13T15:00:00",
+      "scheduled_appointment_date": "2026-11-19T15:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2b5",
+      "prediction_ref": "pred_1fc4ed50dd63",
+      "appointment_id": "6ac85a2a074c2bc731a769d4",
+      "original_created_at": "2026-11-19T14:15:00",
+      "new_created_at": "2026-11-14T14:30:00",
+      "scheduled_appointment_date": "2026-11-19T14:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2b3",
+      "prediction_ref": "pred_15ef810a8dbf",
+      "appointment_id": "6ac85a27074c2bc731a768bc",
+      "original_created_at": "2026-11-19T13:45:00",
+      "new_created_at": "2026-11-16T14:00:00",
+      "scheduled_appointment_date": "2026-11-19T14:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2b4",
+      "prediction_ref": "pred_ab6bb22ace34",
+      "appointment_id": "6ac85a53074c2bc731a781d3",
+      "original_created_at": "2026-11-19T13:45:00",
+      "new_created_at": "2026-11-13T14:00:00",
+      "scheduled_appointment_date": "2026-11-19T14:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2b0",
+      "prediction_ref": "pred_32579b6d3e1b",
+      "appointment_id": "6ac85a36074c2bc731a76e27",
+      "original_created_at": "2026-11-19T11:15:00",
+      "new_created_at": "2026-11-15T11:30:00",
+      "scheduled_appointment_date": "2026-11-19T11:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2b1",
+      "prediction_ref": "pred_6fbf6a8d6a57",
+      "appointment_id": "6ac85a4e074c2bc731a77a3e",
+      "original_created_at": "2026-11-19T11:15:00",
+      "new_created_at": "2026-11-13T11:30:00",
+      "scheduled_appointment_date": "2026-11-19T11:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2b2",
+      "prediction_ref": "pred_23f2f9e3583f",
+      "appointment_id": "6ac85a53074c2bc731a77f9d",
+      "original_created_at": "2026-11-19T11:15:00",
+      "new_created_at": "2026-11-13T11:30:00",
+      "scheduled_appointment_date": "2026-11-19T11:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2af",
+      "prediction_ref": "pred_b8d76a04f46c",
+      "appointment_id": "6ac85a53074c2bc731a780c9",
+      "original_created_at": "2026-11-19T10:15:00",
+      "new_created_at": "2026-11-15T10:30:00",
+      "scheduled_appointment_date": "2026-11-19T10:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2ae",
+      "prediction_ref": "pred_974332891d2c",
+      "appointment_id": "6ac85a4e074c2bc731a77917",
+      "original_created_at": "2026-11-19T09:15:00",
+      "new_created_at": "2026-11-14T09:30:00",
+      "scheduled_appointment_date": "2026-11-19T09:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2ad",
+      "prediction_ref": "pred_177ddd1910b0",
+      "appointment_id": "6ac85a3b074c2bc731a773ad",
+      "original_created_at": "2026-11-19T08:45:00",
+      "new_created_at": "2026-11-16T09:00:00",
+      "scheduled_appointment_date": "2026-11-19T09:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2ab",
+      "prediction_ref": "pred_3bbd33d5dcd0",
+      "appointment_id": "6ac85a36074c2bc731a76d15",
+      "original_created_at": "2026-11-18T16:15:00",
+      "new_created_at": "2026-11-15T16:30:00",
+      "scheduled_appointment_date": "2026-11-18T16:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2ac",
+      "prediction_ref": "pred_96974f584af2",
+      "appointment_id": "6ac85a3b074c2bc731a773a5",
+      "original_created_at": "2026-11-18T16:15:00",
+      "new_created_at": "2026-11-16T16:30:00",
+      "scheduled_appointment_date": "2026-11-18T16:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2aa",
+      "prediction_ref": "pred_5b835528d2b7",
+      "appointment_id": "6ac85a2c074c2bc731a76ae8",
+      "original_created_at": "2026-11-18T15:45:00",
+      "new_created_at": "2026-11-14T16:00:00",
+      "scheduled_appointment_date": "2026-11-18T16:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2a8",
+      "prediction_ref": "pred_67b6e5f846e8",
+      "appointment_id": "6ac85a23074c2bc731a76567",
+      "original_created_at": "2026-11-18T15:15:00",
+      "new_created_at": "2026-11-16T15:30:00",
+      "scheduled_appointment_date": "2026-11-18T15:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2a9",
+      "prediction_ref": "pred_c0e1e646fa48",
+      "appointment_id": "6ac85a53074c2bc731a780ce",
+      "original_created_at": "2026-11-18T15:15:00",
+      "new_created_at": "2026-11-16T15:30:00",
+      "scheduled_appointment_date": "2026-11-18T15:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35de6c3fd1f3314ad2a7",
+      "prediction_ref": "pred_2c59256ff274",
+      "appointment_id": "6ac85a4e074c2bc731a77915",
+      "original_created_at": "2026-11-18T14:45:00",
+      "new_created_at": "2026-11-13T15:00:00",
+      "scheduled_appointment_date": "2026-11-18T15:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad2a4",
+      "prediction_ref": "pred_f69e4080f22b",
+      "appointment_id": "6ac85a27074c2bc731a768c0",
+      "original_created_at": "2026-11-18T14:15:00",
+      "new_created_at": "2026-11-16T14:30:00",
+      "scheduled_appointment_date": "2026-11-18T14:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad2a5",
+      "prediction_ref": "pred_7270179366fb",
+      "appointment_id": "6ac85a4e074c2bc731a77a36",
+      "original_created_at": "2026-11-18T14:15:00",
+      "new_created_at": "2026-11-12T14:30:00",
+      "scheduled_appointment_date": "2026-11-18T14:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad2a6",
+      "prediction_ref": "pred_c49cb16235c4",
+      "appointment_id": "6ac85a53074c2bc731a781d6",
+      "original_created_at": "2026-11-18T14:15:00",
+      "new_created_at": "2026-11-11T14:30:00",
+      "scheduled_appointment_date": "2026-11-18T14:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad2a3",
+      "prediction_ref": "pred_c99ce4257e47",
+      "appointment_id": "6ac85a53074c2bc731a780c6",
+      "original_created_at": "2026-11-18T13:45:00",
+      "new_created_at": "2026-11-13T14:00:00",
+      "scheduled_appointment_date": "2026-11-18T14:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad2a2",
+      "prediction_ref": "pred_de1077ba99e3",
+      "appointment_id": "6ac85a27074c2bc731a768b8",
+      "original_created_at": "2026-11-18T11:45:00",
+      "new_created_at": "2026-11-14T12:00:00",
+      "scheduled_appointment_date": "2026-11-18T12:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad2a0",
+      "prediction_ref": "pred_f8b48b7d3189",
+      "appointment_id": "6ac85a2c074c2bc731a76ae7",
+      "original_created_at": "2026-11-18T10:45:00",
+      "new_created_at": "2026-11-11T11:00:00",
+      "scheduled_appointment_date": "2026-11-18T11:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad2a1",
+      "prediction_ref": "pred_b63ef33c1fc8",
+      "appointment_id": "6ac85a53074c2bc731a77fa2",
+      "original_created_at": "2026-11-18T10:45:00",
+      "new_created_at": "2026-11-12T11:00:00",
+      "scheduled_appointment_date": "2026-11-18T11:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad29f",
+      "prediction_ref": "pred_68cd98908aaf",
+      "appointment_id": "6ac85a53074c2bc731a7840e",
+      "original_created_at": "2026-11-18T10:15:00",
+      "new_created_at": "2026-11-13T10:30:00",
+      "scheduled_appointment_date": "2026-11-18T10:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad29e",
+      "prediction_ref": "pred_faba3468a3f8",
+      "appointment_id": "6ac85a4e074c2bc731a77b51",
+      "original_created_at": "2026-11-18T09:15:00",
+      "new_created_at": "2026-11-15T09:30:00",
+      "scheduled_appointment_date": "2026-11-18T09:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad29c",
+      "prediction_ref": "pred_7dcd6b867126",
+      "appointment_id": "6ac85a39074c2bc731a77059",
+      "original_created_at": "2026-11-17T16:15:00",
+      "new_created_at": "2026-11-15T16:30:00",
+      "scheduled_appointment_date": "2026-11-17T16:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad29d",
+      "prediction_ref": "pred_05bf3ed3f192",
+      "appointment_id": "6ac85a53074c2bc731a782fa",
+      "original_created_at": "2026-11-17T16:15:00",
+      "new_created_at": "2026-11-11T16:30:00",
+      "scheduled_appointment_date": "2026-11-17T16:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad29b",
+      "prediction_ref": "pred_86bd0f0ad75d",
+      "appointment_id": "6ac85a36074c2bc731a76d17",
+      "original_created_at": "2026-11-17T15:45:00",
+      "new_created_at": "2026-11-14T16:00:00",
+      "scheduled_appointment_date": "2026-11-17T16:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad299",
+      "prediction_ref": "pred_e81afed3f953",
+      "appointment_id": "6ac85a2a074c2bc731a769d0",
+      "original_created_at": "2026-11-17T15:15:00",
+      "new_created_at": "2026-11-14T15:30:00",
+      "scheduled_appointment_date": "2026-11-17T15:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad29a",
+      "prediction_ref": "pred_2859e222b5c2",
+      "appointment_id": "6ac85a47074c2bc731a775db",
+      "original_created_at": "2026-11-17T15:15:00",
+      "new_created_at": "2026-11-10T15:30:00",
+      "scheduled_appointment_date": "2026-11-17T15:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad298",
+      "prediction_ref": "pred_b40e080ea4ee",
+      "appointment_id": "6ac85a27074c2bc731a7679a",
+      "original_created_at": "2026-11-17T14:45:00",
+      "new_created_at": "2026-11-14T15:00:00",
+      "scheduled_appointment_date": "2026-11-17T15:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad297",
+      "prediction_ref": "pred_990a0cbcf77b",
+      "appointment_id": "6ac85a36074c2bc731a76d11",
+      "original_created_at": "2026-11-17T13:45:00",
+      "new_created_at": "2026-11-15T14:00:00",
+      "scheduled_appointment_date": "2026-11-17T14:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad296",
+      "prediction_ref": "pred_1ed62a2879c3",
+      "appointment_id": "6ac85a2a074c2bc731a769cf",
+      "original_created_at": "2026-11-17T11:45:00",
+      "new_created_at": "2026-11-13T12:00:00",
+      "scheduled_appointment_date": "2026-11-17T12:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad295",
+      "prediction_ref": "pred_da6a3f432788",
+      "appointment_id": "6ac85a36074c2bc731a76d10",
+      "original_created_at": "2026-11-17T10:45:00",
+      "new_created_at": "2026-11-12T11:00:00",
+      "scheduled_appointment_date": "2026-11-17T11:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35dd6c3fd1f3314ad294",
+      "prediction_ref": "pred_1d67016d0c09",
+      "appointment_id": "6ac85a3b074c2bc731a77170",
+      "original_created_at": "2026-11-17T10:15:00",
+      "new_created_at": "2026-11-15T10:30:00",
+      "scheduled_appointment_date": "2026-11-17T10:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad293",
+      "prediction_ref": "pred_88d521ab225e",
+      "appointment_id": "6ac85a4a074c2bc731a776ed",
+      "original_created_at": "2026-11-17T09:15:00",
+      "new_created_at": "2026-11-14T09:30:00",
+      "scheduled_appointment_date": "2026-11-17T09:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad292",
+      "prediction_ref": "pred_7267ff866bf1",
+      "appointment_id": "6ac85a3b074c2bc731a77287",
+      "original_created_at": "2026-11-17T08:45:00",
+      "new_created_at": "2026-11-15T09:00:00",
+      "scheduled_appointment_date": "2026-11-17T09:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad291",
+      "prediction_ref": "pred_e4c10ee67377",
+      "appointment_id": "6ac85a2f074c2bc731a76bfb",
+      "original_created_at": "2026-11-16T16:15:00",
+      "new_created_at": "2026-11-14T16:30:00",
+      "scheduled_appointment_date": "2026-11-16T16:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad28f",
+      "prediction_ref": "pred_4b215c72d0b6",
+      "appointment_id": "6ac85a36074c2bc731a76f47",
+      "original_created_at": "2026-11-16T15:45:00",
+      "new_created_at": "2026-11-13T16:00:00",
+      "scheduled_appointment_date": "2026-11-16T16:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad290",
+      "prediction_ref": "pred_9ebabae8f802",
+      "appointment_id": "6ac85a39074c2bc731a77058",
+      "original_created_at": "2026-11-16T15:45:00",
+      "new_created_at": "2026-11-10T16:00:00",
+      "scheduled_appointment_date": "2026-11-16T16:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad28e",
+      "prediction_ref": "pred_fb8865743bd1",
+      "appointment_id": "6ac85a26074c2bc731a7668e",
+      "original_created_at": "2026-11-16T15:15:00",
+      "new_created_at": "2026-11-09T15:30:00",
+      "scheduled_appointment_date": "2026-11-16T15:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad28a",
+      "prediction_ref": "pred_a551a8446a4d",
+      "appointment_id": "6ac85a2c074c2bc731a76aef",
+      "original_created_at": "2026-11-16T14:45:00",
+      "new_created_at": "2026-11-10T15:00:00",
+      "scheduled_appointment_date": "2026-11-16T15:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad28b",
+      "prediction_ref": "pred_af77421ae0e9",
+      "appointment_id": "6ac85a3b074c2bc731a773ae",
+      "original_created_at": "2026-11-16T14:45:00",
+      "new_created_at": "2026-11-13T15:00:00",
+      "scheduled_appointment_date": "2026-11-16T15:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad28c",
+      "prediction_ref": "pred_6852f8f325e7",
+      "appointment_id": "6ac85a4e074c2bc731a77a3f",
+      "original_created_at": "2026-11-16T14:45:00",
+      "new_created_at": "2026-11-13T15:00:00",
+      "scheduled_appointment_date": "2026-11-16T15:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad28d",
+      "prediction_ref": "pred_2e0a3f904269",
+      "appointment_id": "6ac85a50074c2bc731a77c50",
+      "original_created_at": "2026-11-16T14:45:00",
+      "new_created_at": "2026-11-14T15:00:00",
+      "scheduled_appointment_date": "2026-11-16T15:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad289",
+      "prediction_ref": "pred_0d731f660c93",
+      "appointment_id": "6ac85a53074c2bc731a781dd",
+      "original_created_at": "2026-11-16T14:15:00",
+      "new_created_at": "2026-11-14T14:30:00",
+      "scheduled_appointment_date": "2026-11-16T14:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad287",
+      "prediction_ref": "pred_f78049c17b3e",
+      "appointment_id": "6ac85a26074c2bc731a76691",
+      "original_created_at": "2026-11-16T13:45:00",
+      "new_created_at": "2026-11-12T14:00:00",
+      "scheduled_appointment_date": "2026-11-16T14:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad288",
+      "prediction_ref": "pred_d15a2b542a29",
+      "appointment_id": "6ac85a36074c2bc731a76e2a",
+      "original_created_at": "2026-11-16T13:45:00",
+      "new_created_at": "2026-11-13T14:00:00",
+      "scheduled_appointment_date": "2026-11-16T14:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad284",
+      "prediction_ref": "pred_09acb3fa2430",
+      "appointment_id": "6ac85a27074c2bc731a767a2",
+      "original_created_at": "2026-11-16T11:45:00",
+      "new_created_at": "2026-11-10T12:00:00",
+      "scheduled_appointment_date": "2026-11-16T12:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad285",
+      "prediction_ref": "pred_c94ec7685a06",
+      "appointment_id": "6ac85a2a074c2bc731a769d1",
+      "original_created_at": "2026-11-16T11:45:00",
+      "new_created_at": "2026-11-11T12:00:00",
+      "scheduled_appointment_date": "2026-11-16T12:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35dc6c3fd1f3314ad286",
+      "prediction_ref": "pred_5bf5dcdab359",
+      "appointment_id": "6ac85a36074c2bc731a76d12",
+      "original_created_at": "2026-11-16T11:45:00",
+      "new_created_at": "2026-11-10T12:00:00",
+      "scheduled_appointment_date": "2026-11-16T12:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad282",
+      "prediction_ref": "pred_cde839279584",
+      "appointment_id": "6ac85a2f074c2bc731a76bfc",
+      "original_created_at": "2026-11-16T11:15:00",
+      "new_created_at": "2026-11-11T11:30:00",
+      "scheduled_appointment_date": "2026-11-16T11:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad283",
+      "prediction_ref": "pred_c78283c055e8",
+      "appointment_id": "6ac85a39074c2bc731a7705a",
+      "original_created_at": "2026-11-16T11:15:00",
+      "new_created_at": "2026-11-09T11:30:00",
+      "scheduled_appointment_date": "2026-11-16T11:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad280",
+      "prediction_ref": "pred_54fa4ecf2649",
+      "appointment_id": "6ac85a27074c2bc731a768c3",
+      "original_created_at": "2026-11-16T10:45:00",
+      "new_created_at": "2026-11-14T11:00:00",
+      "scheduled_appointment_date": "2026-11-16T11:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad281",
+      "prediction_ref": "pred_6bb22d35926a",
+      "appointment_id": "6ac85a3b074c2bc731a773ac",
+      "original_created_at": "2026-11-16T10:45:00",
+      "new_created_at": "2026-11-14T11:00:00",
+      "scheduled_appointment_date": "2026-11-16T11:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad27e",
+      "prediction_ref": "pred_96e028313555",
+      "appointment_id": "6ac85a27074c2bc731a7679c",
+      "original_created_at": "2026-11-16T10:15:00",
+      "new_created_at": "2026-11-14T10:30:00",
+      "scheduled_appointment_date": "2026-11-16T10:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad27f",
+      "prediction_ref": "pred_15f8a2038b93",
+      "appointment_id": "6ac85a4e074c2bc731a77a3b",
+      "original_created_at": "2026-11-16T10:15:00",
+      "new_created_at": "2026-11-09T10:30:00",
+      "scheduled_appointment_date": "2026-11-16T10:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad27c",
+      "prediction_ref": "pred_87f6bd633a0c",
+      "appointment_id": "6ac85a4a074c2bc731a776f2",
+      "original_created_at": "2026-11-16T09:45:00",
+      "new_created_at": "2026-11-10T10:00:00",
+      "scheduled_appointment_date": "2026-11-16T10:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad27d",
+      "prediction_ref": "pred_4ea4c6331181",
+      "appointment_id": "6ac85a53074c2bc731a781d9",
+      "original_created_at": "2026-11-16T09:45:00",
+      "new_created_at": "2026-11-09T10:00:00",
+      "scheduled_appointment_date": "2026-11-16T10:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad27b",
+      "prediction_ref": "pred_6f46bdd4dd23",
+      "appointment_id": "6ac85a4c074c2bc731a77806",
+      "original_created_at": "2026-11-16T09:15:00",
+      "new_created_at": "2026-11-13T09:30:00",
+      "scheduled_appointment_date": "2026-11-16T09:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad278",
+      "prediction_ref": "pred_d806565212f6",
+      "appointment_id": "6ac85a2c074c2bc731a76af1",
+      "original_created_at": "2026-11-13T15:45:00",
+      "new_created_at": "2026-11-09T16:00:00",
+      "scheduled_appointment_date": "2026-11-13T16:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad279",
+      "prediction_ref": "pred_92fc5204df4f",
+      "appointment_id": "6ac85a4c074c2bc731a7780b",
+      "original_created_at": "2026-11-13T15:45:00",
+      "new_created_at": "2026-11-06T16:00:00",
+      "scheduled_appointment_date": "2026-11-13T16:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad27a",
+      "prediction_ref": "pred_441fe506f676",
+      "appointment_id": "6ac85a4e074c2bc731a77a3a",
+      "original_created_at": "2026-11-13T15:45:00",
+      "new_created_at": "2026-11-08T16:00:00",
+      "scheduled_appointment_date": "2026-11-13T16:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad276",
+      "prediction_ref": "pred_1e308682c4c3",
+      "appointment_id": "6ac85a27074c2bc731a7679f",
+      "original_created_at": "2026-11-13T15:15:00",
+      "new_created_at": "2026-11-06T15:30:00",
+      "scheduled_appointment_date": "2026-11-13T15:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad277",
+      "prediction_ref": "pred_e6c9e7919253",
+      "appointment_id": "6ac85a45074c2bc731a774cf",
+      "original_created_at": "2026-11-13T15:15:00",
+      "new_created_at": "2026-11-10T15:30:00",
+      "scheduled_appointment_date": "2026-11-13T15:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad275",
+      "prediction_ref": "pred_b04dcccf6bf3",
+      "appointment_id": "6ac85a4e074c2bc731a77a3c",
+      "original_created_at": "2026-11-13T14:45:00",
+      "new_created_at": "2026-11-06T15:00:00",
+      "scheduled_appointment_date": "2026-11-13T15:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad272",
+      "prediction_ref": "pred_4149032c39f9",
+      "appointment_id": "6ac85a2c074c2bc731a76aee",
+      "original_created_at": "2026-11-13T14:15:00",
+      "new_created_at": "2026-11-10T14:30:00",
+      "scheduled_appointment_date": "2026-11-13T14:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad273",
+      "prediction_ref": "pred_e5c3e712f6b7",
+      "appointment_id": "6ac85a3b074c2bc731a77173",
+      "original_created_at": "2026-11-13T14:15:00",
+      "new_created_at": "2026-11-10T14:30:00",
+      "scheduled_appointment_date": "2026-11-13T14:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35db6c3fd1f3314ad274",
+      "prediction_ref": "pred_8b321ae40c22",
+      "appointment_id": "6ac85a4e074c2bc731a77918",
+      "original_created_at": "2026-11-13T14:15:00",
+      "new_created_at": "2026-11-07T14:30:00",
+      "scheduled_appointment_date": "2026-11-13T14:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad270",
+      "prediction_ref": "pred_32ccbe0de445",
+      "appointment_id": "6ac85a53074c2bc731a77e77",
+      "original_created_at": "2026-11-13T13:45:00",
+      "new_created_at": "2026-11-09T14:00:00",
+      "scheduled_appointment_date": "2026-11-13T14:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad271",
+      "prediction_ref": "pred_ffa123fe896a",
+      "appointment_id": "6ac85a53074c2bc731a780cb",
+      "original_created_at": "2026-11-13T13:45:00",
+      "new_created_at": "2026-11-11T14:00:00",
+      "scheduled_appointment_date": "2026-11-13T14:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad26e",
+      "prediction_ref": "pred_787bf3b0c851",
+      "appointment_id": "6ac85a2f074c2bc731a76c04",
+      "original_created_at": "2026-11-13T11:45:00",
+      "new_created_at": "2026-11-10T12:00:00",
+      "scheduled_appointment_date": "2026-11-13T12:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad26f",
+      "prediction_ref": "pred_5e809b69765a",
+      "appointment_id": "6ac85a53074c2bc731a78409",
+      "original_created_at": "2026-11-13T11:45:00",
+      "new_created_at": "2026-11-09T12:00:00",
+      "scheduled_appointment_date": "2026-11-13T12:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad26c",
+      "prediction_ref": "pred_545cbeb68026",
+      "appointment_id": "6ac85a26074c2bc731a7668c",
+      "original_created_at": "2026-11-13T10:45:00",
+      "new_created_at": "2026-11-08T11:00:00",
+      "scheduled_appointment_date": "2026-11-13T11:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad26d",
+      "prediction_ref": "pred_5e27f77f90b4",
+      "appointment_id": "6ac85a2f074c2bc731a76c01",
+      "original_created_at": "2026-11-13T10:45:00",
+      "new_created_at": "2026-11-08T11:00:00",
+      "scheduled_appointment_date": "2026-11-13T11:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad26b",
+      "prediction_ref": "pred_28d26f9fbe95",
+      "appointment_id": "6ac85a3b074c2bc731a77291",
+      "original_created_at": "2026-11-13T10:15:00",
+      "new_created_at": "2026-11-07T10:30:00",
+      "scheduled_appointment_date": "2026-11-13T10:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad26a",
+      "prediction_ref": "pred_e5c8eb0b7bb2",
+      "appointment_id": "6ac85a53074c2bc731a781d8",
+      "original_created_at": "2026-11-13T09:45:00",
+      "new_created_at": "2026-11-08T10:00:00",
+      "scheduled_appointment_date": "2026-11-13T10:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad269",
+      "prediction_ref": "pred_b59f36697a6e",
+      "appointment_id": "6ac85a36074c2bc731a76f41",
+      "original_created_at": "2026-11-13T09:15:00",
+      "new_created_at": "2026-11-06T09:30:00",
+      "scheduled_appointment_date": "2026-11-13T09:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad267",
+      "prediction_ref": "pred_6aa56ad6a921",
+      "appointment_id": "6ac85a36074c2bc731a76e2b",
+      "original_created_at": "2026-11-12T16:15:00",
+      "new_created_at": "2026-11-05T16:30:00",
+      "scheduled_appointment_date": "2026-11-12T16:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad268",
+      "prediction_ref": "pred_e2349bd56533",
+      "appointment_id": "6ac85a50074c2bc731a77c51",
+      "original_created_at": "2026-11-12T16:15:00",
+      "new_created_at": "2026-11-06T16:30:00",
+      "scheduled_appointment_date": "2026-11-12T16:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad266",
+      "prediction_ref": "pred_1b0e0a9e857b",
+      "appointment_id": "6ac85a23074c2bc731a76568",
+      "original_created_at": "2026-11-12T15:45:00",
+      "new_created_at": "2026-11-10T16:00:00",
+      "scheduled_appointment_date": "2026-11-12T16:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad265",
+      "prediction_ref": "pred_aa8d3a010ec1",
+      "appointment_id": "6ac85a27074c2bc731a76799",
+      "original_created_at": "2026-11-12T15:15:00",
+      "new_created_at": "2026-11-10T15:30:00",
+      "scheduled_appointment_date": "2026-11-12T15:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad264",
+      "prediction_ref": "pred_86740ae1527e",
+      "appointment_id": "6ac85a4a074c2bc731a776f3",
+      "original_created_at": "2026-11-12T14:45:00",
+      "new_created_at": "2026-11-07T15:00:00",
+      "scheduled_appointment_date": "2026-11-12T15:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad263",
+      "prediction_ref": "pred_0251932226c1",
+      "appointment_id": "6ac85a53074c2bc731a77fa1",
+      "original_created_at": "2026-11-12T14:15:00",
+      "new_created_at": "2026-11-09T14:30:00",
+      "scheduled_appointment_date": "2026-11-12T14:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad261",
+      "prediction_ref": "pred_88dc557afc0b",
+      "appointment_id": "6ac85a4e074c2bc731a77919",
+      "original_created_at": "2026-11-12T13:45:00",
+      "new_created_at": "2026-11-06T14:00:00",
+      "scheduled_appointment_date": "2026-11-12T14:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad262",
+      "prediction_ref": "pred_7d3d0a422099",
+      "appointment_id": "6ac85a53074c2bc731a781dc",
+      "original_created_at": "2026-11-12T13:45:00",
+      "new_created_at": "2026-11-09T14:00:00",
+      "scheduled_appointment_date": "2026-11-12T14:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad260",
+      "prediction_ref": "pred_0433e0504a50",
+      "appointment_id": "6ac85a23074c2bc731a76564",
+      "original_created_at": "2026-11-12T11:45:00",
+      "new_created_at": "2026-11-09T12:00:00",
+      "scheduled_appointment_date": "2026-11-12T12:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad25c",
+      "prediction_ref": "pred_a65521255f0c",
+      "appointment_id": "6ac85a3b074c2bc731a7728b",
+      "original_created_at": "2026-11-12T11:15:00",
+      "new_created_at": "2026-11-09T11:30:00",
+      "scheduled_appointment_date": "2026-11-12T11:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad25d",
+      "prediction_ref": "pred_e614b3934033",
+      "appointment_id": "6ac85a4e074c2bc731a77916",
+      "original_created_at": "2026-11-12T11:15:00",
+      "new_created_at": "2026-11-05T11:30:00",
+      "scheduled_appointment_date": "2026-11-12T11:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad25e",
+      "prediction_ref": "pred_f2947a2b8fd3",
+      "appointment_id": "6ac85a53074c2bc731a77d62",
+      "original_created_at": "2026-11-12T11:15:00",
+      "new_created_at": "2026-11-05T11:30:00",
+      "scheduled_appointment_date": "2026-11-12T11:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35da6c3fd1f3314ad25f",
+      "prediction_ref": "pred_7050e119baed",
+      "appointment_id": "6ac85a53074c2bc731a780c8",
+      "original_created_at": "2026-11-12T11:15:00",
+      "new_created_at": "2026-11-06T11:30:00",
+      "scheduled_appointment_date": "2026-11-12T11:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad25b",
+      "prediction_ref": "pred_528955fede5c",
+      "appointment_id": "6ac85a45074c2bc731a774c9",
+      "original_created_at": "2026-11-12T10:45:00",
+      "new_created_at": "2026-11-05T11:00:00",
+      "scheduled_appointment_date": "2026-11-12T11:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad259",
+      "prediction_ref": "pred_6632867c8187",
+      "appointment_id": "6ac85a50074c2bc731a77c53",
+      "original_created_at": "2026-11-12T10:15:00",
+      "new_created_at": "2026-11-06T10:30:00",
+      "scheduled_appointment_date": "2026-11-12T10:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad25a",
+      "prediction_ref": "pred_ec159d37102a",
+      "appointment_id": "6ac85a53074c2bc731a780c4",
+      "original_created_at": "2026-11-12T10:15:00",
+      "new_created_at": "2026-11-08T10:30:00",
+      "scheduled_appointment_date": "2026-11-12T10:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad258",
+      "prediction_ref": "pred_d32074f9a4e1",
+      "appointment_id": "6ac85a53074c2bc731a782f2",
+      "original_created_at": "2026-11-11T15:45:00",
+      "new_created_at": "2026-11-04T16:00:00",
+      "scheduled_appointment_date": "2026-11-11T16:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad257",
+      "prediction_ref": "pred_032f27ed09ca",
+      "appointment_id": "6ac85a39074c2bc731a7705e",
+      "original_created_at": "2026-11-11T15:15:00",
+      "new_created_at": "2026-11-07T15:30:00",
+      "scheduled_appointment_date": "2026-11-11T15:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad255",
+      "prediction_ref": "pred_5b27e4f33056",
+      "appointment_id": "6ac85a2a074c2bc731a769cd",
+      "original_created_at": "2026-11-11T14:15:00",
+      "new_created_at": "2026-11-09T14:30:00",
+      "scheduled_appointment_date": "2026-11-11T14:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad256",
+      "prediction_ref": "pred_6aebe12f6659",
+      "appointment_id": "6ac85a26074c2bc731a76687",
+      "original_created_at": "2026-11-11T14:15:00",
+      "new_created_at": "2026-11-06T14:30:00",
+      "scheduled_appointment_date": "2026-11-11T14:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad253",
+      "prediction_ref": "pred_73983282cd88",
+      "appointment_id": "6ac85a36074c2bc731a76e29",
+      "original_created_at": "2026-11-11T13:45:00",
+      "new_created_at": "2026-11-09T14:00:00",
+      "scheduled_appointment_date": "2026-11-11T14:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad254",
+      "prediction_ref": "pred_6e080eb8516b",
+      "appointment_id": "6ac85a53074c2bc731a7840f",
+      "original_created_at": "2026-11-11T13:45:00",
+      "new_created_at": "2026-11-08T14:00:00",
+      "scheduled_appointment_date": "2026-11-11T14:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad252",
+      "prediction_ref": "pred_faf95902279d",
+      "appointment_id": "6ac85a4e074c2bc731a77a40",
+      "original_created_at": "2026-11-11T11:45:00",
+      "new_created_at": "2026-11-04T12:00:00",
+      "scheduled_appointment_date": "2026-11-11T12:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad24e",
+      "prediction_ref": "pred_b0caac95be39",
+      "appointment_id": "6ac85a2a074c2bc731a769d2",
+      "original_created_at": "2026-11-11T11:15:00",
+      "new_created_at": "2026-11-07T11:30:00",
+      "scheduled_appointment_date": "2026-11-11T11:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad24f",
+      "prediction_ref": "pred_6124971710ba",
+      "appointment_id": "6ac85a3b074c2bc731a77172",
+      "original_created_at": "2026-11-11T11:15:00",
+      "new_created_at": "2026-11-06T11:30:00",
+      "scheduled_appointment_date": "2026-11-11T11:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad250",
+      "prediction_ref": "pred_f71846055ef7",
+      "appointment_id": "6ac85a53074c2bc731a77fa0",
+      "original_created_at": "2026-11-11T11:15:00",
+      "new_created_at": "2026-11-05T11:30:00",
+      "scheduled_appointment_date": "2026-11-11T11:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad251",
+      "prediction_ref": "pred_da81386238c1",
+      "appointment_id": "6ac85a53074c2bc731a780c7",
+      "original_created_at": "2026-11-11T11:15:00",
+      "new_created_at": "2026-11-09T11:30:00",
+      "scheduled_appointment_date": "2026-11-11T11:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad24d",
+      "prediction_ref": "pred_9db6992e9a66",
+      "appointment_id": "6ac85a47074c2bc731a775dc",
+      "original_created_at": "2026-11-11T10:15:00",
+      "new_created_at": "2026-11-07T10:30:00",
+      "scheduled_appointment_date": "2026-11-11T10:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad24b",
+      "prediction_ref": "pred_772159a9f7df",
+      "appointment_id": "6ac85a53074c2bc731a782f8",
+      "original_created_at": "2026-11-11T09:45:00",
+      "new_created_at": "2026-11-05T10:00:00",
+      "scheduled_appointment_date": "2026-11-11T10:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad24c",
+      "prediction_ref": "pred_324b96bc0616",
+      "appointment_id": "6ac85a53074c2bc731a78413",
+      "original_created_at": "2026-11-11T09:45:00",
+      "new_created_at": "2026-11-04T10:00:00",
+      "scheduled_appointment_date": "2026-11-11T10:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d96c3fd1f3314ad24a",
+      "prediction_ref": "pred_0e59e91c7730",
+      "appointment_id": "6ac85a26074c2bc731a76688",
+      "original_created_at": "2026-11-11T09:15:00",
+      "new_created_at": "2026-11-05T09:30:00",
+      "scheduled_appointment_date": "2026-11-11T09:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad249",
+      "prediction_ref": "pred_000d71422858",
+      "appointment_id": "6ac85a39074c2bc731a7705d",
+      "original_created_at": "2026-11-11T08:45:00",
+      "new_created_at": "2026-11-07T09:00:00",
+      "scheduled_appointment_date": "2026-11-11T09:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad248",
+      "prediction_ref": "pred_2e2caba1a9b0",
+      "appointment_id": "6ac85a4a074c2bc731a776f1",
+      "original_created_at": "2026-11-10T16:15:00",
+      "new_created_at": "2026-11-04T16:30:00",
+      "scheduled_appointment_date": "2026-11-10T16:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad246",
+      "prediction_ref": "pred_1f2f9d84dccd",
+      "appointment_id": "6ac85a3b074c2bc731a77289",
+      "original_created_at": "2026-11-10T15:45:00",
+      "new_created_at": "2026-11-07T16:00:00",
+      "scheduled_appointment_date": "2026-11-10T16:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad247",
+      "prediction_ref": "pred_24ba8ae45dcc",
+      "appointment_id": "6ac85a53074c2bc731a782f9",
+      "original_created_at": "2026-11-10T15:45:00",
+      "new_created_at": "2026-11-06T16:00:00",
+      "scheduled_appointment_date": "2026-11-10T16:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad244",
+      "prediction_ref": "pred_8a9063a87897",
+      "appointment_id": "6ac85a27074c2bc731a7679b",
+      "original_created_at": "2026-11-10T14:45:00",
+      "new_created_at": "2026-11-03T15:00:00",
+      "scheduled_appointment_date": "2026-11-10T15:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad245",
+      "prediction_ref": "pred_8d5269a83503",
+      "appointment_id": "6ac85a4e074c2bc731a7791b",
+      "original_created_at": "2026-11-10T14:45:00",
+      "new_created_at": "2026-11-08T15:00:00",
+      "scheduled_appointment_date": "2026-11-10T15:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad242",
+      "prediction_ref": "pred_1a239a64b962",
+      "appointment_id": "6ac85a26074c2bc731a7668f",
+      "original_created_at": "2026-11-10T14:15:00",
+      "new_created_at": "2026-11-04T14:30:00",
+      "scheduled_appointment_date": "2026-11-10T14:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad243",
+      "prediction_ref": "pred_af070e265903",
+      "appointment_id": "6ac85a36074c2bc731a76d1a",
+      "original_created_at": "2026-11-10T14:15:00",
+      "new_created_at": "2026-11-05T14:30:00",
+      "scheduled_appointment_date": "2026-11-10T14:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad240",
+      "prediction_ref": "pred_88ddbe67194e",
+      "appointment_id": "6ac85a3b074c2bc731a773aa",
+      "original_created_at": "2026-11-10T11:45:00",
+      "new_created_at": "2026-11-05T12:00:00",
+      "scheduled_appointment_date": "2026-11-10T12:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad241",
+      "prediction_ref": "pred_ad78203120cb",
+      "appointment_id": "6ac85a39074c2bc731a7705b",
+      "original_created_at": "2026-11-10T11:45:00",
+      "new_created_at": "2026-11-07T12:00:00",
+      "scheduled_appointment_date": "2026-11-10T12:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad23f",
+      "prediction_ref": "pred_4898879df80f",
+      "appointment_id": "6ac85a27074c2bc731a768ba",
+      "original_created_at": "2026-11-10T11:15:00",
+      "new_created_at": "2026-11-08T11:30:00",
+      "scheduled_appointment_date": "2026-11-10T11:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad23d",
+      "prediction_ref": "pred_4528ade4b127",
+      "appointment_id": "6ac85a26074c2bc731a7668a",
+      "original_created_at": "2026-11-10T10:45:00",
+      "new_created_at": "2026-11-08T11:00:00",
+      "scheduled_appointment_date": "2026-11-10T11:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad23e",
+      "prediction_ref": "pred_2ac5db2b6e7f",
+      "appointment_id": "6ac85a53074c2bc731a781da",
+      "original_created_at": "2026-11-10T10:45:00",
+      "new_created_at": "2026-11-05T11:00:00",
+      "scheduled_appointment_date": "2026-11-10T11:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad23c",
+      "prediction_ref": "pred_1bf37b36fb4b",
+      "appointment_id": "6ac85a4a074c2bc731a776f0",
+      "original_created_at": "2026-11-10T10:15:00",
+      "new_created_at": "2026-11-04T10:30:00",
+      "scheduled_appointment_date": "2026-11-10T10:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad23b",
+      "prediction_ref": "pred_c4336998fc1f",
+      "appointment_id": "6ac85a47074c2bc731a775de",
+      "original_created_at": "2026-11-10T09:45:00",
+      "new_created_at": "2026-11-06T10:00:00",
+      "scheduled_appointment_date": "2026-11-10T10:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad239",
+      "prediction_ref": "pred_115aefc5e008",
+      "appointment_id": "6ac85a36074c2bc731a76f4c",
+      "original_created_at": "2026-11-10T09:15:00",
+      "new_created_at": "2026-11-03T09:30:00",
+      "scheduled_appointment_date": "2026-11-10T09:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad23a",
+      "prediction_ref": "pred_c48a86467a80",
+      "appointment_id": "6ac85a2f074c2bc731a76c02",
+      "original_created_at": "2026-11-10T09:15:00",
+      "new_created_at": "2026-11-07T09:30:00",
+      "scheduled_appointment_date": "2026-11-10T09:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad237",
+      "prediction_ref": "pred_f053bbe930ba",
+      "appointment_id": "6ac85a53074c2bc731a77f99",
+      "original_created_at": "2026-11-10T08:45:00",
+      "new_created_at": "2026-11-06T09:00:00",
+      "scheduled_appointment_date": "2026-11-10T09:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad238",
+      "prediction_ref": "pred_6ed1b85d3002",
+      "appointment_id": "6ac85a53074c2bc731a781d7",
+      "original_created_at": "2026-11-10T08:45:00",
+      "new_created_at": "2026-11-06T09:00:00",
+      "scheduled_appointment_date": "2026-11-10T09:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad231",
+      "prediction_ref": "pred_8612b87e8df7",
+      "appointment_id": "6ac85a23074c2bc731a76566",
+      "original_created_at": "2026-11-09T15:45:00",
+      "new_created_at": "2026-11-07T16:00:00",
+      "scheduled_appointment_date": "2026-11-09T16:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad232",
+      "prediction_ref": "pred_417a3d3cd894",
+      "appointment_id": "6ac85a39074c2bc731a7705c",
+      "original_created_at": "2026-11-09T15:45:00",
+      "new_created_at": "2026-11-05T16:00:00",
+      "scheduled_appointment_date": "2026-11-09T16:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad233",
+      "prediction_ref": "pred_70790ba88fb3",
+      "appointment_id": "6ac85a45074c2bc731a774ca",
+      "original_created_at": "2026-11-09T15:45:00",
+      "new_created_at": "2026-11-04T16:00:00",
+      "scheduled_appointment_date": "2026-11-09T16:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad234",
+      "prediction_ref": "pred_26d27252180d",
+      "appointment_id": "6ac85a3b074c2bc731a7728c",
+      "original_created_at": "2026-11-09T15:45:00",
+      "new_created_at": "2026-11-07T16:00:00",
+      "scheduled_appointment_date": "2026-11-09T16:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad235",
+      "prediction_ref": "pred_218fdeac2a37",
+      "appointment_id": "6ac85a53074c2bc731a77d6d",
+      "original_created_at": "2026-11-09T15:45:00",
+      "new_created_at": "2026-11-07T16:00:00",
+      "scheduled_appointment_date": "2026-11-09T16:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d86c3fd1f3314ad236",
+      "prediction_ref": "pred_46bc16422390",
+      "appointment_id": "6ac85a53074c2bc731a7840b",
+      "original_created_at": "2026-11-09T15:45:00",
+      "new_created_at": "2026-11-03T16:00:00",
+      "scheduled_appointment_date": "2026-11-09T16:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad230",
+      "prediction_ref": "pred_f0fb65a371af",
+      "appointment_id": "6ac85a53074c2bc731a77e74",
+      "original_created_at": "2026-11-09T15:15:00",
+      "new_created_at": "2026-11-02T15:30:00",
+      "scheduled_appointment_date": "2026-11-09T15:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad22e",
+      "prediction_ref": "pred_92c1f9a0dfbd",
+      "appointment_id": "6ac85a4a074c2bc731a776ee",
+      "original_created_at": "2026-11-09T14:45:00",
+      "new_created_at": "2026-11-06T15:00:00",
+      "scheduled_appointment_date": "2026-11-09T15:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad22f",
+      "prediction_ref": "pred_2c2d6cbb70dd",
+      "appointment_id": "6ac85a53074c2bc731a780cc",
+      "original_created_at": "2026-11-09T14:45:00",
+      "new_created_at": "2026-11-07T15:00:00",
+      "scheduled_appointment_date": "2026-11-09T15:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad22c",
+      "prediction_ref": "pred_6179a1c800cf",
+      "appointment_id": "6ac85a4c074c2bc731a7780a",
+      "original_created_at": "2026-11-09T14:15:00",
+      "new_created_at": "2026-11-03T14:30:00",
+      "scheduled_appointment_date": "2026-11-09T14:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad22d",
+      "prediction_ref": "pred_4efc439a40dd",
+      "appointment_id": "6ac85a53074c2bc731a781db",
+      "original_created_at": "2026-11-09T14:15:00",
+      "new_created_at": "2026-11-06T14:30:00",
+      "scheduled_appointment_date": "2026-11-09T14:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad228",
+      "prediction_ref": "pred_3cfdb4e850fb",
+      "appointment_id": "6ac85a26074c2bc731a76689",
+      "original_created_at": "2026-11-09T13:45:00",
+      "new_created_at": "2026-11-03T14:00:00",
+      "scheduled_appointment_date": "2026-11-09T14:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad229",
+      "prediction_ref": "pred_4cd0cb0cc740",
+      "appointment_id": "6ac85a2c074c2bc731a76aea",
+      "original_created_at": "2026-11-09T13:45:00",
+      "new_created_at": "2026-11-05T14:00:00",
+      "scheduled_appointment_date": "2026-11-09T14:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad22a",
+      "prediction_ref": "pred_bf0b8c52b569",
+      "appointment_id": "6ac85a4e074c2bc731a77a38",
+      "original_created_at": "2026-11-09T13:45:00",
+      "new_created_at": "2026-11-07T14:00:00",
+      "scheduled_appointment_date": "2026-11-09T14:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad22b",
+      "prediction_ref": "pred_1a26b3eda426",
+      "appointment_id": "6ac85a53074c2bc731a77f9b",
+      "original_created_at": "2026-11-09T13:45:00",
+      "new_created_at": "2026-11-02T14:00:00",
+      "scheduled_appointment_date": "2026-11-09T14:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad227",
+      "prediction_ref": "pred_cb9b0c09642a",
+      "appointment_id": "6ac85a4e074c2bc731a77b4a",
+      "original_created_at": "2026-11-09T11:15:00",
+      "new_created_at": "2026-11-06T11:30:00",
+      "scheduled_appointment_date": "2026-11-09T11:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad226",
+      "prediction_ref": "pred_4043288f35ae",
+      "appointment_id": "6ac85a3b074c2bc731a77292",
+      "original_created_at": "2026-11-09T10:45:00",
+      "new_created_at": "2026-11-02T11:00:00",
+      "scheduled_appointment_date": "2026-11-09T11:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad225",
+      "prediction_ref": "pred_1042fedb76c7",
+      "appointment_id": "6ac85a4c074c2bc731a77803",
+      "original_created_at": "2026-11-09T10:15:00",
+      "new_created_at": "2026-11-03T10:30:00",
+      "scheduled_appointment_date": "2026-11-09T10:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad223",
+      "prediction_ref": "pred_a2973440fc59",
+      "appointment_id": "6ac85a27074c2bc731a76798",
+      "original_created_at": "2026-11-09T09:15:00",
+      "new_created_at": "2026-11-06T09:30:00",
+      "scheduled_appointment_date": "2026-11-09T09:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad224",
+      "prediction_ref": "pred_f122c67a1fcf",
+      "appointment_id": "6ac85a4e074c2bc731a7791f",
+      "original_created_at": "2026-11-09T09:15:00",
+      "new_created_at": "2026-11-03T09:30:00",
+      "scheduled_appointment_date": "2026-11-09T09:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad222",
+      "prediction_ref": "pred_9bc239e6bc64",
+      "appointment_id": "6ac85a36074c2bc731a76e22",
+      "original_created_at": "2026-11-06T16:15:00",
+      "new_created_at": "2026-10-30T16:30:00",
+      "scheduled_appointment_date": "2026-11-06T16:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35d66c3fd1f3314ad21e",
+      "prediction_ref": "pred_4a0d8ad1b230",
+      "appointment_id": "6ac85a36074c2bc731a76f4a",
+      "original_created_at": "2026-11-06T15:45:00",
+      "new_created_at": "2026-11-02T16:00:00",
+      "scheduled_appointment_date": "2026-11-06T16:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35d66c3fd1f3314ad21f",
+      "prediction_ref": "pred_85c9e5a84e2e",
+      "appointment_id": "6ac85a3b074c2bc731a77175",
+      "original_created_at": "2026-11-06T15:45:00",
+      "new_created_at": "2026-10-31T16:00:00",
+      "scheduled_appointment_date": "2026-11-06T16:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad220",
+      "prediction_ref": "pred_cbdf759293ae",
+      "appointment_id": "6ac85a39074c2bc731a77057",
+      "original_created_at": "2026-11-06T15:45:00",
+      "new_created_at": "2026-11-04T16:00:00",
+      "scheduled_appointment_date": "2026-11-06T16:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d76c3fd1f3314ad221",
+      "prediction_ref": "pred_f87d9edf1bde",
+      "appointment_id": "6ac85a53074c2bc731a77e7e",
+      "original_created_at": "2026-11-06T15:45:00",
+      "new_created_at": "2026-10-30T16:00:00",
+      "scheduled_appointment_date": "2026-11-06T16:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d66c3fd1f3314ad21c",
+      "prediction_ref": "pred_6606c30dfcaf",
+      "appointment_id": "6ac85a2a074c2bc731a769c9",
+      "original_created_at": "2026-11-06T15:15:00",
+      "new_created_at": "2026-11-04T15:30:00",
+      "scheduled_appointment_date": "2026-11-06T15:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d66c3fd1f3314ad21d",
+      "prediction_ref": "pred_41d504e75628",
+      "appointment_id": "6ac85a4a074c2bc731a776f5",
+      "original_created_at": "2026-11-06T15:15:00",
+      "new_created_at": "2026-11-03T15:30:00",
+      "scheduled_appointment_date": "2026-11-06T15:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d66c3fd1f3314ad21b",
+      "prediction_ref": "pred_82db00e4b994",
+      "appointment_id": "6ac85a4e074c2bc731a77920",
+      "original_created_at": "2026-11-06T14:45:00",
+      "new_created_at": "2026-11-01T15:00:00",
+      "scheduled_appointment_date": "2026-11-06T15:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d66c3fd1f3314ad21a",
+      "prediction_ref": "pred_7ebf53730429",
+      "appointment_id": "6ac85a53074c2bc731a780c5",
+      "original_created_at": "2026-11-06T14:15:00",
+      "new_created_at": "2026-11-04T14:30:00",
+      "scheduled_appointment_date": "2026-11-06T14:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d66c3fd1f3314ad219",
+      "prediction_ref": "pred_1d7d503cd1ed",
+      "appointment_id": "6ac85a3b074c2bc731a7716f",
+      "original_created_at": "2026-11-06T13:45:00",
+      "new_created_at": "2026-10-31T14:00:00",
+      "scheduled_appointment_date": "2026-11-06T14:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d66c3fd1f3314ad217",
+      "prediction_ref": "pred_8c6d2e95edc5",
+      "appointment_id": "6ac85a45074c2bc731a774ce",
+      "original_created_at": "2026-11-06T11:45:00",
+      "new_created_at": "2026-11-02T12:00:00",
+      "scheduled_appointment_date": "2026-11-06T12:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d66c3fd1f3314ad218",
+      "prediction_ref": "pred_10fc68fbda15",
+      "appointment_id": "6ac85a3b074c2bc731a7716d",
+      "original_created_at": "2026-11-06T11:45:00",
+      "new_created_at": "2026-11-01T12:00:00",
+      "scheduled_appointment_date": "2026-11-06T12:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d66c3fd1f3314ad216",
+      "prediction_ref": "pred_b8183d8f7c11",
+      "appointment_id": "6ac85a53074c2bc731a782f5",
+      "original_created_at": "2026-11-06T10:45:00",
+      "new_created_at": "2026-11-03T11:00:00",
+      "scheduled_appointment_date": "2026-11-06T11:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad211",
+      "prediction_ref": "pred_05ab3c1ad70f",
+      "appointment_id": "6ac85a2a074c2bc731a769cc",
+      "original_created_at": "2026-11-06T10:15:00",
+      "new_created_at": "2026-11-03T10:30:00",
+      "scheduled_appointment_date": "2026-11-06T10:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad212",
+      "prediction_ref": "pred_d8d6e2cc9f6e",
+      "appointment_id": "6ac85a23074c2bc731a76560",
+      "original_created_at": "2026-11-06T10:15:00",
+      "new_created_at": "2026-11-01T10:30:00",
+      "scheduled_appointment_date": "2026-11-06T10:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d66c3fd1f3314ad213",
+      "prediction_ref": "pred_a5a8b92ad740",
+      "appointment_id": "6ac85a45074c2bc731a774c8",
+      "original_created_at": "2026-11-06T10:15:00",
+      "new_created_at": "2026-11-04T10:30:00",
+      "scheduled_appointment_date": "2026-11-06T10:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d66c3fd1f3314ad214",
+      "prediction_ref": "pred_a6378c2e8a9c",
+      "appointment_id": "6ac85a4c074c2bc731a77804",
+      "original_created_at": "2026-11-06T10:15:00",
+      "new_created_at": "2026-11-04T10:30:00",
+      "scheduled_appointment_date": "2026-11-06T10:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d66c3fd1f3314ad215",
+      "prediction_ref": "pred_66eeda181f4b",
+      "appointment_id": "6ac85a4e074c2bc731a7791a",
+      "original_created_at": "2026-11-06T10:15:00",
+      "new_created_at": "2026-11-04T10:30:00",
+      "scheduled_appointment_date": "2026-11-06T10:30:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad20f",
+      "prediction_ref": "pred_dbf59a45ef70",
+      "appointment_id": "6ac85a27074c2bc731a768c2",
+      "original_created_at": "2026-11-06T09:15:00",
+      "new_created_at": "2026-10-30T09:30:00",
+      "scheduled_appointment_date": "2026-11-06T09:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad210",
+      "prediction_ref": "pred_0d4d43fe09f1",
+      "appointment_id": "6ac85a36074c2bc731a76e20",
+      "original_created_at": "2026-11-06T09:15:00",
+      "new_created_at": "2026-11-03T09:30:00",
+      "scheduled_appointment_date": "2026-11-06T09:30:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad20e",
+      "prediction_ref": "pred_71c92bee2924",
+      "appointment_id": "6ac85a3b074c2bc731a773a9",
+      "original_created_at": "2026-11-05T16:15:00",
+      "new_created_at": "2026-11-03T16:30:00",
+      "scheduled_appointment_date": "2026-11-05T16:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad20c",
+      "prediction_ref": "pred_e93f82e2b06d",
+      "appointment_id": "6ac85a2f074c2bc731a76bfe",
+      "original_created_at": "2026-11-05T15:45:00",
+      "new_created_at": "2026-11-03T16:00:00",
+      "scheduled_appointment_date": "2026-11-05T16:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad20d",
+      "prediction_ref": "pred_c3128d89a48a",
+      "appointment_id": "6ac85a53074c2bc731a7840c",
+      "original_created_at": "2026-11-05T15:45:00",
+      "new_created_at": "2026-11-01T16:00:00",
+      "scheduled_appointment_date": "2026-11-05T16:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad208",
+      "prediction_ref": "pred_bee952bf24d6",
+      "appointment_id": "6ac85a3b074c2bc731a7728d",
+      "original_created_at": "2026-11-05T13:45:00",
+      "new_created_at": "2026-10-30T14:00:00",
+      "scheduled_appointment_date": "2026-11-05T14:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad209",
+      "prediction_ref": "pred_c3bc5e1a1529",
+      "appointment_id": "6ac85a50074c2bc731a77c54",
+      "original_created_at": "2026-11-05T13:45:00",
+      "new_created_at": "2026-10-30T14:00:00",
+      "scheduled_appointment_date": "2026-11-05T14:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad20a",
+      "prediction_ref": "pred_19e6991be261",
+      "appointment_id": "6ac85a53074c2bc731a77e7b",
+      "original_created_at": "2026-11-05T13:45:00",
+      "new_created_at": "2026-11-03T14:00:00",
+      "scheduled_appointment_date": "2026-11-05T14:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad20b",
+      "prediction_ref": "pred_f803f98c9888",
+      "appointment_id": "6ac85a53074c2bc731a7840a",
+      "original_created_at": "2026-11-05T13:45:00",
+      "new_created_at": "2026-10-29T14:00:00",
+      "scheduled_appointment_date": "2026-11-05T14:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad207",
+      "prediction_ref": "pred_346a0e9d0037",
+      "appointment_id": "6ac85a39074c2bc731a77060",
+      "original_created_at": "2026-11-05T11:45:00",
+      "new_created_at": "2026-10-31T12:00:00",
+      "scheduled_appointment_date": "2026-11-05T12:00:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad206",
+      "prediction_ref": "pred_dd6678a2c834",
+      "appointment_id": "6ac85a2c074c2bc731a76aec",
+      "original_created_at": "2026-11-05T10:15:00",
+      "new_created_at": "2026-11-02T10:30:00",
+      "scheduled_appointment_date": "2026-11-05T10:30:00",
+      "model_name": "heart_disease_risk",
+      "prediction_type": "HEART_DISEASE_RISK"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad205",
+      "prediction_ref": "pred_3ef9b9849709",
+      "appointment_id": "6ac85a4c074c2bc731a7780c",
+      "original_created_at": "2026-11-05T09:45:00",
+      "new_created_at": "2026-10-30T10:00:00",
+      "scheduled_appointment_date": "2026-11-05T10:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad204",
+      "prediction_ref": "pred_e92dd3187a48",
+      "appointment_id": "6ac85a53074c2bc731a780c3",
+      "original_created_at": "2026-11-05T09:15:00",
+      "new_created_at": "2026-10-29T09:30:00",
+      "scheduled_appointment_date": "2026-11-05T09:30:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad201",
+      "prediction_ref": "pred_f382e8a7539c",
+      "appointment_id": "6ac85a36074c2bc731a76d14",
+      "original_created_at": "2026-11-05T08:45:00",
+      "new_created_at": "2026-10-30T09:00:00",
+      "scheduled_appointment_date": "2026-11-05T09:00:00",
+      "model_name": "fracture_cnn",
+      "prediction_type": "FRACTURE_DETECTION"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad202",
+      "prediction_ref": "pred_284be6263841",
+      "appointment_id": "6ac85a4e074c2bc731a77a37",
+      "original_created_at": "2026-11-05T08:45:00",
+      "new_created_at": "2026-11-01T09:00:00",
+      "scheduled_appointment_date": "2026-11-05T09:00:00",
+      "model_name": "diabetes_risk",
+      "prediction_type": "DIABETES_RISK"
+    },
+    {
+      "prediction_id": "6adb35d56c3fd1f3314ad203",
+      "prediction_ref": "pred_7a2514038bd8",
+      "appointment_id": "6ac85a53074c2bc731a782fb",
+      "original_created_at": "2026-11-05T08:45:00",
+      "new_created_at": "2026-11-01T09:00:00",
+      "scheduled_appointment_date": "2026-11-05T09:00:00",
+      "model_name": "general_health_nlp",
+      "prediction_type": "GENERAL_HEALTH_TRIAGE"
+    }
+  ]
+}

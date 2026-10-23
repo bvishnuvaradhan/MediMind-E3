@@ -220,15 +220,26 @@ export const chairmanService = {
     const activeDocs = rawDocs.filter(d => (d.status || '').toUpperCase() === 'ACTIVE' || d.status === 'Active');
     const inactiveDocs = rawDocs.filter(d => (d.status || '').toUpperCase() === 'INACTIVE' || d.status === 'Inactive');
 
+    const activeAdmins = hospitalAdmins.filter(a => (a.status || '').toUpperCase() === 'ACTIVE' || a.status === 'Active');
+    const inactiveAdmins = hospitalAdmins.filter(a => (a.status || '').toUpperCase() === 'INACTIVE' || a.status === 'Inactive');
+
+    const rawHeads = await chairmanService.getDepartmentHeads().catch(() => []);
+    const activeHeads = rawHeads.filter(h => (h.status || '').toUpperCase() === 'ACTIVE' || h.status === 'Active');
+    const inactiveHeads = rawHeads.filter(h => (h.status || '').toUpperCase() === 'INACTIVE' || h.status === 'Inactive');
+
+    const activeFamilies = familyAccounts.filter(f => (f.status || '').toUpperCase() === 'ACTIVE' || f.status === 'Active');
+    const inactiveFamilies = familyAccounts.filter(f => (f.status || '').toUpperCase() === 'INACTIVE' || f.status === 'Inactive');
+
     const aiData = await chairmanService.getAiAnalytics().catch(() => null);
     const livePredsCount = aiData?.totalInferences || (stats?.byHospitalPreds ? Object.values(stats.byHospitalPreds).reduce((a, b) => a + b, 0) : 0);
 
-    const activeAdminCount = hospitalAdmins.filter(a => a.status === 'Active').length;
+    const activeAdminCount = activeAdmins.length;
     const activeDoctorCount = activeDocs.length;
-    const activeFamilyCount = familyAccounts.length;
-    const activeDeptHeadCount = 14;
+    const activeFamilyCount = activeFamilies.length;
+    const activeDeptHeadCount = activeHeads.length || 14;
     const activeChairmanCount = 2;
     const dynamicTotalPlatformAccounts = activeDoctorCount + activeFamilyCount + activeAdminCount + activeDeptHeadCount + activeChairmanCount;
+    const dynamicTotalDeactivated = inactiveDocs.length + inactiveAdmins.length + inactiveHeads.length + inactiveFamilies.length;
 
     return {
       ...platformSummary,
@@ -237,6 +248,7 @@ export const chairmanService = {
       totalHospitalAdmins: activeAdminCount,
       totalDoctors: activeDoctorCount,
       totalDepartments: rawDepts.length ?? 0,
+      totalDepartmentHeads: activeDeptHeadCount,
       totalFamilyAccounts: activeFamilyCount,
       totalAppointments: totalApts,
       completedAppointments: completedApts,
@@ -252,7 +264,13 @@ export const chairmanService = {
         departmentHead: activeDeptHeadCount,
         hospitalAdmin: activeAdminCount,
         totalDoctorProfiles: rawDocs.length ?? 0,
-        totalDeactivatedAccounts: inactiveDocs.length ?? 0,
+        totalDeactivatedAccounts: dynamicTotalDeactivated,
+        deactivatedBreakdown: {
+          doctor: inactiveDocs.length,
+          hospitalAdmin: inactiveAdmins.length,
+          departmentHead: inactiveHeads.length,
+          family: inactiveFamilies.length,
+        },
         totalHistoricalTestAccounts: 7,
         totalAuthAccounts: 105,
       },
@@ -495,6 +513,21 @@ export const chairmanService = {
     if (!admin) throw new Error('Admin not found');
     admin.status = admin.status === 'Active' ? 'Inactive' : 'Active';
     return admin;
+  },
+
+  getDepartmentHeads: async (statusFilter = 'All') => {
+    try {
+      const res = await fetch('/api/department-heads', { headers: getAuthHeaders() });
+      if (res.ok) {
+        const payload = await res.json();
+        const heads = payload.data || [];
+        if (statusFilter === 'All') return heads;
+        return heads.filter(h => (h.status || '').toLowerCase() === statusFilter.toLowerCase());
+      }
+    } catch {
+      // fallback to empty
+    }
+    return [];
   },
 
 

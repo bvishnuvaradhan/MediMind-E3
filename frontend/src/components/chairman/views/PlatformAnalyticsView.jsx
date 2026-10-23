@@ -30,11 +30,12 @@ export function PlatformAnalyticsView() {
 
   useEffect(() => {
     async function load() {
-      const [data, doctors, admins, families] = await Promise.all([
+      const [data, doctors, admins, families, heads] = await Promise.all([
         chairmanService.getPlatformSummary(),
         chairmanService.getDoctors('', 'All', 'All'),
         chairmanService.getHospitalAdmins(),
         chairmanService.getFamilyAccounts(),
+        chairmanService.getDepartmentHeads(),
       ]);
       setSummary(data);
 
@@ -57,8 +58,25 @@ export function PlatformAnalyticsView() {
         });
       });
 
-      // 2. Hospital Admins
+      // 2. Department Heads
+      (heads || []).forEach((h) => {
+        const isDeact = (h.status || '').toUpperCase() === 'INACTIVE' || h.status === 'Inactive' || h.status === 'Deactivated';
+        roster.push({
+          id: h.id || h.headId || h._id,
+          name: h.fullName || h.name || 'Department Head',
+          email: h.email,
+          role: 'Department Head',
+          specialty: h.specialization || h.departmentName || 'Clinical Management',
+          facility: h.hospitalName || 'Network Facility',
+          status: isDeact ? 'Deactivated' : 'Active',
+          authStatus: isDeact ? 'Login Denied (HTTP 403)' : 'Authorized',
+          deactivationReason: isDeact ? (h.deactivationReason || 'Administrative Deactivation') : null,
+        });
+      });
+
+      // 3. Hospital Admins
       admins.forEach((a) => {
+        const isDeact = (a.status || '').toLowerCase() === 'inactive' || a.status === 'Deactivated';
         roster.push({
           id: a.id,
           name: a.name,
@@ -66,13 +84,15 @@ export function PlatformAnalyticsView() {
           role: 'Hospital Admin',
           specialty: 'Administration',
           facility: a.hospitalName || 'Network Facility',
-          status: a.status === 'Active' ? 'Active' : 'Deactivated',
-          authStatus: a.status === 'Active' ? 'Authorized' : 'Login Denied (HTTP 403)',
+          status: isDeact ? 'Deactivated' : 'Active',
+          authStatus: isDeact ? 'Login Denied (HTTP 403)' : 'Authorized',
+          deactivationReason: isDeact ? (a.deactivationReason || 'Administrative Deactivation') : null,
         });
       });
 
-      // 3. Family Accounts
+      // 4. Family Accounts
       families.forEach((f) => {
+        const isDeact = (f.status || '').toLowerCase() === 'inactive' || f.status === 'Deactivated';
         roster.push({
           id: f.id,
           name: f.name,
@@ -80,12 +100,13 @@ export function PlatformAnalyticsView() {
           role: 'Family Account',
           specialty: `${f.membersCount ?? 0} Members`,
           facility: f.city || 'Bengaluru',
-          status: f.status === 'Active' ? 'Active' : 'Deactivated',
-          authStatus: 'Authorized',
+          status: isDeact ? 'Deactivated' : 'Active',
+          authStatus: isDeact ? 'Login Denied (HTTP 403)' : 'Authorized',
+          deactivationReason: isDeact ? (f.deactivationReason || 'Household Deactivation') : null,
         });
       });
 
-      // 4. Platform Owners (Chairmen)
+      // 5. Platform Owners (Chairmen)
       roster.push({
         id: 'CHAIR-01',
         name: 'Executive Chairman',
@@ -304,6 +325,7 @@ export function PlatformAnalyticsView() {
               >
                 <option value="All">All Roles</option>
                 <option value="Doctor">Doctors</option>
+                <option value="Department Head">Department Heads</option>
                 <option value="Hospital Admin">Hospital Admins</option>
                 <option value="Family Account">Family Accounts</option>
                 <option value="Platform Owner">Platform Owners</option>

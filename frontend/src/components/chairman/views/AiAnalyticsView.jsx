@@ -30,7 +30,7 @@ export function AiAnalyticsView() {
 
   if (!aiData) return <div className="loading-state">Loading AI Analytics...</div>;
 
-  const { modules, totalPredictions, monthlyVolume } = aiData;
+  const { modules, totalPredictions, monthlyVolume, upcomingPreScreenings } = aiData;
 
   const fractureMod = modules?.fracture || {};
   const diabetesMod = modules?.diabetes || {};
@@ -284,13 +284,21 @@ export function AiAnalyticsView() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
           {/* Multi-series Area / Line Chart with all 4 models */}
           <div className="table-card" style={{ padding: '20px' }}>
-            <div style={{ marginBottom: '14px' }}>
-              <h3 style={{ margin: '0 0 4px', fontSize: '15px', fontFamily: 'Plus Jakarta Sans' }}>
-                Monthly Clinical Prediction Volume Trajectory
-              </h3>
-              <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
-                {dateRange === 'All Time' ? 'Platform progression across all clinical AI modules (All Recorded Months)' : `Platform progression across clinical AI modules (${getRelativeDateRange(dateRange).label})`}
-              </p>
+            <div style={{ marginBottom: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+              <div>
+                <h3 style={{ margin: '0 0 4px', fontSize: '15px', fontFamily: 'Plus Jakarta Sans' }}>
+                  Monthly Clinical Prediction Volume Trajectory
+                </h3>
+                <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
+                  {dateRange === 'All Time' ? 'Platform historical trajectory across clinical AI modules (Completed Months)' : `Platform progression across clinical AI modules (${getRelativeDateRange(dateRange).label})`}
+                </p>
+              </div>
+              {upcomingPreScreenings && upcomingPreScreenings.total > 0 && (
+                <div style={{ padding: '6px 12px', borderRadius: '6px', background: 'var(--chair-bg, #f8fafc)', border: '1px solid var(--chair-border, #e2e8f0)', textAlign: 'right' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--chair-sapphire, #2563eb)' }}>Upcoming Pre-Screenings</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700 }}>{upcomingPreScreenings.total} Inferences (Prospective Triage)</div>
+                </div>
+              )}
             </div>
 
             <LineChart

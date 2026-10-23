@@ -20,6 +20,17 @@ import {
 } from 'lucide-react';
 import { chairmanService } from '../../../services/chairmanService';
 
+export const isProtocolOrSop = (a) => {
+  const cat = (a?.category || '').toLowerCase();
+  const tags = Array.isArray(a?.tags) ? a.tags.map(t => String(t).toLowerCase()) : [];
+  return cat === 'clinical protocols & sops' || cat.includes('protocol') || cat.includes('sop') || tags.some(t => t.includes('protocol') || t.includes('sop') || t.includes('guideline'));
+};
+
+export const isUnderPeerReview = (a) => {
+  const st = (a?.status || '').toUpperCase();
+  return st === 'UNDER REVIEW' || st === 'IN_REVIEW' || st === 'UNDER_REVIEW' || st === 'CHANGES REQUESTED' || st === 'CHANGES_REQUESTED' || st === 'SUBMITTED';
+};
+
 export function KnowledgeActivityView() {
   const [articles, setArticles] = useState([]);
   const [hospitals, setHospitals] = useState([]);
@@ -180,17 +191,6 @@ export function KnowledgeActivityView() {
     setSelectedStatus('All');
     setSelectedAuthor('All');
     setSelectedPeriod('All');
-  };
-
-  const isProtocolOrSop = (a) => {
-    const cat = (a.category || '').toLowerCase();
-    const tags = Array.isArray(a.tags) ? a.tags.map(t => t.toLowerCase()) : [];
-    return cat === 'clinical protocols & sops' || cat.includes('protocol') || cat.includes('sop') || tags.some(t => t.includes('protocol') || t.includes('sop') || t.includes('guideline'));
-  };
-
-  const isUnderPeerReview = (a) => {
-    const st = (a.status || '').toUpperCase();
-    return st === 'UNDER REVIEW' || st === 'IN_REVIEW' || st === 'UNDER_REVIEW' || st === 'CHANGES REQUESTED' || st === 'CHANGES_REQUESTED' || st === 'SUBMITTED';
   };
 
   const pendingReviews = useMemo(
