@@ -53,10 +53,12 @@ export function ReportsView({ announce }) {
     async function loadFilterOptions() {
       try {
         const [hosps, depts] = await Promise.all([
-          chairmanService.getHospitals('All').catch(() => []),
+          chairmanService.getHospitals('Active').catch(() => []),
           chairmanService.getDepartments('All').catch(() => []),
         ]);
-        setHospitalsList(hosps || []);
+        // Strict Phase E enforcement: only approved, active hospitals are offered in operational reporting
+        const activeOnlyHosps = (hosps || []).filter(h => (h.status || '').toUpperCase() === 'ACTIVE' || h.status === 'Active');
+        setHospitalsList(activeOnlyHosps);
         setDepartmentsList(depts || []);
       } catch (err) {
         console.warn('Could not load filter dropdowns:', err);
