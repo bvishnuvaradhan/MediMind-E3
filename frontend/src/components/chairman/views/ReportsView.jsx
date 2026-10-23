@@ -386,7 +386,7 @@ export function ReportsView({ announce }) {
               onChange={(e) => setStatusFilter(e.target.value)}
               style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px' }}
             >
-              <option value="ALL">All Statuses (2,851 Appointments)</option>
+              <option value="ALL">All Statuses (Platform-Wide Network)</option>
               <option value="COMPLETED">Completed Consultations</option>
               <option value="CONFIRMED">Confirmed / Upcoming</option>
               <option value="BOOKED">Booked / Pending Triage</option>

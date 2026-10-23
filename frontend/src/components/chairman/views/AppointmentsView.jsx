@@ -241,11 +241,7 @@ export function AppointmentsView() {
           </div>
 
           <BarChart
-            data={(analytics.hospitalThroughput || [
-              { shortName: 'Harborview', total: 1470, completed: 921 },
-              { shortName: 'Nexora', total: 784, completed: 480 },
-              { shortName: 'Aarogyam', total: 597, completed: 362 },
-            ]).map((h) => ({
+            data={(analytics.hospitalThroughput || []).map((h) => ({
               label: h.shortName || h.hospital,
               total: h.total,
               completed: h.completed,

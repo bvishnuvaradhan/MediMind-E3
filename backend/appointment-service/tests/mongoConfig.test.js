@@ -29,7 +29,7 @@ describe('Safe MongoDB Configuration & Masking Suite', () => {
     });
 
     test('accepts remote Atlas mongodb+srv URI in strict mode', () => {
-      const remoteUri = 'mongodb+srv://dbUser:SecretPass123@cluster0.plxllln.mongodb.net/medimind';
+      const remoteUri = 'mongodb+srv://mockUser:mockPassword@mock-cluster.example.invalid/medimind';
       const res = validateMongoConfig(remoteUri, { STRICT_REMOTE_DB: 'true', NODE_ENV: 'production' });
       expect(res.isLocalhost).toBe(false);
       expect(res.isRemote).toBe(true);
@@ -39,10 +39,10 @@ describe('Safe MongoDB Configuration & Masking Suite', () => {
 
   describe('maskMongoUri (Zero Credential Leakage)', () => {
     test('masks standard mongodb+srv URI with username and password', () => {
-      const masked = maskMongoUri('mongodb+srv://medimind_admin:superSecretPassword99@cluster0.plxllln.mongodb.net/medimind_db');
-      expect(masked).toBe('mongodb+srv://***:***@cluster0.plxllln.mongodb.net/medimind_db');
-      expect(masked).not.toContain('medimind_admin');
-      expect(masked).not.toContain('superSecretPassword99');
+      const masked = maskMongoUri('mongodb+srv://mockUser:mockPassword@mock-cluster.example.invalid/medimind_db');
+      expect(masked).toBe('mongodb+srv://***:***@mock-cluster.example.invalid/medimind_db');
+      expect(masked).not.toContain('mockUser');
+      expect(masked).not.toContain('mockPassword');
     });
 
     test('masks standard mongodb:// URI with credentials', () => {
