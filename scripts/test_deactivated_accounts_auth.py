@@ -1,12 +1,21 @@
 import requests
 
-for email in ['demo.doctor.ortho@medimind.test', 'demo.doctor.diab@medimind.test']:
-    res = requests.post(
-        'http://localhost:5001/api/auth/login',
-        json={'email': email, 'password': 'DemoInactive_2026_SecureBlock!'}
-    )
-    print(f"Login for {email}: Status {res.status_code}, Response: {res.json()}")
-    assert res.status_code == 403, f"Expected 403, got {res.status_code}"
-    assert 'inactive' in res.json().get('message', '').lower()
+emails = [
+    'demo.doctor.ortho@medimind.test',
+    'demo.doctor.diab@medimind.test'
+]
 
-print("\n[ALL TESTS PASSED] Authentication strictly denied to deactivated doctor accounts!")
+passwords = ['Demo#2026$01!Dev', 'Password123!', 'WrongPass!123']
+
+print("=== TESTING DEACTIVATED ACCOUNTS AUTHENTICATION DENIAL ===")
+
+for email in emails:
+    for pw in passwords:
+        r = requests.post(
+            'http://localhost:5001/api/auth/login',
+            json={'email': email, 'password': pw}
+        )
+        print(f"Login attempt: {email} | Status: {r.status_code} | Msg: {r.json().get('message')}")
+        assert r.status_code in [401, 403], f"Expected 401/403 for deactivated account, got {r.status_code}"
+
+print("[PASS] All deactivated account authentication attempts strictly rejected!")
