@@ -1135,7 +1135,7 @@ export const appointmentService = {
 
       if (lim > 0) queryExec = queryExec.limit(lim);
 
-    } else if (user.role === 'CHAIRMAN' && query.all !== 'true') {
+    } else if (query.all !== 'true') {
 
       queryExec = queryExec.limit(100);
 

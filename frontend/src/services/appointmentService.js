@@ -1,14 +1,37 @@
 import { authFetch, getAuthHeaders, getStoredToken } from './apiClient.js';
 // MediMind Platform - Frontend Appointment Service Client
 // Integrates with backend appointment-service via API Gateway (/api/appointments)
+// Enforces centralized authFetch and high-performance in-memory TTL caching (15s).
 
-// getAuthHeaders imported from apiClient.js
+const appointmentsCache = new Map();
+const CACHE_TTL_MS = 15000;
+
+function getCacheKey(prefix, params = {}) {
+  const sorted = Object.entries(params)
+    .filter(([_, val]) => val !== undefined && val !== null && val !== '')
+    .sort(([a], [b]) => a.localeCompare(b));
+  return `${prefix}:${JSON.stringify(sorted)}`;
+}
 
 export const appointmentService = {
   /**
-   * Fetch appointments with role-scoped query
+   * Explicitly invalidate the in-memory appointments cache
+   */
+  invalidateCache() {
+    appointmentsCache.clear();
+  },
+
+  /**
+   * Fetch appointments with role-scoped query (with 15s cache)
    */
   async getAppointments(params = {}) {
+    const cacheKey = getCacheKey('list', params);
+    const cached = appointmentsCache.get(cacheKey);
+    const now = Date.now();
+    if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+      return cached.data;
+    }
+
     const query = new URLSearchParams();
     Object.entries(params).forEach(([key, val]) => {
       if (val !== undefined && val !== null && val !== '') {
@@ -18,23 +41,30 @@ export const appointmentService = {
 
     const url = `/api/appointments${query.toString() ? `?${query.toString()}` : ''}`;
     try {
-      const res = await fetch(url, {
-        headers: getAuthHeaders(),
-      });
+      const res = await authFetch(url);
       if (!res.ok) {
-        return [];
+        return cached ? cached.data : [];
       }
       const data = await res.json();
-      return data.success ? (Array.isArray(data.data) ? data.data : (Array.isArray(data.data?.items) ? data.data.items : [])) : [];
+      const result = data.success ? (Array.isArray(data.data) ? data.data : (Array.isArray(data.data?.items) ? data.data.items : [])) : [];
+      appointmentsCache.set(cacheKey, { data: result, timestamp: now });
+      return result;
     } catch {
-      return [];
+      return cached ? cached.data : [];
     }
   },
 
   /**
-   * Fetch appointments with pagination metadata
+   * Fetch appointments with pagination metadata (with 15s cache)
    */
   async getAppointmentsPaginated(params = {}) {
+    const cacheKey = getCacheKey('paginated', params);
+    const cached = appointmentsCache.get(cacheKey);
+    const now = Date.now();
+    if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+      return cached.data;
+    }
+
     const query = new URLSearchParams();
     Object.entries(params).forEach(([key, val]) => {
       if (val !== undefined && val !== null && val !== '') {
@@ -44,22 +74,23 @@ export const appointmentService = {
 
     const url = `/api/appointments${query.toString() ? `?${query.toString()}` : ''}`;
     try {
-      const res = await fetch(url, {
-        headers: getAuthHeaders(),
-      });
+      const res = await authFetch(url);
       if (!res.ok) {
-        return { items: [], total: 0, page: 1, limit: 50, totalPages: 0 };
+        return cached ? cached.data : { items: [], total: 0, page: 1, limit: 50, totalPages: 0 };
       }
       const data = await res.json();
+      let result = { items: [], total: 0, page: 1, limit: 50, totalPages: 0 };
       if (data.success && data.data) {
         if (Array.isArray(data.data)) {
-          return { items: data.data, total: data.data.length, page: 1, limit: data.data.length, totalPages: 1 };
+          result = { items: data.data, total: data.data.length, page: 1, limit: data.data.length, totalPages: 1 };
+        } else {
+          result = data.data;
         }
-        return data.data;
       }
-      return { items: [], total: 0, page: 1, limit: 50, totalPages: 0 };
+      appointmentsCache.set(cacheKey, { data: result, timestamp: now });
+      return result;
     } catch {
-      return { items: [], total: 0, page: 1, limit: 50, totalPages: 0 };
+      return cached ? cached.data : { items: [], total: 0, page: 1, limit: 50, totalPages: 0 };
     }
   },
 
@@ -67,9 +98,8 @@ export const appointmentService = {
    * Book a new appointment or rebook an alternative
    */
   async bookAppointment(payload) {
-    const res = await fetch('/api/appointments', {
+    const res = await authFetch('/api/appointments', {
       method: 'POST',
-      headers: getAuthHeaders(),
       body: JSON.stringify(payload),
     });
 
@@ -80,6 +110,8 @@ export const appointmentService = {
       err.data = data;
       throw err;
     }
+    // Invalidate cached appointment views upon new booking
+    appointmentsCache.clear();
     return data.data;
   },
 
@@ -87,9 +119,8 @@ export const appointmentService = {
    * Cancel an appointment (with required or optional reason)
    */
   async cancelAppointment(appointmentId, reason = '') {
-    const res = await fetch(`/api/appointments/${appointmentId}/cancel`, {
+    const res = await authFetch(`/api/appointments/${appointmentId}/cancel`, {
       method: 'PUT',
-      headers: getAuthHeaders(),
       body: JSON.stringify({ reason }),
     });
 
@@ -99,6 +130,8 @@ export const appointmentService = {
       err.statusCode = res.status;
       throw err;
     }
+    // Invalidate cached appointment views upon cancellation
+    appointmentsCache.clear();
     return data.data;
   },
 
@@ -110,9 +143,7 @@ export const appointmentService = {
       ? `/api/appointments/${appointmentId}/alternatives`
       : '/api/appointments/alternatives';
 
-    const res = await fetch(url, {
-      headers: getAuthHeaders(),
-    });
+    const res = await authFetch(url);
 
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -129,9 +160,7 @@ export const appointmentService = {
     const url = `/api/appointments/notifications${query ? `?${query}` : ''}`;
 
     try {
-      const res = await fetch(url, {
-        headers: getAuthHeaders(),
-      });
+      const res = await authFetch(url);
       if (!res.ok) {
         return [];
       }
@@ -147,9 +176,8 @@ export const appointmentService = {
    */
   async markNotificationRead(notificationId) {
     try {
-      const res = await fetch(`/api/appointments/notifications/${notificationId}/read`, {
+      const res = await authFetch(`/api/appointments/notifications/${notificationId}/read`, {
         method: 'PUT',
-        headers: getAuthHeaders(),
       });
       if (!res.ok) return null;
       const data = await res.json();

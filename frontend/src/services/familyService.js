@@ -19,11 +19,33 @@ let doctorAccessState = [...initialDoctorAccess];
 
 // getAuthHeaders imported from apiClient.js
 
+// High-performance caching layer (15s TTL) to prevent repeated network thrashing
+const familyCache = {
+  members: null,
+  membersTime: 0,
+  records: null,
+  recordsTime: 0,
+};
+const CACHE_TTL_MS = 15000;
+
 export const familyService = {
+  invalidateCache(key) {
+    if (key && familyCache[key] !== undefined) {
+      familyCache[key] = null;
+      familyCache[key + "Time"] = 0;
+    } else {
+      Object.keys(familyCache).forEach(k => { familyCache[k] = null; familyCache[k + "Time"] = 0; });
+    }
+  },
+
   // --- Family Members ---
   async getMembers() {
+    const now = Date.now();
+    if (familyCache.members && (now - familyCache.membersTime < CACHE_TTL_MS)) {
+      return familyCache.members;
+    }
     try {
-      const res = await fetch('/api/families/members', { headers: getAuthHeaders() });
+      const res = await authFetch('/api/families/members');
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -60,6 +82,8 @@ export const familyService = {
               prescriptions: 2,
             };
           });
+          familyCache.members = [...membersState];
+          familyCache.membersTime = now;
           return [...membersState];
         }
       }
@@ -90,9 +114,8 @@ export const familyService = {
     };
 
     try {
-      const res = await fetch('/api/families/members', {
+      const res = await authFetch('/api/families/members', {
         method: 'POST',
-        headers: getAuthHeaders(),
         body: JSON.stringify({
           fullName: newMember.fullName || newMember.name,
           dateOfBirth: newMember.dateOfBirth || new Date('2000-01-01').toISOString(),
@@ -103,6 +126,7 @@ export const familyService = {
           email: newMember.email,
         }),
       });
+      familyCache.members = null;
       if (res.ok) {
         const json = await res.json();
         if (json.data) {
@@ -119,6 +143,7 @@ export const familyService = {
   },
 
   async updateMember(name, updatedData) {
+    familyCache.members = null;
     membersState = membersState.map((m) =>
       m.name.toLowerCase() === name.toLowerCase() ? { ...m, ...updatedData } : m
     );
@@ -127,8 +152,13 @@ export const familyService = {
 
   // --- Records ---
   async getRecords(filters = {}) {
+    const now = Date.now();
+    const hasFilters = Object.keys(filters).length > 0;
+    if (!hasFilters && familyCache.records && (now - familyCache.recordsTime < CACHE_TTL_MS)) {
+      return familyCache.records;
+    }
     try {
-      const res = await fetch('/api/medical-records', { headers: getAuthHeaders() });
+      const res = await authFetch('/api/medical-records');
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -169,6 +199,10 @@ export const familyService = {
     if (filters.category && filters.category !== 'all') {
       list = list.filter((r) => r.category.toLowerCase() === filters.category.toLowerCase());
     }
+    if (!hasFilters) {
+      familyCache.records = [...list];
+      familyCache.recordsTime = now;
+    }
     if (filters.search) {
       const q = filters.search.toLowerCase();
       list = list.filter(
@@ -189,9 +223,8 @@ export const familyService = {
     };
 
     try {
-      await fetch('/api/medical-records', {
+      await authFetch('/api/medical-records', {
         method: 'POST',
-        headers: getAuthHeaders(),
         body: JSON.stringify({
           record_type: record.category === 'Lab reports' ? 'LAB_REPORT' : 'DOCUMENT',
           description: record.description || record.type || 'Family uploaded health document',
@@ -201,6 +234,7 @@ export const familyService = {
           source: 'FAMILY',
         }),
       });
+      familyCache.records = null;
     } catch {
       // memory persist
     }

@@ -419,9 +419,8 @@ export const chairmanService = {
 
     approveHospital: async (hospitalId) => {
     try {
-      const res = await fetch(`/api/hospitals/${hospitalId}/approve`, {
+      const res = await authFetch(`/api/hospitals/${hospitalId}/approve`, {
         method: 'POST',
-        headers: getAuthHeaders(),
       });
       if (res.ok) {
         const json = await res.json();

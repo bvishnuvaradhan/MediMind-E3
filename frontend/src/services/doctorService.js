@@ -28,15 +28,29 @@ let articlesState = [...initialDoctorArticles];
 let notificationsState = [...initialDoctorNotifications];
 let settingsState = { ...initialDoctorSettings };
 
-// getAuthHeaders imported from apiClient.js
+// High-performance caching layer for Doctor profile with 30s TTL
+const doctorProfileCache = new Map();
+const DOCTOR_CACHE_TTL_MS = 30000;
 
 export const doctorService = {
+  // Explicitly invalidate profile cache
+  invalidateProfileCache(docId) {
+    if (docId) doctorProfileCache.delete(docId);
+    else doctorProfileCache.clear();
+  },
+
   // --- Profile & Availability ---
   async getProfile(doctorId) {
     const targetDocId = doctorId || profileState.doctorId || profileState.id;
+    const now = Date.now();
+    const cached = doctorProfileCache.get(targetDocId);
+    if (cached && (now - cached.timestamp < DOCTOR_CACHE_TTL_MS)) {
+      return cached.data;
+    }
+
     try {
       if (targetDocId && targetDocId !== 'doc_001') {
-        const res = await fetch(`/api/doctors/${targetDocId}`, { headers: getAuthHeaders() });
+        const res = await authFetch(`/api/doctors/${targetDocId}`);
         if (res.ok) {
           const json = await res.json();
           const doc = json.data || json;
@@ -62,14 +76,18 @@ export const doctorService = {
               consultationFee: doc.consultationFee || 800,
               availabilitySchedule: doc.availability || profileState.availabilitySchedule,
             };
-            return { ...profileState };
+            const result = { ...profileState };
+            doctorProfileCache.set(targetDocId, { data: result, timestamp: now });
+            return result;
           }
         }
       }
     } catch {
       // safe fallback
     }
-    return { ...profileState };
+    const result = { ...profileState };
+    if (targetDocId) doctorProfileCache.set(targetDocId, { data: result, timestamp: now });
+    return result;
   },
 
   async updateProfile(updatedData) {
@@ -84,15 +102,15 @@ export const doctorService = {
     try {
       const docId = profileState.doctorId || profileState.id;
       if (docId && docId.length === 24) {
-        await fetch(`/api/doctors/${docId}`, {
+        await authFetch(`/api/doctors/${docId}`, {
           method: 'PUT',
-          headers: getAuthHeaders(),
           body: JSON.stringify(updatedData),
         });
       }
     } catch {
       // memory persist
     }
+    doctorProfileCache.clear();
     return { ...profileState };
   },
 
@@ -103,6 +121,7 @@ export const doctorService = {
       slotDurationMinutes: slotDuration || profileState.slotDurationMinutes,
       bufferMinutes: bufferMinutes || profileState.bufferMinutes || 3,
     };
+    doctorProfileCache.clear();
     return { ...profileState };
   },
 
@@ -172,6 +191,7 @@ export const doctorService = {
     appointmentsState = appointmentsState.map((a) =>
       a.id === appointmentId ? { ...a, status } : a
     );
+    appointmentService.invalidateCache();
     return appointmentsState.find((a) => a.id === appointmentId);
   },
 

@@ -28,7 +28,29 @@ let settingsState = { ...initialDepartmentSettings };
 
 // getAuthHeaders imported from apiClient.js
 
+// High-performance caching layer (15s TTL) to prevent repeated network thrashing
+const deptHeadCache = {
+  departmentInfo: null,
+  departmentInfoTime: 0,
+  doctors: null,
+  doctorsTime: 0,
+  analytics: null,
+  analyticsTime: 0,
+  articles: null,
+  articlesTime: 0,
+};
+const CACHE_TTL_MS = 15000;
+
 export const departmentHeadService = {
+  invalidateCache(key) {
+    if (key && deptHeadCache[key] !== undefined) {
+      deptHeadCache[key] = null;
+      deptHeadCache[key + "Time"] = 0;
+    } else {
+      Object.keys(deptHeadCache).forEach(k => { deptHeadCache[k] = null; deptHeadCache[k + "Time"] = 0; });
+    }
+  },
+
   // --- Profile & Department Info ---
   async getProfile(user) {
     if (user) {
@@ -62,9 +84,13 @@ export const departmentHeadService = {
 
   async getDepartmentInfo(departmentId) {
     const targetDeptId = departmentId || profileState.departmentId;
+    const now = Date.now();
+    if (deptHeadCache.departmentInfo && (now - deptHeadCache.departmentInfoTime < CACHE_TTL_MS)) {
+      return deptHeadCache.departmentInfo;
+    }
     try {
       if (targetDeptId) {
-        const res = await fetch(`/api/departments/${targetDeptId}`, { headers: getAuthHeaders() });
+        const res = await authFetch(`/api/departments/${targetDeptId}`);
         if (res.ok) {
           const json = await res.json();
           const dept = json.data || json;
@@ -86,6 +112,8 @@ export const departmentHeadService = {
               completedConsultations: appointmentsState.filter(a => a.status === 'Completed').length || 48,
               aiAssistedAccuracy: '98.4%',
             };
+            deptHeadCache.departmentInfo = { ...departmentInfoState };
+            deptHeadCache.departmentInfoTime = now;
             return { ...departmentInfoState };
           }
         }
@@ -101,12 +129,12 @@ export const departmentHeadService = {
     try {
       const targetId = departmentInfoState._id || departmentInfoState.id;
       if (targetId && targetId.length === 24) {
-        await fetch(`/api/departments/${targetId}`, {
+        await authFetch(`/api/departments/${targetId}`, {
           method: 'PUT',
-          headers: getAuthHeaders(),
           body: JSON.stringify(updatedData),
         });
       }
+      deptHeadCache.departmentInfo = null;
     } catch {
       // memory persist
     }
@@ -116,8 +144,13 @@ export const departmentHeadService = {
   // --- Doctors Management ---
   async getDoctors(filters = {}, departmentId) {
     const targetDeptId = departmentId || profileState.departmentId;
+    const now = Date.now();
+    const hasFilters = Object.keys(filters).length > 0;
+    if (!hasFilters && deptHeadCache.doctors && (now - deptHeadCache.doctorsTime < CACHE_TTL_MS)) {
+      return deptHeadCache.doctors;
+    }
     try {
-      const res = await fetch('/api/doctors', { headers: getAuthHeaders() });
+      const res = await authFetch('/api/doctors');
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -163,6 +196,10 @@ export const departmentHeadService = {
       // safe fallback
     }
 
+    if (!hasFilters) {
+      deptHeadCache.doctors = [...doctorsState];
+      deptHeadCache.doctorsTime = now;
+    }
     let list = [...doctorsState];
     if (filters.status && filters.status !== 'All') {
       list = list.filter((d) => d.status === filters.status);
@@ -209,9 +246,8 @@ export const departmentHeadService = {
     };
 
     try {
-      const res = await fetch('/api/doctors', {
+      const res = await authFetch('/api/doctors', {
         method: 'POST',
-        headers: getAuthHeaders(),
         body: JSON.stringify({
           fullName: doctorData.name,
           email: doctorData.email,
@@ -221,6 +257,7 @@ export const departmentHeadService = {
           specialization: doctorData.specialization,
         }),
       });
+      deptHeadCache.doctors = null;
       if (res.ok) {
         const json = await res.json();
         if (json.data) {
@@ -247,12 +284,12 @@ export const departmentHeadService = {
     );
     try {
       if (doctorId && doctorId.length === 24) {
-        await fetch(`/api/doctors/${doctorId}`, {
+        await authFetch(`/api/doctors/${doctorId}`, {
           method: 'PUT',
-          headers: getAuthHeaders(),
           body: JSON.stringify(updatedData),
         });
       }
+      deptHeadCache.doctors = null;
     } catch {
       // memory persist
     }
@@ -260,6 +297,7 @@ export const departmentHeadService = {
   },
 
   async updateDoctorStatus(doctorId, newStatus) {
+    deptHeadCache.doctors = null;
     doctorsState = doctorsState.map((d) =>
       d.id === doctorId || d.doctorId === doctorId ? { ...d, status: newStatus } : d
     );
@@ -267,6 +305,7 @@ export const departmentHeadService = {
   },
 
   async toggleDoctorStatus(doctorId) {
+    deptHeadCache.doctors = null;
     doctorsState = doctorsState.map((d) => {
       if (d.id === doctorId || d.doctorId === doctorId) {
         const nextStatus = d.status === 'Active' ? 'Inactive' : 'Active';
@@ -337,10 +376,14 @@ export const departmentHeadService = {
   // --- Analytics ---
   async getAnalytics(departmentId) {
     const targetDeptId = departmentId || profileState.departmentId;
+    const now = Date.now();
+    if (deptHeadCache.analytics && (now - deptHeadCache.analyticsTime < CACHE_TTL_MS)) {
+      return deptHeadCache.analytics;
+    }
     try {
       const [statsRes, aiRes] = await Promise.all([
-        fetch(`/api/appointments/stats?departmentId=${targetDeptId}`, { headers: getAuthHeaders() }),
-        fetch('/api/ai/analytics', { headers: getAuthHeaders() }),
+        authFetch(`/api/appointments/stats?departmentId=${targetDeptId}`),
+        authFetch('/api/ai/analytics'),
       ]);
 
       const statsJson = statsRes.ok ? await statsRes.json() : null;
@@ -380,6 +423,8 @@ export const departmentHeadService = {
             averageConfidence: aiData.averageConfidence || '63.6%',
           },
         };
+        deptHeadCache.analytics = { ...analyticsState };
+        deptHeadCache.analyticsTime = now;
         return { ...analyticsState };
       }
     } catch {
@@ -422,8 +467,13 @@ export const departmentHeadService = {
   // --- Knowledge Articles & Reviewer ---
   async getArticles(departmentId, filters = {}) {
     const targetDeptId = departmentId || profileState.departmentId;
+    const now = Date.now();
+    const hasFilters = Object.keys(filters).length > 0;
+    if (!hasFilters && deptHeadCache.articles && (now - deptHeadCache.articlesTime < CACHE_TTL_MS)) {
+      return deptHeadCache.articles;
+    }
     try {
-      const res = await fetch('/api/knowledge', { headers: getAuthHeaders() });
+      const res = await authFetch('/api/knowledge');
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -463,6 +513,10 @@ export const departmentHeadService = {
     if (filters.category && filters.category !== 'All') {
       list = list.filter((a) => a.category === filters.category);
     }
+    if (!hasFilters) {
+      deptHeadCache.articles = [...list];
+      deptHeadCache.articlesTime = now;
+    }
     if (filters.search) {
       const q = filters.search.toLowerCase();
       list = list.filter(
@@ -490,11 +544,11 @@ export const departmentHeadService = {
     };
 
     try {
-      await fetch('/api/knowledge', {
+      await authFetch('/api/knowledge', {
         method: 'POST',
-        headers: getAuthHeaders(),
         body: JSON.stringify(newArt),
       });
+      deptHeadCache.articles = null;
     } catch {
       // memory persist
     }
@@ -504,6 +558,7 @@ export const departmentHeadService = {
   },
 
   async reviewArticle(articleId, decision, reviewerNotes = '') {
+    deptHeadCache.articles = null;
     const statusMap = {
       approve: 'Published',
       reject: 'Rejected',

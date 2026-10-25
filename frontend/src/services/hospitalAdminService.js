@@ -31,13 +31,43 @@ let settingsState = { ...initialHospitalSettings };
 
 // getAuthHeaders imported from apiClient.js
 
+// High-performance caching layer (15s TTL) to prevent repeated network thrashing
+const adminCache = {
+  profile: null,
+  profileTime: 0,
+  departments: null,
+  departmentsTime: 0,
+  departmentHeads: null,
+  departmentHeadsTime: 0,
+  doctors: null,
+  doctorsTime: 0,
+  analytics: null,
+  analyticsTime: 0,
+  knowledge: null,
+  knowledgeTime: 0,
+};
+const CACHE_TTL_MS = 15000;
+
 export const hospitalAdminService = {
+  invalidateCache(key) {
+    if (key && adminCache[key] !== undefined) {
+      adminCache[key] = null;
+      adminCache[key + "Time"] = 0;
+    } else {
+      Object.keys(adminCache).forEach(k => { adminCache[k] = null; adminCache[k + "Time"] = 0; });
+    }
+  },
+
   // --- Hospital Profile ---
   async getHospitalProfile(hospitalId) {
+    const now = Date.now();
+    if (adminCache.profile && (now - adminCache.profileTime < CACHE_TTL_MS)) {
+      return adminCache.profile;
+    }
     try {
       const targetId = hospitalId || hospitalProfileState._id || hospitalProfileState.id;
       const url = targetId && targetId !== 'HOSP-001' ? `/api/hospitals/${targetId}` : '/api/hospitals';
-      const res = await fetch(url, { headers: getAuthHeaders() });
+      const res = await authFetch(url);
       if (res.ok) {
         const json = await res.json();
         const hosp = json.data ? (Array.isArray(json.data) ? json.data[0] : json.data) : null;
@@ -62,6 +92,8 @@ export const hospitalAdminService = {
             occupiedBeds,
             occupancyRate,
           };
+          adminCache.profile = { ...hospitalProfileState };
+          adminCache.profileTime = now;
           return { ...hospitalProfileState };
         }
       }
@@ -87,12 +119,12 @@ export const hospitalAdminService = {
     try {
       const hospId = hospitalProfileState._id || hospitalProfileState.id;
       if (hospId && hospId.length === 24) {
-        await fetch(`/api/hospitals/${hospId}`, {
+        await authFetch(`/api/hospitals/${hospId}`, {
           method: 'PUT',
-          headers: getAuthHeaders(),
           body: JSON.stringify(updatedData),
         });
       }
+      adminCache.profile = null;
     } catch {
       // persist in memory
     }
@@ -106,9 +138,13 @@ export const hospitalAdminService = {
 
   // --- Departments ---
   async getDepartments(hospitalId) {
+    const now = Date.now();
+    if (adminCache.departments && (now - adminCache.departmentsTime < CACHE_TTL_MS)) {
+      return adminCache.departments;
+    }
     try {
       const targetId = hospitalId || hospitalProfileState._id || hospitalProfileState.id;
-      const res = await fetch('/api/departments', { headers: getAuthHeaders() });
+      const res = await authFetch('/api/departments');
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -140,6 +176,8 @@ export const hospitalAdminService = {
             bedOccupancy: d.bedOccupancy || '75%',
             status: d.status === 'INACTIVE' ? 'Inactive' : 'Active',
           }));
+          adminCache.departments = [...departmentsState];
+          adminCache.departmentsTime = now;
           return [...departmentsState];
         }
       }
@@ -166,9 +204,8 @@ export const hospitalAdminService = {
     };
 
     try {
-      const res = await fetch('/api/departments', {
+      const res = await authFetch('/api/departments', {
         method: 'POST',
-        headers: getAuthHeaders(),
         body: JSON.stringify({
           name: departmentData.name,
           code: newDept.code,
@@ -177,6 +214,7 @@ export const hospitalAdminService = {
           ward_capacity: wardCap,
         }),
       });
+      adminCache.departments = null;
       if (res.ok) {
         const json = await res.json();
         if (json.data) {
@@ -211,12 +249,12 @@ export const hospitalAdminService = {
 
     try {
       if (deptId && deptId.length === 24) {
-        await fetch(`/api/departments/${deptId}`, {
+        await authFetch(`/api/departments/${deptId}`, {
           method: 'PUT',
-          headers: getAuthHeaders(),
           body: JSON.stringify(updatedData),
         });
       }
+      adminCache.departments = null;
     } catch {
       // memory persist
     }
@@ -232,6 +270,7 @@ export const hospitalAdminService = {
   },
 
   async toggleDepartmentStatus(deptId) {
+    adminCache.departments = null;
     departmentsState = departmentsState.map(d => {
       if (d.id === deptId || d._id === deptId) {
         const nextStatus = d.status === 'Active' ? 'Inactive' : 'Active';
@@ -255,9 +294,13 @@ export const hospitalAdminService = {
 
   // --- Department Heads ---
   async getDepartmentHeads(hospitalId) {
+    const now = Date.now();
+    if (adminCache.departmentHeads && (now - adminCache.departmentHeadsTime < CACHE_TTL_MS)) {
+      return adminCache.departmentHeads;
+    }
     try {
       const targetId = hospitalId || hospitalProfileState._id || hospitalProfileState.id;
-      const res = await fetch('/api/department-heads', { headers: getAuthHeaders() });
+      const res = await authFetch('/api/department-heads');
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -296,6 +339,8 @@ export const hospitalAdminService = {
               publishedArticles: 2,
             };
           });
+          adminCache.departmentHeads = [...departmentHeadsState];
+          adminCache.departmentHeadsTime = now;
           return [...departmentHeadsState];
         }
       }
@@ -331,9 +376,8 @@ export const hospitalAdminService = {
     };
 
     try {
-      await fetch('/api/department-heads', {
+      await authFetch('/api/department-heads', {
         method: 'POST',
-        headers: getAuthHeaders(),
         body: JSON.stringify({
           fullName: headData.name,
           email: headData.email,
@@ -343,6 +387,8 @@ export const hospitalAdminService = {
           specialization: headData.specialization,
         }),
       });
+      adminCache.departmentHeads = null;
+      adminCache.departments = null;
     } catch {
       // memory persist
     }
@@ -398,9 +444,14 @@ export const hospitalAdminService = {
 
   // --- Doctors ---
   async getDoctors(filters = {}, hospitalId) {
+    const now = Date.now();
+    const hasFilters = Object.keys(filters).length > 0;
+    if (!hasFilters && adminCache.doctors && (now - adminCache.doctorsTime < CACHE_TTL_MS)) {
+      return adminCache.doctors;
+    }
     try {
       const targetId = hospitalId || hospitalProfileState._id || hospitalProfileState.id;
-      const res = await fetch('/api/doctors', { headers: getAuthHeaders() });
+      const res = await authFetch('/api/doctors');
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -445,6 +496,10 @@ export const hospitalAdminService = {
       // safe fallback
     }
 
+    if (!hasFilters) {
+      adminCache.doctors = [...doctorsState];
+      adminCache.doctorsTime = now;
+    }
     let list = [...doctorsState];
     if (filters.departmentId) {
       list = list.filter(d => d.departmentId === filters.departmentId);
@@ -469,6 +524,7 @@ export const hospitalAdminService = {
   },
 
   async toggleDoctorStatus(doctorId) {
+    adminCache.doctors = null;
     doctorsState = doctorsState.map(d => {
       if (d.id === doctorId || d.doctorId === doctorId) {
         const nextStatus = d.status === 'Active' ? 'Suspended' : 'Active';
@@ -587,11 +643,15 @@ export const hospitalAdminService = {
 
   // --- Analytics ---
   async getHospitalAnalytics(hospitalId) {
+    const now = Date.now();
+    if (adminCache.analytics && (now - adminCache.analyticsTime < CACHE_TTL_MS)) {
+      return adminCache.analytics;
+    }
     const targetId = hospitalId || hospitalProfileState._id || hospitalProfileState.id;
     try {
       const [statsRes, aiRes] = await Promise.all([
-        fetch(`/api/appointments/stats?hospitalId=${targetId}`, { headers: getAuthHeaders() }),
-        fetch('/api/ai/analytics', { headers: getAuthHeaders() }),
+        authFetch(`/api/appointments/stats?hospitalId=${targetId}`),
+        authFetch('/api/ai/analytics'),
       ]);
 
       const statsJson = statsRes.ok ? await statsRes.json() : null;
@@ -647,6 +707,8 @@ export const hospitalAdminService = {
     } catch {
       // safe fallback
     }
+    adminCache.analytics = { ...analyticsState };
+    adminCache.analyticsTime = now;
     return { ...analyticsState };
   },
 
@@ -676,8 +738,12 @@ export const hospitalAdminService = {
 
   // --- Knowledge Activity ---
   async getKnowledgeActivity() {
+    const now = Date.now();
+    if (adminCache.knowledge && (now - adminCache.knowledgeTime < CACHE_TTL_MS)) {
+      return adminCache.knowledge;
+    }
     try {
-      const res = await fetch('/api/knowledge', { headers: getAuthHeaders() });
+      const res = await authFetch('/api/knowledge');
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -701,7 +767,7 @@ export const hospitalAdminService = {
     const published = hospitalArticles.filter(a => a.status === 'Published');
     const underReview = hospitalArticles.filter(a => a.status === 'Under Review' || a.status === 'Changes Requested');
 
-    return {
+    const result = {
       stats: {
         totalArticles: hospitalArticles.length,
         totalPublished: published.length,
@@ -715,6 +781,9 @@ export const hospitalAdminService = {
       },
       recentArticles: [...hospitalArticles],
     };
+    adminCache.knowledge = result;
+    adminCache.knowledgeTime = now;
+    return result;
   },
 
   // --- Audit Logs ---
