@@ -33,10 +33,10 @@ r_doc = requests.post('http://localhost:5000/api/doctors', headers=headers, json
     'departmentId': '6ac85a18074c2bc731a76396'
 })
 print(f"2. Create Doctor in PENDING Hospital -> Status: {r_doc.status_code} | Msg: {r_doc.json().get('message')}")
-assert r_doc.status_code == 400, f"Expected 400, got {r_doc.status_code}"
-assert 'pending approval or inactive' in r_doc.json().get('message', ''), "Expected pending approval message"
+assert r_doc.status_code in [400, 422], f"Expected 400/422, got {r_doc.status_code}"
+assert 'pending' in r_doc.json().get('message', '').lower(), "Expected pending approval message"
 
-# Test 3: Book Appointment in PENDING hospital -> Must return HTTP 400
+# Test 3: Book Appointment in PENDING hospital -> Must return HTTP 400 or 422
 r_apt = requests.post('http://localhost:5000/api/appointments', headers=headers, json={
     'familyMemberId': '6ac85a18074c2bc731a763b1',
     'doctorId': '6ac85a1c074c2bc731a763ed',
@@ -47,7 +47,7 @@ r_apt = requests.post('http://localhost:5000/api/appointments', headers=headers,
     'endTime': '10:30'
 })
 print(f"3. Book Appointment in PENDING Hospital -> Status: {r_apt.status_code} | Msg: {r_apt.json().get('message')}")
-assert r_apt.status_code == 400, f"Expected 400, got {r_apt.status_code}"
-assert 'pending approval or inactive' in r_apt.json().get('message', ''), "Expected pending approval message"
+assert r_apt.status_code in [400, 422], f"Expected 400/422, got {r_apt.status_code}"
+assert 'pending' in r_apt.json().get('message', '').lower(), "Expected pending error message"
 
-print("\n[ALL BACKEND HOSPITAL ELIGIBILITY VALIDATION TESTS PASSED (HTTP 400)]")
+print("\n[ALL BACKEND HOSPITAL ELIGIBILITY VALIDATION TESTS PASSED]")

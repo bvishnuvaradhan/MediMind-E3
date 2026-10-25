@@ -348,8 +348,8 @@ export const chairmanService = {
         joinedDate: h.joinedDate || '12 Jan 2026',
         departmentsCount: deptCount || h.departmentsCount || 0,
         doctorsCount: docCount || h.doctorsCount || 0,
-        appointmentsCount: aptCount || 0,
-        aiPredictionsCount: (stats?.byHospitalPreds && stats.byHospitalPreds[hid]) || 0,
+        appointmentsCount: normStatus === 'Active' ? (aptCount || 0) : 0,
+        aiPredictionsCount: normStatus === 'Active' ? ((stats?.byHospitalPreds && stats.byHospitalPreds[hid]) || 0) : 0,
       };
     });
 

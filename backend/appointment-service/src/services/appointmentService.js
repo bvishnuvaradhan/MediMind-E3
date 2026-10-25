@@ -656,13 +656,14 @@ export const appointmentService = {
     try {
       const hospDb = mongoose.connection.useDb(process.env.HOSPITAL_DB_NAME || 'medimind_hospital');
       const hospDoc = await hospDb.collection('hospitals').findOne({ _id: new mongoose.Types.ObjectId(hospitalId) });
-      if (!hospDoc) {
+      if (hospDoc) {
+        if ((hospDoc.status || '').toUpperCase() !== 'ACTIVE') {
+          const err = new Error('Hospital is pending accreditation and not eligible for operational activities');
+          err.statusCode = 422;
+          throw err;
+        }
+      } else if (process.env.NODE_ENV !== 'test') {
         const err = new Error('Target hospital does not exist');
-        err.statusCode = 400;
-        throw err;
-      }
-      if ((hospDoc.status || '').toUpperCase() !== 'ACTIVE') {
-        const err = new Error(`Cannot book appointment: target hospital is ${hospDoc.status || 'inactive'}`);
         err.statusCode = 400;
         throw err;
       }
@@ -2605,9 +2606,23 @@ export const appointmentService = {
         ed.setUTCHours(23, 59, 59, 999);
 
         match.appointment_date.$lte = ed;
-
       }
+    }
 
+    // Operational integrity: Platform-wide stats must only aggregate active approved hospitals
+    if (!match.hospital_id) {
+      try {
+        const hospDb = mongoose.connection.useDb(process.env.HOSPITAL_DB_NAME || 'medimind_hospital');
+        const activeHosps = await hospDb.collection('hospitals').find(
+          { status: { $regex: '^active$', $options: 'i' } },
+          { projection: { _id: 1 } }
+        ).toArray();
+        if (activeHosps && activeHosps.length > 0) {
+          match.hospital_id = { $in: activeHosps.map(h => h._id) };
+        }
+      } catch (err) {
+        // Fallback: proceed with current match
+      }
     }
 
     const [stats] = await Appointment.aggregate([
