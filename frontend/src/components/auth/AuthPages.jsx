@@ -1,10 +1,10 @@
 
-const PRESET_ROLES = [
-  { label: 'Platform Owner', email: 'chairman@medimind.org', password: 'Chair#2026$01!Dev', badge: 'Chairman' },
-  { label: 'Hospital Admin', email: 'admin@aarogyam.hospital', password: 'Admin#2026$01!Dev', badge: 'Admin' },
-  { label: 'Doctor', email: 'dr.rahul.sharma@aarogyam.hospital', password: 'Doctor#2026$01!Dev', badge: 'Doctor' },
-  { label: 'Department Head', email: 'meenakshi.sundaram@aarogyam.hospital', password: 'Head#2026$02!Dev', badge: 'Dept Head' },
-  { label: 'Family Account', email: 'rohan.kapoor@example.com', password: 'Family#2026$01!Dev', badge: 'Family' },
+const ROLE_PRESETS = [
+  { label: 'Platform Owner', email: 'chairman@medimind.org', badge: 'Chairman' },
+  { label: 'Hospital Admin', email: 'admin@aarogyam.hospital', badge: 'Admin' },
+  { label: 'Doctor', email: 'dr.rahul.sharma@aarogyam.hospital', badge: 'Doctor' },
+  { label: 'Department Head', email: 'meenakshi.sundaram@aarogyam.hospital', badge: 'Dept Head' },
+  { label: 'Family Account', email: 'rohan.kapoor@example.com', badge: 'Family' },
 ];
 
 // MediMind Platform - Authentication Pages
@@ -132,16 +132,15 @@ export function LoginPage({ onSwitchToSignup }) {
 
         <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
           <p style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', textAlign: 'center' }}>
-            Quick Sign-In Credentials
+            Role Quick Select
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '6px' }}>
-            {PRESET_ROLES.map((role) => (
+            {ROLE_PRESETS.map((role) => (
               <button
                 key={role.email}
                 type="button"
                 onClick={() => {
                   setEmail(role.email);
-                  setPassword(role.password);
                   if (validationError) setValidationError('');
                 }}
                 style={{

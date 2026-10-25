@@ -299,19 +299,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const ROLE_CREDENTIALS = {
-    CHAIRMAN: { email: 'chairman@medimind.org', password: 'Chair#2026$01!Dev' },
-    HOSPITAL_ADMIN: { email: 'admin@aarogyam.hospital', password: 'Admin#2026$01!Dev' },
-    DEPARTMENT_HEAD: { email: 'meenakshi.sundaram@aarogyam.hospital', password: 'Head#2026$02!Dev' },
-    DOCTOR: { email: 'dr.rahul.sharma@aarogyam.hospital', password: 'Doctor#2026$01!Dev' },
-    FAMILY: { email: 'rohan.kapoor@example.com', password: 'Family#2026$01!Dev' },
-  };
-
-  const switchRole = async (targetRole) => {
-    const creds = ROLE_CREDENTIALS[targetRole];
-    if (creds) {
-      return await login(creds.email, creds.password);
-    }
+  const switchRole = (_targetRole) => {
     logout();
   };
 
