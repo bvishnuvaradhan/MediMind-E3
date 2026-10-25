@@ -2703,6 +2703,34 @@ export const appointmentService = {
 
                   }
 
+                },
+
+                aiUsage: {
+
+                  $sum: {
+
+                    $cond: [
+
+                      {
+
+                        $and: [
+
+                          { $ne: [{ $ifNull: ['$ai_prediction_id', null] }, null] },
+
+                          { $ne: ['$ai_prediction_id', ''] }
+
+                        ]
+
+                      },
+
+                      1,
+
+                      0
+
+                    ]
+
+                  }
+
                 }
 
               }
@@ -2795,13 +2823,19 @@ export const appointmentService = {
 
         monthKey: m._id,
 
+        appointments: m.total,
+
         volume: m.total,
+
+        total: m.total,
 
         completed: m.completed,
 
         scheduled: m.scheduled,
 
         cancelled: m.cancelled,
+
+        aiUsage: m.aiUsage || 0,
 
       };
 

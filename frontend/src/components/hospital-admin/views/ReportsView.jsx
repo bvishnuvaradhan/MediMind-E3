@@ -30,31 +30,32 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
 
   // Dynamic metrics based on reporting period
   const getPeriodMetrics = () => {
+    const periodCount = reports.length;
     switch (reportingPeriod) {
       case 'Last Month':
         return {
-          totalGenerated: 14,
+          totalGenerated: periodCount,
           auditCompliance: '99.1%',
           archivedRecords: '38,400',
           label: `${getRelativeDateRange('Previous Month').label} (Historical Period)`,
         };
       case 'This Quarter':
         return {
-          totalGenerated: 28,
+          totalGenerated: periodCount,
           auditCompliance: '98.8%',
           archivedRecords: '72,150',
           label: `${getRelativeDateRange('This Quarter').label} (Current Quarter)`,
         };
       case 'Last Quarter':
         return {
-          totalGenerated: 31,
+          totalGenerated: periodCount,
           auditCompliance: '99.5%',
           archivedRecords: '69,800',
           label: `${getRelativeDateRange('Previous Quarter').label} (Historical Quarter)`,
         };
       case 'This Year':
         return {
-          totalGenerated: 86,
+          totalGenerated: periodCount,
           auditCompliance: '98.9%',
           archivedRecords: '210,500',
           label: `Calendar Year ${new Date().getFullYear()}`,
@@ -63,7 +64,7 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
       case 'This Month':
       default:
         return {
-          totalGenerated: 12,
+          totalGenerated: periodCount,
           auditCompliance: '98.4%',
           archivedRecords: '29,450',
           label: `${getRelativeDateRange('This Month').label} (Current Period)`,
@@ -179,25 +180,25 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
             className={`ha-filter-pill ${categoryFilter === 'Appointments' ? 'active' : ''}`}
             onClick={() => setCategoryFilter('Appointments')}
           >
-            Appointments
+            Appointments ({reports.filter(r => r.category === 'Appointments').length})
           </button>
           <button
             className={`ha-filter-pill ${categoryFilter === 'Doctors & Staff' ? 'active' : ''}`}
             onClick={() => setCategoryFilter('Doctors & Staff')}
           >
-            Doctors & Staff
+            Doctors & Staff ({reports.filter(r => r.category === 'Doctors & Staff').length})
           </button>
           <button
             className={`ha-filter-pill ${categoryFilter === 'Departments' ? 'active' : ''}`}
             onClick={() => setCategoryFilter('Departments')}
           >
-            Departments
+            Departments ({reports.filter(r => r.category === 'Departments').length})
           </button>
           <button
             className={`ha-filter-pill ${categoryFilter === 'AI Diagnostics' ? 'active' : ''}`}
             onClick={() => setCategoryFilter('AI Diagnostics')}
           >
-            AI Diagnostics
+            AI Diagnostics ({reports.filter(r => r.category === 'AI Diagnostics').length})
           </button>
         </div>
       </div>
@@ -246,7 +247,6 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
               <button
                 className="ha-btn ha-btn-primary ha-btn-sm"
                 style={{ width: '100%' }}
-                disabled={isDateRangeInvalid}
                 onClick={() => onDownloadReport({
                   ...rep,
                   period: reportingPeriod === 'This Month' ? rep.period : periodMetrics.label,

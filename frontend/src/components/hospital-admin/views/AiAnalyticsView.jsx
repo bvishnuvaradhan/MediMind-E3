@@ -13,10 +13,10 @@ export function AiAnalyticsView({ analytics = {}, hospital = null }) {
   const isHosp002 = hospital?.id === 'HOSP-002';
   const ai = analytics?.aiAggregateMetrics || analytics || {};
 
-  const fRuns = ai.fracturePredictions ?? 0;
-  const dRuns = ai.diabetesPredictions ?? 0;
-  const hRuns = ai.heartPredictions ?? ai.heartDiseasePredictions ?? 0;
-  const gRuns = isHosp002 ? 0 : (ai.generalHealthScreenings ?? 0);
+  const fRuns = ai.fracturePredictions ?? ai.modules?.fracture?.totalRuns ?? 0;
+  const dRuns = ai.diabetesPredictions ?? ai.modules?.diabetes?.totalRuns ?? 0;
+  const hRuns = ai.heartPredictions ?? ai.heartDiseasePredictions ?? ai.modules?.heartDisease?.totalRuns ?? 0;
+  const gRuns = isHosp002 ? 0 : (ai.generalHealthScreenings ?? ai.modules?.generalHealth?.totalRuns ?? 0);
   const totalRuns = fRuns + dRuns + hRuns + gRuns;
 
   const aiDonutData = [

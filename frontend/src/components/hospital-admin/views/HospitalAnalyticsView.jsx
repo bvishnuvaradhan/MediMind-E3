@@ -109,26 +109,45 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
   const scheduledAppts = currentMetrics.scheduledAppts;
   const cancelledAppts = currentMetrics.cancelledAppts;
   const occupiedBeds = currentMetrics.occupiedBeds;
-  const completionRate = Math.round((completedAppts / totalAppts) * 100);
-  const noShowRate = ((cancelledAppts / totalAppts) * 100).toFixed(1);
+  const completionRate = totalAppts > 0 ? Math.round((completedAppts / totalAppts) * 100) : 0;
+  const noShowRate = totalAppts > 0 ? ((cancelledAppts / totalAppts) * 100).toFixed(1) : '0.0';
   const weeklyData = currentMetrics.weeklyData;
 
-  const monthlyTrends = analytics.monthlyTrends || (() => {
-    const list = [];
-    const now = new Date();
-    for (let i = 4; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const label = d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
-      list.push({
-        month: label,
-        appointments: 92 + (4 - i) * 9,
-        completed: 78 + (4 - i) * 7,
-        cancelled: 4 + (i % 2),
-        aiUsage: 64 + (4 - i) * 7,
-      });
-    }
-    return list;
-  })();
+  const rawMonthlyTrends = (analytics.monthlyTrends && analytics.monthlyTrends.length > 0)
+    ? analytics.monthlyTrends
+    : (() => {
+        const list = [];
+        const now = new Date();
+        for (let i = 4; i >= 0; i--) {
+          const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          const label = d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+          list.push({
+            month: label,
+            appointments: 92 + (4 - i) * 9,
+            completed: 78 + (4 - i) * 7,
+            cancelled: 4 + (i % 2),
+            aiUsage: 64 + (4 - i) * 7,
+          });
+        }
+        return list;
+      })();
+
+  const monthlyTrends = rawMonthlyTrends.map((m) => {
+    const appointments = Number(m.appointments ?? m.volume ?? m.total ?? 0);
+    const completed = Number(m.completed ?? 0);
+    const cancelled = Number(m.cancelled ?? 0);
+    const scheduled = Number(m.scheduled ?? 0);
+    const aiUsage = Number(m.aiUsage ?? 0);
+    return {
+      ...m,
+      month: m.month || 'Unknown',
+      appointments,
+      completed,
+      cancelled,
+      scheduled,
+      aiUsage,
+    };
+  });
 
   return (
     <div>
@@ -236,7 +255,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
 
           <LineChart
             data={monthlyTrends.map((m) => ({
-              label: m.month.split(' ')[0],
+              label: (m.month || '').split(' ')[0],
               appointments: m.appointments,
               completed: m.completed,
               aiUsage: m.aiUsage,
@@ -372,9 +391,11 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
             </thead>
             <tbody>
               {monthlyTrends.map((item) => {
-                const rate = Math.round((item.completed / item.appointments) * 100);
-                const cancelled = item.cancelled || (item.appointments - item.completed - 6 > 0 ? item.appointments - item.completed - 6 : 4);
-                const cRate = ((cancelled / item.appointments) * 100).toFixed(1);
+                const appts = item.appointments;
+                const completed = item.completed;
+                const cancelled = item.cancelled;
+                const rate = appts > 0 ? `${Math.round((completed / appts) * 100)}%` : (completed === 0 ? '0%' : 'N/A');
+                const cRate = appts > 0 ? `${((cancelled / appts) * 100).toFixed(1)}%` : (cancelled === 0 ? '0.0%' : 'N/A');
 
                 return (
                   <tr key={item.month}>
@@ -382,19 +403,19 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
                       <strong style={{ fontSize: '13px', color: 'var(--ha-text-primary)' }}>{item.month}</strong>
                     </td>
                     <td>
-                      <strong style={{ fontSize: '13px' }}>{item.appointments}</strong>
+                      <strong style={{ fontSize: '13px' }}>{appts}</strong>
                     </td>
                     <td>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ha-teal)' }}>{item.completed}</span>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ha-teal)' }}>{completed}</span>
                     </td>
                     <td>
-                      <span className="ha-badge success">{rate}%</span>
+                      <span className="ha-badge success">{rate}</span>
                     </td>
                     <td>
                       <span style={{ fontSize: '12px', color: 'var(--ha-text-secondary)' }}>{cancelled}</span>
                     </td>
                     <td>
-                      <span style={{ fontSize: '12px', color: 'var(--ha-warning)' }}>{cRate}%</span>
+                      <span style={{ fontSize: '12px', color: 'var(--ha-warning)' }}>{cRate}</span>
                     </td>
                     <td>
                       <span style={{ fontSize: '12px', color: 'var(--ha-primary)' }}>{item.aiUsage} Scans</span>

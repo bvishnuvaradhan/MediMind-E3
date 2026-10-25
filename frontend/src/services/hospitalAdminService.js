@@ -678,17 +678,22 @@ export const hospitalAdminService = {
           });
         }
 
+        const fCount = aiData.modules?.fracture?.totalRuns || 0;
+        const dCount = aiData.modules?.diabetes?.totalRuns || 0;
+        const hCount = aiData.modules?.heartDisease?.totalRuns || 0;
+        const gCount = aiData.modules?.generalHealth?.totalRuns || 0;
+
         analyticsState = {
           totalOPDConsultations: totalConsultations,
           completedConsultations,
           bedOccupancyPercentage: 84,
-          aiAssistedAccuracy: '98.2%',
+          aiAssistedAccuracy: aiData.overallAccuracy || '98.2%',
           averageConsultationDuration: '18 mins',
           kpis: {
             totalOPDConsultations: totalConsultations,
             completedConsultations,
             bedOccupancyPercentage: 84,
-            aiAssistedAccuracy: '98.2%',
+            aiAssistedAccuracy: aiData.overallAccuracy || '98.2%',
             activeDoctorsCount: doctorsState.length || 24,
             departmentCount: departmentsState.length || 3,
           },
@@ -696,9 +701,17 @@ export const hospitalAdminService = {
             totalScans: totalPreds,
             totalInferences: totalPreds,
             diagnosticAssistanceRate: '98.5%',
-            accuracy: '98.2%',
-            averageConfidence: aiData.averageConfidence || '63.6%',
+            accuracy: aiData.overallAccuracy || '98.2%',
+            averageConfidence: aiData.averageConfidence || '96.8%',
+            fracturePredictions: fCount,
+            diabetesPredictions: dCount,
+            heartPredictions: hCount,
+            heartDiseasePredictions: hCount,
+            generalHealthScreenings: gCount,
+            modules: aiData.modules || {},
           },
+          byDepartment: stats.byDepartment || {},
+          byDepartmentPreds: stats.byDepartmentPreds || {},
           monthlyDepartmentTraffic: deptTraffic.length > 0 ? deptTraffic : analyticsState.monthlyDepartmentTraffic,
           monthlyTrends: stats.monthlyTrends || [],
         };

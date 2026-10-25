@@ -262,13 +262,14 @@ export function HospitalAdminLayout({ dark, setDark }) {
 
     async function loadLiveHospitalData() {
       try {
-        const [liveHosp, liveDepts, liveHeads, liveDocs, liveApts, liveAnalytics] = await Promise.all([
+        const [liveHosp, liveDepts, liveHeads, liveDocs, liveApts, liveAnalytics, liveReports] = await Promise.all([
           hospitalAdminService.getHospitalProfile(targetHospId),
           hospitalAdminService.getDepartments(targetHospId),
           hospitalAdminService.getDepartmentHeads(targetHospId),
           hospitalAdminService.getDoctors({}, targetHospId),
           hospitalAdminService.getAppointments(targetHospId),
           hospitalAdminService.getHospitalAnalytics(targetHospId),
+          hospitalAdminService.getReports(),
         ]);
         if (liveHosp) setHospital(liveHosp);
         if (liveDepts && liveDepts.length > 0) setDepartments(liveDepts);
@@ -276,6 +277,7 @@ export function HospitalAdminLayout({ dark, setDark }) {
         if (liveDocs && liveDocs.length > 0) setDoctors(liveDocs);
         if (liveApts && liveApts.length > 0) setAppointments(liveApts);
         if (liveAnalytics) setAnalytics(liveAnalytics);
+        if (liveReports && liveReports.length > 0) setReports(liveReports);
       } catch {
         // safe fallback
       }
