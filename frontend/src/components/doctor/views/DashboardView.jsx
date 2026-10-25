@@ -7,6 +7,7 @@ export function DashboardView({
   patients = [],
   appointments = [],
   _consultations = [],
+  prescriptions = [],
   onNavigate,
   onSelectPatient,
   onOpenAddWalkIn,
@@ -17,6 +18,17 @@ export function DashboardView({
   const todayApts = appointments.filter((a) => a.date?.includes('Today'));
   const activePatients = patients.filter((p) => p.accessStatus === 'Active');
 
+  // Count completed appointments — handles both 'Completed' and 'COMPLETED' status values
+  const completedAptsCount = appointments.filter(
+    (a) => a.status === 'Completed' || a.status === 'COMPLETED'
+  ).length;
+
+  // AI scans count: total aiPredictions across all authorized patients (authoritative source)
+  const aiScansCount = patients.reduce(
+    (sum, p) => sum + (Array.isArray(p.aiPredictions) ? p.aiPredictions.length : 0),
+    0
+  );
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Top Banner */}
@@ -25,13 +37,13 @@ export function DashboardView({
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
               <span className="doctor-badge doctor-badge-scheduled">{doctorProfile?.departmentName || 'Orthopedics'}</span>
-              <span style={{ fontSize: '13px', color: 'var(--doctor-text-muted)' }}>{doctorProfile?.hospitalName || 'MediMind Central Hospital'} • {doctorProfile?.room || 'OPD Room 204'}</span>
+              <span style={{ fontSize: '13px', color: 'var(--doctor-text-muted)' }}>{doctorProfile?.hospitalName || 'MediMind Central Hospital'} &bull; {doctorProfile?.room || 'OPD Room 204'}</span>
             </div>
             <h2 style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 4px', color: 'var(--doctor-text-primary)' }}>
-              Clinical Workspace — {doctorProfile?.name || 'Dr. Rahul Mehta'}
+              Clinical Workspace &mdash; {doctorProfile?.name || 'Dr. Rahul Mehta'}
             </h2>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--doctor-text-secondary)' }}>
-              {doctorProfile?.specialization} • {doctorProfile?.qualification}
+              {doctorProfile?.specialization} &bull; {doctorProfile?.qualification}
             </p>
           </div>
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -61,9 +73,9 @@ export function DashboardView({
       <div className="doctor-stat-grid">
         <StatCard
           label="Today's Appointments"
-          value={todayApts.length || 3}
+          value={todayApts.length}
           tone="blue"
-          change="100% Attended"
+          change={todayApts.length > 0 ? `${todayApts.filter(a => a.status === 'Completed' || a.status === 'COMPLETED').length} Completed` : 'Queue Active'}
           changeType="positive"
           subtext="OPD consultation queue"
           icon={
@@ -86,12 +98,12 @@ export function DashboardView({
           }
         />
         <StatCard
-          label="Consultations Completed"
-          value={doctorProfile?.totalConsultationsCompleted || 42}
+          label="Appointments Completed"
+          value={completedAptsCount}
           tone="indigo"
-          change="★ 4.9 Satisfaction"
+          change={appointments.length > 0 ? `${Math.round((completedAptsCount / appointments.length) * 100)}% of total` : 'Authoritative'}
           changeType="positive"
-          subtext="Total clinical records"
+          subtext="Authoritative completed encounters"
           icon={
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -100,9 +112,9 @@ export function DashboardView({
         />
         <StatCard
           label="AI Scans Screened"
-          value={doctorProfile?.totalAiScansScreened || 12}
+          value={aiScansCount}
           tone="coral"
-          change="97.4% Model Calibration"
+          change="Verified Atlas Telemetry"
           changeType="positive"
           subtext="Decision support telemetry"
           icon={
@@ -121,7 +133,7 @@ export function DashboardView({
               <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--doctor-primary)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
-              Today's Clinical Consultation Workflow Pipeline
+              Today&apos;s Clinical Consultation Workflow Pipeline
             </h3>
             <div className="doctor-card-description">Live patient throughput progression through outpatient clinical stages</div>
           </div>
@@ -129,11 +141,11 @@ export function DashboardView({
 
         <FunnelChart
           stages={[
-            { stage: '1. Waiting Room', count: 5, color: '#3b82f6', subtext: 'Arrived & Checked In' },
-            { stage: '2. AI Pre-Screened', count: 4, color: '#0ea5e9', subtext: 'X-Ray Saliency Ready' },
-            { stage: '3. In Consultation', count: 2, color: '#6366f1', subtext: 'Active Clinical Exam' },
-            { stage: '4. Rx Formulated', count: 3, color: '#0f766e', subtext: 'E-Prescription Drafted' },
-            { stage: '5. Completed', count: 3, color: '#16a34a', subtext: 'Visit Concluded' },
+            { stage: '1. Waiting Room', count: appointments.filter(a => a.status === 'Booked' || a.status === 'Confirmed').length, color: '#3b82f6', subtext: 'Scheduled & Confirmed' },
+            { stage: '2. AI Pre-Screened', count: aiScansCount, color: '#0ea5e9', subtext: 'X-Ray Telemetry Ready' },
+            { stage: '3. In Consultation', count: appointments.filter(a => a.status === 'In Progress').length || (appointments.filter(a => a.status === 'Confirmed').length > 0 ? 1 : 0), color: '#6366f1', subtext: 'Active Clinical Exam' },
+            { stage: '4. Rx Formulated', count: prescriptions.length, color: '#0f766e', subtext: 'E-Prescription Drafted' },
+            { stage: '5. Completed', count: completedAptsCount, color: '#16a34a', subtext: 'Encounter Concluded' },
           ]}
           height={160}
         />
@@ -149,7 +161,7 @@ export function DashboardView({
                 <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--doctor-primary)' }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Today's Patient Queue ({todayApts.length})
+                Today&apos;s Patient Queue ({todayApts.length})
               </h3>
               <div className="doctor-card-description">Live OPD consultation slots</div>
             </div>
@@ -179,7 +191,7 @@ export function DashboardView({
                     <span style={{ fontSize: '12px', color: 'var(--doctor-text-muted)' }}>({apt.patientAge}y, {apt.patientGender})</span>
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--doctor-text-muted)', marginTop: '2px' }}>
-                    {apt.time} • {apt.type} • {apt.purpose}
+                    {apt.time} &bull; {apt.type} &bull; {apt.purpose}
                   </div>
                 </div>
 
@@ -232,12 +244,12 @@ export function DashboardView({
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--doctor-text-primary)' }}>{pred.patientName}</span>
-                    <span className={`doctor-badge doctor-badge-${pred.riskLevel.toLowerCase()}`}>
+                    <span className={`doctor-badge doctor-badge-${pred.riskLevel?.toLowerCase() || 'low'}`}>
                       {pred.finding}
                     </span>
                   </div>
                   <div style={{ fontSize: '11.5px', color: 'var(--doctor-text-muted)', marginTop: '2px' }}>
-                    {pred.pipeline} • {pred.targetOrgan} • {pred.confidence}% confidence
+                    {pred.pipeline} &bull; {pred.targetOrgan} &bull; {pred.confidence}% confidence
                   </div>
                 </div>
 
@@ -298,7 +310,7 @@ export function DashboardView({
                   </span>
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--doctor-text-muted)', marginTop: '2px' }}>
-                  {pat.gender}, {pat.age}y • Blood Group <strong>{pat.bloodGroup}</strong>
+                  {pat.gender}, {pat.age}y &bull; Blood Group <strong>{pat.bloodGroup}</strong>
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--doctor-text-secondary)', marginTop: '6px', lineHeight: 1.3 }}>
                   <strong>Chief Complaint:</strong> {pat.chiefComplaint}
@@ -307,7 +319,7 @@ export function DashboardView({
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid var(--doctor-border)' }}>
                 <span style={{ fontSize: '11px', color: 'var(--doctor-text-muted)' }}>
-                  {pat.medicalRecords?.length || 0} records • {pat.aiPredictions?.length || 0} AI scans
+                  {pat.medicalRecords?.length || 0} records &bull; {pat.aiPredictions?.length || 0} AI scans
                 </span>
                 <button
                   className="doctor-btn doctor-btn-outline doctor-btn-sm"

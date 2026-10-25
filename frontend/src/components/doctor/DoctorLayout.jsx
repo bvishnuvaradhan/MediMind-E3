@@ -188,10 +188,10 @@ export function DoctorLayout({ dark, setDark }) {
             time: a.start_time ? `${a.start_time}${a.end_time ? ` - ${a.end_time}` : ''}` : '10:00 AM',
             type: a.appointment_type === 'WALK_IN' ? 'Walk-in' : (a.reason || 'OPD Consultation'),
             purpose: a.reason || 'Outpatient Consultation',
-            status: a.status === 'CANCELLED' ? 'Cancelled' : a.status === 'COMPLETED' ? 'Completed' : 'Confirmed',
+            status: a.status === 'CANCELLED' ? 'Cancelled' : a.status === 'COMPLETED' ? 'Completed' : a.status === 'RESCHEDULED' ? 'Rescheduled' : a.status === 'BOOKED' ? 'Booked' : (a.status || 'Confirmed'),
             cancellationReason: a.cancellation_reason,
             isWalkIn: a.appointment_type === 'WALK_IN',
-            aiPredictionId: a.prediction_id || null,
+            aiPredictionId: a.ai_prediction_id || a.aiPredictionId || null,
           };
         });
 
@@ -854,6 +854,7 @@ export function DoctorLayout({ dark, setDark }) {
               patients={patients}
               appointments={appointments}
               consultations={consultations}
+              prescriptions={prescriptions}
               onNavigate={handleNavigate}
               onSelectPatient={handleSelectPatient}
               onOpenAddWalkIn={handleOpenAddWalkIn}
