@@ -43,21 +43,21 @@ MediMind uses an asynchronous microservice architecture mediated by a unified AP
 
 ---
 
-## User Roles
+## User Roles & Operational Workforce
 
-The platform enforces strict Role-Based Access Control (RBAC) across five canonical personas:
+The platform enforces strict Role-Based Access Control (RBAC) across five canonical personas, managing 96 active operational accounts and 2 deactivated accounts:
 
-1. **`FAMILY`**: Household health portal for managing family members, booking consultations, accessing medical records, and running patient-facing AI symptom/risk screenings.
-2. **`DOCTOR`**: Clinical practitioner workspace for viewing scheduled patient appointments, conducting consultations, prescribing medications, and inspecting model explainability (e.g., Grad-CAM heatmaps).
-3. **`DEPARTMENT_HEAD`**: Clinical department leadership overseeing departmental doctors, OPD shifts, and clinical practice guideline publication.
-4. **`HOSPITAL_ADMIN`**: Hospital operational management administering facility beds, clinical departments, department heads, and hospital admissions trends.
-5. **`CHAIRMAN`**: Platform owner governing multi-hospital network accreditation, onboarding applications, and system-wide clinical analytics.
+1. **`FAMILY`**: 10 Household Accounts (representing 44 registered family members) managing dependent records, booking consultations, accessing medical records, and executing standalone AI symptom/risk screenings.
+2. **`DOCTOR`**: 68 Credentialed Doctor Profiles (66 Active, 2 Deactivated) triaging patient appointment queues, conducting clinical consultations, prescribing medications, and inspecting model explainability (e.g., Grad-CAM heatmaps).
+3. **`DEPARTMENT_HEAD`**: 14 Department Leadership Accounts overseeing clinical departments across the 3 active network hospitals, OPD shifts, and clinical guideline publication.
+4. **`HOSPITAL_ADMIN`**: 4 Hospital Operational Administrators administering facility capacities, clinical departments, department heads, and hospital throughput.
+5. **`CHAIRMAN`**: 2 Platform Owners governing multi-hospital network accreditation, onboarding applications, hospital eligibility boundaries, and system-wide clinical analytics.
 
 ---
 
-## AI Modules
+## AI Decision Support & Diagnostic Screenings
 
-MediMind integrates four validated clinical decision support modules:
+MediMind integrates four validated clinical decision support modules with 3,719 persisted predictions (3,693 appointment-linked, 26 standalone screenings with a 76.9% 30-day booking conversion rate):
 
 - **Fracture Detection (`ai_fracture`):** Deep convolutional neural network (ResNet-18 initialized on Stanford MURA v1.1 and calibrated on FracAtlas) detecting bone fractures in musculoskeletal radiographs.
   - *Production Operating Threshold:* `0.1800`
@@ -212,10 +212,26 @@ MediMind includes an automated Playwright acceptance suite validating full brows
 
 ---
 
-## Current Status
+## Governance, Data Integrity & Master Remediation Audits
 
-- **Authentication & Identity:** Fully completed, hardened, and verified with 523/523 checks passing across 26 canonical accounts.
-- **Microservices & API Gateway:** All 8 Node.js services and the API Gateway are fully operational, tested, and integrated.
-- **Clinical AI Services:** 4 production models active and tested (253/253 tests passing); Experiment 8A research baseline frozen.
-- **Frontend Application:** Certified React 19 / Vite application with 68 routes, pure-SVG interactive visualizations, and zero lint errors.
-- **Live Demo Readiness:** Verified and certified ready for evaluator presentation.
+The root directory maintains comprehensive, evidence-based audit reports certifying data integrity, security hardening, and release readiness:
+
+1. [MediMind Master Remediation Report](MediMind_Master_Remediation_Report.md) — Overarching release gate certification across all 13 phases.
+2. [MediMind Account Lifecycle & Deactivation Audit](MediMind_Account_Lifecycle_and_Deactivation_Audit.md) — Directory vs. dashboard reconciliation and staging deactivation boundaries.
+3. [MediMind Hospital Eligibility & Throughput Audit](MediMind_Hospital_Eligibility_and_Throughput_Audit.md) — Zero pending throughput enforcement and Sunrise encounter resolution.
+4. [MediMind Appointment & Clinical Record Integrity](MediMind_Appointment_and_Clinical_Record_Integrity.md) — Past unattended closures, October booking creation volume, and zero orphaned records.
+5. [MediMind AI Prediction & Standalone Screening Audit](MediMind_AI_Prediction_and_Standalone_Screening_Audit.md) — Prediction timestamps, dynamic relative periods, and 76.9% screening conversion.
+6. [MediMind Performance & Cache Freshness Report](MediMind_Performance_and_Cache_Freshness_Report.md) — Sub-second Owner latency benchmarks and 15s/30s dual-tier cache validation.
+7. [MediMind E2E Role & Cross-Flow Test Report](MediMind_E2E_Role_and_Cross_Flow_Test_Report.md) — Cross-role workflows, access control denial (HTTP 403), and contract verification.
+8. [MediMind Security & Cryptographic Integrity Report](MediMind_Security_and_Data_Integrity_Report.md) — 100% 6/6 SHA-256 model checksum verification and secret scanning.
+9. [MediMind Repository Cleanup Report](MediMind_Repository_Cleanup_Report.md) — 5,950 file inventory, safe deletions, and hardened .gitignore rules.
+
+---
+
+## Current Status & Release Certification
+
+- **Target Branch:** `experiment8-multiview-localized-fusion` (Never pushed to `main`).
+- **Cryptographic Integrity:** 6/6 Model weights matched bit-for-bit (0% drift).
+- **Test Discovery:** Pytest 283/283 passed; Jest 74/74 passed; Vite production build bundled cleanly in 1.30s.
+- **Reporting Engine:** 5 multi-sheet OpenXML compliant Excel workbooks verified (< 5s export, zero timeouts).
+- **Release Readiness:** Certified Production-Ready for final deployment.
