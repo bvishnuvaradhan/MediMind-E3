@@ -1,3 +1,4 @@
+import { authFetch, getAuthHeaders, getStoredToken } from './apiClient.js';
 // MediMind Platform - Doctor Service Layer
 // Abstracts clinical data access and mutations scoped to the Doctor role.
 // Connects to live microservices via API Gateway with intelligent in-memory caching and graceful fallbacks.
@@ -27,23 +28,7 @@ let articlesState = [...initialDoctorArticles];
 let notificationsState = [...initialDoctorNotifications];
 let settingsState = { ...initialDoctorSettings };
 
-function getAuthHeaders() {
-  const headers = { 'Content-Type': 'application/json' };
-  if (typeof window !== 'undefined') {
-    let token = localStorage.getItem('medimind_jwt_token');
-    if (!token) {
-      try {
-        const session = JSON.parse(localStorage.getItem('medimind_auth_session') || '{}');
-        token = session?.token;
-        if (token) {
-          localStorage.setItem('medimind_jwt_token', token);
-        }
-      } catch {}
-    }
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-  }
-  return headers;
-}
+// getAuthHeaders imported from apiClient.js
 
 export const doctorService = {
   // --- Profile & Availability ---

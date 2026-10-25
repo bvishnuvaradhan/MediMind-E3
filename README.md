@@ -225,6 +225,7 @@ The root directory maintains comprehensive, evidence-based audit reports certify
 7. [MediMind E2E Role & Cross-Flow Test Report](MediMind_E2E_Role_and_Cross_Flow_Test_Report.md) — Cross-role workflows, access control denial (HTTP 403), and contract verification.
 8. [MediMind Security & Cryptographic Integrity Report](MediMind_Security_and_Data_Integrity_Report.md) — 100% 6/6 SHA-256 model checksum verification and secret scanning.
 9. [MediMind Repository Cleanup Report](MediMind_Repository_Cleanup_Report.md) — 5,950 file inventory, safe deletions, and hardened .gitignore rules.
+10. [MediMind Authentication & Full-Stack Recovery Audit](MediMind_Authentication_and_Full_Stack_Recovery_Audit.md) — Centralized apiClient, pre-flight JWT expiry check, 401 interception, and zero-mock live data reconciliation.
 
 ---
 

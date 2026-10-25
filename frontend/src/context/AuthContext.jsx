@@ -2,11 +2,18 @@
 // Manages authentication state, user identity, and strict role isolation.
 // Roles supported: FAMILY, CHAIRMAN, HOSPITAL_ADMIN, DEPARTMENT_HEAD, DOCTOR.
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AuthContext } from './authContextCore';
 import { chairmen, hospitalAdmins, departmentHeads, doctors, hospitals, families } from '../data/medimindData';
+import {
+  TOKEN_STORAGE_KEY,
+  SESSION_STORAGE_KEY,
+  isTokenExpired,
+  getStoredToken,
+  handleUnauthorized,
+} from '../services/apiClient';
 
-const STORAGE_KEY = 'medimind_auth_session';
+const STORAGE_KEY = SESSION_STORAGE_KEY;
 
 function resolveUserProfile(role, email, apiUser = {}) {
   const cleanEmail = (email || '').trim().toLowerCase();
@@ -39,11 +46,11 @@ function resolveUserProfile(role, email, apiUser = {}) {
       name: matched.name,
       email: cleanEmail || matched.email,
       role: 'HOSPITAL_ADMIN',
-      title: matched.role || 'Hospital Administrator',
+      title: `${hosp.name} Administrator`,
       hospitalId: apiUser.hospitalId || matched.hospitalId || hosp.id,
-      hospitalName: apiUser.hospitalName || hosp.name,
-      avatarInitials: matched.avatarInitials || 'HA',
-      avatarTone: matched.avatarTone || 'sapphire',
+      hospitalName: hosp.name,
+      avatarInitials: matched.avatarInitials,
+      avatarTone: matched.avatarTone || 'blue',
       referenceId: apiUser.referenceId || matched.id,
       accountType: apiUser.accountType || 'HOSPITAL_ADMIN_ACCOUNT',
     };
@@ -52,50 +59,52 @@ function resolveUserProfile(role, email, apiUser = {}) {
   if (role === 'DEPARTMENT_HEAD') {
     const matched = departmentHeads.find((dh) => dh.email.toLowerCase() === cleanEmail || (apiUser.departmentId && dh.departmentId === apiUser.departmentId)) ||
       departmentHeads[0];
+    const hosp = hospitals.find((h) => h.id === (apiUser.hospitalId || matched.hospitalId)) || hospitals[0];
     return {
       id: apiUser.userId || matched.id,
       userId: apiUser.userId || matched.id,
       name: matched.name,
       email: cleanEmail || matched.email,
       role: 'DEPARTMENT_HEAD',
-      title: matched.title || `Head of ${matched.departmentName}`,
+      title: `Head of ${matched.departmentName}`,
       departmentId: apiUser.departmentId || matched.departmentId,
-      departmentName: apiUser.departmentName || matched.departmentName,
-      hospitalId: apiUser.hospitalId || matched.hospitalId,
-      hospitalName: apiUser.hospitalName || matched.hospitalName,
-      avatarInitials: matched.avatarInitials || 'DH',
-      avatarTone: matched.avatarTone || 'coral',
+      departmentName: matched.departmentName,
+      hospitalId: apiUser.hospitalId || matched.hospitalId || hosp.id,
+      hospitalName: hosp.name,
+      avatarInitials: matched.avatarInitials,
+      avatarTone: matched.avatarTone || 'emerald',
       referenceId: apiUser.referenceId || matched.id,
       accountType: apiUser.accountType || 'DEPARTMENT_HEAD_ACCOUNT',
     };
   }
 
   if (role === 'DOCTOR') {
-    const matched = doctors.find((doc) => doc.email.toLowerCase() === cleanEmail || (apiUser.doctorId && (doc.id === apiUser.doctorId || doc.codeId === apiUser.doctorId))) ||
+    const matched = doctors.find((d) => d.email.toLowerCase() === cleanEmail || (apiUser.doctorId && d.id === apiUser.doctorId)) ||
       doctors[0];
+    const hosp = hospitals.find((h) => h.id === (apiUser.hospitalId || matched.hospitalId)) || hospitals[0];
     return {
       id: apiUser.userId || matched.id,
       userId: apiUser.userId || matched.id,
+      doctorId: apiUser.doctorId || matched.id,
       name: matched.name,
       email: cleanEmail || matched.email,
       role: 'DOCTOR',
-      title: matched.title || 'Senior Consultant',
-      doctorId: apiUser.doctorId || apiUser.referenceId || matched.id,
-      departmentId: matched.departmentId,
-      departmentName: matched.departmentName,
-      hospitalId: matched.hospitalId,
-      hospitalName: matched.hospitalName,
-      specialization: matched.specialization,
-      avatarInitials: matched.avatarInitials || 'MD',
-      avatarTone: matched.avatarTone || 'coral',
+      title: `${matched.specialty} Specialist`,
+      specialty: matched.specialty,
+      department: matched.department,
+      hospitalId: apiUser.hospitalId || matched.hospitalId || hosp.id,
+      hospitalName: hosp.name,
+      avatarInitials: matched.avatarInitials,
+      avatarTone: matched.avatarTone || 'teal',
       referenceId: apiUser.referenceId || matched.id,
       accountType: apiUser.accountType || 'DOCTOR_ACCOUNT',
     };
   }
 
-  // FAMILY
-  const resolvedFamId = apiUser.familyId || (cleanEmail && families.find((f) => f.email?.toLowerCase() === cleanEmail)?.id) || 'FAM-001';
-  const matchedFamily = families.find((f) => f.id === resolvedFamId) || families[0];
+  // FAMILY Role
+  const matchedFamily = families.find((f) => f.email?.toLowerCase() === cleanEmail || (apiUser.familyId && f.id === apiUser.familyId)) ||
+    families[0];
+  const resolvedFamId = apiUser.familyId || matchedFamily.id;
   return {
     id: apiUser.userId || `usr_${resolvedFamId.toLowerCase()}`,
     userId: apiUser.userId || `usr_${resolvedFamId.toLowerCase()}`,
@@ -113,32 +122,50 @@ function resolveUserProfile(role, email, apiUser = {}) {
 }
 
 function getInitialUser() {
+  if (typeof window === 'undefined') return null;
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (parsed && parsed.role) {
-        if (parsed.token && typeof localStorage !== 'undefined' && !localStorage.getItem('medimind_jwt_token')) {
-          localStorage.setItem('medimind_jwt_token', parsed.token);
+      if (parsed && parsed.role && parsed.token) {
+        if (!isTokenExpired(parsed.token)) {
+          if (!localStorage.getItem(TOKEN_STORAGE_KEY)) {
+            localStorage.setItem(TOKEN_STORAGE_KEY, parsed.token);
+          }
+          return parsed;
         }
-        return parsed;
       }
     }
   } catch {
-    localStorage.removeItem(STORAGE_KEY);
+    // clear corrupted storage
   }
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(TOKEN_STORAGE_KEY);
   return null;
 }
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(getInitialUser);
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Synchronize state on unauthorized event to smoothly show login screen
+  useEffect(() => {
+    const onUnauthorized = (e) => {
+      setUser(null);
+      if (e.detail?.message) {
+        setError(e.detail.message);
+      }
+    };
+    window.addEventListener('medimind:unauthorized', onUnauthorized);
+    return () => window.removeEventListener('medimind:unauthorized', onUnauthorized);
+  }, []);
 
   const login = async (email, password) => {
     setError(null);
+    setLoading(true);
     localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem('medimind_jwt_token');
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
     if (typeof window !== 'undefined') {
       try {
         sessionStorage.clear();
@@ -149,8 +176,16 @@ export function AuthProvider({ children }) {
         // ignore storage errors
       }
     }
+
     const cleanEmail = (email || '').trim().toLowerCase();
-    const cleanPassword = (password || '').trim() || 'Password123!';
+    const cleanPassword = (password || '').trim();
+
+    if (!cleanEmail || !cleanPassword) {
+      const err = 'Please enter both email address and password.';
+      setError(err);
+      setLoading(false);
+      return { success: false, error: err };
+    }
 
     // Attempt real backend authentication first
     try {
@@ -160,82 +195,40 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ email: cleanEmail, password: cleanPassword }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.data?.token) {
-          const { user: apiUser, token } = data.data;
-          localStorage.setItem('medimind_jwt_token', token);
+      const data = await res.json().catch(() => ({}));
 
-          const roleUser = resolveUserProfile(apiUser.role, apiUser.email || cleanEmail, apiUser);
+      if (res.ok && data.success && data.data?.token) {
+        const { user: apiUser, token } = data.data;
+        localStorage.setItem(TOKEN_STORAGE_KEY, token);
 
-          const authenticatedUser = {
-            ...roleUser,
-            token,
-          };
-          setUser(authenticatedUser);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(authenticatedUser));
-          return { success: true, user: authenticatedUser };
-        }
+        const roleUser = resolveUserProfile(apiUser.role, apiUser.email || cleanEmail, apiUser);
+
+        const authenticatedUser = {
+          ...roleUser,
+          token,
+        };
+        setUser(authenticatedUser);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(authenticatedUser));
+        setLoading(false);
+        return { success: true, user: authenticatedUser };
       } else {
-        const data = await res.json().catch(() => ({}));
         const errMessage = data.message || `Authentication failed (${res.status})`;
         setError(errMessage);
+        setLoading(false);
         return { success: false, error: errMessage };
       }
     } catch {
-      // Backend is unreachable (e.g. offline unit testing) -> fallback to credential matching
+      const errMessage = 'Authentication service is unreachable. Ensure backend microservices are running on port 5000.';
+      setError(errMessage);
+      setLoading(false);
+      return { success: false, error: errMessage };
     }
-
-    // Check credentials for Chairman
-    if (cleanEmail.includes('chairman') || cleanEmail.includes('owner') || cleanEmail.startsWith('chair') || cleanEmail === 'admin@medimind.com') {
-      const chairmanUser = resolveUserProfile('CHAIRMAN', cleanEmail);
-      setUser(chairmanUser);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(chairmanUser));
-      return { success: true, user: chairmanUser };
-    }
-
-    // Check credentials for Hospital Admin
-    if (cleanEmail === 'admin@medimindhospital.com' || cleanEmail.startsWith('admin') || cleanEmail.includes('hadmin') || cleanEmail.includes('admin@apexmetro') || cleanEmail.includes('admin@stjude') || cleanEmail.includes('hospital.admin') || cleanEmail.includes('admin.central')) {
-      const hospitalAdminUser = resolveUserProfile('HOSPITAL_ADMIN', cleanEmail);
-      setUser(hospitalAdminUser);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(hospitalAdminUser));
-      return { success: true, user: hospitalAdminUser };
-    }
-
-    // Check credentials for Department Head
-    if (cleanEmail.includes('priya') || cleanEmail.includes('depthead') || cleanEmail.includes('head.') || cleanEmail.includes('head@') || cleanEmail.includes('suresh.iyer') || cleanEmail.includes('rajesh.nair') || cleanEmail.includes('amit.verma') || cleanEmail.includes('sunita.kulkarni') || cleanEmail.includes('vikram.deshmukh') || cleanEmail.includes('harish.rao') || cleanEmail.includes('meera.reddy') || cleanEmail.includes('sanjay.gupta')) {
-      const dhUser = resolveUserProfile('DEPARTMENT_HEAD', cleanEmail);
-      setUser(dhUser);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(dhUser));
-      return { success: true, user: dhUser };
-    }
-
-    // Check credentials for Doctor
-    if (cleanEmail.includes('rahul') || cleanEmail.includes('doctor') || cleanEmail.includes('doc_') || cleanEmail.includes('dr.') || cleanEmail.includes('vikram.anand') || cleanEmail.includes('sneha.reddy') || cleanEmail.includes('ananya.roy') || cleanEmail.includes('arjun.patel') || cleanEmail.includes('deepak.verma') || cleanEmail.includes('@medimindhospital.com') || cleanEmail.includes('doc@')) {
-      const docUser = resolveUserProfile('DOCTOR', cleanEmail);
-      setUser(docUser);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(docUser));
-      return { success: true, user: docUser };
-    }
-
-    // Check credentials for Family
-    const matchedOfflineFamily = families.find((f) => f.email?.toLowerCase() === cleanEmail);
-    if (matchedOfflineFamily || cleanEmail.includes('rohan') || cleanEmail.includes('ravi') || cleanEmail.includes('patel') || cleanEmail.includes('kiran') || cleanEmail.includes('menon') || cleanEmail.includes('mukherjee') || cleanEmail.includes('family') || cleanEmail.includes('kapoor') || cleanEmail.includes('member') || cleanEmail.includes('patient') || cleanEmail.includes('@example.com')) {
-      const familyUser = resolveUserProfile('FAMILY', cleanEmail);
-      setUser(familyUser);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(familyUser));
-      return { success: true, user: familyUser };
-    }
-
-    const fallbackErr = 'Invalid email or password';
-    setError(fallbackErr);
-    return { success: false, error: fallbackErr };
   };
 
   const signup = async ({ name, email, password: _password }) => {
     setError(null);
     localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem('medimind_jwt_token');
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
     if (typeof window !== 'undefined') {
       try {
         sessionStorage.clear();
@@ -249,35 +242,53 @@ export function AuthProvider({ children }) {
     const cleanEmail = (email || '').trim().toLowerCase();
     const cleanName = (name || '').trim() || cleanEmail.split('@')[0];
 
-    const newUser = {
-      id: `usr_fam_${Date.now()}`,
-      name: cleanName,
-      email: cleanEmail,
-      role: 'FAMILY',
-      title: 'Family Account Creator',
-      avatarInitials: cleanName.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase() || 'FA',
-      avatarTone: 'mint',
-    };
+    // Family account creation
+    try {
+      const res = await fetch('/api/families', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `${cleanName} Family`,
+          primaryContact: cleanName,
+          email: cleanEmail,
+          phone: '+91 98765 00000',
+        }),
+      });
 
-    setUser(newUser);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
-    return { success: true, user: newUser };
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success && data.data?.token) {
+        const { token, family } = data.data;
+        localStorage.setItem(TOKEN_STORAGE_KEY, token);
+        const newUser = {
+          id: `usr_${family.id || Date.now()}`,
+          userId: `usr_${family.id || Date.now()}`,
+          name: cleanName,
+          email: cleanEmail,
+          role: 'FAMILY',
+          title: `${cleanName} Household Head`,
+          familyId: family.id,
+          familyName: family.name,
+          avatarInitials: cleanName.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase() || 'FA',
+          avatarTone: 'coral',
+          referenceId: family.id,
+          token,
+        };
+        setUser(newUser);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
+        return { success: true, user: newUser };
+      }
+    } catch {
+      // ignore
+    }
+
+    const fallbackErr = 'Failed to register family account. Please try again.';
+    setError(fallbackErr);
+    return { success: false, error: fallbackErr };
   };
 
   const logout = () => {
-    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('medimind_jwt_token') : null;
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem('medimind_jwt_token');
-    if (typeof window !== 'undefined') {
-      try {
-        sessionStorage.clear();
-        if (window.location.hash) {
-          window.history.replaceState(null, '', window.location.pathname + window.location.search);
-        }
-      } catch {
-        // ignore
-      }
-    }
+    const token = getStoredToken();
+    handleUnauthorized('You have signed out of your session.');
     setUser(null);
     setError(null);
     if (token) {
@@ -288,28 +299,27 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const switchRole = (targetRole) => {
-    localStorage.removeItem('medimind_jwt_token');
-    if (typeof window !== 'undefined') {
-      try {
-        sessionStorage.clear();
-        if (window.location.hash) {
-          window.history.replaceState(null, '', window.location.pathname + window.location.search);
-        }
-      } catch {
-        // ignore
-      }
+  const ROLE_CREDENTIALS = {
+    CHAIRMAN: { email: 'chairman@medimind.org', password: 'Chair#2026$01!Dev' },
+    HOSPITAL_ADMIN: { email: 'admin@aarogyam.hospital', password: 'Admin#2026$01!Dev' },
+    DEPARTMENT_HEAD: { email: 'meenakshi.sundaram@aarogyam.hospital', password: 'Head#2026$02!Dev' },
+    DOCTOR: { email: 'dr.rahul.sharma@aarogyam.hospital', password: 'Doctor#2026$01!Dev' },
+    FAMILY: { email: 'rohan.kapoor@example.com', password: 'Family#2026$01!Dev' },
+  };
+
+  const switchRole = async (targetRole) => {
+    const creds = ROLE_CREDENTIALS[targetRole];
+    if (creds) {
+      return await login(creds.email, creds.password);
     }
-    const switchedUser = resolveUserProfile(targetRole);
-    setUser(switchedUser);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(switchedUser));
+    logout();
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
+        isAuthenticated: !!user && !!user?.token && !isTokenExpired(user?.token),
         role: user?.role || null,
         isDoctor: user?.role === 'DOCTOR',
         isDepartmentHead: user?.role === 'DEPARTMENT_HEAD',

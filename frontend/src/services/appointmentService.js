@@ -1,18 +1,8 @@
+import { authFetch, getAuthHeaders, getStoredToken } from './apiClient.js';
 // MediMind Platform - Frontend Appointment Service Client
 // Integrates with backend appointment-service via API Gateway (/api/appointments)
 
-function getAuthHeaders() {
-  const headers = {
-    'Content-Type': 'application/json',
-  };
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('medimind_jwt_token');
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-  }
-  return headers;
-}
+// getAuthHeaders imported from apiClient.js
 
 export const appointmentService = {
   /**

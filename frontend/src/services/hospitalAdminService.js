@@ -1,3 +1,4 @@
+import { authFetch, getAuthHeaders, getStoredToken } from './apiClient.js';
 // MediMind Platform - Hospital Admin Service
 // Service abstraction layer providing live data access and mutations for Hospital Admin operations.
 // Integrates with backend microservices via API Gateway with intelligent in-memory caching and graceful fallbacks.
@@ -28,23 +29,7 @@ let knowledgeState = Array.isArray(initialKnowledgeActivity) ? [...initialKnowle
 let auditLogsState = [...initialAuditLogs];
 let settingsState = { ...initialHospitalSettings };
 
-function getAuthHeaders() {
-  const headers = { 'Content-Type': 'application/json' };
-  if (typeof window !== 'undefined') {
-    let token = localStorage.getItem('medimind_jwt_token');
-    if (!token) {
-      try {
-        const session = JSON.parse(localStorage.getItem('medimind_auth_session') || '{}');
-        token = session?.token;
-        if (token) {
-          localStorage.setItem('medimind_jwt_token', token);
-        }
-      } catch {}
-    }
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-  }
-  return headers;
-}
+// getAuthHeaders imported from apiClient.js
 
 export const hospitalAdminService = {
   // --- Hospital Profile ---

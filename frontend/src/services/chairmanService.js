@@ -1,4 +1,5 @@
 import { getRelativeDateRange } from "../utils/dateUtils.js";
+import { authFetch, getAuthHeaders } from "./apiClient.js";
 // MediMind Platform - Chairman Service Layer
 // Clean service abstraction isolating data management from React components.
 // Connects to live microservices via API Gateway with intelligent in-memory caching and graceful fallbacks.
@@ -58,23 +59,7 @@ const cache = {
 const CACHE_TTL_MS = 15000;
 
 
-function getAuthHeaders() {
-  const headers = { 'Content-Type': 'application/json' };
-  if (typeof window !== 'undefined') {
-    let token = localStorage.getItem('medimind_jwt_token');
-    if (!token) {
-      try {
-        const session = JSON.parse(localStorage.getItem('medimind_auth_session') || '{}');
-        token = session?.token;
-        if (token) {
-          localStorage.setItem('medimind_jwt_token', token);
-        }
-      } catch {}
-    }
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-  }
-  return headers;
-}
+// getAuthHeaders and authFetch are imported from apiClient.js
 
 
 // Internal cached fetchers
@@ -84,7 +69,7 @@ async function fetchCachedHospitals() {
     return cache.hospitals;
   }
   try {
-    const res = await fetch('/api/hospitals', { headers: getAuthHeaders() });
+    const res = await authFetch('/api/hospitals');
     if (res.ok) {
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -106,7 +91,7 @@ async function fetchCachedDepartments() {
     return cache.departments;
   }
   try {
-    const res = await fetch('/api/departments', { headers: getAuthHeaders() });
+    const res = await authFetch('/api/departments');
     if (res.ok) {
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -128,7 +113,7 @@ async function fetchCachedDoctors() {
     return cache.doctors;
   }
   try {
-    const res = await fetch('/api/doctors?status=ALL', { headers: getAuthHeaders() });
+    const res = await authFetch('/api/doctors?status=ALL');
     if (res.ok) {
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -150,7 +135,7 @@ async function fetchCachedAppointmentStats() {
     return cache.appointmentStats;
   }
   try {
-    const res = await fetch('/api/appointments/stats', { headers: getAuthHeaders() });
+    const res = await authFetch('/api/appointments/stats');
     if (res.ok) {
       const json = await res.json();
       if (json.success && json.data) {
@@ -403,7 +388,7 @@ export const chairmanService = {
   // Hospital Onboarding Requests (Approve / Reject)
   getHospitalRequests: async (statusFilter = 'All') => {
     try {
-      const res = await fetch('/api/hospital-requests', { headers: getAuthHeaders() });
+      const res = await authFetch('/api/hospital-requests');
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -526,7 +511,7 @@ export const chairmanService = {
 
   getDepartmentHeads: async (statusFilter = 'All') => {
     try {
-      const res = await fetch('/api/department-heads', { headers: getAuthHeaders() });
+      const res = await authFetch('/api/department-heads');
       if (res.ok) {
         const payload = await res.json();
         const heads = payload.data || [];
@@ -867,7 +852,7 @@ export const chairmanService = {
           url += `?start_date=${startDate}&end_date=${endDate}&period=${encodeURIComponent(dateRange)}`;
         }
       }
-      const response = await fetch(url, { headers: getAuthHeaders() });
+      const response = await authFetch(url);
       if (response.ok) {
         const payload = await response.json();
         if (payload.success && payload.data) {
@@ -936,7 +921,7 @@ export const chairmanService = {
   // Knowledge Activity (Platform-wide oversight, Drafts strictly private to authoring doctors)
   getKnowledgeArticles: async () => {
     try {
-      const res = await fetch('/api/knowledge/articles', { headers: getAuthHeaders() });
+      const res = await authFetch('/api/knowledge/articles');
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -1007,9 +992,7 @@ export const chairmanService = {
     if (filters.limit) params.append('limit', filters.limit);
 
 
-    const res = await fetch(`/api/appointments/reports/preview?${params.toString()}`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await authFetch(`/api/appointments/reports/preview?${params.toString()}`);
 
 
     if (!res.ok) {
@@ -1038,9 +1021,7 @@ export const chairmanService = {
     if (filters.reportType) params.append('reportType', filters.reportType);
 
 
-    const res = await fetch(`/api/appointments/reports/export-excel?${params.toString()}`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await authFetch(`/api/appointments/reports/export-excel?${params.toString()}`);
 
 
     if (!res.ok) {

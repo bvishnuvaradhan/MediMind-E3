@@ -1,3 +1,4 @@
+import { authFetch, getAuthHeaders, getStoredToken } from './apiClient.js';
 // MediMind Platform - Family Account Service Layer
 // Abstracts patient & family health record management, appointments, consultations, and doctor access.
 // Connects to live backend microservices via API Gateway with intelligent in-memory caching and graceful fallbacks.
@@ -16,23 +17,7 @@ let presentationState = { ...initialPresentationData };
 let bookedSlotsState = { ...initialBookedSlots };
 let doctorAccessState = [...initialDoctorAccess];
 
-function getAuthHeaders() {
-  const headers = { 'Content-Type': 'application/json' };
-  if (typeof window !== 'undefined') {
-    let token = localStorage.getItem('medimind_jwt_token');
-    if (!token) {
-      try {
-        const session = JSON.parse(localStorage.getItem('medimind_auth_session') || '{}');
-        token = session?.token;
-        if (token) {
-          localStorage.setItem('medimind_jwt_token', token);
-        }
-      } catch {}
-    }
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-  }
-  return headers;
-}
+// getAuthHeaders imported from apiClient.js
 
 export const familyService = {
   // --- Family Members ---

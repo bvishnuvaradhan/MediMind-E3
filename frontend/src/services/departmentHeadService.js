@@ -1,3 +1,4 @@
+import { authFetch, getAuthHeaders, getStoredToken } from './apiClient.js';
 // MediMind Platform - Department Head Service Layer
 // Service abstraction layer providing live data access and mutations scoped to the Department Head workspace.
 // Connects to live microservices via API Gateway with intelligent in-memory caching and graceful fallbacks.
@@ -25,23 +26,7 @@ let performanceState = [...initialDoctorPerformance];
 let articlesState = [...initialDepartmentArticles];
 let settingsState = { ...initialDepartmentSettings };
 
-function getAuthHeaders() {
-  const headers = { 'Content-Type': 'application/json' };
-  if (typeof window !== 'undefined') {
-    let token = localStorage.getItem('medimind_jwt_token');
-    if (!token) {
-      try {
-        const session = JSON.parse(localStorage.getItem('medimind_auth_session') || '{}');
-        token = session?.token;
-        if (token) {
-          localStorage.setItem('medimind_jwt_token', token);
-        }
-      } catch {}
-    }
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-  }
-  return headers;
-}
+// getAuthHeaders imported from apiClient.js
 
 export const departmentHeadService = {
   // --- Profile & Department Info ---

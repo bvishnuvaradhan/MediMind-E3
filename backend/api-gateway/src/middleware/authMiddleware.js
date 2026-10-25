@@ -42,9 +42,12 @@ export const verifyJwt = (req, res, next) => {
 
     next();
   } catch (error) {
-    // optionalJwt: JWT is optional. If token has expired or is invalid, do not reject with 401; proceed unauthenticated.
-    req.user = null;
-    return next();
+    return res.status(401).json({
+      success: false,
+      message: error.name === 'TokenExpiredError'
+        ? 'Authentication token has expired. Please re-authenticate.'
+        : 'Invalid authentication token.',
+    });
   }
 };
 
