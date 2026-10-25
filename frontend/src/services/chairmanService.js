@@ -214,21 +214,30 @@ export const chairmanService = {
     const cancelledApts = stats ? stats.cancelled : platformSummary.cancelledAppointments;
 
 
-    const activeHospCount = rawHosps.filter(h => (h.status || '').toUpperCase() === 'ACTIVE' || h.status === 'Active').length;
+    const isInactiveStatus = (s) => {
+      const norm = (s || '').trim().toUpperCase();
+      return norm === 'INACTIVE' || norm === 'DEACTIVATED';
+    };
+    const isActiveStatus = (s) => {
+      const norm = (s || '').trim().toUpperCase();
+      return norm === 'ACTIVE';
+    };
+
+    const activeHospCount = rawHosps.filter(h => isActiveStatus(h.status)).length;
     const pendingHospReqCount = rawHosps.filter(h => (h.status || '').toUpperCase() === 'PENDING' || h.status === 'Pending').length || hospitalRequests.filter(r => r.status === 'Pending').length;
 
-    const activeDocs = rawDocs.filter(d => (d.status || '').toUpperCase() === 'ACTIVE' || d.status === 'Active');
-    const inactiveDocs = rawDocs.filter(d => (d.status || '').toUpperCase() === 'INACTIVE' || d.status === 'Inactive');
+    const activeDocs = rawDocs.filter(d => isActiveStatus(d.status));
+    const inactiveDocs = rawDocs.filter(d => isInactiveStatus(d.status));
 
-    const activeAdmins = hospitalAdmins.filter(a => (a.status || '').toUpperCase() === 'ACTIVE' || a.status === 'Active');
-    const inactiveAdmins = hospitalAdmins.filter(a => (a.status || '').toUpperCase() === 'INACTIVE' || a.status === 'Inactive');
+    const activeAdmins = hospitalAdmins.filter(a => isActiveStatus(a.status));
+    const inactiveAdmins = hospitalAdmins.filter(a => isInactiveStatus(a.status));
 
     const rawHeads = await chairmanService.getDepartmentHeads().catch(() => []);
-    const activeHeads = rawHeads.filter(h => (h.status || '').toUpperCase() === 'ACTIVE' || h.status === 'Active');
-    const inactiveHeads = rawHeads.filter(h => (h.status || '').toUpperCase() === 'INACTIVE' || h.status === 'Inactive');
+    const activeHeads = rawHeads.filter(h => isActiveStatus(h.status));
+    const inactiveHeads = rawHeads.filter(h => isInactiveStatus(h.status));
 
-    const activeFamilies = familyAccounts.filter(f => (f.status || '').toUpperCase() === 'ACTIVE' || f.status === 'Active');
-    const inactiveFamilies = familyAccounts.filter(f => (f.status || '').toUpperCase() === 'INACTIVE' || f.status === 'Inactive');
+    const activeFamilies = familyAccounts.filter(f => isActiveStatus(f.status));
+    const inactiveFamilies = familyAccounts.filter(f => isInactiveStatus(f.status));
 
     const aiData = await chairmanService.getAiAnalytics().catch(() => null);
     const livePredsCount = aiData?.totalInferences || (stats?.byHospitalPreds ? Object.values(stats.byHospitalPreds).reduce((a, b) => a + b, 0) : 0);

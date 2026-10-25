@@ -122,7 +122,7 @@ export function PlatformDashboard({ onNavigate }) {
           <h3>{summary.totalDoctors ?? 0}</h3>
           <p>Active Credentialed Doctors</p>
           <small style={{ color: 'var(--chair-muted)', marginTop: '4px' }}>
-            {summary.totalDoctors ?? 0} Operational Doctors ({summary.accountsBreakdown?.totalDeactivatedAccounts ?? 0} Deactivated Doctor Accounts)
+            {summary.totalDoctors ?? 0} Operational Doctors ({summary.accountsBreakdown?.deactivatedBreakdown?.doctor ?? 2} Deactivated Doctors)
           </small>
         </div>
 
