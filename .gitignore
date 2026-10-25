@@ -38,6 +38,20 @@ Thumbs.db
 *.pdf
 ~$*
 *.xlsx
+*credentials*.csv
+*Credentials*.csv
+
+# Temporary, Backup & Editor files
+*.bak
+*.orig
+*~
+*.tmp
+*.swp
+*.log
+scratch/
+tmp/
+mongo_dumps/
+*.dump
 
 # ML Training temporary runs & dataset images
 ai-prediction-service/artifacts/fracture_v2/experiment5_localization/dataset/images/
