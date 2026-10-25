@@ -33,7 +33,9 @@ export function DoctorsView({ doctors, departments, onSelectDoctor, onToggleStat
           </div>
           <div>
             <h1>Hospital Clinical Doctors Directory</h1>
-            <p>Operational overview of all 9 practicing doctors across Orthopedics, Diabetology, and Cardiology</p>
+            <p>
+              Operational overview of {doctors.length} practicing doctors across {departments.length > 0 ? departments.map((d) => d.name).join(', ') : 'clinical departments'}
+            </p>
           </div>
         </div>
 
@@ -110,16 +112,18 @@ export function DoctorsView({ doctors, departments, onSelectDoctor, onToggleStat
             </div>
 
             <div style={{ padding: '10px 12px', borderRadius: '8px', backgroundColor: 'var(--ha-bg)', fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <div><strong>Specialization:</strong> {doc.specialization}</div>
-              <div style={{ color: 'var(--ha-text-muted)' }}><strong>Qualifications:</strong> {doc.qualification} ({doc.experience})</div>
+              <div><strong>Specialization:</strong> {doc.specialization || 'Clinical Specialist'}</div>
+              <div style={{ color: 'var(--ha-text-muted)' }}>
+                <strong>Qualifications:</strong> {doc.qualification && doc.qualification !== 'Not provided' ? `${doc.qualification}${doc.experience ? ` (${doc.experience})` : ''}` : (doc.experience ? `Clinical Practice (${doc.experience})` : 'Not provided')}
+              </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', color: 'var(--ha-text-muted)' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Clock size={13} /> {doc.schedule}
+                <Clock size={13} /> {doc.schedule || 'No schedule configured'}
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#eab308', fontWeight: 700 }}>
-                <Star size={13} fill="#eab308" /> {doc.rating}
+                <Star size={13} fill="#eab308" /> {doc.rating || 4.8}
               </span>
             </div>
 
@@ -127,12 +131,12 @@ export function DoctorsView({ doctors, departments, onSelectDoctor, onToggleStat
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
                 <span style={{ color: 'var(--ha-text-muted)' }}>Current Workload</span>
-                <strong>{doc.workload} / {doc.maxCapacity} Consultations</strong>
+                <strong>{doc.workload || 0} / {doc.maxCapacity || 30} Consultations</strong>
               </div>
               <div className="ha-progress-bar-bg">
                 <div
                   className="ha-progress-bar-fill"
-                  style={{ width: `${(doc.workload / doc.maxCapacity) * 100}%` }}
+                  style={{ width: `${Math.min(100, Math.round(((doc.workload || 0) / (doc.maxCapacity || 30)) * 100))}%` }}
                 />
               </div>
             </div>

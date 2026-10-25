@@ -11,13 +11,13 @@ export function EditDepartmentModal({
     name: department.name || '',
     code: department.code || '',
     specialization: department.specialization || department.name || '',
-    wardCapacity: department.wardCapacity || 40,
+    wardCapacity: department.wardCapacity || department.bedCapacity || 40,
     headId: department.headId || '',
     headName: department.headName || 'Unassigned',
     headEmail: department.headEmail || '',
     status: department.status || 'Active',
     floor: department.floor || 'Level 1, Wing A',
-    aiService: department.aiService || 'General Health Triaging',
+    aiService: department.aiService || department.linkedAi || 'General Health Triaging',
     description: department.description || '',
   });
 

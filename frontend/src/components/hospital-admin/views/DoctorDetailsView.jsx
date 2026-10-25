@@ -16,7 +16,7 @@ import {
 export function DoctorDetailsView({ doctor, onBack, onToggleStatus }) {
   if (!doctor) return null;
 
-  const workloadPct = Math.round((doctor.workload / (doctor.maxCapacity || 25)) * 100);
+  const workloadPct = Math.round(((doctor.workload || 0) / (doctor.maxCapacity || 30)) * 100);
 
   return (
     <div>
@@ -94,14 +94,14 @@ export function DoctorDetailsView({ doctor, onBack, onToggleStatus }) {
               <span className="ha-info-label">
                 <User size={13} /> Qualifications
               </span>
-              <span className="ha-info-value">{doctor.qualification}</span>
+              <span className="ha-info-value">{doctor.qualification || 'Not provided'}</span>
             </div>
 
             <div className="ha-info-tile">
               <span className="ha-info-label">
                 <Clock size={13} /> Consultation Schedule
               </span>
-              <span className="ha-info-value">{doctor.schedule}</span>
+              <span className="ha-info-value">{doctor.schedule || 'No schedule configured'}</span>
             </div>
 
             <div className="ha-info-tile">

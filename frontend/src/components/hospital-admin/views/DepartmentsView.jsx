@@ -126,7 +126,7 @@ export function DepartmentsView({
                   <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>AI Pipeline</span>
                 </div>
                 <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ha-text-primary)' }}>
-                  {(dept.aiService || dept.linkedAi || 'None Configured').split('(')[0]}
+                  {(dept.linkedAi || dept.aiService || 'Not configured').split('(')[0].trim()}
                 </div>
               </div>
 

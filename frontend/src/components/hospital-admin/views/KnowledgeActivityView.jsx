@@ -30,8 +30,18 @@ export function KnowledgeActivityView({
   const [selectedPeriod, setSelectedPeriod] = useState('All');
   const [selectedArticle, setSelectedArticle] = useState(null);
 
-  const currentHospitalId = hospital?.id || 'HOSP-001';
-  const currentHospitalName = hospital?.name || 'MediMind Central Hospital';
+  const currentHospitalId = hospital?.id || hospital?._id || '6ac85a18074c2bc731a76381';
+  const currentHospitalName = hospital?.name || 'Aarogyam Multispeciality Hospital';
+
+  const normalizeStatus = (status) => {
+    if (!status) return 'Published';
+    const u = status.toUpperCase();
+    if (u === 'PUBLISHED') return 'Published';
+    if (u === 'UNDER_REVIEW') return 'Under Review';
+    if (u === 'CHANGES_REQUESTED') return 'Changes Requested';
+    if (u === 'DRAFT') return 'Draft';
+    return status;
+  };
 
   // 1. Resolve raw article list from props
   const rawArticles = useMemo(() => {
@@ -46,14 +56,21 @@ export function KnowledgeActivityView({
   // - Hospital Admin only sees articles belonging to their assigned hospital
   // - Draft articles are private to authoring clinicians and are excluded
   const hospitalArticles = useMemo(() => {
-    return rawArticles.filter((art) => {
-      const isHospitalMatch =
-        art.hospitalId === currentHospitalId ||
-        art.hospital === currentHospitalName ||
-        (!art.hospitalId && !art.hospital);
-      const isNotDraft = art.status !== 'Draft';
-      return isHospitalMatch && isNotDraft;
-    });
+    return rawArticles
+      .map((art) => ({
+        ...art,
+        status: normalizeStatus(art.status),
+      }))
+      .filter((art) => {
+        const artHospId = art.hospitalId || art.hospital_id;
+        const artHospName = art.hospital || art.hospitalName || art.hospital_name;
+        const isHospitalMatch =
+          (artHospId && artHospId.toString() === currentHospitalId.toString()) ||
+          (artHospName && (artHospName === currentHospitalName || currentHospitalName.includes(artHospName))) ||
+          (!artHospId && !artHospName);
+        const isNotDraft = art.status !== 'Draft' && art.status !== 'DRAFT';
+        return isHospitalMatch && isNotDraft;
+      });
   }, [rawArticles, currentHospitalId, currentHospitalName]);
 
   // 3. Dynamic filter option lists derived from hospital-scoped non-draft articles
@@ -130,13 +147,20 @@ export function KnowledgeActivityView({
 
       // Period filter
       if (selectedPeriod !== 'All') {
-        const dateStr = art.publishedDate || art.date || art.createdDate || '';
+        const rawDate = art.publishedDate || art.date || art.createdDate || art.createdAt || '';
+        let monthLabel = '';
+        if (rawDate) {
+          const parsed = new Date(rawDate);
+          if (!isNaN(parsed.getTime())) {
+            monthLabel = parsed.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+          }
+        }
         if (selectedPeriod === curMonth) {
-          if (!dateStr.includes(curMonth)) return false;
+          if (monthLabel !== curMonth && !rawDate.includes(curMonth)) return false;
         } else if (selectedPeriod === prevMonth) {
-          if (!dateStr.includes(prevMonth)) return false;
+          if (monthLabel !== prevMonth && !rawDate.includes(prevMonth)) return false;
         } else if (selectedPeriod === 'Earlier') {
-          if (dateStr.includes(curMonth) || dateStr.includes(prevMonth)) return false;
+          if (monthLabel === curMonth || monthLabel === prevMonth || rawDate.includes(curMonth) || rawDate.includes(prevMonth)) return false;
         }
       }
 
@@ -545,8 +569,13 @@ export function KnowledgeActivityView({
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Calendar size={13} />
                     <span>
-                      Date: {art.publishedDate || art.date || art.createdDate} ·{' '}
-                      {art.reads ?? art.views ?? 0} Public Reads · {art.citations ?? 0} Citations
+                      Date:{' '}
+                      {(() => {
+                        const raw = art.publishedDate || art.date || art.createdDate || art.createdAt;
+                        if (!raw) return 'Recent';
+                        const d = new Date(raw);
+                        return !isNaN(d.getTime()) ? d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : raw;
+                      })()} · {art.reads ?? art.views ?? 0} Public Reads · {art.citations ?? 0} Citations
                     </span>
                   </div>
                   {art.reviewerName && (

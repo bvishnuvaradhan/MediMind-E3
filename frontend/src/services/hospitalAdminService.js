@@ -157,25 +157,45 @@ export const hospitalAdminService = {
             if (filtered.length > 0) list = filtered;
           }
 
-          departmentsState = list.map((d) => ({
-            id: d._id || d.id,
-            _id: d._id || d.id,
-            code: d.code || (d.name || '').slice(0, 4).toUpperCase(),
-            name: d.name,
-            specialization: d.specialization || d.name,
-            hospitalId: d.hospital_id || d.hospitalId || targetId,
-            hospitalName: d.hospitalName || hospitalProfileState.name,
-            headName: d.head_name || d.headName || d.fullName || 'Assigned Head',
-            headId: d.head_id || d.headId,
-            headEmail: d.head_email || d.headEmail,
-            doctorsCount: d.doctorsCount || d.doctors_count || 3,
-            activeAppointments: d.activeAppointments || 12,
-            completedConsultations: d.completedConsultations || 45,
-            aiPredictionsCount: d.aiPredictionsCount || 42,
-            wardCapacity: Number(d.ward_capacity || d.wardCapacity) || 40,
-            bedOccupancy: d.bedOccupancy || '75%',
-            status: d.status === 'INACTIVE' ? 'Inactive' : 'Active',
-          }));
+          departmentsState = list.map((d) => {
+            const wardCap = Number(d.bedCapacity || d.ward_capacity || d.wardCapacity) || 40;
+            const occBeds = Number(d.occupiedBeds) !== undefined && !isNaN(Number(d.occupiedBeds)) ? Number(d.occupiedBeds) : Math.round(wardCap * 0.5);
+            const occPct = Math.round((occBeds / wardCap) * 100);
+            const deptId = d._id || d.id;
+            const dName = d.name || '';
+            const matchingDocs = doctorsState.filter(doc => (doc.departmentId && doc.departmentId.toString() === deptId.toString()) || (doc.departmentName && doc.departmentName.toLowerCase() === dName.toLowerCase()) || (doc.department && doc.department.toLowerCase() === dName.toLowerCase()));
+            const docCount = matchingDocs.length > 0 ? matchingDocs.length : (d.doctorsCount || d.doctors_count || 0);
+            const activeApts = (analyticsState.byDepartment && analyticsState.byDepartment[deptId]) || d.activeAppointments || 0;
+            const aiPreds = (analyticsState.byDepartmentPreds && analyticsState.byDepartmentPreds[deptId]) || d.aiPredictionsCount || 0;
+            const compApts = Math.round(activeApts * 0.62) || d.completedConsultations || 0;
+            const defaultAi = dName.includes('Cardio') ? 'Heart Disease Risk Stratification' : (dName.includes('Diab') ? 'Diabetes Risk Assessment' : (dName.includes('Ortho') ? 'Fracture Detection' : 'Not configured'));
+
+            return {
+              id: deptId,
+              _id: deptId,
+              code: d.code || (d.name || '').slice(0, 4).toUpperCase(),
+              name: d.name,
+              specialization: d.specialization || d.name,
+              hospitalId: d.hospital_id || d.hospitalId || targetId,
+              hospitalName: d.hospitalName || hospitalProfileState.name,
+              headName: d.head_name || d.headName || d.fullName || 'Assigned Head',
+              headId: d.head_id || d.headId,
+              headEmail: d.head_email || d.headEmail,
+              doctorsCount: docCount,
+              activeAppointments: activeApts,
+              completedConsultations: compApts,
+              aiPredictionsCount: aiPreds,
+              wardCapacity: wardCap,
+              bedCapacity: wardCap,
+              occupiedBeds: occBeds,
+              bedOccupancy: `${occPct}%`,
+              aiService: d.linkedAi || d.aiService || defaultAi,
+              linkedAi: d.linkedAi || d.aiService || defaultAi,
+              floor: d.floor || 'Level 1',
+              description: d.description || `Specialized ${d.name} clinical diagnostics and inpatient care.`,
+              status: d.status === 'INACTIVE' ? 'Inactive' : 'Active',
+            };
+          });
           adminCache.departments = [...departmentsState];
           adminCache.departmentsTime = now;
           return [...departmentsState];
@@ -468,6 +488,46 @@ export const hospitalAdminService = {
           doctorsState = list.map((d, idx) => {
             const displayName = d.fullName || d.full_name || d.name || 'Dr. Attending Physician';
             const initials = displayName.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
+            
+            // Format qualifications
+            let qualificationStr = 'Not provided';
+            if (Array.isArray(d.qualifications) && d.qualifications.length > 0) {
+              qualificationStr = d.qualifications.join(', ');
+            } else if (typeof d.qualification === 'string' && d.qualification) {
+              qualificationStr = d.qualification;
+            } else if (Array.isArray(d.degrees) && d.degrees.length > 0) {
+              qualificationStr = d.degrees.join(', ');
+            }
+
+            // Format experience
+            const expYears = d.experienceYears ?? d.experience;
+            const experienceStr = expYears !== undefined && expYears !== null
+              ? (typeof expYears === 'number' ? `${expYears} yrs exp` : `${expYears}`)
+              : '5+ yrs exp';
+
+            // Format schedule / availability
+            let scheduleStr = 'No schedule configured';
+            if (Array.isArray(d.availability) && d.availability.length > 0) {
+              const days = d.availability.map(a => a.day ? a.day.slice(0, 3) : '').filter(Boolean);
+              const uniqueDays = [...new Set(days)];
+              const firstSlot = d.availability[0];
+              const timeRange = firstSlot.startTime && firstSlot.endTime
+                ? ` (${firstSlot.startTime} - ${firstSlot.endTime})`
+                : '';
+              if (uniqueDays.length >= 5) {
+                scheduleStr = `Mon - Fri${timeRange}`;
+              } else if (uniqueDays.length > 0) {
+                scheduleStr = `${uniqueDays.join(', ')}${timeRange}`;
+              }
+            } else if (typeof d.schedule === 'string' && d.schedule) {
+              scheduleStr = d.schedule;
+            } else {
+              scheduleStr = 'Mon - Sat (09:00 - 17:00)';
+            }
+
+            const maxCapacity = Number(d.maxCapacity) || 30;
+            const workload = Number(d.activePatients || d.workload) || (d.experienceYears ? Math.min(26, d.experienceYears * 2 + 5) : 12);
+
             return {
               id: d._id || d.id || d.doctorId,
               doctorId: d.doctorId || d._id || d.id,
@@ -481,9 +541,16 @@ export const hospitalAdminService = {
               departmentId: d.department_id || d.departmentId,
               hospitalId: d.hospital_id || d.hospitalId || targetId,
               hospitalName: d.hospitalName || hospitalProfileState.name,
-              status: d.status === 'INACTIVE' ? 'Inactive' : 'Active',
-              rating: d.rating || 4.8,
-              workload: d.experienceYears || 10,
+              status: d.status === 'INACTIVE' ? 'Inactive' : (d.status === 'SUSPENDED' ? 'Suspended' : 'Active'),
+              rating: typeof d.rating === 'number' ? Number(d.rating.toFixed(1)) : 4.8,
+              qualifications: Array.isArray(d.qualifications) ? d.qualifications : [qualificationStr],
+              qualification: qualificationStr,
+              experience: experienceStr,
+              experienceYears: expYears,
+              schedule: scheduleStr,
+              availability: d.availability || [],
+              workload,
+              maxCapacity,
               room: d.room || 'OPD Room 204',
               avatarInitials: initials,
               avatarTone: tones[idx % tones.length],
@@ -606,6 +673,8 @@ export const hospitalAdminService = {
             hospitalId: a.hospital_id || a.hospitalId || targetId,
             hospitalName: a.hospitalName || hospitalProfileState.name,
             date: rawDate ? rawDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Today',
+            rawDate: a.appointment_date || null,
+            appointmentDate: a.appointment_date || null,
             time: a.start_time ? `${a.start_time}${a.end_time ? ` - ${a.end_time}` : ''}` : '10:00 AM',
             status: a.status === 'CANCELLED' ? 'Cancelled' : a.status === 'COMPLETED' ? 'Completed' : 'Confirmed',
             type: a.appointment_type === 'WALK_IN' ? 'Walk-in' : (a.reason || 'General Outpatient'),
@@ -692,6 +761,7 @@ export const hospitalAdminService = {
           kpis: {
             totalOPDConsultations: totalConsultations,
             completedConsultations,
+            totalAiPredictions: totalPreds,
             bedOccupancyPercentage: 84,
             aiAssistedAccuracy: aiData.overallAccuracy || '98.2%',
             activeDoctorsCount: doctorsState.length || 24,
@@ -750,47 +820,96 @@ export const hospitalAdminService = {
   },
 
   // --- Knowledge Activity ---
-  async getKnowledgeActivity() {
+  async getKnowledgeActivity(hospitalId) {
     const now = Date.now();
     if (adminCache.knowledge && (now - adminCache.knowledgeTime < CACHE_TTL_MS)) {
       return adminCache.knowledge;
     }
+    const currentHospitalId = hospitalId || hospitalProfileState?.id || hospitalProfileState?._id || '6ac85a18074c2bc731a76381';
+    const currentHospitalName = hospitalProfileState?.name || 'Aarogyam Multispeciality Hospital';
+
+    let list = [];
     try {
       const res = await authFetch('/api/knowledge');
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-          knowledgeState = json.data;
+          list = json.data;
+          knowledgeState = list;
         }
       }
     } catch {
       // safe fallback
     }
 
-    const raw = Array.isArray(knowledgeState) ? knowledgeState : (knowledgeState.recentArticles || []);
-    const currentHospitalId = hospitalProfileState?.id || hospitalProfileState?._id || 'HOSP-001';
-    const currentHospitalName = hospitalProfileState?.name || 'Aarogyam Multispeciality Hospital';
+    if (list.length === 0) {
+      list = Array.isArray(knowledgeState) ? knowledgeState : (knowledgeState.recentArticles || []);
+    }
 
-    const hospitalArticles = raw.filter(a => {
-      const isHospitalMatch = (a.hospitalId === currentHospitalId) || (a.hospital === currentHospitalName) || (!a.hospitalId && !a.hospital);
-      const isNotDraft = a.status !== 'Draft';
+    const normalizeStatus = (status) => {
+      if (!status) return 'Published';
+      const u = status.toUpperCase();
+      if (u === 'PUBLISHED') return 'Published';
+      if (u === 'UNDER_REVIEW') return 'Under Review';
+      if (u === 'CHANGES_REQUESTED') return 'Changes Requested';
+      if (u === 'DRAFT') return 'Draft';
+      return status;
+    };
+
+    const normalizedArticles = list.map((a) => {
+      const dateStr = a.publishedAt || a.published_at || a.createdAt || a.created_at || a.date || '';
+      const normStatus = normalizeStatus(a.status);
+      const artHospId = a.hospitalId || a.hospital_id;
+      const artHospName = a.hospital || a.hospitalName || a.hospital_name || currentHospitalName;
+      return {
+        ...a,
+        id: a._id || a.id,
+        _id: a._id || a.id,
+        hospitalId: artHospId,
+        hospital: artHospName,
+        hospitalName: artHospName,
+        department: a.department || a.departmentName || a.department_name || 'Clinical Department',
+        departmentName: a.departmentName || a.department || a.department_name || 'Clinical Department',
+        author: a.author || a.authorName || a.author_name || 'Medical Specialist',
+        authorName: a.authorName || a.author || a.author_name || 'Medical Specialist',
+        status: normStatus,
+        date: dateStr,
+        publishedDate: dateStr,
+        createdAt: dateStr,
+        category: a.category || 'Clinical Protocols & SOPs',
+        tags: Array.isArray(a.tags) ? a.tags : [],
+        reads: a.reads ?? a.views ?? 0,
+        citations: a.citations ?? 0,
+      };
+    });
+
+    const hospitalArticles = normalizedArticles.filter((a) => {
+      const isHospitalMatch =
+        (a.hospitalId && a.hospitalId.toString() === currentHospitalId.toString()) ||
+        (a.hospital && a.hospital === currentHospitalName) ||
+        (!a.hospitalId && !a.hospital);
+      const isNotDraft = a.status !== 'Draft' && a.status !== 'DRAFT';
       return isHospitalMatch && isNotDraft;
     });
 
-    const published = hospitalArticles.filter(a => a.status === 'Published');
-    const underReview = hospitalArticles.filter(a => a.status === 'Under Review' || a.status === 'Changes Requested');
+    const published = hospitalArticles.filter((a) => a.status === 'Published');
+    const underReview = hospitalArticles.filter((a) => a.status === 'Under Review' || a.status === 'Changes Requested');
 
     const result = {
       stats: {
         totalArticles: hospitalArticles.length,
         totalPublished: published.length,
-        publishedThisMonth: published.filter(a => (a.date || a.publishedDate || a.createdAt || '').includes('2026')).length,
+        publishedThisMonth: published.filter((a) => (a.date || '').includes('2026')).length,
         peerReviewsPending: underReview.length,
-        clinicalGuidelinesActive: hospitalArticles.filter(a => (a.category || '').toLowerCase().includes('clinical') || (a.tags || []).some(t => t.toLowerCase().includes('protocol') || t.toLowerCase().includes('guideline'))).length,
-        orthopedicsPublished: published.filter(a => (a.department || '').includes('Ortho')).length,
-        diabetologyPublished: published.filter(a => (a.department || '').includes('Diab')).length,
-        cardiologyPublished: published.filter(a => (a.department || '').includes('Cardio')).length,
-        generalMedicinePublished: published.filter(a => (a.department || '').includes('General')).length,
+        clinicalGuidelinesActive: hospitalArticles.filter(
+          (a) =>
+            (a.category || '').toLowerCase().includes('clinical') ||
+            (a.tags || []).some((t) => t.toLowerCase().includes('protocol') || t.toLowerCase().includes('guideline'))
+        ).length,
+        orthopedicsPublished: published.filter((a) => (a.department || '').includes('Ortho')).length,
+        diabetologyPublished: published.filter((a) => (a.department || '').includes('Diab')).length,
+        cardiologyPublished: published.filter((a) => (a.department || '').includes('Cardio')).length,
+        generalMedicinePublished: published.filter((a) => (a.department || '').includes('General')).length,
       },
       recentArticles: [...hospitalArticles],
     };
