@@ -2598,32 +2598,26 @@ export const appointmentService = {
 
     }
 
+    let dateFilter = null;
     if (query.startDate || query.endDate || query.start_date || query.end_date) {
-
       const start = query.startDate || query.start_date;
-
       const end = query.endDate || query.end_date;
-
-      match.appointment_date = {};
-
+      dateFilter = {};
       if (start) {
-
         const sd = new Date(start);
-
         sd.setUTCHours(0, 0, 0, 0);
-
-        match.appointment_date.$gte = sd;
-
+        dateFilter.$gte = sd;
       }
-
       if (end) {
-
         const ed = new Date(end);
-
         ed.setUTCHours(23, 59, 59, 999);
-
-        match.appointment_date.$lte = ed;
+        dateFilter.$lte = ed;
       }
+      // Dual timestamp matching: capture both encounter service events (appointment_date) and booking intake events (created_at)
+      match.$or = [
+        { appointment_date: dateFilter },
+        { created_at: dateFilter }
+      ];
     }
 
     // Operational integrity: Platform-wide stats must only aggregate active approved hospitals
@@ -2643,123 +2637,150 @@ export const appointmentService = {
     }
 
     const [stats] = await Appointment.aggregate([
-
       { $match: match },
-
       {
-
         $facet: {
+          total: [
+            { $match: dateFilter ? { appointment_date: dateFilter } : {} },
+            { $count: 'count' }
+          ],
 
-          total: [{ $count: 'count' }],
+          totalIntake: [
+            {
+              $match: dateFilter ? {
+                $or: [
+                  { created_at: dateFilter },
+                  { created_at: { $exists: false }, appointment_date: dateFilter }
+                ]
+              } : {}
+            },
+            { $count: 'count' }
+          ],
 
-          byStatus: [{ $group: { _id: '$status', count: { $sum: 1 } } }],
+          byHospitalIntake: [
+            {
+              $match: dateFilter ? {
+                $or: [
+                  { created_at: dateFilter },
+                  { created_at: { $exists: false }, appointment_date: dateFilter }
+                ]
+              } : {}
+            },
+            { $group: { _id: '$hospital_id', count: { $sum: 1 } } },
+          ],
 
-          byHospital: [{ $group: { _id: '$hospital_id', count: { $sum: 1 } } }],
+          byStatus: [
+            { $match: dateFilter ? { appointment_date: dateFilter } : {} },
+            { $group: { _id: '$status', count: { $sum: 1 } } }
+          ],
+
+          byHospital: [
+            { $match: dateFilter ? { appointment_date: dateFilter } : {} },
+            { $group: { _id: '$hospital_id', count: { $sum: 1 } } }
+          ],
 
           byHospitalCompleted: [
-
-            { $match: { status: 'COMPLETED' } },
-
+            {
+              $match: {
+                status: 'COMPLETED',
+                ...(dateFilter ? { appointment_date: dateFilter } : {})
+              }
+            },
             { $group: { _id: '$hospital_id', count: { $sum: 1 } } },
-
           ],
 
           byHospitalPreds: [
-
-            { $match: { ai_prediction_id: { $type: 'string', $ne: '' } } },
-
+            {
+              $match: {
+                ai_prediction_id: { $type: 'string', $ne: '' },
+                ...(dateFilter ? { appointment_date: dateFilter } : {})
+              }
+            },
             { $group: { _id: '$hospital_id', count: { $sum: 1 } } },
-
           ],
 
-          byDepartment: [{ $group: { _id: '$department_id', count: { $sum: 1 } } }],
+          byHospitalCancelled: [
+            {
+              $match: {
+                status: { $in: ['CANCELLED', 'CANCELED'] },
+                ...(dateFilter ? { appointment_date: dateFilter } : {})
+              }
+            },
+            { $group: { _id: '$hospital_id', count: { $sum: 1 } } },
+          ],
+
+          byHospitalNoShow: [
+            {
+              $match: {
+                status: 'NO_SHOW',
+                ...(dateFilter ? { appointment_date: dateFilter } : {})
+              }
+            },
+            { $group: { _id: '$hospital_id', count: { $sum: 1 } } },
+          ],
+
+          byDepartment: [
+            { $match: dateFilter ? { appointment_date: dateFilter } : {} },
+            { $group: { _id: '$department_id', count: { $sum: 1 } } }
+          ],
 
           byDepartmentPreds: [
-
-            { $match: { ai_prediction_id: { $type: 'string', $ne: '' } } },
-
+            {
+              $match: {
+                ai_prediction_id: { $type: 'string', $ne: '' },
+                ...(dateFilter ? { appointment_date: dateFilter } : {})
+              }
+            },
             { $group: { _id: '$department_id', count: { $sum: 1 } } },
-
           ],
 
           byMonth: [
-
+            { $match: dateFilter ? { appointment_date: dateFilter } : {} },
             {
-
               $group: {
-
                 _id: { $dateToString: { format: '%Y-%m', date: '$appointment_date' } },
-
                 total: { $sum: 1 },
-
                 completed: { $sum: { $cond: [{ $eq: ['$status', 'COMPLETED'] }, 1, 0] } },
-
                 scheduled: {
-
                   $sum: {
-
                     $cond: [
-
                       { $in: ['$status', ['BOOKED', 'CONFIRMED', 'SCHEDULED', 'RESCHEDULED', 'PENDING']] },
-
                       1,
-
                       0
-
                     ]
-
                   }
-
                 },
-
                 cancelled: {
-
                   $sum: {
-
                     $cond: [{ $in: ['$status', ['CANCELLED', 'CANCELED']] }, 1, 0]
-
                   }
-
                 },
-
                 aiUsage: {
-
                   $sum: {
-
                     $cond: [
-
                       {
-
                         $and: [
-
                           { $ne: [{ $ifNull: ['$ai_prediction_id', null] }, null] },
-
                           { $ne: ['$ai_prediction_id', ''] }
-
                         ]
-
                       },
-
                       1,
-
                       0
-
                     ]
-
                   }
-
                 }
-
               }
-
             },
-
             { $sort: { _id: 1 } }
-
           ],
 
           byHospitalMonthlyCompleted: [
-            { $match: { status: 'COMPLETED' } },
+            {
+              $match: {
+                status: 'COMPLETED',
+                ...(dateFilter ? { appointment_date: dateFilter } : {})
+              }
+            },
             {
               $group: {
                 _id: {
@@ -2773,7 +2794,12 @@ export const appointmentService = {
           ],
 
           byHospitalMonthlyPreds: [
-            { $match: { ai_prediction_id: { $type: 'string', $ne: '' } } },
+            {
+              $match: {
+                ai_prediction_id: { $type: 'string', $ne: '' },
+                ...(dateFilter ? { appointment_date: dateFilter } : {})
+              }
+            },
             {
               $group: {
                 _id: {
@@ -2786,8 +2812,45 @@ export const appointmentService = {
             { $sort: { '_id.bucket': 1 } }
           ],
 
+          byHospitalMonthlyIntake: [
+            {
+              $match: dateFilter ? {
+                $or: [
+                  { created_at: dateFilter },
+                  { created_at: { $exists: false }, appointment_date: dateFilter }
+                ]
+              } : {}
+            },
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: {
+                    $dateToString: {
+                      format: '%Y-%m',
+                      date: {
+                        $cond: [
+                          { $eq: [{ $type: '$created_at' }, 'date'] },
+                          '$created_at',
+                          { $ifNull: [{ $dateFromString: { dateString: '$created_at', onError: null } }, '$appointment_date'] }
+                        ]
+                      }
+                    }
+                  }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
           byHospitalDailyCompleted: [
-            { $match: { status: 'COMPLETED' } },
+            {
+              $match: {
+                status: 'COMPLETED',
+                ...(dateFilter ? { appointment_date: dateFilter } : {})
+              }
+            },
             {
               $group: {
                 _id: {
@@ -2801,7 +2864,12 @@ export const appointmentService = {
           ],
 
           byHospitalDailyPreds: [
-            { $match: { ai_prediction_id: { $type: 'string', $ne: '' } } },
+            {
+              $match: {
+                ai_prediction_id: { $type: 'string', $ne: '' },
+                ...(dateFilter ? { appointment_date: dateFilter } : {})
+              }
+            },
             {
               $group: {
                 _id: {
@@ -2814,7 +2882,40 @@ export const appointmentService = {
             { $sort: { '_id.bucket': 1 } }
           ],
 
+          byHospitalDailyIntake: [
+            {
+              $match: dateFilter ? {
+                $or: [
+                  { created_at: dateFilter },
+                  { created_at: { $exists: false }, appointment_date: dateFilter }
+                ]
+              } : {}
+            },
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: {
+                    $dateToString: {
+                      format: '%Y-%m-%d',
+                      date: {
+                        $cond: [
+                          { $eq: [{ $type: '$created_at' }, 'date'] },
+                          '$created_at',
+                          { $ifNull: [{ $dateFromString: { dateString: '$created_at', onError: null } }, '$appointment_date'] }
+                        ]
+                      }
+                    }
+                  }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
           byDayOfWeek: [
+            { $match: dateFilter ? { appointment_date: dateFilter } : {} },
             {
               $group: {
                 _id: { $dayOfWeek: '$appointment_date' },
@@ -2838,11 +2939,8 @@ export const appointmentService = {
             },
             { $sort: { _id: 1 } }
           ],
-
         },
-
       },
-
     ]);
 
     const total = stats?.total?.[0]?.count || 0;
@@ -2973,22 +3071,55 @@ export const appointmentService = {
       count: m.count || 0,
     }));
 
+    const byHospitalIntakeMap = {};
+    (stats?.byHospitalIntake || []).forEach(h => {
+      if (h._id) byHospitalIntakeMap[h._id.toString()] = h.count;
+    });
+
+    const byHospitalCancelledMap = {};
+    (stats?.byHospitalCancelled || []).forEach(h => {
+      if (h._id) byHospitalCancelledMap[h._id.toString()] = h.count;
+    });
+
+    const byHospitalNoShowMap = {};
+    (stats?.byHospitalNoShow || []).forEach(h => {
+      if (h._id) byHospitalNoShowMap[h._id.toString()] = h.count;
+    });
+
+    const byHospitalMonthlyIntake = (stats?.byHospitalMonthlyIntake || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      count: m.count || 0,
+    }));
+
+    const byHospitalDailyIntake = (stats?.byHospitalDailyIntake || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      count: m.count || 0,
+    }));
+
     return {
       total,
+      totalIntake: stats?.totalIntake?.[0]?.count || 0,
       completed,
       upcoming,
       cancelled,
       byStatus: byStatusMap,
       byHospital: byHospitalMap,
+      byHospitalIntake: byHospitalIntakeMap,
       byHospitalCompleted: byHospitalCompletedMap,
       byHospitalPreds: byHospitalPredsMap,
+      byHospitalCancelled: byHospitalCancelledMap,
+      byHospitalNoShow: byHospitalNoShowMap,
       byDepartment: byDepartmentMap,
       byDepartmentPreds: byDepartmentPredsMap,
       monthlyTrends,
       byHospitalMonthlyCompleted,
       byHospitalMonthlyPreds,
+      byHospitalMonthlyIntake,
       byHospitalDailyCompleted,
       byHospitalDailyPreds,
+      byHospitalDailyIntake,
       byDayOfWeek,
     };
 

@@ -925,18 +925,24 @@ export const chairmanService = {
         return docHid === hid || (hname && docHname && docHname.includes(hname.slice(0, 8)));
       }).length;
 
-      // Authoritative Completed Consultations (Appointments Served)
+      // Authoritative Completed Consultations (Appointments Served by appointment_date)
       const servedCount = (stats?.byHospitalCompleted && stats.byHospitalCompleted[hid]) || 0;
       // Authoritative AI Predictions (Clinical AI Runs)
       const aiRunsCount = (stats?.byHospitalPreds && stats.byHospitalPreds[hid]) || 0;
+      // Authoritative Intake Bookings (by created_at)
+      const intakeCount = (stats?.byHospitalIntake && stats.byHospitalIntake[hid]) || 0;
+      // Authoritative Cancellations and No-Shows
+      const cancelledCount = (stats?.byHospitalCancelled && stats.byHospitalCancelled[hid]) || 0;
+      const noShowCount = (stats?.byHospitalNoShow && stats.byHospitalNoShow[hid]) || 0;
+
+      // Derived Operational Ratios
+      const completionRate = intakeCount > 0 ? `${Math.round((servedCount / intakeCount) * 100)}%` : (servedCount > 0 ? '100%' : '0%');
+      const noShowRate = intakeCount > 0 ? `${Math.round((noShowCount / intakeCount) * 100)}%` : '0%';
 
       // Usable bed capacity from database
       const bedCap = h.bedCapacity || (hid.endsWith('81') ? 350 : hid.endsWith('83') ? 400 : 600);
-      // Usable occupied beds from database if tracked
       const occupiedBeds = h.occupiedBeds;
       const bedUtilization = (occupiedBeds && bedCap) ? `${Math.round((occupiedBeds / bedCap) * 100)}%` : 'Unavailable';
-
-      // Patient satisfaction from authoritative source if available
       const patientSatisfaction = h.patientSatisfaction || h.satisfactionScore || 'Unavailable';
 
       // Network status directly from authoritative status
@@ -961,10 +967,25 @@ export const chairmanService = {
         bedCapacity: bedCap,
         patientSatisfaction,
         status: netStatus,
+        // Hospital Operational Comparison Metrics (7 Columns Table)
+        totalBookings: intakeCount,
+        completedConsultations: servedCount,
+        completionRate,
+        cancelledBookings: cancelledCount,
+        noShowRate,
+        aiTriageRuns: aiRunsCount,
       };
     });
 
-    const HOSPITAL_COLORS = ['#2563eb', '#059669', '#7c3aed', '#d97706', '#db2777'];
+    const getHospitalColor = (hName, index) => {
+      const lower = (hName || '').toLowerCase();
+      if (lower.includes('harborview')) return '#2563eb';
+      if (lower.includes('aarogyam')) return '#059669';
+      if (lower.includes('nexora')) return '#7c3aed';
+      const fallbackColors = ['#2563eb', '#059669', '#7c3aed', '#d97706', '#db2777'];
+      return fallbackColors[index % fallbackColors.length];
+    };
+
     const trendSeries = activeHosps.map((h, i) => {
       const hid = (h._id || h.id || '').toString();
       return {
@@ -972,7 +993,7 @@ export const chairmanService = {
         hospitalId: hid,
         name: h.name,
         shortName: h.name.replace('Hospital', '').replace('MediMind', '').trim(),
-        color: HOSPITAL_COLORS[i % HOSPITAL_COLORS.length],
+        color: getHospitalColor(h.name, i),
       };
     });
 
@@ -981,17 +1002,32 @@ export const chairmanService = {
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const currentMonthKey = new Date().toISOString().slice(0, 7);
 
+    let intakeTrends = [];
     let servedTrends = [];
     let aiRunsTrends = [];
 
     if (isSingleMonth) {
       // Daily line chart granularity
+      const dailyIntake = stats?.byHospitalDailyIntake || [];
       const dailyCompleted = stats?.byHospitalDailyCompleted || [];
       const dailyPreds = stats?.byHospitalDailyPreds || [];
       const distinctDays = [...new Set([
+        ...dailyIntake.map(d => d.bucket),
         ...dailyCompleted.map(d => d.bucket),
         ...dailyPreds.map(d => d.bucket)
       ])].filter(Boolean).sort();
+
+      intakeTrends = distinctDays.map(dayStr => {
+        const parts = dayStr.split('-');
+        const mIdx = parseInt(parts[1], 10) - 1;
+        const label = `${parts[2]} ${monthNames[mIdx] || parts[1]}`;
+        const row = { bucket: dayStr, label };
+        trendSeries.forEach(s => {
+          const match = dailyIntake.find(d => d.bucket === dayStr && d.hospitalId === s.hospitalId);
+          row[s.key] = match ? match.count : 0;
+        });
+        return row;
+      });
 
       servedTrends = distinctDays.map(dayStr => {
         const parts = dayStr.split('-');
@@ -1040,13 +1076,33 @@ export const chairmanService = {
         ];
       } else {
         // Monthly line chart granularity (exclude future months)
+        const monthlyIntake = (stats?.byHospitalMonthlyIntake || []).filter(m => m.bucket <= currentMonthKey);
         const monthlyCompleted = (stats?.byHospitalMonthlyCompleted || []).filter(m => m.bucket <= currentMonthKey);
         const monthlyPreds = (stats?.byHospitalMonthlyPreds || []).filter(m => m.bucket <= currentMonthKey);
         distinctMonths = [...new Set([
+          ...monthlyIntake.map(m => m.bucket),
           ...monthlyCompleted.map(m => m.bucket),
           ...monthlyPreds.map(m => m.bucket)
         ])].filter(Boolean).sort();
       }
+
+      intakeTrends = distinctMonths.map(mStr => {
+        const [yStr, mNum] = mStr.split('-');
+        const mIdx = parseInt(mNum, 10) - 1;
+        const isFuture = mStr > currentMonthKey;
+        const monthName = monthNames[mIdx] || mNum;
+        const label = isFuture ? `${monthName} ${yStr} (Planned)` : `${monthName} ${yStr}`;
+        const row = { bucket: mStr, label, isFuture };
+        trendSeries.forEach(s => {
+          if (isFuture) {
+            row[s.key] = 0;
+          } else {
+            const match = (stats?.byHospitalMonthlyIntake || []).find(m => m.bucket === mStr && m.hospitalId === s.hospitalId);
+            row[s.key] = match ? match.count : 0;
+          }
+        });
+        return row;
+      });
 
       servedTrends = distinctMonths.map(mStr => {
         const [yStr, mNum] = mStr.split('-');
@@ -1088,6 +1144,7 @@ export const chairmanService = {
     const result = [...hospitalsList];
     result.hospitals = hospitalsList;
     result.trendSeries = trendSeries;
+    result.intakeTrends = intakeTrends;
     result.servedTrends = servedTrends;
     result.aiRunsTrends = aiRunsTrends;
     result.granularity = isSingleMonth ? 'daily' : 'monthly';

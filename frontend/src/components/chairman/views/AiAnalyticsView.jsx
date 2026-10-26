@@ -177,7 +177,13 @@ export function AiAnalyticsView() {
         <div className="stat-card">
           <p>Total Model Inferences</p>
           <h3 style={{ marginTop: '8px' }}>{totalPredictions ?? 0}</h3>
-          <span className="stat-delta">100% Appointment Linked</span>
+          <span className="stat-delta">
+            {aiData?.linkage ? (
+              `${aiData.linkage.appointmentLinked ?? 0} Linked • ${aiData.linkage.standaloneScreenings ?? 0} Standalone`
+            ) : (
+              'Multi-Module Clinical Telemetry'
+            )}
+          </span>
         </div>
         <div className="stat-card">
           <p>🦴 Fracture Detection (CNN)</p>
