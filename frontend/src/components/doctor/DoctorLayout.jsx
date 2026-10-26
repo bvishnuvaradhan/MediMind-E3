@@ -13,7 +13,7 @@ import PrescriptionsView from './views/PrescriptionsView';
 import AiDiagnosticView from './views/AiDiagnosticView';
 import AiExplainabilityView from './views/AiExplainabilityView';
 import AvailabilityView from './views/AvailabilityView';
-import PatientAccessView from './views/PatientAccessView';
+
 import KnowledgeView from './views/KnowledgeView';
 import SettingsView from './views/SettingsView';
 
@@ -37,7 +37,6 @@ const validDoctorTabs = [
   'ai_diagnostics',
   'ai_explain',
   'availability',
-  'patient_access',
   'knowledge',
   'settings',
 ];
@@ -515,7 +514,6 @@ export function DoctorLayout({ dark, setDark }) {
     ai_diagnostics: { title: 'AI Decision Support Telemetry', sub: 'Fracture Detection CNN & Grad-CAM heatmap localization' },
     ai_explain: { title: 'AI Explainability & Deep Decision Support', sub: 'Detailed neural network telemetry, Grad-CAM heatmap localization & anatomical findings' },
     availability: { title: 'Consultation Availability', sub: 'Weekly OPD shift timings & booking slot capacity' },
-    patient_access: { title: 'Patient Access History', sub: 'Auditable record of family authorizations & revocations' },
     knowledge: { title: 'MediMind Knowledge Base', sub: 'Clinical guidelines, protocols, and authored articles' },
     settings: { title: 'Doctor Profile & Settings', sub: 'Clinician credentials, notification alerts & presets' },
   };
@@ -740,16 +738,6 @@ export function DoctorLayout({ dark, setDark }) {
             </svg>
             Availability & Slots
           </button>
-
-          <button
-            className={`doctor-nav-item ${activeTab === 'patient_access' ? 'active' : ''}`}
-            onClick={() => handleNavigate('patient_access')}
-          >
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-            Patient Access Log
-          </button>
         </nav>
 
         {/* Navigation Section 5: Knowledge & Config */}
@@ -891,6 +879,7 @@ export function DoctorLayout({ dark, setDark }) {
             <AppointmentsView
               appointments={appointments}
               patients={patients}
+              consultations={consultations}
               onSelectPatient={handleSelectPatient}
               onOpenAddWalkIn={handleOpenAddWalkIn}
               onOpenNewConsultation={handleOpenNewConsultation}
@@ -956,10 +945,7 @@ export function DoctorLayout({ dark, setDark }) {
             />
           )}
 
-          {activeTab === 'patient_access' && (
-            <PatientAccessView accessHistory={accessHistory} />
-          )}
-
+ 
           {activeTab === 'knowledge' && (
             <KnowledgeView
               articles={articles}

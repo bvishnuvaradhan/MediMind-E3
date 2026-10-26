@@ -11,7 +11,8 @@ export const authenticateFamily = (req, res, next) => {
     const referenceId = req.headers['x-user-reference-id'];
 
     if (userId && role) {
-      if (role !== 'FAMILY') {
+      const allowedRoles = ['FAMILY', 'DOCTOR', 'HOSPITAL_ADMIN', 'CHAIRMAN'];
+      if (!allowedRoles.includes(role)) {
         return res.status(403).json({
           success: false,
           message: 'Access forbidden: insufficient role permissions',
@@ -43,7 +44,8 @@ export const authenticateFamily = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, secret);
 
-    if (decoded.role !== 'FAMILY') {
+    const allowedRoles = ['FAMILY', 'DOCTOR', 'HOSPITAL_ADMIN', 'CHAIRMAN'];
+    if (!allowedRoles.includes(decoded.role)) {
       return res.status(403).json({
         success: false,
         message: 'Access forbidden: insufficient role permissions',

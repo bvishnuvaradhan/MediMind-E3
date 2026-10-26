@@ -4,6 +4,7 @@ import { authenticate, requireRole } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+router.get('/', authenticate, prescriptionController.getPrescriptions);
 router.post('/', authenticate, requireRole('DOCTOR'), prescriptionController.createPrescription);
 router.get('/member/:memberId', authenticate, prescriptionController.getPrescriptionsByMember);
 router.get('/:prescriptionId', authenticate, prescriptionController.getPrescriptionById);

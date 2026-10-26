@@ -523,7 +523,24 @@ export const appointmentService = {
 
     const appointmentDate = parseDateOnly(appointmentDateStr);
 
-    // 2. Family ownership verification
+    // 2. Family ownership & relationship verification
+    const providedFamilyId = payload.familyId || payload.family_id;
+    if (providedFamilyId && mongoose.Types.ObjectId.isValid(providedFamilyId)) {
+      try {
+        const famDb = mongoose.connection.useDb(process.env.FAMILY_DB_NAME || 'medimind_family');
+        const memberDoc = await famDb.collection('familymembers').findOne({
+          _id: new mongoose.Types.ObjectId(familyMemberId),
+          family_id: new mongoose.Types.ObjectId(providedFamilyId),
+        });
+        if (!memberDoc) {
+          const err = new Error('Selected family member does not belong to the selected family account');
+          err.statusCode = 400;
+          throw err;
+        }
+      } catch (err) {
+        if (err.statusCode) throw err;
+      }
+    }
 
     if (user.role === 'FAMILY') {
 

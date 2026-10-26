@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { Pagination } from '../../common/Pagination';
+import { useState, useMemo, useEffect } from 'react';
 import { FileText, Upload, Users, Search, Calendar, Filter, RotateCcw } from 'lucide-react';
 import { initialRecords, matchesFamilyMember } from '../../../data/medimindData';
 import { RecordRow } from '../components/RecordRow';
@@ -22,6 +23,12 @@ export function MedicalRecordsView({
   const [statusFilter, setStatusFilter] = useState('All');
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedMemberFilter, recordFilter, searchQuery, dateRangeFilter, statusFilter]);
 
   const filters = ['All', 'Reports', 'Tests', 'X-Rays', 'Prescriptions', 'Consultations', 'AI Reports'];
   const dateRanges = ['All Time', 'Last 30 Days', 'Last 3 Months', 'Last 6 Months'];
@@ -130,6 +137,9 @@ export function MedicalRecordsView({
       return true;
     });
   }, [memberFilteredRecords, recordFilter, statusFilter, dateRangeFilter, searchQuery]);
+
+  const totalFiltered = filteredRecords.length;
+  const pagedRecords = filteredRecords.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const hasActiveFilters =
     selectedMemberFilter !== 'All' ||
@@ -360,7 +370,7 @@ export function MedicalRecordsView({
               )}
             </div>
           ) : (
-            filteredRecords.map((record, index) => (
+            pagedRecords.map((record, index) => (
               <RecordRow
                 record={record}
                 announce={announce}
@@ -371,6 +381,13 @@ export function MedicalRecordsView({
             ))
           )}
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalFiltered}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+        />
       </div>
 
       {/* Upload Record Modal */}

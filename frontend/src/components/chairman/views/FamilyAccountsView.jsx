@@ -1,3 +1,4 @@
+import { Pagination } from '../../common/Pagination';
 // MediMind Platform - Family Accounts Overview (Chairman / Platform Owner)
 // Section 11 of PLATFORM OWNER.txt: Platform-level family account statistics
 // Strict Privacy: Aggregate account metadata only, strictly NO private patient records or scans.
@@ -17,6 +18,12 @@ export function FamilyAccountsView() {
   const [families, setFamilies] = useState([]);
   const [search, setSearch] = useState('');
   const [selectedFamily, setSelectedFamily] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   useEffect(() => {
     async function load() {
@@ -25,6 +32,9 @@ export function FamilyAccountsView() {
     }
     load();
   }, [search]);
+
+  const totalFiltered = families.length;
+  const pagedFamilies = families.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="family-accounts-view">
@@ -116,7 +126,7 @@ export function FamilyAccountsView() {
                   </td>
                 </tr>
               ) : (
-                families.map((fam) => (
+                pagedFamilies.map((fam) => (
                   <tr key={fam.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -177,6 +187,13 @@ export function FamilyAccountsView() {
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalFiltered}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+        />
       </div>
 
       {/* Account Info Modal */}

@@ -3,13 +3,20 @@ import React, { useState } from 'react';
 function PrescriptionForm({
   initialData,
   patients = [],
+  appointments = [],
+  consultations = [],
   onSaveDraft,
   onFinalize,
   onClose,
 }) {
+  const completedAppointments = appointments.filter((a) => a.status === 'Completed' || a.status === 'COMPLETED');
+  const [selectedConsultationId, setSelectedConsultationId] = useState(
+    initialData?.consultationId || (consultations[0]?.id || '')
+  );
   const [formData, setFormData] = useState({
     id: initialData?.id || null,
-    patientId: initialData?.patientId || (patients[0]?.id || ''),
+    consultationId: initialData?.consultationId || (consultations[0]?.id || ''),
+    patientId: initialData?.patientId || (consultations[0]?.patientId || patients[0]?.id || ''),
     diagnosis: initialData?.diagnosis || 'Orthopedic Management',
     remarks: initialData?.remarks || 'Take medications after meals as prescribed.',
     medications: initialData?.medications || [

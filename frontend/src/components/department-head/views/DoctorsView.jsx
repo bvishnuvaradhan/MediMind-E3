@@ -1,3 +1,4 @@
+import { Pagination } from '../../common/Pagination';
 import React, { useState } from 'react';
 
 export function DoctorsView({
@@ -9,6 +10,12 @@ export function DoctorsView({
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
 
   const filteredDoctors = doctors.filter((doc) => {
     const matchesStatus = statusFilter === 'All' || doc.status === statusFilter;
@@ -20,6 +27,9 @@ export function DoctorsView({
       (doc.room && doc.room.toLowerCase().includes(query));
     return matchesStatus && matchesSearch;
   });
+
+  const totalFiltered = filteredDoctors.length;
+  const pagedDoctors = filteredDoctors.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -96,7 +106,7 @@ export function DoctorsView({
                   </td>
                 </tr>
               ) : (
-                filteredDoctors.map((doc) => {
+                pagedDoctors.map((doc) => {
                   return (
                     <tr key={doc.id}>
                       <td>
@@ -170,6 +180,13 @@ export function DoctorsView({
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalFiltered}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+        />
       </div>
     </div>
   );

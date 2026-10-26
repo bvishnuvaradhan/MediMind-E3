@@ -44,13 +44,35 @@ export const consultationService = {
 
     // Validate appointment and assigned doctor
     const appointment = await internalServices.getAppointment(appointmentId);
-    if (appointment) {
-      const apptDoctorId = appointment.doctorId || appointment.doctor_id?._id || appointment.doctor_id;
-      if (apptDoctorId && apptDoctorId.toString() !== doctorId.toString()) {
-        const err = new Error('Access forbidden: cannot create consultation for another doctor\'s appointment');
-        err.statusCode = 403;
-        throw err;
-      }
+    if (!appointment) {
+      const err = new Error('Associated appointment not found');
+      err.statusCode = 404;
+      throw err;
+    }
+
+    const apptDoctorId = appointment.doctorId || appointment.doctor_id?._id || appointment.doctor_id;
+    if (apptDoctorId && apptDoctorId.toString() !== doctorId.toString()) {
+      const err = new Error('Access forbidden: cannot create consultation for another doctor\'s appointment');
+      err.statusCode = 403;
+      throw err;
+    }
+
+    const apptStatus = (appointment.status || '').toUpperCase();
+    if (apptStatus !== 'COMPLETED') {
+      const err = new Error(`Consultation can only be created for completed appointments (current status: ${appointment.status})`);
+      err.statusCode = 400;
+      throw err;
+    }
+
+    // Prevent duplicate consultation for the same appointment
+    const existing = await Consultation.findOne({
+      appointment_id: appointmentId,
+      status: { $in: ['DRAFT', 'FINAL', 'AMENDED'] },
+    });
+    if (existing) {
+      const err = new Error(`A consultation record already exists for appointment ${appointmentId}`);
+      err.statusCode = 409;
+      throw err;
     }
 
     const consultation = await Consultation.create({
@@ -67,6 +89,46 @@ export const consultationService = {
     });
 
     return consultation.toPublicJSON();
+  },
+
+  /**
+   * Retrieve consultations (Doctor sees their consultations, Family sees their members')
+   */
+  async getConsultations(user, query = {}) {
+    const filter = {};
+    if (user.role === 'DOCTOR') {
+      const doctorId = user.doctorId || user.referenceId;
+      if (!doctorId) {
+        const err = new Error('Doctor profile not linked to user account');
+        err.statusCode = 403;
+        throw err;
+      }
+      filter.doctor_id = doctorId;
+    } else if (user.role === 'FAMILY') {
+      if (query.familyMemberId || query.memberId) {
+        const memberId = query.familyMemberId || query.memberId;
+        const check = await internalServices.verifyFamilyMember({ user, memberId });
+        if (!check.valid) {
+          const err = new Error('Access forbidden: member outside family');
+          err.statusCode = 403;
+          throw err;
+        }
+        filter.family_member_id = memberId;
+      }
+    }
+
+    if (query.familyMemberId || query.memberId) {
+      filter.family_member_id = query.familyMemberId || query.memberId;
+    }
+    if (query.appointmentId || query.appointment_id) {
+      filter.appointment_id = query.appointmentId || query.appointment_id;
+    }
+    if (query.status) {
+      filter.status = query.status.toUpperCase();
+    }
+
+    const consultations = await Consultation.find(filter).sort({ created_at: -1 });
+    return consultations.map((c) => c.toPublicJSON());
   },
 
   /**

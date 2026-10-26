@@ -1,3 +1,4 @@
+import { Pagination } from '../../common/Pagination';
 import React, { useState } from 'react';
 
 export function AiDiagnosticView({
@@ -7,6 +8,12 @@ export function AiDiagnosticView({
   onOpenNewConsultation,
 }) {
   const [selectedPatientFilter, setSelectedPatientFilter] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedPatientFilter]);
 
   const allAiScans = patients.flatMap((p) =>
     (p.aiPredictions || []).map((pred) => ({
@@ -21,6 +28,9 @@ export function AiDiagnosticView({
   const filteredScans = allAiScans.filter((s) => {
     return selectedPatientFilter === 'All' || s.patientId === selectedPatientFilter;
   });
+
+  const totalFiltered = filteredScans.length;
+  const pagedScans = filteredScans.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -71,7 +81,7 @@ export function AiDiagnosticView({
 
       {/* Grid of AI Scan Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '20px' }}>
-        {filteredScans.map((scan) => (
+        {pagedScans.map((scan) => (
           <div
             key={scan.id}
             className="doctor-card"
@@ -146,6 +156,13 @@ export function AiDiagnosticView({
           </div>
         ))}
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalItems={totalFiltered}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+      />
     </div>
   );
 }

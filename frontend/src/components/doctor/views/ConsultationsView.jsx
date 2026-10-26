@@ -1,3 +1,4 @@
+import { Pagination } from '../../common/Pagination';
 import React, { useState } from 'react';
 
 export function ConsultationsView({
@@ -8,6 +9,12 @@ export function ConsultationsView({
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
   const [amendingConsultation, setAmendingConsultation] = useState(null);
   const [amendmentForm, setAmendmentForm] = useState({
     reason: '',
@@ -24,6 +31,9 @@ export function ConsultationsView({
       (cons.diagnosis || '').toLowerCase().includes(q);
     return matchesStatus && matchesSearch;
   });
+
+  const totalFiltered = filteredConsultations.length;
+  const pagedConsultations = filteredConsultations.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handleStartAmend = (cons) => {
     setAmendingConsultation(cons);
@@ -103,7 +113,7 @@ export function ConsultationsView({
             No consultations found matching current filter.
           </div>
         ) : (
-          filteredConsultations.map((cons) => (
+          pagedConsultations.map((cons) => (
             <div key={cons.id} className="doctor-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -188,6 +198,14 @@ export function ConsultationsView({
           ))
         )}
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalItems={totalFiltered}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+      />
 
       {/* Amendment Modal */}
       {amendingConsultation && (

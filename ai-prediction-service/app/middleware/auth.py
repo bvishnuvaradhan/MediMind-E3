@@ -68,6 +68,8 @@ def authorize_family_member_access(user: Dict[str, Any], family_member_id: str):
         return True
 
     role = user.get("role", "").upper()
+    if role in ["DOCTOR", "CHAIRMAN", "HOSPITAL_ADMIN", "DEPARTMENT_HEAD"]:
+        return True
         
     if role == "FAMILY":
         # 1. If token explicitly contains family_member_ids (e.g. from unit tests / scoped JWT):

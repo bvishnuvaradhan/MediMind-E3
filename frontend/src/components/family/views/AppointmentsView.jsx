@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { Pagination } from '../../common/Pagination';
+import { useState, useEffect } from 'react';
 import { CalendarDays, Users, Sparkles, Plus, ArrowUpRight } from 'lucide-react';
 import { initialPresentationData, matchesFamilyMember } from '../../../data/medimindData';
 
@@ -17,6 +18,12 @@ export function AppointmentsView({
   appointments = null,
 }) {
   const [selectedMemberFilter, setSelectedMemberFilter] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedMemberFilter]);
 
   const baseItems = appointments || initialPresentationData.Appointments || [];
   const allAppointments = [...baseItems, ...bookedAppointments];
@@ -30,6 +37,9 @@ export function AppointmentsView({
     if (selectedMemberFilter === 'All') return true;
     return matchesFamilyMember(apt, selectedMemberObj);
   });
+
+  const totalFiltered = filteredAppointments.length;
+  const pagedAppointments = filteredAppointments.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <section className="feature-view">
@@ -127,7 +137,7 @@ export function AppointmentsView({
               No appointments found for {selectedMemberFilter === 'All' ? 'any family member' : (selectedMemberObj?.fullName || selectedMemberFilter)}.
             </div>
           ) : (
-            filteredAppointments.map((item, idx) => {
+            pagedAppointments.map((item, idx) => {
               const itemKey = `${item.title}|${item.detail}`;
               const isCancelled =
                 (item.id && appointmentStatuses[item.id] === 'Cancelled') ||
@@ -228,6 +238,13 @@ export function AppointmentsView({
             })
           )}
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalFiltered}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+        />
       </div>
     </section>
   );

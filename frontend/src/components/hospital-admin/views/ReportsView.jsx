@@ -1,5 +1,6 @@
+import { Pagination } from '../../common/Pagination';
 import { getRelativeDateRange } from "../../../utils/dateUtils";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FileText,
   Plus,
@@ -16,6 +17,12 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [reportingPeriod, setReportingPeriod] = useState('This Month');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, categoryFilter, reportingPeriod]);
 
   // Filter reports by category, search term, and period context
   const filteredReports = reports.filter((rep) => {
@@ -27,6 +34,9 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
       rep.category.toLowerCase().includes(search.toLowerCase());
     return matchesCat && matchesSearch;
   });
+
+  const totalFiltered = filteredReports.length;
+  const pagedReports = filteredReports.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   // Dynamic metrics based on reporting period
   const getPeriodMetrics = () => {
@@ -205,7 +215,7 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
 
       {/* Reports Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
-        {filteredReports.map((rep) => (
+        {pagedReports.map((rep) => (
           <div key={rep.id} className="ha-card-panel" style={{ display: 'flex', flexDirection: 'column', gap: '14px', margin: 0 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -258,6 +268,13 @@ export function ReportsView({ reports = [], onOpenGenerateReport, onDownloadRepo
           </div>
         ))}
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalItems={totalFiltered}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+      />
     </div>
   );
 }

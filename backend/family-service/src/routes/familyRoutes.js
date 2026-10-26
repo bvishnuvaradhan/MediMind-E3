@@ -9,6 +9,8 @@ router.post('/', familyController.createFamily);
 
 // Health route
 router.get('/health', familyController.health);
+router.get('/', authenticateFamily, familyController.getFamilies);
+router.get('/:familyId/members', authenticateFamily, familyController.getFamilyMembersByFamilyId);
 
 // Protected routes: Family account operations
 router.get('/me', authenticateFamily, familyController.getMyFamily);

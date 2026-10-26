@@ -72,6 +72,30 @@ export const prescriptionService = {
       throw err;
     }
 
+    // Verify appointment status if consultation is linked to an appointment
+    if (consultation.appointment_id) {
+      const appointment = await internalServices.getAppointment(consultation.appointment_id);
+      if (appointment) {
+        const apptStatus = (appointment.status || '').toUpperCase();
+        if (apptStatus !== 'COMPLETED') {
+          const err = new Error(`Prescriptions can only be issued for completed appointments (current status: ${appointment.status})`);
+          err.statusCode = 400;
+          throw err;
+        }
+      }
+    }
+
+    // Prevent duplicate active prescription for the same consultation
+    const existing = await Prescription.findOne({
+      consultation_id: consultationId,
+      status: { $in: ['DRAFT', 'FINAL', 'CORRECTED'] },
+    });
+    if (existing) {
+      const err = new Error(`A prescription record already exists for consultation ${consultationId}`);
+      err.statusCode = 409;
+      throw err;
+    }
+
     const prescription = await Prescription.create({
       family_member_id: familyMemberId,
       doctor_id: doctorId,
@@ -82,6 +106,46 @@ export const prescriptionService = {
     });
 
     return prescription.toPublicJSON();
+  },
+
+  /**
+   * Retrieve prescriptions (Doctor sees their prescriptions, Family sees their members')
+   */
+  async getPrescriptions(user, query = {}) {
+    const filter = {};
+    if (user.role === 'DOCTOR') {
+      const doctorId = user.doctorId || user.referenceId;
+      if (!doctorId) {
+        const err = new Error('Doctor profile not linked to user account');
+        err.statusCode = 403;
+        throw err;
+      }
+      filter.doctor_id = doctorId;
+    } else if (user.role === 'FAMILY') {
+      if (query.familyMemberId || query.memberId) {
+        const memberId = query.familyMemberId || query.memberId;
+        const check = await internalServices.verifyFamilyMember({ user, memberId });
+        if (!check.valid) {
+          const err = new Error('Access forbidden: member outside family');
+          err.statusCode = 403;
+          throw err;
+        }
+        filter.family_member_id = memberId;
+      }
+    }
+
+    if (query.familyMemberId || query.memberId) {
+      filter.family_member_id = query.familyMemberId || query.memberId;
+    }
+    if (query.consultationId || query.consultation_id) {
+      filter.consultation_id = query.consultationId || query.consultation_id;
+    }
+    if (query.status) {
+      filter.status = query.status.toUpperCase();
+    }
+
+    const prescriptions = await Prescription.find(filter).sort({ created_at: -1 });
+    return prescriptions.map((p) => p.toPublicJSON());
   },
 
   /**

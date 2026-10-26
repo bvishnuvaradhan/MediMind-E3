@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { Pagination } from '../../common/Pagination';
 import {
   Layers,
   Plus,
@@ -25,6 +27,11 @@ export function DepartmentsView({
   onToggleStatus,
   navigate,
 }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const allDepts = departments || [];
+  const totalFiltered = allDepts.length;
+  const pagedDepartments = allDepts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
   return (
     <div>
       <div className="ha-page-header">
@@ -43,7 +50,7 @@ export function DepartmentsView({
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
-        {departments.map((dept) => {
+        {pagedDepartments.map((dept) => {
           const specialty = getDepartmentSpecialtyConfig(dept);
           const renderDeptIcon = () => {
             switch (specialty.iconName) {
@@ -177,6 +184,13 @@ export function DepartmentsView({
         );
       })}
     </div>
+    <Pagination
+      currentPage={currentPage}
+      totalItems={totalFiltered}
+      pageSize={pageSize}
+      onPageChange={setCurrentPage}
+      onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+    />
   </div>
   );
 }

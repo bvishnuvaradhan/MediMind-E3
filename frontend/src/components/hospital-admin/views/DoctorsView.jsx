@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { Pagination } from '../../common/Pagination';
+import { useState, useEffect } from 'react';
 import {
   Stethoscope,
   Search,
@@ -13,6 +14,13 @@ import {
 export function DoctorsView({ doctors, departments, onSelectDoctor, onToggleStatus }) {
   const [search, setSearch] = useState('');
   const [selectedDept, setSelectedDept] = useState('ALL');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Reset page when search or department filter changes
+  useState(() => {}, []);
+  useEffect(() => { setCurrentPage(1); }, [search, selectedDept]);
+
 
   const filteredDoctors = doctors.filter((doc) => {
     const matchesDept = selectedDept === 'ALL' || doc.departmentId === selectedDept;
@@ -23,6 +31,9 @@ export function DoctorsView({ doctors, departments, onSelectDoctor, onToggleStat
       doc.department.toLowerCase().includes(search.toLowerCase());
     return matchesDept && matchesSearch;
   });
+
+  const totalFiltered = filteredDoctors.length;
+  const pagedDoctors = filteredDoctors.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div>
@@ -77,7 +88,7 @@ export function DoctorsView({ doctors, departments, onSelectDoctor, onToggleStat
 
       {/* Doctors Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
-        {filteredDoctors.map((doc) => (
+        {pagedDoctors.map((doc) => (
           <div key={doc.id} className="ha-card-panel" style={{ display: 'flex', flexDirection: 'column', gap: '14px', margin: 0 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -162,6 +173,13 @@ export function DoctorsView({ doctors, departments, onSelectDoctor, onToggleStat
           </div>
         ))}
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalItems={totalFiltered}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+      />
     </div>
   );
 }

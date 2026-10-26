@@ -3,6 +3,18 @@ import { successResponse } from '../utils/responseEnvelope.js';
 
 export const prescriptionController = {
   /**
+   * Get prescriptions list (scoped by role & query filters)
+   */
+  async getPrescriptions(req, res, next) {
+    try {
+      const prescriptions = await prescriptionService.getPrescriptions(req.user, req.query);
+      return successResponse(res, 200, 'Prescriptions retrieved successfully', prescriptions);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
    * Create a new prescription (DRAFT)
    */
   async createPrescription(req, res, next) {

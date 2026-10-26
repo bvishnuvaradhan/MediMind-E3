@@ -3,13 +3,20 @@ import React, { useState } from 'react';
 function ConsultationForm({
   initialData,
   patients = [],
+  appointments = [],
+  consultations = [],
   onSaveDraft,
   onFinalize,
   onClose,
 }) {
+  const completedAppointments = appointments.filter((a) => a.status === 'Completed' || a.status === 'COMPLETED');
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState(
+    initialData?.appointmentId || (completedAppointments[0]?.id || '')
+  );
   const [formData, setFormData] = useState({
     id: initialData?.id || null,
-    patientId: initialData?.patientId || (patients[0]?.id || ''),
+    appointmentId: initialData?.appointmentId || (completedAppointments[0]?.id || ''),
+    patientId: initialData?.patientId || (completedAppointments[0]?.patientId || patients[0]?.id || ''),
     symptoms: initialData?.symptoms || '',
     observations: initialData?.observations || '',
     diagnosis: initialData?.diagnosis || '',
@@ -30,8 +37,13 @@ function ConsultationForm({
 
   const handleDraftSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.patientId || !formData.symptoms.trim()) {
-      setError('Please select a patient and provide chief symptoms.');
+    const targetAppt = appointments.find((a) => a.id === selectedAppointmentId);
+    if (!targetAppt || (targetAppt.status !== 'Completed' && targetAppt.status !== 'COMPLETED')) {
+      setError('Consultation can only be created for completed appointments. Please complete the appointment first.');
+      return;
+    }
+    if (!formData.symptoms.trim()) {
+      setError('Please provide chief clinical presentation & symptoms.');
       return;
     }
     setError('');
@@ -39,6 +51,7 @@ function ConsultationForm({
     try {
       await onSaveDraft({
         ...formData,
+        appointmentId: selectedAppointmentId,
         patientName: selectedPatient?.name || 'Patient',
       });
       onClose();
@@ -50,7 +63,12 @@ function ConsultationForm({
   };
 
   const handleFinalizeSubmit = async () => {
-    if (!formData.patientId || !formData.symptoms.trim() || !formData.diagnosis.trim()) {
+    const targetAppt = appointments.find((a) => a.id === selectedAppointmentId);
+    if (!targetAppt || (targetAppt.status !== 'Completed' && targetAppt.status !== 'COMPLETED')) {
+      setError('Consultation can only be created for completed appointments. Please complete the appointment first.');
+      return;
+    }
+    if (!formData.symptoms.trim() || !formData.diagnosis.trim()) {
       setError('Clinical diagnosis and chief symptoms are required to finalize a medical consultation.');
       return;
     }
@@ -59,6 +77,7 @@ function ConsultationForm({
     try {
       await onFinalize({
         ...formData,
+        appointmentId: selectedAppointmentId,
         patientName: selectedPatient?.name || 'Patient',
       });
       onClose();
@@ -94,6 +113,40 @@ function ConsultationForm({
           </div>
         )}
 
+        {/* Completed Encounter Selection */}
+        <div className="doctor-form-group">
+          <label className="doctor-label">Associated Completed Encounter *</label>
+          <select
+            className="doctor-select"
+            value={selectedAppointmentId}
+            onChange={(e) => {
+              const aId = e.target.value;
+              setSelectedAppointmentId(aId);
+              const appt = appointments.find((a) => a.id === aId);
+              if (appt) {
+                setFormData((prev) => ({ ...prev, appointmentId: aId, patientId: appt.patientId }));
+              }
+            }}
+            disabled={!!initialData?.appointmentId}
+          >
+            {completedAppointments.length === 0 ? (
+              <option value="">-- No completed appointments available --</option>
+            ) : (
+              completedAppointments.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.token} — {a.patientName} ({a.date} • {a.type})
+                </option>
+              ))
+            )}
+          </select>
+        </div>
+
+        {completedAppointments.length === 0 && (
+          <div style={{ padding: '10px 14px', borderRadius: '8px', backgroundColor: '#fffbeb', color: '#92400e', fontSize: '12.5px', border: '1px solid #fde68a' }}>
+            ⚠️ <strong>Encounter Requirement:</strong> Consultations can only be recorded for Completed appointments. Please mark an appointment as Completed first.
+          </div>
+        )}
+
         <div className="doctor-form-group">
           <label className="doctor-label">Patient *</label>
           <select
@@ -101,7 +154,7 @@ function ConsultationForm({
             name="patientId"
             value={formData.patientId}
             onChange={handleChange}
-            disabled={!!initialData?.patientId}
+            disabled={!!initialData?.patientId || !!selectedAppointmentId}
           >
             {patients.map((p) => (
               <option key={p.id} value={p.id}>

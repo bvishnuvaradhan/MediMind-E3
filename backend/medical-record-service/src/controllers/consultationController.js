@@ -3,6 +3,18 @@ import { successResponse } from '../utils/responseEnvelope.js';
 
 export const consultationController = {
   /**
+   * Get consultations list (scoped by role & query filters)
+   */
+  async getConsultations(req, res, next) {
+    try {
+      const consultations = await consultationService.getConsultations(req.user, req.query);
+      return successResponse(res, 200, 'Consultations retrieved successfully', consultations);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
    * Create a new consultation (DRAFT)
    */
   async createConsultation(req, res, next) {

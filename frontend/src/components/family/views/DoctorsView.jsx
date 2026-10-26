@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { Pagination } from '../../common/Pagination';
+import { useState, useMemo, useEffect } from 'react';
 import { Stethoscope, CalendarDays, ArrowUpRight, Clock, Search, Building2 } from 'lucide-react';
 import { initialPresentationData, hospitals } from '../../../data/medimindData';
 
@@ -13,6 +14,13 @@ export function DoctorsView({
   const [selectedHospital, setSelectedHospital] = useState('All Hospitals');
   const [selectedDepartment, setSelectedDepartment] = useState('All Departments');
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedHospital, selectedDepartment, searchQuery]);
+
 
   // Extract unique departments dynamically based on selected hospital
   const departmentOptions = useMemo(() => {
@@ -82,6 +90,8 @@ export function DoctorsView({
       return true;
     });
   }, [selectedHospital, selectedDepartment, searchQuery]);
+  const totalFiltered = filteredDoctors.length;
+  const pagedDoctors = filteredDoctors.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <section className="feature-view">
@@ -194,7 +204,7 @@ export function DoctorsView({
               No doctors found matching your search or filters. Try adjusting your criteria.
             </div>
           ) : (
-            filteredDoctors.map((doctor) => {
+            pagedDoctors.map((doctor) => {
               const departmentName = doctor.department || (doctor.detail ? doctor.detail.split(' · ')[0] : 'Specialist');
               const hospitalName = doctor.hospital || (doctor.detail ? doctor.detail.split(' · ')[1] : 'MediMind Hospital');
 
@@ -264,6 +274,13 @@ export function DoctorsView({
             })
           )}
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalFiltered}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+        />
       </div>
     </section>
   );

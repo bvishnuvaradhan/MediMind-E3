@@ -4,6 +4,7 @@ import { authenticate, requireRole } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+router.get('/', authenticate, consultationController.getConsultations);
 router.post('/', authenticate, requireRole('DOCTOR'), consultationController.createConsultation);
 router.get('/member/:memberId', authenticate, consultationController.getConsultationsByMember);
 router.get('/:consultationId', authenticate, consultationController.getConsultationById);

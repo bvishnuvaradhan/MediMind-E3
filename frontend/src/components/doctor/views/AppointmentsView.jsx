@@ -1,3 +1,4 @@
+import { Pagination } from '../../common/Pagination';
 import React, { useState } from 'react';
 
 function resolvePatientForAppointment(apt, patients = []) {
@@ -12,23 +13,28 @@ function resolvePatientForAppointment(apt, patients = []) {
   );
 }
 
-function resolvePredictionForAppointment(apt, patient) {
-  if (!patient || !patient.aiPredictions || patient.aiPredictions.length === 0) return null;
+function resolvePredictionForAppointment(apt, patient, allPatients = []) {
+  if (!apt) return null;
   if (apt.aiPredictionId) {
-    const matched = patient.aiPredictions.find((pred) => pred.id === apt.aiPredictionId);
-    if (matched) return matched;
+    if (patient?.aiPredictions) {
+      const matched = patient.aiPredictions.find((pred) => pred.id === apt.aiPredictionId || pred.predictionId === apt.aiPredictionId);
+      if (matched) return matched;
+    }
+    for (const p of allPatients) {
+      const matched = (p.aiPredictions || []).find((pred) => pred.id === apt.aiPredictionId || pred.predictionId === apt.aiPredictionId);
+      if (matched) return matched;
+    }
   }
-  if (apt.aiModuleId || apt.moduleId) {
-    const modId = apt.aiModuleId || apt.moduleId;
-    const matched = patient.aiPredictions.find((pred) => pred.moduleId === modId);
-    if (matched) return matched;
+  if (patient?.aiPredictions && patient.aiPredictions.length > 0) {
+    return patient.aiPredictions[0];
   }
-  return patient.aiPredictions[0];
+  return null;
 }
 
 export function AppointmentsView({
   appointments = [],
   patients = [],
+  consultations = [],
   onSelectPatient,
   onOpenAddWalkIn,
   onOpenNewConsultation,
@@ -39,6 +45,12 @@ export function AppointmentsView({
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [tabFilter, setTabFilter] = useState('Today');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, tabFilter]);
 
   const filteredAppointments = appointments.filter((apt) => {
     let matchesTab = true;
@@ -55,6 +67,9 @@ export function AppointmentsView({
 
     return matchesTab && matchesSearch;
   });
+
+  const totalFiltered = filteredAppointments.length;
+  const pagedAppointments = filteredAppointments.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -151,9 +166,11 @@ export function AppointmentsView({
                   </td>
                 </tr>
               ) : (
-                filteredAppointments.map((apt) => {
+                pagedAppointments.map((apt) => {
                   const patient = resolvePatientForAppointment(apt, patients);
-                  const prediction = resolvePredictionForAppointment(apt, patient);
+                  const prediction = resolvePredictionForAppointment(apt, patient, patients);
+                  const existingConsultation = consultations.find(c => c.appointmentId === apt.id);
+                  const hasConsultation = !!existingConsultation;
                   const isWalkIn =
                     Boolean(apt.isWalkIn) ||
                     apt.type?.toLowerCase().includes('walk-in') ||
@@ -217,10 +234,12 @@ export function AppointmentsView({
                           <span className="doctor-badge doctor-badge-completed" style={{ fontSize: '11px' }}>
                             {apt.aiPreCheck}
                           </span>
+                        ) : apt.status === 'Cancelled' ? (
+                          <span style={{ fontSize: '12px', color: 'var(--doctor-text-muted)' }}>—</span>
+                        ) : apt.status === 'Completed' ? (
+                          <span style={{ fontSize: '11.5px', color: 'var(--doctor-text-muted)' }}>AI Not Required</span>
                         ) : (
-                          <span style={{ fontSize: '12px', color: 'var(--doctor-text-muted)' }}>
-                            AI Pre-Screen Pending
-                          </span>
+                          <span style={{ fontSize: '11.5px', color: 'var(--doctor-text-muted)' }}>Not ordered</span>
                         )}
                       </td>
                       <td>
@@ -294,6 +313,52 @@ export function AppointmentsView({
                             Records
                           </button>
 
+                          {apt.status === 'Completed' ? (
+                            hasConsultation ? (
+                              <button
+                                type="button"
+                                className="doctor-btn doctor-btn-sm"
+                                style={{
+                                  fontSize: '11px',
+                                  padding: '4px 8px',
+                                  color: 'var(--doctor-primary)',
+                                  borderColor: 'var(--doctor-primary)',
+                                  backgroundColor: 'var(--doctor-soft-bg)',
+                                  fontWeight: 600,
+                                }}
+                                onClick={() => onOpenNewConsultation(patient, existingConsultation)}
+                                title="View signed consultation record"
+                              >
+                                View Cons
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                className="doctor-btn doctor-btn-sm doctor-btn-primary"
+                                style={{ fontSize: '11px', padding: '4px 8px' }}
+                                onClick={() => onOpenNewConsultation(patient, { appointmentId: apt.id, patientId: patient?.id || apt.patientId })}
+                                title="Create consultation for completed encounter"
+                              >
+                                + Consult
+                              </button>
+                            )
+                          ) : (
+                            <button
+                              type="button"
+                              className="doctor-btn doctor-btn-sm"
+                              disabled
+                              style={{
+                                fontSize: '11px',
+                                padding: '4px 8px',
+                                opacity: 0.5,
+                                cursor: 'not-allowed',
+                              }}
+                              title="Consultation can only be created for completed appointments"
+                            >
+                              + Consult
+                            </button>
+                          )}
+
                           {apt.status !== 'Completed' && apt.status !== 'Cancelled' && (
                             <>
                               <button
@@ -324,6 +389,13 @@ export function AppointmentsView({
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalFiltered}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+        />
       </div>
     </div>
   );

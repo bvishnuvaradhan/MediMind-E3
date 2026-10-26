@@ -1,3 +1,4 @@
+import { Pagination } from '../../common/Pagination';
 import React, { useState } from 'react';
 
 export function PrescriptionsView({
@@ -8,6 +9,12 @@ export function PrescriptionsView({
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
   const [correctingRx, setCorrectingRx] = useState(null);
   const [correctionForm, setCorrectionForm] = useState({
     reasonForCorrection: '',
@@ -23,6 +30,9 @@ export function PrescriptionsView({
       (rx.diagnosis || '').toLowerCase().includes(q);
     return matchesStatus && matchesSearch;
   });
+
+  const totalFiltered = filteredPrescriptions.length;
+  const pagedPrescriptions = filteredPrescriptions.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handleStartCorrect = (rx) => {
     setCorrectingRx(rx);
@@ -102,7 +112,7 @@ export function PrescriptionsView({
             No prescriptions found matching current filter.
           </div>
         ) : (
-          filteredPrescriptions.map((rx) => (
+          pagedPrescriptions.map((rx) => (
             <div key={rx.id} className="doctor-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -202,6 +212,14 @@ export function PrescriptionsView({
           ))
         )}
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalItems={totalFiltered}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+      />
 
       {/* Correction Modal */}
       {correctingRx && (

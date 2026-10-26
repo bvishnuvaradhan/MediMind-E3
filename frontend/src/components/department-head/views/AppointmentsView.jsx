@@ -1,3 +1,4 @@
+import { Pagination } from '../../common/Pagination';
 import React, { useState } from 'react';
 
 export function AppointmentsView({
@@ -8,6 +9,12 @@ export function AppointmentsView({
   const [statusFilter, setStatusFilter] = useState('All');
   const [doctorFilter, setDoctorFilter] = useState('All');
   const [selectedAiApt, setSelectedAiApt] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, doctorFilter]);
 
   const filteredAppointments = appointments.filter((apt) => {
     const status = apt.status || 'Confirmed';
@@ -20,6 +27,9 @@ export function AppointmentsView({
     const matchesSearch = patientStr.includes(q) || tokenStr.includes(q) || docStr.includes(q);
     return matchesStatus && matchesDoctor && matchesSearch;
   });
+
+  const totalFiltered = filteredAppointments.length;
+  const pagedAppointments = filteredAppointments.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -108,7 +118,7 @@ export function AppointmentsView({
                   </td>
                 </tr>
               ) : (
-                filteredAppointments.map((apt) => {
+                pagedAppointments.map((apt) => {
                   const statusStr = apt.status || 'Confirmed';
                   const statusClass = statusStr.toLowerCase().replace(/\s+/g, '-');
                   const tokenText = apt.token || apt.id?.toUpperCase() || 'ORTHO-OPD';
@@ -177,6 +187,13 @@ export function AppointmentsView({
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalFiltered}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+        />
       </div>
 
       {/* Operational AI Pre-Screen Status Modal */}

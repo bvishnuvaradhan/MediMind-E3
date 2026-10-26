@@ -130,43 +130,6 @@ export function LoginPage({ onSwitchToSignup }) {
           </button>
         </form>
 
-        <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
-          <p style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', textAlign: 'center' }}>
-            Role Quick Select
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '6px' }}>
-            {ROLE_PRESETS.map((role) => (
-              <button
-                key={role.email}
-                type="button"
-                onClick={() => {
-                  setEmail(role.email);
-                  if (validationError) setValidationError('');
-                }}
-                style={{
-                  padding: '6px 10px',
-                  background: '#f8fafc',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '6px',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  color: '#334155',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <span>{role.label}</span>
-                <span style={{ fontSize: '9px', background: '#e0e7ff', color: '#4338ca', padding: '1px 5px', borderRadius: '4px' }}>
-                  {role.badge}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div className="auth-footer">
           <span>Don't have a family account yet?</span>
           <button

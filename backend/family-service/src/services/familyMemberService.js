@@ -4,6 +4,19 @@ import Family from '../models/Family.js';
 import { familyService } from './familyService.js';
 
 export const familyMemberService = {
+  async getMembersByFamilyId(familyId) {
+    if (!familyId || !mongoose.Types.ObjectId.isValid(familyId)) {
+      const err = new Error('Invalid family ID format');
+      err.statusCode = 400;
+      throw err;
+    }
+    const members = await FamilyMember.find({
+      family_id: new mongoose.Types.ObjectId(familyId),
+      status: { $ne: 'REMOVED' },
+    }).sort({ created_at: 1 });
+    return members.map((m) => m.toPublicJSON());
+  },
+
   async addMember(user, memberData) {
     const familyId = await familyService.resolveFamilyIdForUser(user);
     if (!familyId) {

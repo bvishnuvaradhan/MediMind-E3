@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { Pagination } from '../../common/Pagination';
+import { useState, useEffect } from 'react';
 import { Activity, Users, ArrowUpRight } from 'lucide-react';
 import { initialPresentationData, matchesFamilyMember } from '../../../data/medimindData';
 
@@ -9,6 +10,12 @@ export function ConsultationsView({
   consultations = null,
 }) {
   const [selectedMemberFilter, setSelectedMemberFilter] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedMemberFilter]);
 
   const baseItems = consultations || initialPresentationData.Consultations || [];
 
@@ -20,6 +27,9 @@ export function ConsultationsView({
     if (selectedMemberFilter === 'All') return true;
     return matchesFamilyMember(item, selectedMemberObj);
   });
+
+  const totalFiltered = filteredItems.length;
+  const pagedItems = filteredItems.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <section className="feature-view">
@@ -77,7 +87,7 @@ export function ConsultationsView({
               No consultation notes found for {selectedMemberFilter === 'All' ? 'any family member' : (selectedMemberObj?.fullName || selectedMemberFilter)}.
             </div>
           ) : (
-            filteredItems.map((item, idx) => (
+            pagedItems.map((item, idx) => (
               <article className="feature-card" key={`cons-${item.title}-${idx}`}>
                 <div className={`avatar avatar-${item.tone || 'coral'}`}>{item.initials || 'RM'}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -102,6 +112,13 @@ export function ConsultationsView({
             ))
           )}
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalFiltered}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+        />
       </div>
     </section>
   );

@@ -2,6 +2,19 @@ import mongoose from 'mongoose';
 import Family from '../models/Family.js';
 
 export const familyService = {
+  async getAllFamilies(query = {}) {
+    const filter = { status: { $ne: 'DELETED' } };
+    if (query.search) {
+      filter.$or = [
+        { family_name: { $regex: query.search, $options: 'i' } },
+        { email: { $regex: query.search, $options: 'i' } },
+        { mobile: { $regex: query.search, $options: 'i' } },
+      ];
+    }
+    const families = await Family.find(filter).sort({ family_name: 1 }).limit(100);
+    return families.map((f) => f.toPublicJSON());
+  },
+
   async createFamily(familyData) {
     const { familyName, email, mobile, creatorUserId } = familyData;
 

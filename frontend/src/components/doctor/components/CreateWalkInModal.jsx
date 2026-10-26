@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { doctorService } from '../../../services/doctorService.js';
 
 function WalkInForm({
   patients = [],
@@ -7,7 +8,45 @@ function WalkInForm({
   onClose,
 }) {
   const [patientMode, setPatientMode] = useState('existing'); // 'existing' | 'new'
+  const [families, setFamilies] = useState([]);
+  const [familiesLoading, setFamiliesLoading] = useState(true);
+  const [selectedFamilyId, setSelectedFamilyId] = useState('');
+  const [familyMembers, setFamilyMembers] = useState([]);
+  const [selectedMemberId, setSelectedMemberId] = useState('');
   const [selectedPatientId, setSelectedPatientId] = useState(patients[0]?.id || '');
+
+  // Load families on component mount
+  useEffect(() => {
+    async function loadFamilies() {
+      const fams = await doctorService.getFamilies();
+      setFamilies(fams);
+      if (fams.length > 0) {
+        const firstFamId = fams[0].id || fams[0]._id;
+        setSelectedFamilyId(firstFamId);
+        const mems = await doctorService.getFamilyMembers(firstFamId);
+        setFamilyMembers(mems);
+        if (mems.length > 0) {
+          const firstMemId = mems[0].id || mems[0]._id || mems[0].memberId;
+          setSelectedMemberId(firstMemId);
+        }
+      }
+    }
+    loadFamilies();
+  }, []);
+
+  // Handle family account selection change
+  const handleFamilyChange = async (famId) => {
+    setSelectedFamilyId(famId);
+    setSelectedMemberId(''); // Immediately clear member selection on family change!
+    setFamilyMembers([]);
+    if (famId) {
+      const mems = await doctorService.getFamilyMembers(famId);
+      setFamilyMembers(mems);
+      if (mems.length > 0) {
+        setSelectedMemberId(mems[0].id || mems[0]._id || mems[0].memberId);
+      }
+    }
+  };
 
   // New patient state
   const [newPatient, setNewPatient] = useState({
@@ -52,8 +91,12 @@ function WalkInForm({
     setError('');
 
     if (patientMode === 'existing') {
-      if (!selectedPatientId && (!patients || patients.length === 0)) {
-        setError('Please select an existing patient or switch to Add New Patient.');
+      if (!selectedFamilyId) {
+        setError('Please select an authorized family account.');
+        return;
+      }
+      if (!selectedMemberId) {
+        setError('Please select a dependent family member for this family account.');
         return;
       }
     } else {
@@ -84,7 +127,10 @@ function WalkInForm({
     try {
       await onCreateWalkIn({
         isNewPatient: patientMode === 'new',
-        patientId: patientMode === 'existing' ? (selectedPatient?.id || selectedPatientId) : null,
+        familyId: patientMode === 'existing' ? selectedFamilyId : null,
+        familyMemberId: patientMode === 'existing' ? selectedMemberId : null,
+        patientId: patientMode === 'existing' ? (selectedMemberId || selectedPatient?.id) : null,
+        selectedMember: patientMode === 'existing' ? familyMembers.find(m => (m.id || m._id || m.memberId) === selectedMemberId) : null,
         newPatientData: patientMode === 'new' ? {
           ...newPatient,
           age: Number(newPatient.age),
@@ -216,60 +262,87 @@ function WalkInForm({
             </div>
           </div>
 
-          {/* Option A: Select Existing Patient */}
+          {/* Option A: Select Family Account -> Family Member */}
           {patientMode === 'existing' ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div className="doctor-form-group">
-                <label className="doctor-label">Select Patient *</label>
+                <label className="doctor-label">Select Family Account *</label>
                 <select
                   className="doctor-select"
-                  value={selectedPatientId}
-                  onChange={(e) => setSelectedPatientId(e.target.value)}
+                  value={selectedFamilyId}
+                  onChange={(e) => handleFamilyChange(e.target.value)}
                   required
                 >
-                  {patients.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} ({p.gender}, {p.age}y — Blood {p.bloodGroup} • ID: {p.id})
+                  <option value="">-- Choose Authorized Family Account --</option>
+                  {families.map((fam) => (
+                    <option key={fam.id || fam._id} value={fam.id || fam._id}>
+                      {fam.familyName || fam.family_name} ({fam.email} • {fam.mobile})
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* Selected Patient Quick Summary Card */}
-              {selectedPatient && (
-                <div
-                  style={{
-                    padding: '12px 14px',
-                    backgroundColor: 'var(--doctor-soft-bg)',
-                    borderRadius: '8px',
-                    border: '1px solid var(--doctor-border)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '6px',
-                    fontSize: '12.5px',
-                  }}
+              <div className="doctor-form-group">
+                <label className="doctor-label">Select Family Member *</label>
+                <select
+                  className="doctor-select"
+                  value={selectedMemberId}
+                  onChange={(e) => setSelectedMemberId(e.target.value)}
+                  disabled={!selectedFamilyId || familyMembers.length === 0}
+                  required
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
-                    <strong>{selectedPatient.name}</strong>
-                    <span className="doctor-badge doctor-badge-active" style={{ fontSize: '11px' }}>
-                      {selectedPatient.accessStatus || 'Active'} Access
-                    </span>
-                  </div>
-                  <div style={{ color: 'var(--doctor-text-muted)' }}>
-                    {selectedPatient.gender}, {selectedPatient.age} yrs • Blood Group: <strong>{selectedPatient.bloodGroup}</strong> • Phone: {selectedPatient.phone || 'N/A'}
-                  </div>
-                  {selectedPatient.chiefComplaint && (
-                    <div style={{ color: 'var(--doctor-text-secondary)' }}>
-                      <strong>Recorded Presentation:</strong> {selectedPatient.chiefComplaint}
+                  <option value="">
+                    {familyMembers.length === 0 ? '-- No members found for selected family --' : '-- Choose Family Member --'}
+                  </option>
+                  {familyMembers.map((m) => {
+                    const mId = m.id || m._id || m.memberId;
+                    const birthYear = m.dateOfBirth ? new Date(m.dateOfBirth).getFullYear() : null;
+                    const approxAge = birthYear ? (new Date().getFullYear() - birthYear) : (m.age || 35);
+                    return (
+                      <option key={mId} value={mId}>
+                        {m.fullName || m.full_name} ({m.gender}, {approxAge}y • Blood {m.bloodGroup || m.blood_group || 'B+'})
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              {/* Selected Member Quick Summary Card */}
+              {(() => {
+                const curMember = familyMembers.find(m => (m.id || m._id || m.memberId) === selectedMemberId);
+                if (!curMember) return null;
+                const birthYear = curMember.dateOfBirth ? new Date(curMember.dateOfBirth).getFullYear() : null;
+                const approxAge = birthYear ? (new Date().getFullYear() - birthYear) : (curMember.age || 35);
+                return (
+                  <div
+                    style={{
+                      padding: '12px 14px',
+                      backgroundColor: 'var(--doctor-soft-bg)',
+                      borderRadius: '8px',
+                      border: '1px solid var(--doctor-border)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '6px',
+                      fontSize: '12.5px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+                      <strong>{curMember.fullName || curMember.full_name}</strong>
+                      <span className="doctor-badge doctor-badge-active" style={{ fontSize: '11px' }}>
+                        Authorized Encounter
+                      </span>
                     </div>
-                  )}
-                  {selectedPatient.allergies && selectedPatient.allergies.length > 0 && (
-                    <div style={{ color: 'var(--doctor-coral)', fontWeight: 600 }}>
-                      Allergies: {selectedPatient.allergies.join(', ')}
+                    <div style={{ color: 'var(--doctor-text-muted)' }}>
+                      {curMember.gender}, {approxAge} yrs • Blood Group: <strong>{curMember.bloodGroup || curMember.blood_group || 'B+'}</strong> • Phone: {curMember.phone || 'N/A'}
                     </div>
-                  )}
-                </div>
-              )}
+                    {curMember.emergencyContact?.name && (
+                      <div style={{ color: 'var(--doctor-text-secondary)' }}>
+                        <strong>Emergency Contact:</strong> {curMember.emergencyContact.name} ({curMember.emergencyContact.relationship || 'Guardian'})
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           ) : (
             /* Option B: Add New Patient */
@@ -443,7 +516,7 @@ function WalkInForm({
           <button
             type="submit"
             className="doctor-btn doctor-btn-primary"
-            disabled={submitting}
+            disabled={submitting || (patientMode === 'existing' && (!selectedFamilyId || !selectedMemberId))}
           >
             {submitting ? 'Registering Encounter...' : 'Create Walk-in'}
           </button>

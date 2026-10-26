@@ -2,6 +2,34 @@ import { familyService } from '../services/familyService.js';
 import mongoose from 'mongoose';
 
 export const familyController = {
+  async getFamilies(req, res, next) {
+    try {
+      const families = await familyService.getAllFamilies(req.query);
+      return res.status(200).json({
+        success: true,
+        message: 'Families retrieved successfully',
+        data: families,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getFamilyMembersByFamilyId(req, res, next) {
+    try {
+      const { familyId } = req.params;
+      const { familyMemberService } = await import('../services/familyMemberService.js');
+      const members = await familyMemberService.getMembersByFamilyId(familyId);
+      return res.status(200).json({
+        success: true,
+        message: 'Family members retrieved successfully',
+        data: members,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async createFamily(req, res, next) {
     try {
       const result = await familyService.createFamily(req.body);

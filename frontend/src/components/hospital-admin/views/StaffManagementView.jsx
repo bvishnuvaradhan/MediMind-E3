@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { Pagination } from '../../common/Pagination';
+import { useState, useEffect } from 'react';
 import {
   Users,
   Search,
@@ -22,6 +23,12 @@ export function StaffManagementView({
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [deptFilter, setDeptFilter] = useState('ALL');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, roleFilter, deptFilter]);
 
   let combinedStaff = [];
   if (Array.isArray(propStaff) && propStaff.length > 0) {
@@ -65,6 +72,9 @@ export function StaffManagementView({
       staffDept.toLowerCase().includes(search.toLowerCase());
     return matchesRole && matchesDept && matchesSearch;
   });
+
+  const totalFiltered = filteredStaff.length;
+  const pagedStaff = filteredStaff.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div>
@@ -166,7 +176,7 @@ export function StaffManagementView({
             </tr>
           </thead>
           <tbody>
-            {filteredStaff.map((staff) => (
+            {pagedStaff.map((staff) => (
               <tr key={staff.id}>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -253,6 +263,13 @@ export function StaffManagementView({
           </tbody>
         </table>
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalItems={totalFiltered}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+      />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { Pagination } from '../../common/Pagination';
 import React, { useState } from 'react';
 
 export function PatientsView({
@@ -9,6 +10,12 @@ export function PatientsView({
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showUnauthorizedModal, setShowUnauthorizedModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
 
   const filteredPatients = patients.filter((pat) => {
     const matchesStatus = statusFilter === 'All' || pat.accessStatus === statusFilter;
@@ -19,6 +26,9 @@ export function PatientsView({
       (pat.chiefComplaint || '').toLowerCase().includes(q);
     return matchesStatus && matchesSearch;
   });
+
+  const totalFiltered = filteredPatients.length;
+  const pagedPatients = filteredPatients.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -54,6 +64,13 @@ export function PatientsView({
             </button>
           </div>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalFiltered}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(s) => { setPageSize(s); setCurrentPage(1); }}
+        />
       </div>
 
       {/* Filter and Search Bar */}
@@ -108,7 +125,7 @@ export function PatientsView({
                   </td>
                 </tr>
               ) : (
-                filteredPatients.map((pat) => (
+                pagedPatients.map((pat) => (
                   <tr key={pat.id}>
                     <td>
                       <div>
