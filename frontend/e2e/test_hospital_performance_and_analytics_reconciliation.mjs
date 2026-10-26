@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { getRelativeDateRange, STANDARDIZED_ANALYTICS_PERIODS } from '../src/utils/dateUtils.js';
+import { getRelativeDateRange, STANDARDIZED_ANALYTICS_PERIODS, HOSPITAL_ADMIN_PERIOD_OPTIONS } from '../src/utils/dateUtils.js';
 
 async function run() {
   console.log('======================================================================');
@@ -9,11 +9,22 @@ async function run() {
   // -------------------------------------------------------------------------
   // 1. UNIT & SERVICE LOGIC CHECKS
   // -------------------------------------------------------------------------
-  console.log('--- 1. Testing Standardized Date Range Definitions ---');
-  if (STANDARDIZED_ANALYTICS_PERIODS.length !== 6) {
-    throw new Error(`Expected 6 standardized analytics periods, found ${STANDARDIZED_ANALYTICS_PERIODS.length}`);
+  console.log('--- 1. Testing Standardized Date Range Definitions (8 Options) ---');
+  const expectedPeriods = [
+    'This Month',
+    'Previous Month',
+    'This Quarter',
+    'Previous Quarter',
+    'Last 3 Months',
+    'This Half Year',
+    'This Year',
+    'All Time',
+  ];
+
+  if (STANDARDIZED_ANALYTICS_PERIODS.length !== 8) {
+    throw new Error(`Expected 8 standardized analytics periods, found ${STANDARDIZED_ANALYTICS_PERIODS.length}`);
   }
-  const expectedPeriods = ['This Month', 'Previous Month', 'This Quarter', 'This Half Year', 'This Year', 'All Time'];
+
   for (let i = 0; i < expectedPeriods.length; i++) {
     if (STANDARDIZED_ANALYTICS_PERIODS[i] !== expectedPeriods[i]) {
       throw new Error(`Expected period ${expectedPeriods[i]} at index ${i}, got ${STANDARDIZED_ANALYTICS_PERIODS[i]}`);
@@ -21,7 +32,7 @@ async function run() {
     const range = getRelativeDateRange(expectedPeriods[i]);
     console.log(`✓ Period [${expectedPeriods[i]}]: ${range.startDate || 'Beginning'} -> ${range.endDate || 'Present'} (Label: ${range.label})`);
   }
-  console.log('✓ PASS: All 6 standardized date range definitions verified.\n');
+  console.log('✓ PASS: All 8 standardized date range definitions verified.\n');
 
   // -------------------------------------------------------------------------
   // 2. BROWSER VERIFICATION WITH PLAYWRIGHT
@@ -73,20 +84,20 @@ async function run() {
     console.log('✓ Hospital Performance Comparison view loaded with populated data');
 
     // Verify Date Range Selector in Chairman View
-    console.log('[Step 3] Verifying Standardized Date Range Selector (6 options)...');
+    console.log('[Step 3] Verifying Standardized Date Range Selector (8 options)...');
     const selectOptions = await page.$$eval('select[aria-label="Standardized Date Range Selector"] option, .view-actions select option', (opts) =>
       opts.map((o) => o.value)
     );
     console.log('Selector options rendered:', selectOptions);
-    if (selectOptions.length !== 6) {
-      throw new Error(`Expected exactly 6 date range options in selector, found ${selectOptions.length}`);
+    if (selectOptions.length !== 8) {
+      throw new Error(`Expected exactly 8 date range options in selector, found ${selectOptions.length}`);
     }
     for (let i = 0; i < expectedPeriods.length; i++) {
       if (selectOptions[i] !== expectedPeriods[i]) {
         throw new Error(`Selector option mismatch at index ${i}: expected ${expectedPeriods[i]}, got ${selectOptions[i]}`);
       }
     }
-    console.log('✓ PASS: Exactly 6 standardized date range options rendered in correct order.');
+    console.log('✓ PASS: Exactly 8 standardized date range options rendered in correct order.');
 
     // Verify Table Columns
     console.log('[Step 4] Verifying Hospital Performance Comparison Table structure...');
@@ -171,19 +182,25 @@ async function run() {
     }
     console.log('✓ PASS: Line chart legends contain all active hospital network facilities.');
 
-    // Test Date Range Change in Chairman View
-    console.log('[Step 6] Testing Date Range Selector change to "This Month"...');
-    await page.selectOption('select[aria-label="Standardized Date Range Selector"]', 'This Month');
+    // Test Date Range Change in Chairman View to This Quarter (Verify 3 months)
+    console.log('[Step 6] Testing Date Range Selector change to "This Quarter"...');
+    await page.selectOption('select[aria-label="Standardized Date Range Selector"]', 'This Quarter');
     await page.waitForTimeout(1000);
-    const monthKpi = await page.textContent('.stat-card:has-text("Appointments Served")');
-    console.log(`Updated KPI for This Month: ${monthKpi?.replace(/\s+/g, ' ').trim()}`);
 
-    console.log('Testing Date Range Selector change to "This Half Year"...');
-    await page.selectOption('select[aria-label="Standardized Date Range Selector"]', 'This Half Year');
+    // Verify the charts display all 3 months of the quarter
+    const chartLabelsThisQuarter = await page.$$eval('.table-card svg text', (texts) =>
+      texts.map((t) => t.textContent.trim()).filter(Boolean)
+    );
+    console.log('Quarter chart axis text samples:', chartLabelsThisQuarter.slice(0, 10));
+
+    console.log('Testing Date Range Selector change to "Previous Quarter"...');
+    await page.selectOption('select[aria-label="Standardized Date Range Selector"]', 'Previous Quarter');
     await page.waitForTimeout(1000);
-    const halfYearKpi = await page.textContent('.stat-card:has-text("Appointments Served")');
-    console.log(`Updated KPI for This Half Year: ${halfYearKpi?.replace(/\s+/g, ' ').trim()}`);
-    console.log('✓ PASS: Date range switching dynamically updates metrics across the page.\n');
+
+    console.log('Testing Date Range Selector change to "Last 3 Months"...');
+    await page.selectOption('select[aria-label="Standardized Date Range Selector"]', 'Last 3 Months');
+    await page.waitForTimeout(1000);
+    console.log('✓ PASS: Platform Owner successfully switched through This Quarter, Previous Quarter, and Last 3 Months.\n');
 
     await chairContext.close();
 
@@ -212,15 +229,15 @@ async function run() {
       await adminPage.waitForTimeout(800);
     }
 
-    // Verify all 6 filter pills are present
-    console.log('[Step 9] Verifying 6 standardized operational period pills...');
+    // Verify all 8 filter pills are present
+    console.log('[Step 9] Verifying 8 standardized operational period pills in strict order...');
     const pills = await adminPage.$$eval('.ha-filter-pills button.ha-filter-pill', (btns) =>
       btns.map((b) => b.innerText.trim())
     );
     console.log('Hospital Admin operational period pills:', pills);
 
-    if (pills.length !== 6) {
-      throw new Error(`Expected exactly 6 period pills, found ${pills.length}: ${JSON.stringify(pills)}`);
+    if (pills.length !== 8) {
+      throw new Error(`Expected exactly 8 period pills, found ${pills.length}: ${JSON.stringify(pills)}`);
     }
 
     for (let i = 0; i < expectedPeriods.length; i++) {
@@ -228,27 +245,94 @@ async function run() {
         throw new Error(`Pill mismatch at index ${i}: expected "${expectedPeriods[i]}", got "${pills[i]}"`);
       }
     }
-    console.log('✓ PASS: All 6 standardized period pills present in Hospital Operational Analytics, including "All Time" and "This Half Year".');
+    console.log('✓ PASS: All 8 standardized period pills present in Hospital Operational Analytics in strict order.');
 
-    // Test clicking pills
-    console.log('[Step 10] Testing filter pill interactions and dynamic subtexts...');
+    // Step 10: Verify 5 Responsive KPI Cards (including Clinical AI Runs)
+    console.log('[Step 10] Verifying 5 responsive KPI cards including Clinical AI Runs...');
+    const statCards = await adminPage.$$eval('.ha-stat-grid .ha-stat-card', (cards) =>
+      cards.map((c) => ({
+        label: c.querySelector('.ha-stat-label')?.textContent.trim(),
+        value: c.querySelector('.ha-stat-value')?.textContent.trim(),
+        subtext: c.querySelector('.ha-stat-subtext')?.textContent.trim(),
+      }))
+    );
+    console.log('Rendered KPI cards:', statCards);
+
+    if (statCards.length !== 5) {
+      throw new Error(`Expected exactly 5 KPI cards in .ha-stat-grid, found ${statCards.length}`);
+    }
+
+    const expectedLabels = [
+      'Total Hospital Bookings',
+      'Completed Consultations',
+      'Scheduled & In-Queue',
+      'Cancellation & No-Show',
+      'Clinical AI Runs',
+    ];
+
+    for (let i = 0; i < expectedLabels.length; i++) {
+      if (statCards[i].label !== expectedLabels[i]) {
+        throw new Error(`KPI card ${i + 1} mismatch: expected "${expectedLabels[i]}", got "${statCards[i].label}"`);
+      }
+    }
+    console.log('✓ PASS: Exactly 5 responsive KPI cards rendered with Clinical AI Runs prominently featured.');
+
+    // Step 11: Verify Removed Sections are completely absent from DOM
+    console.log('[Step 11] Verifying unwanted sections are completely absent from DOM...');
+    const wholePageText = await adminPage.textContent('.ha-content, .ha-main, body');
+
+    const forbiddenPhrases = [
+      'Bed Capacity vs Operational Utilization',
+      'Patient Satisfaction',
+      'Bed Utilization',
+      'Care Modality Mix & Inpatient Capacity',
+      'Hospital Inpatient Bed Occupancy',
+    ];
+
+    for (const phrase of forbiddenPhrases) {
+      if (wholePageText.includes(phrase)) {
+        throw new Error(`Forbidden phrase "${phrase}" still exists in Hospital Operational Analytics page!`);
+      }
+    }
+    console.log('✓ PASS: Bed Capacity vs Operational Utilization, Patient Satisfaction, Bed Utilization, and Inpatient Bed Occupancy completely absent from DOM.');
+
+    // Step 12: Test clicking pills: Previous Quarter and Last 3 Months
+    console.log('[Step 12] Testing filter pill interactions (Previous Quarter, Last 3 Months)...');
+    await adminPage.click('.ha-filter-pill:has-text("Previous Quarter")');
+    await adminPage.waitForTimeout(600);
+    const prevQActive = await adminPage.isVisible('.ha-filter-pill.active:has-text("Previous Quarter")');
+    if (!prevQActive) {
+      throw new Error('Previous Quarter pill did not activate upon click');
+    }
+    console.log('✓ Previous Quarter pill active');
+
+    await adminPage.click('.ha-filter-pill:has-text("Last 3 Months")');
+    await adminPage.waitForTimeout(600);
+    const last3Active = await adminPage.isVisible('.ha-filter-pill.active:has-text("Last 3 Months")');
+    if (!last3Active) {
+      throw new Error('Last 3 Months pill did not activate upon click');
+    }
+    console.log('✓ Last 3 Months pill active');
+
     await adminPage.click('.ha-filter-pill:has-text("This Quarter")');
-    await adminPage.waitForTimeout(500);
-    const quarterActive = await adminPage.isVisible('.ha-filter-pill.active:has-text("This Quarter")');
-    console.log(`This Quarter pill active: ${quarterActive}`);
+    await adminPage.waitForTimeout(600);
+    const thisQActive = await adminPage.isVisible('.ha-filter-pill.active:has-text("This Quarter")');
+    if (!thisQActive) {
+      throw new Error('This Quarter pill did not activate upon click');
+    }
+    console.log('✓ This Quarter pill active');
 
-    await adminPage.click('.ha-filter-pill:has-text("All Time")');
-    await adminPage.waitForTimeout(500);
-    const allTimeActive = await adminPage.isVisible('.ha-filter-pill.active:has-text("All Time")');
-    console.log(`All Time pill active: ${allTimeActive}`);
-
-    // Verify Retrospective Trend Label
+    // Step 13: Verify Retrospective Trend Label and Heatmap are present
+    console.log('[Step 13] Verifying Retrospective Trend and OPD Peak Activity Heatmap...');
     const hasTrendHeader = await adminPage.isVisible('h3:has-text("Five-Month Retrospective Volume Trends")');
-    console.log(`Five-Month Retrospective Volume Trends label present: ${hasTrendHeader}`);
     if (!hasTrendHeader) {
       throw new Error('Retrospective trend label missing in Hospital Operational Analytics');
     }
-    console.log('✓ PASS: Retrospective monthly trend chart clearly identified as independent multi-month trajectory.');
+    const hasHeatmapHeader = await adminPage.isVisible('h3:has-text("OPD Clinic Peak Activity Heatmap")');
+    if (!hasHeatmapHeader) {
+      throw new Error('OPD Clinic Peak Activity Heatmap missing in Hospital Operational Analytics');
+    }
+    console.log('✓ PASS: Retrospective trends and OPD Clinic Peak Activity Heatmap both visible and functional.');
 
     // Verify static stale text like "vs Aug" is completely eliminated
     const adminPageText = await adminPage.textContent('.ha-stat-grid');

@@ -977,6 +977,7 @@ export const chairmanService = {
     });
 
     const isSingleMonth = dateRange === 'This Month' || dateRange === 'Previous Month';
+    const isQuarter = dateRange === 'This Quarter' || dateRange === 'Previous Quarter';
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const currentMonthKey = new Date().toISOString().slice(0, 7);
 
@@ -1016,34 +1017,69 @@ export const chairmanService = {
         return row;
       });
     } else {
-      // Monthly line chart granularity (exclude future months)
-      const monthlyCompleted = (stats?.byHospitalMonthlyCompleted || []).filter(m => m.bucket <= currentMonthKey);
-      const monthlyPreds = (stats?.byHospitalMonthlyPreds || []).filter(m => m.bucket <= currentMonthKey);
-      const distinctMonths = [...new Set([
-        ...monthlyCompleted.map(m => m.bucket),
-        ...monthlyPreds.map(m => m.bucket)
-      ])].filter(Boolean).sort();
+      let distinctMonths = [];
+
+      if (isQuarter) {
+        // Enforce all 3 calendar months of the quarter are represented
+        const now = new Date();
+        const y = now.getUTCFullYear();
+        const m = now.getUTCMonth();
+        const q = Math.floor(m / 3) + 1;
+        let targetQ = q;
+        let targetY = y;
+        if (dateRange === 'Previous Quarter') {
+          targetQ = q === 1 ? 4 : q - 1;
+          targetY = q === 1 ? y - 1 : y;
+        }
+        const qStartM = (targetQ - 1) * 3;
+        const pad2 = (n) => String(n).padStart(2, '0');
+        distinctMonths = [
+          `${targetY}-${pad2(qStartM + 1)}`,
+          `${targetY}-${pad2(qStartM + 2)}`,
+          `${targetY}-${pad2(qStartM + 3)}`,
+        ];
+      } else {
+        // Monthly line chart granularity (exclude future months)
+        const monthlyCompleted = (stats?.byHospitalMonthlyCompleted || []).filter(m => m.bucket <= currentMonthKey);
+        const monthlyPreds = (stats?.byHospitalMonthlyPreds || []).filter(m => m.bucket <= currentMonthKey);
+        distinctMonths = [...new Set([
+          ...monthlyCompleted.map(m => m.bucket),
+          ...monthlyPreds.map(m => m.bucket)
+        ])].filter(Boolean).sort();
+      }
 
       servedTrends = distinctMonths.map(mStr => {
-        const [y, mNum] = mStr.split('-');
+        const [yStr, mNum] = mStr.split('-');
         const mIdx = parseInt(mNum, 10) - 1;
-        const label = `${monthNames[mIdx] || mNum} ${y}`;
-        const row = { bucket: mStr, label };
+        const isFuture = mStr > currentMonthKey;
+        const monthName = monthNames[mIdx] || mNum;
+        const label = isFuture ? `${monthName} ${yStr} (Planned)` : `${monthName} ${yStr}`;
+        const row = { bucket: mStr, label, isFuture };
         trendSeries.forEach(s => {
-          const match = monthlyCompleted.find(m => m.bucket === mStr && m.hospitalId === s.hospitalId);
-          row[s.key] = match ? match.count : 0;
+          if (isFuture) {
+            row[s.key] = 0;
+          } else {
+            const match = (stats?.byHospitalMonthlyCompleted || []).find(m => m.bucket === mStr && m.hospitalId === s.hospitalId);
+            row[s.key] = match ? match.count : 0;
+          } 
         });
         return row;
       });
 
       aiRunsTrends = distinctMonths.map(mStr => {
-        const [y, mNum] = mStr.split('-');
+        const [yStr, mNum] = mStr.split('-');
         const mIdx = parseInt(mNum, 10) - 1;
-        const label = `${monthNames[mIdx] || mNum} ${y}`;
-        const row = { bucket: mStr, label };
+        const isFuture = mStr > currentMonthKey;
+        const monthName = monthNames[mIdx] || mNum;
+        const label = isFuture ? `${monthName} ${yStr} (Planned)` : `${monthName} ${yStr}`;
+        const row = { bucket: mStr, label, isFuture };
         trendSeries.forEach(s => {
-          const match = monthlyPreds.find(m => m.bucket === mStr && m.hospitalId === s.hospitalId);
-          row[s.key] = match ? match.count : 0;
+          if (isFuture) {
+            row[s.key] = 0;
+          } else {
+            const match = (stats?.byHospitalMonthlyPreds || []).find(m => m.bucket === mStr && m.hospitalId === s.hospitalId);
+            row[s.key] = match ? match.count : 0;
+          }
         });
         return row;
       });

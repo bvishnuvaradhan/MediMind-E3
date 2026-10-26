@@ -770,6 +770,7 @@ export const hospitalAdminService = {
           completedConsultations,
           upcomingAppointments,
           cancelledAppointments,
+          totalAiPredictions: totalPreds,
           byDayOfWeek: stats.byDayOfWeek || [],
           bedOccupancyPercentage: 84,
           aiAssistedAccuracy: aiData.overallAccuracy || '98.2%',

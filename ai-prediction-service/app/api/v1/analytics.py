@@ -18,6 +18,8 @@ _ANALYTICS_CACHE: Dict[str, Any] = {}
 _ANALYTICS_CACHE_TIME: Dict[str, float] = {}
 CACHE_TTL = 30.0
 
+import calendar
+
 def get_relative_date_range(period: str, ref_date: Optional[datetime.date] = None) -> Tuple[Optional[str], Optional[str], str]:
     today = ref_date or datetime.date.today()
     y = today.year
@@ -27,8 +29,7 @@ def get_relative_date_range(period: str, ref_date: Optional[datetime.date] = Non
 
     if p in ['This Month', 'Current Month']:
         start = datetime.date(y, m, 1)
-        next_month = datetime.date(y + 1, 1, 1) if m == 12 else datetime.date(y, m + 1, 1)
-        end = next_month - datetime.timedelta(days=1)
+        end = today
         return start.isoformat(), end.isoformat(), f"{start.strftime('%b %Y')}"
 
     elif p in ['Previous Month', 'Last Month']:
@@ -43,7 +44,8 @@ def get_relative_date_range(period: str, ref_date: Optional[datetime.date] = Non
         start = datetime.date(y, q_start_m, 1)
         q_end_m = q_start_m + 2
         next_q = datetime.date(y + 1, 1, 1) if q_end_m == 12 else datetime.date(y, q_end_m + 1, 1)
-        end = next_q - datetime.timedelta(days=1)
+        full_q_end = next_q - datetime.timedelta(days=1)
+        end = full_q_end if today > full_q_end else today
         return start.isoformat(), end.isoformat(), f"Q{q} {y}"
 
     elif p in ['Previous Quarter', 'Last Quarter']:
@@ -66,12 +68,14 @@ def get_relative_date_range(period: str, ref_date: Optional[datetime.date] = Non
         h_start_m = 1 if h == 1 else 7
         start = datetime.date(y, h_start_m, 1)
         next_h = datetime.date(y, 7, 1) if h == 1 else datetime.date(y + 1, 1, 1)
-        end = next_h - datetime.timedelta(days=1)
+        full_h_end = next_h - datetime.timedelta(days=1)
+        end = full_h_end if today > full_h_end else today
         return start.isoformat(), end.isoformat(), f"H{h} {y}"
 
     elif p in ['This Year', 'Current Year']:
         start = datetime.date(y, 1, 1)
-        end = datetime.date(y, 12, 31)
+        full_y_end = datetime.date(y, 12, 31)
+        end = full_y_end if today > full_y_end else today
         return start.isoformat(), end.isoformat(), f"{y}"
 
     elif p in ['Previous Year', 'Last Year', 'Last 1 Year']:
@@ -80,15 +84,16 @@ def get_relative_date_range(period: str, ref_date: Optional[datetime.date] = Non
         return start.isoformat(), end.isoformat(), f"{y - 1}"
 
     elif p == 'Last 3 Months':
-        next_month = datetime.date(y + 1, 1, 1) if m == 12 else datetime.date(y, m + 1, 1)
-        end = next_month - datetime.timedelta(days=1)
-        start_m = m - 2
-        start_y = y
-        if start_m <= 0:
-            start_m += 12
-            start_y -= 1
-        start = datetime.date(start_y, start_m, 1)
-        return start.isoformat(), end.isoformat(), f"{start.strftime('%b %Y')} - {end.strftime('%b %Y')}"
+        end = today
+        target_m = m - 3
+        target_y = y
+        if target_m <= 0:
+            target_m += 12
+            target_y -= 1
+        max_d = calendar.monthrange(target_y, target_m)[1]
+        target_d = min(today.day, max_d)
+        start = datetime.date(target_y, target_m, target_d)
+        return start.isoformat(), end.isoformat(), f"{start.strftime('%b %d, %Y')} - {end.strftime('%b %d, %Y')}"
 
     return None, None, "All Time"
 
