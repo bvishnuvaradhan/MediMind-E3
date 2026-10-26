@@ -192,8 +192,8 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
         <div className="ha-card-panel" style={{ margin: 0 }}>
           <div className="ha-card-panel-header">
             <div>
-              <h3>Five-Month Retrospective Volume Trends ({monthlyTrends[0]?.month || 'Baseline'} – {monthlyTrends[monthlyTrends.length - 1]?.month || 'Current'})</h3>
-              <p>Five-month historical trajectory of scheduled intake and completed consultations (Independent Retrospective Trend)</p>
+              <h3>Historical Monthly Operational Volume Trends ({monthlyTrends[0]?.month || 'March 2026'} – {monthlyTrends[monthlyTrends.length - 1]?.month || 'Present'})</h3>
+              <p>Monthly booking intake, completed consultations, and clinical AI activity across the available reporting history</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--ha-text-muted)' }}>
               <TrendingUp size={14} style={{ color: 'var(--ha-primary)' }} />
@@ -218,8 +218,8 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
               yAxisLabel="Consultations"
               series={[
                 { key: 'appointments', name: 'Intake Bookings', color: '#2563eb', area: true, fillOpacity: 0.18 },
-                { key: 'completed', name: 'Completed Cases', color: '#0f766e', area: true, fillOpacity: 0.12 },
-                { key: 'aiUsage', name: 'AI Screened', color: '#7c3aed' },
+                { key: 'completed', name: 'Completed Consultations', color: '#0f766e', area: true, fillOpacity: 0.12 },
+                { key: 'aiUsage', name: 'Clinical AI Runs', color: '#7c3aed' },
               ]}
             />
           )}

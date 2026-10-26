@@ -344,6 +344,21 @@ async function run() {
     }
     console.log('✓ PASS: Bed Capacity vs Operational Utilization, Patient Satisfaction, Bed Utilization, and Inpatient Bed Occupancy completely absent from DOM.');
 
+    // Step 15: Verify Historical Monthly Volume Trends header (replacing Five-Month wording)
+    console.log('[Step 15] Verifying Historical Monthly Operational Volume Trends...');
+    const hasTrendHeader = await adminPage.isVisible('h3:has-text("Historical Monthly Operational Volume Trends")');
+    if (!hasTrendHeader) {
+      throw new Error('Historical Monthly Operational Volume Trends title missing in Hospital Operational Analytics');
+    }
+    const hasHeatmapHeader = await adminPage.isVisible('h3:has-text("OPD Clinic Peak Activity Heatmap")');
+    if (!hasHeatmapHeader) {
+      throw new Error('OPD Clinic Peak Activity Heatmap missing in Hospital Operational Analytics');
+    }
+    if (wholePageText.includes('Five-Month')) {
+      throw new Error('Misleading "Five-Month" text still present in Hospital Operational Analytics!');
+    }
+    console.log('✓ PASS: Historical Monthly Operational Volume Trends active and misleading "Five-Month" wording eliminated.');
+
     await adminContext.close();
 
     console.log('\n======================================================================');
