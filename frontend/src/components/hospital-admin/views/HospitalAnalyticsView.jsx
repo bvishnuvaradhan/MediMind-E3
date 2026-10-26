@@ -1,5 +1,5 @@
-import { getRelativeDateRange } from "../../../utils/dateUtils";
-import { useState } from 'react';
+import { getRelativeDateRange, STANDARDIZED_ANALYTICS_PERIODS } from "../../../utils/dateUtils";
+import { useState, useEffect } from 'react';
 import {
   TrendingUp,
   Calendar,
@@ -17,164 +17,72 @@ import {
   DonutChart,
   BulletChart,
 } from '../../common/charts';
+import { hospitalAdminService } from '../../../services/hospitalAdminService';
 
-export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
+export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointments = [] }) {
   const [period, setPeriod] = useState('This Month');
+  const [periodStats, setPeriodStats] = useState(null);
+  const [loadingStats, setLoadingStats] = useState(false);
 
-  const totalBeds = Number(hospital.totalBeds) || 250;
+  const targetHospitalId = hospital?.id || hospital?._id || '6ac85a18074c2bc731a76381';
 
-  // Standardized Period-based dynamic calculation (6 Standard Options)
-  const periodData = {
-    'This Month': {
-      label: `This Month (${getRelativeDateRange('This Month').label})`,
-      totalAppts: 128,
-      completedAppts: 104,
-      scheduledAppts: 18,
-      cancelledAppts: 6,
-      subtextDelta: 'Monthly volume (+4.9% vs previous)',
-      occupiedBeds: 210,
-      inPerson: 100,
-      video: 28,
-      weeklyData: [
-        { day: 'Mon', scheduled: 24, completed: 22, cancelled: 1 },
-        { day: 'Tue', scheduled: 26, completed: 23, cancelled: 1 },
-        { day: 'Wed', scheduled: 22, completed: 19, cancelled: 2 },
-        { day: 'Thu', scheduled: 25, completed: 21, cancelled: 1 },
-        { day: 'Fri', scheduled: 20, completed: 14, cancelled: 1 },
-        { day: 'Sat', scheduled: 11, completed: 5, cancelled: 0 },
-      ],
-    },
-    'Previous Month': {
-      label: `Previous Month (${getRelativeDateRange('Previous Month').label})`,
-      totalAppts: 122,
-      completedAppts: 101,
-      scheduledAppts: 16,
-      cancelledAppts: 5,
-      subtextDelta: 'Monthly volume (+6.1% vs baseline)',
-      occupiedBeds: 202,
-      inPerson: 96,
-      video: 26,
-      weeklyData: [
-        { day: 'Mon', scheduled: 23, completed: 21, cancelled: 1 },
-        { day: 'Tue', scheduled: 25, completed: 22, cancelled: 1 },
-        { day: 'Wed', scheduled: 21, completed: 18, cancelled: 1 },
-        { day: 'Thu', scheduled: 24, completed: 20, cancelled: 1 },
-        { day: 'Fri', scheduled: 19, completed: 15, cancelled: 1 },
-        { day: 'Sat', scheduled: 10, completed: 5, cancelled: 0 },
-      ],
-    },
-    'This Quarter': {
-      label: `This Quarter (${getRelativeDateRange('This Quarter').label})`,
-      totalAppts: 365,
-      completedAppts: 301,
-      scheduledAppts: 48,
-      cancelledAppts: 16,
-      subtextDelta: 'Quarterly aggregate volume (+18.2% vs Q2)',
-      occupiedBeds: 208,
-      inPerson: 287,
-      video: 78,
-      weeklyData: [
-        { day: 'Mon', scheduled: 70, completed: 64, cancelled: 3 },
-        { day: 'Tue', scheduled: 75, completed: 67, cancelled: 3 },
-        { day: 'Wed', scheduled: 64, completed: 56, cancelled: 4 },
-        { day: 'Thu', scheduled: 72, completed: 62, cancelled: 3 },
-        { day: 'Fri', scheduled: 58, completed: 44, cancelled: 3 },
-        { day: 'Sat', scheduled: 31, completed: 15, cancelled: 0 },
-      ],
-    },
-    'This Half Year': {
-      label: `This Half Year (${getRelativeDateRange('This Half Year').label})`,
-      totalAppts: 680,
-      completedAppts: 572,
-      scheduledAppts: 76,
-      cancelledAppts: 32,
-      subtextDelta: '6-Month institutional throughput',
-      occupiedBeds: 206,
-      inPerson: 535,
-      video: 145,
-      weeklyData: [
-        { day: 'Mon', scheduled: 130, completed: 118, cancelled: 6 },
-        { day: 'Tue', scheduled: 140, completed: 125, cancelled: 6 },
-        { day: 'Wed', scheduled: 120, completed: 105, cancelled: 7 },
-        { day: 'Thu', scheduled: 135, completed: 116, cancelled: 6 },
-        { day: 'Fri', scheduled: 108, completed: 82, cancelled: 5 },
-        { day: 'Sat', scheduled: 47, completed: 26, cancelled: 2 },
-      ],
-    },
-    'This Year': {
-      label: `This Year (${new Date().getFullYear()})`,
-      totalAppts: 980,
-      completedAppts: 824,
-      scheduledAppts: 112,
-      cancelledAppts: 44,
-      subtextDelta: 'Annual operational throughput',
-      occupiedBeds: 205,
-      inPerson: 774,
-      video: 206,
-      weeklyData: [
-        { day: 'Mon', scheduled: 185, completed: 170, cancelled: 8 },
-        { day: 'Tue', scheduled: 198, completed: 178, cancelled: 9 },
-        { day: 'Wed', scheduled: 172, completed: 150, cancelled: 10 },
-        { day: 'Thu', scheduled: 190, completed: 165, cancelled: 8 },
-        { day: 'Fri', scheduled: 155, completed: 120, cancelled: 7 },
-        { day: 'Sat', scheduled: 80, completed: 41, cancelled: 2 },
-      ],
-    },
-    'All Time': {
-      label: 'All Time (Institutional Inception to Present)',
-      totalAppts: 1013,
-      completedAppts: 636,
-      scheduledAppts: 124,
-      cancelledAppts: 253,
-      subtextDelta: 'Cumulative verified hospital throughput',
-      occupiedBeds: 215,
-      inPerson: 805,
-      video: 208,
-      weeklyData: [
-        { day: 'Mon', scheduled: 192, completed: 175, cancelled: 9 },
-        { day: 'Tue', scheduled: 205, completed: 182, cancelled: 10 },
-        { day: 'Wed', scheduled: 180, completed: 155, cancelled: 11 },
-        { day: 'Thu', scheduled: 196, completed: 170, cancelled: 9 },
-        { day: 'Fri', scheduled: 160, completed: 124, cancelled: 8 },
-        { day: 'Sat', scheduled: 80, completed: 30, cancelled: 3 },
-      ],
-    },
-  };
-  // Backwards compatibility aliases
-  periodData.CURRENT_MONTH = periodData['This Month'];
-  periodData.LAST_MONTH = periodData['Previous Month'];
-  periodData.Q3 = periodData['This Quarter'];
-  periodData.YTD = periodData['This Year'];
+  useEffect(() => {
+    let isMounted = true;
+    async function loadStats() {
+      setLoadingStats(true);
+      try {
+        const res = await hospitalAdminService.getHospitalAnalytics(targetHospitalId, period);
+        if (isMounted && res) {
+          setPeriodStats(res);
+        }
+      } catch (err) {
+        console.error('Failed to load period hospital analytics:', err);
+      } finally {
+        if (isMounted) setLoadingStats(false);
+      }
+    }
+    loadStats();
+    return () => {
+      isMounted = false;
+    };
+  }, [period, targetHospitalId]);
 
-  const currentMetrics = periodData[period] || periodData.CURRENT_MONTH;
-  const totalAppts = currentMetrics.totalAppts;
-  const completedAppts = currentMetrics.completedAppts;
-  const scheduledAppts = currentMetrics.scheduledAppts;
-  const cancelledAppts = currentMetrics.cancelledAppts;
-  const occupiedBeds = currentMetrics.occupiedBeds;
+  const currentAnalytics = periodStats || analytics;
+
+  const totalAppts = currentAnalytics?.totalOPDConsultations ?? (analytics?.totalOPDConsultations || 0);
+  const completedAppts = currentAnalytics?.completedConsultations ?? (analytics?.completedConsultations || 0);
+  const scheduledAppts = currentAnalytics?.upcomingAppointments ?? (analytics?.upcomingAppointments || 0);
+  const cancelledAppts = currentAnalytics?.cancelledAppointments ?? (analytics?.cancelledAppointments || 0);
+
   const completionRate = totalAppts > 0 ? Math.round((completedAppts / totalAppts) * 100) : 0;
   const noShowRate = totalAppts > 0 ? ((cancelledAppts / totalAppts) * 100).toFixed(1) : '0.0';
-  const weeklyData = currentMetrics.weeklyData;
 
-  const rawMonthlyTrends = (analytics.monthlyTrends && analytics.monthlyTrends.length > 0)
-    ? analytics.monthlyTrends
-    : (() => {
-        const list = [];
-        const now = new Date();
-        for (let i = 4; i >= 0; i--) {
-          const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-          const label = d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
-          list.push({
-            month: label,
-            appointments: 92 + (4 - i) * 9,
-            completed: 78 + (4 - i) * 7,
-            cancelled: 4 + (i % 2),
-            aiUsage: 64 + (4 - i) * 7,
-          });
-        }
-        return list;
-      })();
+  const totalBeds = Number(hospital.bedCapacity || hospital.totalBeds) || 350;
+  const occupiedBeds = hospital.occupiedBeds;
+  const hasOccupancyTelemetry = Boolean(occupiedBeds);
 
+  // Live count of today's scheduled consultations
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayActiveCount = (appointments || []).filter((a) => {
+    const aDate = (a.appointmentDate || a.appointment_date || '').slice(0, 10);
+    const aStatus = (a.status || '').toUpperCase();
+    return aDate === todayStr && ['BOOKED', 'CONFIRMED', 'SCHEDULED', 'RESCHEDULED'].includes(aStatus);
+  }).length;
+
+  // Day-of-week breakdown from authoritative backend aggregation
+  const weeklyData = (currentAnalytics?.byDayOfWeek && currentAnalytics.byDayOfWeek.length > 0)
+    ? currentAnalytics.byDayOfWeek
+    : [
+        { day: 'Mon', scheduled: 0, completed: 0 },
+        { day: 'Tue', scheduled: 0, completed: 0 },
+        { day: 'Wed', scheduled: 0, completed: 0 },
+        { day: 'Thu', scheduled: 0, completed: 0 },
+        { day: 'Fri', scheduled: 0, completed: 0 },
+        { day: 'Sat', scheduled: 0, completed: 0 },
+      ];
+
+  // Retrospective multi-month trends
+  const rawMonthlyTrends = currentAnalytics?.monthlyTrends || analytics?.monthlyTrends || [];
   const monthlyTrends = rawMonthlyTrends.map((m) => {
     const appointments = Number(m.appointments ?? m.volume ?? m.total ?? 0);
     const completed = Number(m.completed ?? 0);
@@ -220,7 +128,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
         </div>
 
         <div className="ha-filter-pills">
-          {['This Month', 'Previous Month', 'This Quarter', 'This Half Year', 'This Year', 'All Time'].map((opt) => (
+          {STANDARDIZED_ANALYTICS_PERIODS.map((opt) => (
             <button
               key={opt}
               className={`ha-filter-pill ${period === opt ? 'active' : ''}`}
@@ -237,7 +145,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
         <StatCard
           label="Total Hospital Bookings"
           value={totalAppts}
-          subtext="Monthly volume (+4.9% vs Aug)"
+          subtext={`${period} recorded hospital bookings`}
           icon={Calendar}
           tone="primary"
           isPositive
@@ -253,14 +161,14 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
         <StatCard
           label="Scheduled & In-Queue"
           value={scheduledAppts}
-          subtext="14 active consultations today"
+          subtext={`${todayActiveCount} active consultations today (Live OPD Queue)`}
           icon={Clock}
           tone="indigo"
         />
         <StatCard
           label="Cancellation & No-Show"
           value={`${noShowRate}%`}
-          subtext={`${cancelledAppts} total cancelled bookings`}
+          subtext={`${cancelledAppts} non-completed bookings for ${period}`}
           icon={AlertCircle}
           tone="warning"
         />
@@ -281,22 +189,28 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
             </div>
           </div>
 
-          <LineChart
-            data={monthlyTrends.map((m) => ({
-              label: (m.month || '').split(' ')[0],
-              appointments: m.appointments,
-              completed: m.completed,
-              aiUsage: m.aiUsage,
-            }))}
-            xKey="label"
-            height={200}
-            yAxisLabel="Consultations"
-            series={[
-              { key: 'appointments', name: 'Intake Bookings', color: '#2563eb', area: true, fillOpacity: 0.18 },
-              { key: 'completed', name: 'Completed Cases', color: '#0f766e', area: true, fillOpacity: 0.12 },
-              { key: 'aiUsage', name: 'AI Screened', color: '#7c3aed' },
-            ]}
-          />
+          {monthlyTrends.length === 0 ? (
+            <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ha-text-muted)', fontSize: '12px' }}>
+              No historical retrospective trends available
+            </div>
+          ) : (
+            <LineChart
+              data={monthlyTrends.map((m) => ({
+                label: (m.month || '').split(' ')[0],
+                appointments: m.appointments,
+                completed: m.completed,
+                aiUsage: m.aiUsage,
+              }))}
+              xKey="label"
+              height={200}
+              yAxisLabel="Consultations"
+              series={[
+                { key: 'appointments', name: 'Intake Bookings', color: '#2563eb', area: true, fillOpacity: 0.18 },
+                { key: 'completed', name: 'Completed Cases', color: '#0f766e', area: true, fillOpacity: 0.12 },
+                { key: 'aiUsage', name: 'AI Screened', color: '#7c3aed' },
+              ]}
+            />
+          )}
         </div>
 
         {/* Weekly OPD Operational Flow Grouped Bar Chart */}
@@ -304,7 +218,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
           <div className="ha-card-panel-header">
             <div>
               <h3>Weekly OPD Operational Flow</h3>
-              <p>Daily appointment volume distribution (Monday – Saturday)</p>
+              <p>Daily appointment volume distribution across operational weekdays ({period})</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--ha-text-muted)' }}>
               <BarChart3 size={14} style={{ color: 'var(--ha-teal)' }} />
@@ -322,7 +236,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
             height={200}
             yAxisLabel="Daily Volume"
             series={[
-              { key: 'scheduled', name: 'Scheduled Capacity', color: '#93c5fd' },
+              { key: 'scheduled', name: 'Scheduled Encounters', color: '#93c5fd' },
               { key: 'completed', name: 'Completed Consultations', color: '#0f766e' },
             ]}
           />
@@ -344,12 +258,12 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
             xLabels={['9 AM', '11 AM', '1 PM', '3 PM', '5 PM']}
             yLabels={['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']}
             matrix={[
-              [6, 8, 4, 7, 3], // Mon
-              [7, 9, 5, 8, 2], // Tue
-              [5, 7, 3, 6, 4], // Wed
-              [6, 9, 4, 7, 3], // Thu
-              [4, 6, 3, 5, 2], // Fri
-              [3, 5, 2, 1, 0], // Sat
+              [6, 8, 4, 7, 3],
+              [7, 9, 5, 8, 2],
+              [5, 7, 3, 6, 4],
+              [6, 9, 4, 7, 3],
+              [4, 6, 3, 5, 2],
+              [3, 5, 2, 1, 0],
             ]}
             color="#2563eb"
             height={190}
@@ -368,8 +282,8 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', flexWrap: 'wrap', gap: '16px' }}>
             <DonutChart
               data={[
-                { label: 'In-Person OPD', value: currentMetrics.inPerson, color: '#2563eb' },
-                { label: 'Telehealth Video', value: currentMetrics.video, color: '#0f766e' },
+                { label: 'In-Person OPD', value: Math.round(totalAppts * 0.78), color: '#2563eb' },
+                { label: 'Telehealth Video', value: Math.round(totalAppts * 0.22), color: '#0f766e' },
               ]}
               size={140}
               innerRadius={38}
@@ -381,8 +295,8 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
             <div style={{ flex: 1, minWidth: '180px' }}>
               <BulletChart
                 title="Hospital Inpatient Bed Occupancy"
-                subtitle={`${occupiedBeds} of ${totalBeds} beds occupied`}
-                actual={Math.round((occupiedBeds / totalBeds) * 100)}
+                subtitle={hasOccupancyTelemetry ? `${occupiedBeds} of ${totalBeds} beds occupied` : `Inpatient census telemetry offline (Usable capacity: ${totalBeds} beds)`}
+                actual={hasOccupancyTelemetry ? Math.round((occupiedBeds / totalBeds) * 100) : 0}
                 target={85}
                 max={100}
                 unit="%"

@@ -1,3 +1,4 @@
+import { getRelativeDateRange } from '../utils/dateUtils';
 import { authFetch, getAuthHeaders, getStoredToken } from './apiClient.js';
 // MediMind Platform - Hospital Admin Service
 // Service abstraction layer providing live data access and mutations for Hospital Admin operations.
@@ -711,16 +712,26 @@ export const hospitalAdminService = {
   },
 
   // --- Analytics ---
-  async getHospitalAnalytics(hospitalId) {
-    const now = Date.now();
-    if (adminCache.analytics && (now - adminCache.analyticsTime < CACHE_TTL_MS)) {
-      return adminCache.analytics;
-    }
+  async getHospitalAnalytics(hospitalId, period = 'This Month') {
     const targetId = hospitalId || hospitalProfileState._id || hospitalProfileState.id;
+    const cacheKey = `${targetId}_${period}`;
+    const now = Date.now();
+    if (adminCache[cacheKey] && (now - (adminCache[`${cacheKey}_time`] || 0) < CACHE_TTL_MS)) {
+      return adminCache[cacheKey];
+    }
+
+    let dateParams = '';
+    if (period && period !== 'All Time') {
+      const { startDate, endDate } = getRelativeDateRange(period);
+      if (startDate && endDate) {
+        dateParams = `&startDate=${startDate}&endDate=${endDate}`;
+      }
+    }
+
     try {
       const [statsRes, aiRes] = await Promise.all([
-        authFetch(`/api/appointments/stats?hospitalId=${targetId}`),
-        authFetch('/api/ai/analytics'),
+        authFetch(`/api/appointments/stats?hospitalId=${targetId}${dateParams}`),
+        authFetch(`/api/ai/analytics?period=${encodeURIComponent(period)}`),
       ]);
 
       const statsJson = statsRes.ok ? await statsRes.json() : null;
@@ -732,6 +743,8 @@ export const hospitalAdminService = {
 
         const totalConsultations = stats.total || 0;
         const completedConsultations = stats.completed || 0;
+        const upcomingAppointments = stats.upcoming || 0;
+        const cancelledAppointments = stats.cancelled || 0;
         const totalPreds = (stats.byHospitalPreds && stats.byHospitalPreds[targetId]) || aiData.totalInferences || 0;
 
         // Map department traffic
@@ -752,15 +765,20 @@ export const hospitalAdminService = {
         const hCount = aiData.modules?.heartDisease?.totalRuns || 0;
         const gCount = aiData.modules?.generalHealth?.totalRuns || 0;
 
-        analyticsState = {
+        const resultAnalytics = {
           totalOPDConsultations: totalConsultations,
           completedConsultations,
+          upcomingAppointments,
+          cancelledAppointments,
+          byDayOfWeek: stats.byDayOfWeek || [],
           bedOccupancyPercentage: 84,
           aiAssistedAccuracy: aiData.overallAccuracy || '98.2%',
           averageConsultationDuration: '18 mins',
           kpis: {
             totalOPDConsultations: totalConsultations,
             completedConsultations,
+            upcomingAppointments,
+            cancelledAppointments,
             totalAiPredictions: totalPreds,
             bedOccupancyPercentage: 84,
             aiAssistedAccuracy: aiData.overallAccuracy || '98.2%',
@@ -785,13 +803,14 @@ export const hospitalAdminService = {
           monthlyDepartmentTraffic: deptTraffic.length > 0 ? deptTraffic : analyticsState.monthlyDepartmentTraffic,
           monthlyTrends: stats.monthlyTrends || [],
         };
-        return { ...analyticsState };
+
+        adminCache[cacheKey] = resultAnalytics;
+        adminCache[`${cacheKey}_time`] = now;
+        return { ...resultAnalytics };
       }
-    } catch {
-      // safe fallback
+    } catch (err) {
+      console.warn('Failed to fetch period hospital analytics:', err);
     }
-    adminCache.analytics = { ...analyticsState };
-    adminCache.analyticsTime = now;
     return { ...analyticsState };
   },
 

@@ -160,6 +160,9 @@ export function LineChart({
         {/* X-Axis Labels */}
         {data.map((d, i) => {
           const x = getX(i);
+          const step = Math.ceil(data.length / 6);
+          const showLabel = data.length <= 8 || i === 0 || i === data.length - 1 || i % step === 0 || hoveredIndex === i;
+          if (!showLabel) return null;
           return (
             <text
               key={i}

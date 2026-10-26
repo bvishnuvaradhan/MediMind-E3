@@ -139,8 +139,8 @@ async function run() {
     }
     console.log('✓ PASS: All table rows contain exactly 7 cells aligned with headers.');
 
-    // Verify Graph 1 and Graph 2 are present
-    console.log('[Step 5] Verifying Separate Graphs for Appointments Served and Clinical AI Runs...');
+    // Verify Graph 1 and Graph 2 are present as Monthly/Daily Line Charts
+    console.log('[Step 5] Verifying Separate Monthly Line Charts for Appointments Served and Clinical AI Runs...');
     const graph1Title = await page.isVisible('h3:has-text("Appointments Served by Hospital")');
     const graph2Title = await page.isVisible('h3:has-text("Clinical AI Runs by Hospital")');
 
@@ -152,13 +152,24 @@ async function run() {
     }
     console.log('✓ PASS: Both dedicated graph titles rendered.');
 
-    // Verify SVG bars are rendered in both graphs
-    const svgBarCount = await page.$$eval('.table-card svg rect', (rects) => rects.length);
-    console.log(`Total SVG bar rects rendered across graphs: ${svgBarCount}`);
-    if (svgBarCount === 0) {
-      throw new Error('Zero SVG bar elements found in graphs!');
+    // Verify SVG line paths and dots are rendered in both line charts
+    const svgLineCount = await page.$$eval('.table-card svg path', (paths) => paths.length);
+    const svgCircleCount = await page.$$eval('.table-card svg circle', (circles) => circles.length);
+    console.log(`SVG line chart elements rendered: ${svgLineCount} line paths, ${svgCircleCount} data circles`);
+    if (svgLineCount === 0 || svgCircleCount === 0) {
+      throw new Error('Zero SVG line chart elements found in graphs!');
     }
-    console.log('✓ PASS: SVG bar chart visualizations active in both graphs.');
+    console.log('✓ PASS: SVG monthly trend line chart visualizations active in both graphs.');
+
+    // Verify Legends have hospital names
+    const pageText = await page.textContent('.hospital-performance-view');
+    const hasHarborviewInLegend = pageText.includes('Harborview Medical Centre') || pageText.includes('Harborview');
+    const hasAarogyamInLegend = pageText.includes('Aarogyam Multispeciality') || pageText.includes('Aarogyam');
+    const hasNexoraInLegend = pageText.includes('Nexora Advanced Care') || pageText.includes('Nexora');
+    if (!hasHarborviewInLegend || !hasAarogyamInLegend || !hasNexoraInLegend) {
+      throw new Error('Hospital legends missing from line charts!');
+    }
+    console.log('✓ PASS: Line chart legends contain all active hospital network facilities.');
 
     // Test Date Range Change in Chairman View
     console.log('[Step 6] Testing Date Range Selector change to "This Month"...');
@@ -220,7 +231,7 @@ async function run() {
     console.log('✓ PASS: All 6 standardized period pills present in Hospital Operational Analytics, including "All Time" and "This Half Year".');
 
     // Test clicking pills
-    console.log('[Step 10] Testing filter pill interactions...');
+    console.log('[Step 10] Testing filter pill interactions and dynamic subtexts...');
     await adminPage.click('.ha-filter-pill:has-text("This Quarter")');
     await adminPage.waitForTimeout(500);
     const quarterActive = await adminPage.isVisible('.ha-filter-pill.active:has-text("This Quarter")');
@@ -238,6 +249,13 @@ async function run() {
       throw new Error('Retrospective trend label missing in Hospital Operational Analytics');
     }
     console.log('✓ PASS: Retrospective monthly trend chart clearly identified as independent multi-month trajectory.');
+
+    // Verify static stale text like "vs Aug" is completely eliminated
+    const adminPageText = await adminPage.textContent('.ha-stat-grid');
+    if (adminPageText.includes('vs Aug')) {
+      throw new Error('Static text "vs Aug" found in Hospital Operational Analytics!');
+    }
+    console.log('✓ PASS: Static stale comparative text like "vs Aug" successfully eliminated.');
 
     await adminContext.close();
 

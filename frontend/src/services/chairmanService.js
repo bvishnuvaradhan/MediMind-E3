@@ -758,9 +758,9 @@ export const chairmanService = {
         const dynamicThroughput = [];
         if (stats.byHospital) {
           Object.entries(stats.byHospital).forEach(([hid, hospTotal]) => {
-            const hName = hospMap[hid] || (hid.includes('6ac85a18074c2bc731a76385') ? 'Harborview Medical Centre' :
-                                           hid.includes('6ac85a18074c2bc731a76384') ? 'Nexora Advanced Care Hospital' :
-                                           hid.includes('6ac85a18074c2bc731a76383') ? 'Aarogyam Multispeciality Hospital' : 'Hospital Facility');
+            const hName = hospMap[hid] || (hid.endsWith('85') ? 'Harborview Medical Centre' :
+                                           hid.endsWith('83') ? 'Nexora Advanced Care Hospital' :
+                                           hid.endsWith('81') ? 'Aarogyam Multispeciality Hospital' : 'Hospital Facility');
             const short = hName.includes('Harborview') ? 'Harborview' : hName.includes('Nexora') ? 'Nexora' : hName.includes('Aarogyam') ? 'Aarogyam' : hName;
             const hospComp = (stats.byHospitalCompleted && stats.byHospitalCompleted[hid]) || 0;
             dynamicThroughput.push({
@@ -907,7 +907,7 @@ export const chairmanService = {
 
     const activeHosps = rawHosps.filter(h => (h.status || 'Active').toUpperCase() === 'ACTIVE' || h.status === 'Active');
 
-    return activeHosps.map(h => {
+    const hospitalsList = activeHosps.map(h => {
       const hid = (h._id || h.id || '').toString();
       const hname = (h.name || '').toLowerCase();
 
@@ -930,15 +930,25 @@ export const chairmanService = {
       // Authoritative AI Predictions (Clinical AI Runs)
       const aiRunsCount = (stats?.byHospitalPreds && stats.byHospitalPreds[hid]) || 0;
 
-      // Bed capacity and utilization
+      // Usable bed capacity from database
       const bedCap = h.bedCapacity || (hid.endsWith('81') ? 350 : hid.endsWith('83') ? 400 : 600);
-      const utilNum = hid.endsWith('85') ? 88 : hid.endsWith('81') ? 84 : 79;
-      const utilRate = `${utilNum}%`;
+      // Usable occupied beds from database if tracked
+      const occupiedBeds = h.occupiedBeds;
+      const bedUtilization = (occupiedBeds && bedCap) ? `${Math.round((occupiedBeds / bedCap) * 100)}%` : 'Unavailable';
+
+      // Patient satisfaction from authoritative source if available
+      const patientSatisfaction = h.patientSatisfaction || h.satisfactionScore || 'Unavailable';
+
+      // Network status directly from authoritative status
+      const netStatus = (h.status || 'Active').charAt(0).toUpperCase() + (h.status || 'Active').slice(1).toLowerCase();
+
+      // Location directly from hospital address
+      const city = h.address?.city || h.city || (hid.endsWith('81') || hid.endsWith('83') ? 'Hyderabad' : 'Mumbai');
 
       return {
         id: hid,
         name: h.name,
-        city: h.city || 'Mumbai',
+        city,
         doctorsCount: docCount || h.doctorsCount || 0,
         departmentsCount: deptCount || h.departmentsCount || 0,
         appointmentsServed: servedCount,
@@ -946,13 +956,106 @@ export const chairmanService = {
         appointmentsCount: servedCount,
         totalEncountersCount: (stats?.byHospital && stats.byHospital[hid]) || 0,
         aiPredictionsCount: aiRunsCount,
-        bedUtilization: utilRate,
-        utilizationRate: utilRate,
+        bedUtilization,
+        utilizationRate: bedUtilization,
         bedCapacity: bedCap,
-        patientSatisfaction: '98.4%',
-        status: 'Active',
+        patientSatisfaction,
+        status: netStatus,
       };
     });
+
+    const HOSPITAL_COLORS = ['#2563eb', '#059669', '#7c3aed', '#d97706', '#db2777'];
+    const trendSeries = activeHosps.map((h, i) => {
+      const hid = (h._id || h.id || '').toString();
+      return {
+        key: `hosp_${hid.slice(-4)}`,
+        hospitalId: hid,
+        name: h.name,
+        shortName: h.name.replace('Hospital', '').replace('MediMind', '').trim(),
+        color: HOSPITAL_COLORS[i % HOSPITAL_COLORS.length],
+      };
+    });
+
+    const isSingleMonth = dateRange === 'This Month' || dateRange === 'Previous Month';
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const currentMonthKey = new Date().toISOString().slice(0, 7);
+
+    let servedTrends = [];
+    let aiRunsTrends = [];
+
+    if (isSingleMonth) {
+      // Daily line chart granularity
+      const dailyCompleted = stats?.byHospitalDailyCompleted || [];
+      const dailyPreds = stats?.byHospitalDailyPreds || [];
+      const distinctDays = [...new Set([
+        ...dailyCompleted.map(d => d.bucket),
+        ...dailyPreds.map(d => d.bucket)
+      ])].filter(Boolean).sort();
+
+      servedTrends = distinctDays.map(dayStr => {
+        const parts = dayStr.split('-');
+        const mIdx = parseInt(parts[1], 10) - 1;
+        const label = `${parts[2]} ${monthNames[mIdx] || parts[1]}`;
+        const row = { bucket: dayStr, label };
+        trendSeries.forEach(s => {
+          const match = dailyCompleted.find(d => d.bucket === dayStr && d.hospitalId === s.hospitalId);
+          row[s.key] = match ? match.count : 0;
+        });
+        return row;
+      });
+
+      aiRunsTrends = distinctDays.map(dayStr => {
+        const parts = dayStr.split('-');
+        const mIdx = parseInt(parts[1], 10) - 1;
+        const label = `${parts[2]} ${monthNames[mIdx] || parts[1]}`;
+        const row = { bucket: dayStr, label };
+        trendSeries.forEach(s => {
+          const match = dailyPreds.find(d => d.bucket === dayStr && d.hospitalId === s.hospitalId);
+          row[s.key] = match ? match.count : 0;
+        });
+        return row;
+      });
+    } else {
+      // Monthly line chart granularity (exclude future months)
+      const monthlyCompleted = (stats?.byHospitalMonthlyCompleted || []).filter(m => m.bucket <= currentMonthKey);
+      const monthlyPreds = (stats?.byHospitalMonthlyPreds || []).filter(m => m.bucket <= currentMonthKey);
+      const distinctMonths = [...new Set([
+        ...monthlyCompleted.map(m => m.bucket),
+        ...monthlyPreds.map(m => m.bucket)
+      ])].filter(Boolean).sort();
+
+      servedTrends = distinctMonths.map(mStr => {
+        const [y, mNum] = mStr.split('-');
+        const mIdx = parseInt(mNum, 10) - 1;
+        const label = `${monthNames[mIdx] || mNum} ${y}`;
+        const row = { bucket: mStr, label };
+        trendSeries.forEach(s => {
+          const match = monthlyCompleted.find(m => m.bucket === mStr && m.hospitalId === s.hospitalId);
+          row[s.key] = match ? match.count : 0;
+        });
+        return row;
+      });
+
+      aiRunsTrends = distinctMonths.map(mStr => {
+        const [y, mNum] = mStr.split('-');
+        const mIdx = parseInt(mNum, 10) - 1;
+        const label = `${monthNames[mIdx] || mNum} ${y}`;
+        const row = { bucket: mStr, label };
+        trendSeries.forEach(s => {
+          const match = monthlyPreds.find(m => m.bucket === mStr && m.hospitalId === s.hospitalId);
+          row[s.key] = match ? match.count : 0;
+        });
+        return row;
+      });
+    }
+
+    const result = [...hospitalsList];
+    result.hospitals = hospitalsList;
+    result.trendSeries = trendSeries;
+    result.servedTrends = servedTrends;
+    result.aiRunsTrends = aiRunsTrends;
+    result.granularity = isSingleMonth ? 'daily' : 'monthly';
+    return result;
   },
 
 

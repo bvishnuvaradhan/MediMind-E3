@@ -8,7 +8,7 @@ import {
   Users,
 } from 'lucide-react';
 import { chairmanService } from '../../../services/chairmanService';
-import { BarChart, BulletChart } from '../../common/charts';
+import { LineChart, BulletChart } from '../../common/charts';
 import { STANDARDIZED_ANALYTICS_PERIODS } from '../../../utils/dateUtils';
 
 export function HospitalPerformanceView() {
@@ -44,19 +44,10 @@ export function HospitalPerformanceView() {
   const totalServed = performance.reduce((sum, h) => sum + (Number(h.appointmentsServed) || 0), 0);
   const totalAiRuns = performance.reduce((sum, h) => sum + (Number(h.clinicalAiRuns) || 0), 0);
 
-  // Graph 1: Appointments Served by Hospital (Single series bar chart)
-  const appointmentsServedChartData = performance.map((h) => ({
-    label: h.name.replace('Hospital', '').replace('MediMind', '').trim(),
-    fullName: h.name,
-    served: Number(h.appointmentsServed) || 0,
-  }));
-
-  // Graph 2: Clinical AI Runs by Hospital (Single series bar chart)
-  const clinicalAiRunsChartData = performance.map((h) => ({
-    label: h.name.replace('Hospital', '').replace('MediMind', '').trim(),
-    fullName: h.name,
-    aiRuns: Number(h.clinicalAiRuns) || 0,
-  }));
+  const servedTrends = performance.servedTrends || [];
+  const aiRunsTrends = performance.aiRunsTrends || [];
+  const trendSeries = performance.trendSeries || [];
+  const granularity = performance.granularity || 'monthly';
 
   return (
     <div className="hospital-performance-view">
@@ -156,12 +147,24 @@ export function HospitalPerformanceView() {
                     <td>{item.city}</td>
                     <td>{item.doctorsCount} Specialists</td>
                     <td>{item.departmentsCount} Active</td>
-                    <td>{item.bedUtilization || item.utilizationRate || 'N/A'}</td>
                     <td>
-                      <span className="badge badge-active">{item.patientSatisfaction || '98.4%'}</span>
+                      {item.bedUtilization && item.bedUtilization !== 'Unavailable' ? (
+                        item.bedUtilization
+                      ) : (
+                        <span style={{ color: 'var(--chair-muted)', fontSize: '12px' }}>Unavailable</span>
+                      )}
                     </td>
                     <td>
-                      <span className={`badge badge-${(item.status || 'Active').toLowerCase()}`}>{item.status || 'Active'}</span>
+                      {item.patientSatisfaction && item.patientSatisfaction !== 'Unavailable' ? (
+                        <span className="badge badge-active">{item.patientSatisfaction}</span>
+                      ) : (
+                        <span className="badge badge-inactive" style={{ opacity: 0.75 }}>Unavailable</span>
+                      )}
+                    </td>
+                    <td>
+                      <span className={`badge badge-${(item.status || 'Active').toLowerCase()}`}>
+                        {item.status || 'Active'}
+                      </span>
                     </td>
                   </tr>
                 ))
@@ -171,51 +174,49 @@ export function HospitalPerformanceView() {
         </div>
       </div>
 
-      {/* Two Dedicated Separate Graphs for Appointments Served and Clinical AI Runs */}
+      {/* Two Dedicated Separate Line Charts for Appointments Served and Clinical AI Runs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '22px', marginBottom: '24px' }}>
-        {/* Graph 1: Appointments Served by Hospital */}
+        {/* Graph A: Appointments Served by Hospital (Monthly/Daily Line Chart) */}
         <div className="table-card" style={{ padding: '24px' }}>
           <div style={{ marginBottom: '16px' }}>
             <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>
               Appointments Served by Hospital
             </h3>
             <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
-              Completed patient consultations for the selected period ({dateRange})
+              Completed patient consultations by {granularity === 'daily' ? 'daily encounter date' : 'calendar month'} ({dateRange})
             </p>
           </div>
 
-          <BarChart
-            data={appointmentsServedChartData}
+          <LineChart
+            data={servedTrends}
+            series={trendSeries}
             xKey="label"
             height={220}
             yAxisLabel="Served Visits"
-            showLegend={false}
-            series={[
-              { key: 'served', name: 'Appointments Served', color: '#2563eb' },
-            ]}
+            showGrid={true}
+            showLegend={true}
           />
         </div>
 
-        {/* Graph 2: Clinical AI Runs by Hospital */}
+        {/* Graph B: Clinical AI Runs by Hospital (Monthly/Daily Line Chart) */}
         <div className="table-card" style={{ padding: '24px' }}>
           <div style={{ marginBottom: '16px' }}>
             <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>
               Clinical AI Runs by Hospital
             </h3>
             <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
-              Diagnostic AI inference runs executed for the selected period ({dateRange})
+              Diagnostic AI inference executions by {granularity === 'daily' ? 'daily telemetry timestamp' : 'calendar month'} ({dateRange})
             </p>
           </div>
 
-          <BarChart
-            data={clinicalAiRunsChartData}
+          <LineChart
+            data={aiRunsTrends}
+            series={trendSeries}
             xKey="label"
             height={220}
             yAxisLabel="AI Inferences"
-            showLegend={false}
-            series={[
-              { key: 'aiRuns', name: 'Clinical AI Runs', color: '#0f766e' },
-            ]}
+            showGrid={true}
+            showLegend={true}
           />
         </div>
       </div>
@@ -233,12 +234,13 @@ export function HospitalPerformanceView() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {performance.map((item) => {
-            const utilNum = parseFloat(item.bedUtilization || item.utilizationRate) || 82;
+            const isAvailable = item.bedUtilization && item.bedUtilization !== 'Unavailable';
+            const utilNum = isAvailable ? parseFloat(item.bedUtilization) : 0;
             return (
               <BulletChart
                 key={item.id}
                 title={item.name}
-                subtitle={`${item.city} (${item.departmentsCount} Depts • Capacity: ${item.bedCapacity || 350} Beds)`}
+                subtitle={`${item.city} (${item.departmentsCount} Depts • Usable Capacity: ${item.bedCapacity || 350} Beds${!isAvailable ? ' • Inpatient Census: Offline' : ''})`}
                 actual={utilNum}
                 target={85}
                 max={100}

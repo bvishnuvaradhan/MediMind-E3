@@ -2758,6 +2758,87 @@ export const appointmentService = {
 
           ],
 
+          byHospitalMonthlyCompleted: [
+            { $match: { status: 'COMPLETED' } },
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: { $dateToString: { format: '%Y-%m', date: '$appointment_date' } }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
+          byHospitalMonthlyPreds: [
+            { $match: { ai_prediction_id: { $type: 'string', $ne: '' } } },
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: { $dateToString: { format: '%Y-%m', date: '$appointment_date' } }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
+          byHospitalDailyCompleted: [
+            { $match: { status: 'COMPLETED' } },
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: { $dateToString: { format: '%Y-%m-%d', date: '$appointment_date' } }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
+          byHospitalDailyPreds: [
+            { $match: { ai_prediction_id: { $type: 'string', $ne: '' } } },
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: { $dateToString: { format: '%Y-%m-%d', date: '$appointment_date' } }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
+          byDayOfWeek: [
+            {
+              $group: {
+                _id: { $dayOfWeek: '$appointment_date' },
+                total: { $sum: 1 },
+                completed: { $sum: { $cond: [{ $eq: ['$status', 'COMPLETED'] }, 1, 0] } },
+                scheduled: {
+                  $sum: {
+                    $cond: [
+                      { $in: ['$status', ['BOOKED', 'CONFIRMED', 'SCHEDULED', 'RESCHEDULED', 'PENDING']] },
+                      1,
+                      0
+                    ]
+                  }
+                },
+                cancelled: {
+                  $sum: {
+                    $cond: [{ $in: ['$status', ['CANCELLED', 'CANCELED']] }, 1, 0]
+                  }
+                }
+              }
+            },
+            { $sort: { _id: 1 } }
+          ],
+
         },
 
       },
@@ -2858,30 +2939,57 @@ export const appointmentService = {
 
     });
 
+    const dayNames = ['', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const byDayOfWeek = (stats?.byDayOfWeek || []).map(d => ({
+      day: dayNames[d._id] || `Day ${d._id}`,
+      dayNum: d._id,
+      total: d.total || 0,
+      completed: d.completed || 0,
+      scheduled: d.scheduled || 0,
+      cancelled: d.cancelled || 0,
+    }));
+
+    const byHospitalMonthlyCompleted = (stats?.byHospitalMonthlyCompleted || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      count: m.count || 0,
+    }));
+
+    const byHospitalMonthlyPreds = (stats?.byHospitalMonthlyPreds || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      count: m.count || 0,
+    }));
+
+    const byHospitalDailyCompleted = (stats?.byHospitalDailyCompleted || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      count: m.count || 0,
+    }));
+
+    const byHospitalDailyPreds = (stats?.byHospitalDailyPreds || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      count: m.count || 0,
+    }));
+
     return {
-
       total,
-
       completed,
-
       upcoming,
-
       cancelled,
-
       byStatus: byStatusMap,
-
       byHospital: byHospitalMap,
-
       byHospitalCompleted: byHospitalCompletedMap,
-
       byHospitalPreds: byHospitalPredsMap,
-
       byDepartment: byDepartmentMap,
-
       byDepartmentPreds: byDepartmentPredsMap,
-
       monthlyTrends,
-
+      byHospitalMonthlyCompleted,
+      byHospitalMonthlyPreds,
+      byHospitalDailyCompleted,
+      byHospitalDailyPreds,
+      byDayOfWeek,
     };
 
   },
