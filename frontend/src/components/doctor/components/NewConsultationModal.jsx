@@ -13,6 +13,12 @@ function ConsultationForm({
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(
     initialData?.appointmentId || (completedAppointments[0]?.id || '')
   );
+  const [encounterMode, setEncounterMode] = useState(
+    initialData?.followUpConsultationId ? 'follow_up' : 'new'
+  );
+  const [selectedPriorConsultationId, setSelectedPriorConsultationId] = useState(
+    initialData?.followUpConsultationId || ''
+  );
   const [formData, setFormData] = useState({
     id: initialData?.id || null,
     appointmentId: initialData?.appointmentId || (completedAppointments[0]?.id || ''),
@@ -23,12 +29,38 @@ function ConsultationForm({
     treatmentPlan: initialData?.treatmentPlan || '',
     doctorNotes: initialData?.doctorNotes || '',
     followUpDate: initialData?.followUpDate || '',
+    followUpConsultationId: initialData?.followUpConsultationId || null,
+    isFollowUp: Boolean(initialData?.followUpConsultationId),
   });
 
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const selectedPatient = patients.find((p) => p.id === formData.patientId) || patients[0];
+
+  const eligiblePriorConsultations = (consultations || []).filter(
+    (c) => (c.patientId === formData.patientId || c.patientName === selectedPatient?.name) && c.id !== initialData?.id
+  );
+
+  const handleSelectPriorConsultation = (priorId) => {
+    setSelectedPriorConsultationId(priorId);
+    const prior = eligiblePriorConsultations.find((c) => c.id === priorId);
+    if (prior) {
+      setFormData((prev) => ({
+        ...prev,
+        followUpConsultationId: priorId,
+        isFollowUp: true,
+        diagnosis: prior.diagnosis || prev.diagnosis,
+        treatmentPlan: prior.treatmentPlan ? `Follow-up on previous plan:\n${prior.treatmentPlan}` : prev.treatmentPlan,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        followUpConsultationId: null,
+        isFollowUp: false,
+      }));
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -177,6 +209,68 @@ function ConsultationForm({
           </div>
         )}
 
+        {/* Encounter Classification: New vs Follow-up */}
+        <div className="doctor-form-group" style={{ padding: '12px 14px', backgroundColor: 'var(--doctor-bg, #f8fafc)', borderRadius: '8px', border: '1px solid var(--doctor-border, #e2e8f0)' }}>
+          <label className="doctor-label" style={{ marginBottom: '8px' }}>Encounter Classification *</label>
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', fontWeight: encounterMode === 'new' ? 700 : 500 }}>
+              <input
+                type="radio"
+                name="encounterMode"
+                value="new"
+                checked={encounterMode === 'new'}
+                onChange={() => {
+                  setEncounterMode('new');
+                  setSelectedPriorConsultationId('');
+                  setFormData((prev) => ({ ...prev, isFollowUp: false, followUpConsultationId: null }));
+                }}
+              />
+              New Clinical Consultation
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', fontWeight: encounterMode === 'follow_up' ? 700 : 500 }}>
+              <input
+                type="radio"
+                name="encounterMode"
+                value="follow_up"
+                checked={encounterMode === 'follow_up'}
+                onChange={() => {
+                  setEncounterMode('follow_up');
+                  if (eligiblePriorConsultations.length > 0) {
+                    handleSelectPriorConsultation(eligiblePriorConsultations[0].id);
+                  }
+                }}
+              />
+              Follow-Up Encounter (Linked to Prior Consultation)
+            </label>
+          </div>
+
+          {encounterMode === 'follow_up' && (
+            <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid var(--doctor-border, #e2e8f0)' }}>
+              <label className="doctor-label" style={{ fontSize: '12px' }}>
+                Select Prior Eligible Consultation for {selectedPatient?.name} *
+              </label>
+              {eligiblePriorConsultations.length === 0 ? (
+                <div style={{ fontSize: '12px', color: '#b45309', padding: '6px 10px', backgroundColor: '#fef3c7', borderRadius: '6px' }}>
+                  ℹ No prior completed consultations found for this patient. This encounter will be filed as primary.
+                </div>
+              ) : (
+                <select
+                  className="doctor-select"
+                  value={selectedPriorConsultationId}
+                  onChange={(e) => handleSelectPriorConsultation(e.target.value)}
+                >
+                  <option value="">-- Choose Prior Consultation --</option>
+                  {eligiblePriorConsultations.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.consultationNumber || c.id} — {c.diagnosis} ({c.date || 'Previous'})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          )}
+        </div>
+
         <div className="doctor-form-group">
           <label className="doctor-label">Chief Symptoms & Clinical Presentation *</label>
           <textarea
@@ -280,6 +374,8 @@ export function NewConsultationModal({
   isOpen,
   initialData,
   patients = [],
+  appointments = [],
+  consultations = [],
   onSaveDraft,
   onFinalize,
   onClose,
@@ -289,9 +385,11 @@ export function NewConsultationModal({
   return (
     <div className="doctor-modal-overlay" onClick={onClose}>
       <ConsultationForm
-        key={initialData?.id || 'new_cons'}
+        key={initialData?.id || initialData?.appointmentId || 'new_cons'}
         initialData={initialData}
         patients={patients}
+        appointments={appointments}
+        consultations={consultations}
         onSaveDraft={onSaveDraft}
         onFinalize={onFinalize}
         onClose={onClose}

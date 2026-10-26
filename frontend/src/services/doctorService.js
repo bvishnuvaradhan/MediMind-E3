@@ -211,6 +211,21 @@ export const doctorService = {
   },
 
   async updateAppointmentStatus(appointmentId, status) {
+    try {
+      if (status === 'Completed' || status === 'COMPLETED') {
+        await authFetch(`/api/appointments/${appointmentId}/complete`, {
+          method: 'PUT',
+        });
+      } else {
+        await authFetch(`/api/appointments/${appointmentId}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: status.toUpperCase() }),
+        });
+      }
+    } catch {
+      // In-memory fallback if backend is offline or mock ID
+    }
     appointmentsState = appointmentsState.map((a) =>
       a.id === appointmentId ? { ...a, status } : a
     );

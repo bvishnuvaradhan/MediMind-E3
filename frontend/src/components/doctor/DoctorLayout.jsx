@@ -552,6 +552,8 @@ export function DoctorLayout({ dark, setDark }) {
         isOpen={isConsultationModalOpen}
         initialData={consultationModalData}
         patients={patients}
+        appointments={appointments}
+        consultations={consultations}
         onSaveDraft={handleSaveConsultationDraft}
         onFinalize={handleFinalizeConsultation}
         onClose={() => {
@@ -565,6 +567,8 @@ export function DoctorLayout({ dark, setDark }) {
         isOpen={isPrescriptionModalOpen}
         initialData={prescriptionModalData}
         patients={patients}
+        appointments={appointments}
+        consultations={consultations}
         onSaveDraft={handleSavePrescriptionDraft}
         onFinalize={handleFinalizePrescription}
         onClose={() => {

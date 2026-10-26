@@ -136,6 +136,37 @@ function PrescriptionForm({
           </div>
         )}
 
+        {/* Linked Consultation Record */}
+        <div className="doctor-form-group">
+          <label className="doctor-label">Associated Clinical Consultation Record *</label>
+          <select
+            className="doctor-select"
+            value={formData.consultationId}
+            onChange={(e) => {
+              const cId = e.target.value;
+              const matched = (consultations || []).find((c) => c.id === cId);
+              setFormData((prev) => ({
+                ...prev,
+                consultationId: cId,
+                patientId: matched?.patientId || prev.patientId,
+                diagnosis: matched?.diagnosis || prev.diagnosis,
+              }));
+            }}
+          >
+            {consultations.length === 0 ? (
+              <option value="">-- No signed consultations available (General prescription) --</option>
+            ) : (
+              (consultations || [])
+                .filter((c) => !formData.patientId || c.patientId === formData.patientId)
+                .map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.consultationNumber || c.id} — {c.patientName} ({c.diagnosis})
+                  </option>
+                ))
+            )}
+          </select>
+        </div>
+
         <div className="doctor-form-row">
           <div className="doctor-form-group">
             <label className="doctor-label">Authorized Patient *</label>
@@ -301,6 +332,8 @@ export function NewPrescriptionModal({
   isOpen,
   initialData,
   patients = [],
+  appointments = [],
+  consultations = [],
   onSaveDraft,
   onFinalize,
   onClose,
@@ -310,9 +343,11 @@ export function NewPrescriptionModal({
   return (
     <div className="doctor-modal-overlay" onClick={onClose}>
       <PrescriptionForm
-        key={initialData?.id || 'new_rx'}
+        key={initialData?.id || initialData?.consultationId || 'new_rx'}
         initialData={initialData}
         patients={patients}
+        appointments={appointments}
+        consultations={consultations}
         onSaveDraft={onSaveDraft}
         onFinalize={onFinalize}
         onClose={onClose}
