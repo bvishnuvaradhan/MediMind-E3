@@ -61,6 +61,14 @@ def get_relative_date_range(period: str, ref_date: Optional[datetime.date] = Non
         end = next_q - datetime.timedelta(days=1)
         return start.isoformat(), end.isoformat(), f"Q{prev_q} {prev_y}"
 
+    elif p in ['This Half Year', 'Current Half Year', 'Last 6 Months']:
+        h = 1 if m <= 6 else 2
+        h_start_m = 1 if h == 1 else 7
+        start = datetime.date(y, h_start_m, 1)
+        next_h = datetime.date(y, 7, 1) if h == 1 else datetime.date(y + 1, 1, 1)
+        end = next_h - datetime.timedelta(days=1)
+        return start.isoformat(), end.isoformat(), f"H{h} {y}"
+
     elif p in ['This Year', 'Current Year']:
         start = datetime.date(y, 1, 1)
         end = datetime.date(y, 12, 31)

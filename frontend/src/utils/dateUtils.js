@@ -1,8 +1,19 @@
 /**
  * MediMind Platform - Dynamic Relative Date & Period Utilities
- * Enforces dynamic relative date calculations across all platform analytics,
+ * Enforces standardized relative date calculations across all platform analytics,
  * reports, charts, and filter dropdowns.
  */
+
+export const STANDARDIZED_ANALYTICS_PERIODS = [
+  'This Month',
+  'Previous Month',
+  'This Quarter',
+  'This Half Year',
+  'This Year',
+  'All Time',
+];
+
+export const RELATIVE_PERIOD_OPTIONS = STANDARDIZED_ANALYTICS_PERIODS;
 
 export function getRelativeDateRange(period, refDate = new Date()) {
   const y = refDate.getFullYear();
@@ -42,13 +53,21 @@ export function getRelativeDateRange(period, refDate = new Date()) {
     const startDate = start.toISOString().slice(0, 10);
     const endDate = end.toISOString().slice(0, 10);
     return { startDate, endDate, label: `Q${prevQ} ${prevY}`, periodName: 'Previous Quarter' };
+  } else if (p === 'This Half Year' || p === 'Current Half Year' || p === 'Last 6 Months') {
+    const h = m < 6 ? 1 : 2;
+    const hStartMonth = h === 1 ? 0 : 6;
+    const start = new Date(Date.UTC(y, hStartMonth, 1, 0, 0, 0, 0));
+    const end = new Date(Date.UTC(y, hStartMonth + 6, 0, 23, 59, 59, 999));
+    const startDate = start.toISOString().slice(0, 10);
+    const endDate = end.toISOString().slice(0, 10);
+    return { startDate, endDate, label: `H${h} ${y} (${h === 1 ? 'Jan–Jun' : 'Jul–Dec'})`, periodName: 'This Half Year' };
   } else if (p === 'This Year' || p === 'Current Year') {
     const start = new Date(Date.UTC(y, 0, 1, 0, 0, 0, 0));
     const end = new Date(Date.UTC(y, 11, 31, 23, 59, 59, 999));
     const startDate = start.toISOString().slice(0, 10);
     const endDate = end.toISOString().slice(0, 10);
     return { startDate, endDate, label: `${y}`, periodName: 'This Year' };
-  } else if (p === 'Previous Year' || p === 'Last Year') {
+  } else if (p === 'Previous Year' || p === 'Last Year' || p === 'Last 1 Year') {
     const start = new Date(Date.UTC(y - 1, 0, 1, 0, 0, 0, 0));
     const end = new Date(Date.UTC(y - 1, 11, 31, 23, 59, 59, 999));
     const startDate = start.toISOString().slice(0, 10);
@@ -64,16 +83,6 @@ export function getRelativeDateRange(period, refDate = new Date()) {
 
   return { startDate: null, endDate: null, label: 'All Time', periodName: 'All Time' };
 }
-
-export const RELATIVE_PERIOD_OPTIONS = [
-  'All Time',
-  'This Month',
-  'Previous Month',
-  'This Quarter',
-  'Previous Quarter',
-  'This Year',
-  'Previous Year',
-];
 
 export function getCurrentMonthLabel(refDate = new Date()) {
   return refDate.toLocaleString('en-US', { month: 'short', year: 'numeric' });

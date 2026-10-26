@@ -19,19 +19,19 @@ import {
 } from '../../common/charts';
 
 export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
-  const [period, setPeriod] = useState('CURRENT_MONTH');
+  const [period, setPeriod] = useState('This Month');
 
   const totalBeds = Number(hospital.totalBeds) || 250;
 
-  // Period-based dynamic calculation
+  // Standardized Period-based dynamic calculation (6 Standard Options)
   const periodData = {
-    CURRENT_MONTH: {
+    'This Month': {
       label: `This Month (${getRelativeDateRange('This Month').label})`,
       totalAppts: 128,
       completedAppts: 104,
       scheduledAppts: 18,
       cancelledAppts: 6,
-      subtextDelta: 'Monthly volume (+4.9% vs Aug)',
+      subtextDelta: 'Monthly volume (+4.9% vs previous)',
       occupiedBeds: 210,
       inPerson: 100,
       video: 28,
@@ -44,13 +44,13 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
         { day: 'Sat', scheduled: 11, completed: 5, cancelled: 0 },
       ],
     },
-    LAST_MONTH: {
+    'Previous Month': {
       label: `Previous Month (${getRelativeDateRange('Previous Month').label})`,
       totalAppts: 122,
       completedAppts: 101,
       scheduledAppts: 16,
       cancelledAppts: 5,
-      subtextDelta: 'Monthly volume (+6.1% vs Jul)',
+      subtextDelta: 'Monthly volume (+6.1% vs baseline)',
       occupiedBeds: 202,
       inPerson: 96,
       video: 26,
@@ -63,7 +63,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
         { day: 'Sat', scheduled: 10, completed: 5, cancelled: 0 },
       ],
     },
-    Q3: {
+    'This Quarter': {
       label: `This Quarter (${getRelativeDateRange('This Quarter').label})`,
       totalAppts: 365,
       completedAppts: 301,
@@ -82,13 +82,32 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
         { day: 'Sat', scheduled: 31, completed: 15, cancelled: 0 },
       ],
     },
-    YTD: {
-      label: `Year-to-Date (${new Date().getFullYear()})`,
+    'This Half Year': {
+      label: `This Half Year (${getRelativeDateRange('This Half Year').label})`,
+      totalAppts: 680,
+      completedAppts: 572,
+      scheduledAppts: 76,
+      cancelledAppts: 32,
+      subtextDelta: '6-Month institutional throughput',
+      occupiedBeds: 206,
+      inPerson: 535,
+      video: 145,
+      weeklyData: [
+        { day: 'Mon', scheduled: 130, completed: 118, cancelled: 6 },
+        { day: 'Tue', scheduled: 140, completed: 125, cancelled: 6 },
+        { day: 'Wed', scheduled: 120, completed: 105, cancelled: 7 },
+        { day: 'Thu', scheduled: 135, completed: 116, cancelled: 6 },
+        { day: 'Fri', scheduled: 108, completed: 82, cancelled: 5 },
+        { day: 'Sat', scheduled: 47, completed: 26, cancelled: 2 },
+      ],
+    },
+    'This Year': {
+      label: `This Year (${new Date().getFullYear()})`,
       totalAppts: 980,
       completedAppts: 824,
       scheduledAppts: 112,
       cancelledAppts: 44,
-      subtextDelta: '9-Month operational throughput',
+      subtextDelta: 'Annual operational throughput',
       occupiedBeds: 205,
       inPerson: 774,
       video: 206,
@@ -101,7 +120,31 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
         { day: 'Sat', scheduled: 80, completed: 41, cancelled: 2 },
       ],
     },
+    'All Time': {
+      label: 'All Time (Institutional Inception to Present)',
+      totalAppts: 1013,
+      completedAppts: 636,
+      scheduledAppts: 124,
+      cancelledAppts: 253,
+      subtextDelta: 'Cumulative verified hospital throughput',
+      occupiedBeds: 215,
+      inPerson: 805,
+      video: 208,
+      weeklyData: [
+        { day: 'Mon', scheduled: 192, completed: 175, cancelled: 9 },
+        { day: 'Tue', scheduled: 205, completed: 182, cancelled: 10 },
+        { day: 'Wed', scheduled: 180, completed: 155, cancelled: 11 },
+        { day: 'Thu', scheduled: 196, completed: 170, cancelled: 9 },
+        { day: 'Fri', scheduled: 160, completed: 124, cancelled: 8 },
+        { day: 'Sat', scheduled: 80, completed: 30, cancelled: 3 },
+      ],
+    },
   };
+  // Backwards compatibility aliases
+  periodData.CURRENT_MONTH = periodData['This Month'];
+  periodData.LAST_MONTH = periodData['Previous Month'];
+  periodData.Q3 = periodData['This Quarter'];
+  periodData.YTD = periodData['This Year'];
 
   const currentMetrics = periodData[period] || periodData.CURRENT_MONTH;
   const totalAppts = currentMetrics.totalAppts;
@@ -177,30 +220,15 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
         </div>
 
         <div className="ha-filter-pills">
-          <button
-            className={`ha-filter-pill ${period === 'CURRENT_MONTH' ? 'active' : ''}`}
-            onClick={() => setPeriod('CURRENT_MONTH')}
-          >
-            This Month
-          </button>
-          <button
-            className={`ha-filter-pill ${period === 'LAST_MONTH' ? 'active' : ''}`}
-            onClick={() => setPeriod('LAST_MONTH')}
-          >
-            Previous Month
-          </button>
-          <button
-            className={`ha-filter-pill ${period === 'Q3' ? 'active' : ''}`}
-            onClick={() => setPeriod('Q3')}
-          >
-            This Quarter
-          </button>
-          <button
-            className={`ha-filter-pill ${period === 'YTD' ? 'active' : ''}`}
-            onClick={() => setPeriod('YTD')}
-          >
-            This Year
-          </button>
+          {['This Month', 'Previous Month', 'This Quarter', 'This Half Year', 'This Year', 'All Time'].map((opt) => (
+            <button
+              key={opt}
+              className={`ha-filter-pill ${period === opt ? 'active' : ''}`}
+              onClick={() => setPeriod(opt)}
+            >
+              {opt}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -244,8 +272,8 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {} }) {
         <div className="ha-card-panel" style={{ margin: 0 }}>
           <div className="ha-card-panel-header">
             <div>
-              <h3>Monthly Operational Volume Trends ({monthlyTrends[0]?.month || 'Baseline'} – {monthlyTrends[monthlyTrends.length - 1]?.month || 'Current'})</h3>
-              <p>Five-month trajectory of scheduled intake and completed consultations</p>
+              <h3>Five-Month Retrospective Volume Trends ({monthlyTrends[0]?.month || 'Baseline'} – {monthlyTrends[monthlyTrends.length - 1]?.month || 'Current'})</h3>
+              <p>Five-month historical trajectory of scheduled intake and completed consultations (Independent Retrospective Trend)</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--ha-text-muted)' }}>
               <TrendingUp size={14} style={{ color: 'var(--ha-primary)' }} />
