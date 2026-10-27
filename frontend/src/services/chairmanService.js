@@ -935,9 +935,13 @@ export const chairmanService = {
       const cancelledCount = (stats?.byHospitalCancelled && stats.byHospitalCancelled[hid]) || 0;
       const noShowCount = (stats?.byHospitalNoShow && stats.byHospitalNoShow[hid]) || 0;
 
-      // Derived Operational Ratios
-      const completionRate = intakeCount > 0 ? `${Math.round((servedCount / intakeCount) * 100)}%` : (servedCount > 0 ? '100%' : '0%');
-      const noShowRate = intakeCount > 0 ? `${Math.round((noShowCount / intakeCount) * 100)}%` : '0%';
+      // Derived Operational Ratios (formatted to 1 decimal place, safe denominator handling)
+      const completionRate = intakeCount > 0
+        ? `${((servedCount / intakeCount) * 100).toFixed(1)}%`
+        : (servedCount > 0 ? '100.0%' : '0.0%');
+      const noShowRate = intakeCount > 0
+        ? `${((noShowCount / intakeCount) * 100).toFixed(1)}%`
+        : '0.0%';
 
       // Usable bed capacity from database
       const bedCap = h.bedCapacity || (hid.endsWith('81') ? 350 : hid.endsWith('83') ? 400 : 600);

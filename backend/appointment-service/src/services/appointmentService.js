@@ -1832,7 +1832,7 @@ export const appointmentService = {
 
     }
 
-    const validStatuses = ['BOOKED', 'CONFIRMED', 'CHECKED_IN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'RESCHEDULED'];
+    const validStatuses = ['BOOKED', 'CONFIRMED', 'CHECKED_IN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'RESCHEDULED', 'NO_SHOW'];
 
     const targetStatus = status?.toUpperCase();
 
@@ -2712,7 +2712,7 @@ export const appointmentService = {
           byHospitalNoShow: [
             {
               $match: {
-                status: 'NO_SHOW',
+                status: { $in: ['NO_SHOW', 'NOSHOW'] },
                 ...(dateFilter ? { appointment_date: dateFilter } : {})
               }
             },

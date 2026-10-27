@@ -60,6 +60,7 @@ const appointmentSchema = new mongoose.Schema(
         'COMPLETED',
         'CANCELLED',
         'RESCHEDULED',
+        'NO_SHOW',
       ],
       default: 'BOOKED',
       index: true,

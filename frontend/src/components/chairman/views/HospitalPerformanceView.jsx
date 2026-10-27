@@ -232,7 +232,7 @@ export function HospitalPerformanceView() {
                       <span style={{ fontSize: '11px', color: 'var(--chair-muted)', marginLeft: '4px' }}>Cancelled</span>
                     </td>
                     <td>
-                      <span style={{ color: item.noShowRate !== '0%' ? 'var(--chair-text)' : 'var(--chair-muted)' }}>
+                      <span style={{ color: item.noShowRate !== '0.0%' && item.noShowRate !== '0%' ? 'var(--chair-text)' : 'var(--chair-muted)' }}>
                         {item.noShowRate}
                       </span>
                     </td>
