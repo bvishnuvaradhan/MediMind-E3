@@ -2688,7 +2688,12 @@ export const appointmentService = {
             {
               $match: {
                 ai_prediction_id: { $type: 'string', $ne: '' },
-                ...(dateFilter ? { appointment_date: dateFilter } : {})
+                ...(dateFilter ? {
+                  $or: [
+                    { created_at: dateFilter },
+                    { created_at: { $exists: false }, appointment_date: dateFilter }
+                  ]
+                } : {})
               }
             },
             { $group: { _id: '$hospital_id', count: { $sum: 1 } } },
@@ -2723,7 +2728,12 @@ export const appointmentService = {
             {
               $match: {
                 ai_prediction_id: { $type: 'string', $ne: '' },
-                ...(dateFilter ? { appointment_date: dateFilter } : {})
+                ...(dateFilter ? {
+                  $or: [
+                    { created_at: dateFilter },
+                    { created_at: { $exists: false }, appointment_date: dateFilter }
+                  ]
+                } : {})
               }
             },
             { $group: { _id: '$department_id', count: { $sum: 1 } } },
@@ -2792,14 +2802,28 @@ export const appointmentService = {
             {
               $match: {
                 ai_prediction_id: { $type: 'string', $ne: '' },
-                appointment_date: { $lte: new Date() }
+                $or: [
+                  { created_at: { $lte: new Date() } },
+                  { created_at: { $exists: false }, appointment_date: { $lte: new Date() } }
+                ]
               }
             },
             {
               $group: {
                 _id: {
                   hospital_id: '$hospital_id',
-                  bucket: { $dateToString: { format: '%Y-%m', date: '$appointment_date' } }
+                  bucket: {
+                    $dateToString: {
+                      format: '%Y-%m',
+                      date: {
+                        $cond: [
+                          { $eq: [{ $type: '$created_at' }, 'date'] },
+                          '$created_at',
+                          { $ifNull: [{ $dateFromString: { dateString: '$created_at', onError: null } }, '$appointment_date'] }
+                        ]
+                      }
+                    }
+                  }
                 },
                 count: { $sum: 1 }
               }
@@ -2862,14 +2886,30 @@ export const appointmentService = {
             {
               $match: {
                 ai_prediction_id: { $type: 'string', $ne: '' },
-                ...(dateFilter ? { appointment_date: dateFilter } : {})
+                ...(dateFilter ? {
+                  $or: [
+                    { created_at: dateFilter },
+                    { created_at: { $exists: false }, appointment_date: dateFilter }
+                  ]
+                } : {})
               }
             },
             {
               $group: {
                 _id: {
                   hospital_id: '$hospital_id',
-                  bucket: { $dateToString: { format: '%Y-%m-%d', date: '$appointment_date' } }
+                  bucket: {
+                    $dateToString: {
+                      format: '%Y-%m-%d',
+                      date: {
+                        $cond: [
+                          { $eq: [{ $type: '$created_at' }, 'date'] },
+                          '$created_at',
+                          { $ifNull: [{ $dateFromString: { dateString: '$created_at', onError: null } }, '$appointment_date'] }
+                        ]
+                      }
+                    }
+                  }
                 },
                 count: { $sum: 1 }
               }

@@ -1128,9 +1128,14 @@ export const chairmanService = {
         const [yStr, mNum] = mStr.split('-');
         const mIdx = parseInt(mNum, 10) - 1;
         const isFuture = mStr > currentMonthKey;
+        const isCurrentMonth = mStr === currentMonthKey;
         const monthName = monthNames[mIdx] || mNum;
-        const label = isFuture ? `${monthName} ${yStr} (Planned)` : `${monthName} ${yStr}`;
-        const row = { bucket: mStr, label, isFuture };
+        const label = isFuture
+          ? `${monthName} ${yStr} (Planned)`
+          : isCurrentMonth
+          ? `${monthName} ${yStr} (MTD)`
+          : `${monthName} ${yStr}`;
+        const row = { bucket: mStr, label, isFuture, isCurrentMonth };
         trendSeries.forEach(s => {
           if (isFuture) {
             row[s.key] = 0;
@@ -1148,9 +1153,14 @@ export const chairmanService = {
         const [yStr, mNum] = mStr.split('-');
         const mIdx = parseInt(mNum, 10) - 1;
         const isFuture = mStr > currentMonthKey;
+        const isCurrentMonth = mStr === currentMonthKey;
         const monthName = monthNames[mIdx] || mNum;
-        const label = isFuture ? `${monthName} ${yStr} (Planned)` : `${monthName} ${yStr}`;
-        const row = { bucket: mStr, label, isFuture };
+        const label = isFuture
+          ? `${monthName} ${yStr} (Planned)`
+          : isCurrentMonth
+          ? `${monthName} ${yStr} (MTD)`
+          : `${monthName} ${yStr}`;
+        const row = { bucket: mStr, label, isFuture, isCurrentMonth };
         trendSeries.forEach(s => {
           if (isFuture) {
             row[s.key] = 0;
@@ -1168,9 +1178,14 @@ export const chairmanService = {
         const [yStr, mNum] = mStr.split('-');
         const mIdx = parseInt(mNum, 10) - 1;
         const isFuture = mStr > currentMonthKey;
+        const isCurrentMonth = mStr === currentMonthKey;
         const monthName = monthNames[mIdx] || mNum;
-        const label = isFuture ? `${monthName} ${yStr} (Planned)` : `${monthName} ${yStr}`;
-        const row = { bucket: mStr, label, isFuture };
+        const label = isFuture
+          ? `${monthName} ${yStr} (Planned)`
+          : isCurrentMonth
+          ? `${monthName} ${yStr} (MTD)`
+          : `${monthName} ${yStr}`;
+        const row = { bucket: mStr, label, isFuture, isCurrentMonth };
         trendSeries.forEach(s => {
           if (isFuture) {
             row[s.key] = 0;

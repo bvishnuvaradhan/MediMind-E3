@@ -249,6 +249,36 @@ export function HospitalPerformanceView() {
         </div>
       </div>
 
+      {/* Section Header: Historical Volume Trends & Monthly Trajectories */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+        <div>
+          <h2 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 4px', fontFamily: 'Plus Jakarta Sans', color: 'var(--chair-text)' }}>
+            {dateRange === 'All Time'
+              ? 'Historical Monthly Volume Trends (March 2026 – Present)'
+              : `Operational Volume Trends (${dateRange})`}
+          </h2>
+          <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
+            Comparative throughput trajectories across verified multi-tenant hospital facilities
+          </p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span
+            className="badge"
+            style={{
+              backgroundColor: 'rgba(234, 179, 8, 0.12)',
+              color: '#b45309',
+              fontWeight: '600',
+              fontSize: '11px',
+              padding: '4px 10px',
+              borderRadius: '6px',
+              border: '1px solid rgba(234, 179, 8, 0.3)'
+            }}
+          >
+            Reporting Cutoff: October 27, 2026 (Month-to-Date)
+          </span>
+        </div>
+      </div>
+
       {/* Three Dedicated Separate Line Charts for Intake Bookings, Appointments Served, and Clinical AI Runs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '22px', marginBottom: '24px' }}>
         {/* Graph 1: Intake Bookings by Hospital (Monthly/Daily Line Chart) */}
@@ -258,7 +288,7 @@ export function HospitalPerformanceView() {
               Intake Bookings by Hospital
             </h3>
             <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
-              Hospital booking intake by {granularity === 'daily' ? 'booking creation date' : 'calendar month'} for the selected reporting period ({dateRange})
+              New bookings grouped by booking creation date for the selected reporting period
             </p>
           </div>
 
@@ -280,7 +310,7 @@ export function HospitalPerformanceView() {
               Appointments Served by Hospital
             </h3>
             <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
-              Completed patient consultations by {granularity === 'daily' ? 'daily encounter date' : 'calendar month'} for the selected reporting period ({dateRange})
+              Completed clinical encounters by encounter date for the selected reporting period
             </p>
           </div>
 
@@ -302,7 +332,7 @@ export function HospitalPerformanceView() {
               Clinical AI Runs by Hospital
             </h3>
             <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
-              Diagnostic AI inference executions by {granularity === 'daily' ? 'daily telemetry timestamp' : 'calendar month'} for the selected reporting period ({dateRange})
+              Persisted clinical AI inference executions by inference date for the selected reporting period
             </p>
           </div>
 

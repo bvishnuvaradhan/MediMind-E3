@@ -180,6 +180,7 @@ async function run() {
       }
     }
     await page.waitForSelector('table.data-table', { timeout: 10000 });
+    await page.waitForSelector('table.data-table tbody tr:not(:has-text("Loading"))', { timeout: 15000 });
 
     // Ensure "All Time" is selected to see full March-October range
     console.log('[Step 3] Selecting "All Time" period...');
