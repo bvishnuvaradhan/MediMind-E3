@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 /**
  * Clean Pure-SVG Line and Multi-Series Area Chart Component
+ * Supports discontinuous data series (null breaks line and marks pre-onboarding periods as Unavailable)
  */
 export function LineChart({
   data = [],
@@ -31,12 +32,15 @@ export function LineChart({
   const innerWidth = chartWidth - padding.left - padding.right;
   const innerHeight = chartHeight - padding.top - padding.bottom;
 
-  // Compute Y-min and Y-max
+  // Compute Y-min and Y-max (filtering out null/undefined values)
   const allValues = data.flatMap((d) =>
-    series.map((s) => (typeof d[s.key] === 'number' ? d[s.key] : Number(d[s.key]) || 0))
+    series
+      .map((s) => d[s.key])
+      .filter((v) => v !== null && v !== undefined && !isNaN(Number(v)))
+      .map((v) => Number(v))
   );
-  const dataMin = Math.min(...allValues, 0);
-  const dataMax = Math.max(...allValues, 10);
+  const dataMin = allValues.length > 0 ? Math.min(...allValues, 0) : 0;
+  const dataMax = allValues.length > 0 ? Math.max(...allValues, 10) : 10;
   const minVal = yMin !== null ? yMin : dataMin;
   const maxVal = yMax !== null ? yMax : Math.ceil(dataMax * 1.15);
   const valRange = maxVal - minVal || 1;
@@ -47,38 +51,79 @@ export function LineChart({
   };
 
   const getY = (val) => {
-    const num = typeof val === 'number' ? val : Number(val) || 0;
+    if (val === null || val === undefined) return null;
+    const num = Number(val);
+    if (isNaN(num)) return null;
     const clamped = Math.max(minVal, Math.min(maxVal, num));
     const ratio = (clamped - minVal) / valRange;
     return padding.top + innerHeight - ratio * innerHeight;
   };
 
-  // Generate SVG path for a line
-  const generateLinePath = (sKey) => {
-    return data.reduce((acc, d, i) => {
-      const x = getX(i);
-      const y = getY(d[sKey]);
-      if (i === 0) return `M ${x.toFixed(1)} ${y.toFixed(1)}`;
-      if (curve && i > 0) {
-        const prevX = getX(i - 1);
-        const prevY = getY(data[i - 1][sKey]);
-        const cp1x = prevX + (x - prevX) / 2;
-        const cp1y = prevY;
-        const cp2x = prevX + (x - prevX) / 2;
-        const cp2y = y;
-        return `${acc} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${x.toFixed(1)} ${y.toFixed(1)}`;
+  // Helper to extract contiguous non-null segments for a series
+  const getSeriesSegments = (sKey) => {
+    const segments = [];
+    let current = [];
+    data.forEach((d, i) => {
+      const val = d[sKey];
+      if (val !== null && val !== undefined && !isNaN(Number(val))) {
+        current.push({ x: getX(i), y: getY(val), index: i });
+      } else {
+        if (current.length > 0) {
+          segments.push(current);
+          current = [];
+        }
       }
-      return `${acc} L ${x.toFixed(1)} ${y.toFixed(1)}`;
-    }, '');
+    });
+    if (current.length > 0) {
+      segments.push(current);
+    }
+    return segments;
   };
 
-  // Generate SVG path for area fill
+  // Generate SVG path for a line (supports discontinuous segments with null breaks)
+  const generateLinePath = (sKey) => {
+    const segments = getSeriesSegments(sKey);
+    return segments.map((seg) => {
+      if (seg.length === 1) {
+        return `M ${seg[0].x.toFixed(1)} ${seg[0].y.toFixed(1)} l 0.1 0`;
+      }
+      return seg.reduce((acc, p, j) => {
+        if (j === 0) return `M ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+        if (curve && j > 0) {
+          const prev = seg[j - 1];
+          const cp1x = prev.x + (p.x - prev.x) / 2;
+          const cp1y = prev.y;
+          const cp2x = prev.x + (p.x - prev.x) / 2;
+          const cp2y = p.y;
+          return `${acc} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+        }
+        return `${acc} L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+      }, '');
+    }).join(' ');
+  };
+
+  // Generate SVG path for area fill (closed per segment)
   const generateAreaPath = (sKey) => {
-    const linePath = generateLinePath(sKey);
-    const lastX = getX(data.length - 1);
-    const firstX = getX(0);
+    const segments = getSeriesSegments(sKey);
     const bottomY = padding.top + innerHeight;
-    return `${linePath} L ${lastX.toFixed(1)} ${bottomY.toFixed(1)} L ${firstX.toFixed(1)} ${bottomY.toFixed(1)} Z`;
+    return segments.map((seg) => {
+      if (seg.length < 2) return '';
+      const linePath = seg.reduce((acc, p, j) => {
+        if (j === 0) return `M ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+        if (curve && j > 0) {
+          const prev = seg[j - 1];
+          const cp1x = prev.x + (p.x - prev.x) / 2;
+          const cp1y = prev.y;
+          const cp2x = prev.x + (p.x - prev.x) / 2;
+          const cp2y = p.y;
+          return `${acc} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+        }
+        return `${acc} L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+      }, '');
+      const firstX = seg[0].x;
+      const lastX = seg[seg.length - 1].x;
+      return `${linePath} L ${lastX.toFixed(1)} ${bottomY.toFixed(1)} L ${firstX.toFixed(1)} ${bottomY.toFixed(1)} Z`;
+    }).filter(Boolean).join(' ');
   };
 
   // Y-axis grid ticks (4 ticks)
@@ -222,9 +267,12 @@ export function LineChart({
                 />
               )}
 
-              {/* Data points */}
+              {/* Data points (only plotted for non-null values) */}
               {series.map((s) => {
-                const y = getY(d[s.key]);
+                const rawVal = d[s.key];
+                if (rawVal === null || rawVal === undefined) return null;
+                const y = getY(rawVal);
+                if (y === null) return null;
                 const isHovered = hoveredIndex === i;
                 return (
                   <circle
@@ -279,18 +327,28 @@ export function LineChart({
             {data[hoveredIndex][xKey]}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {series.map((s) => (
-              <div key={s.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: s.color, display: 'inline-block', flexShrink: 0 }} />
-                  <span style={{ color: '#e2e8f0' }}>{s.name || s.key}:</span>
+            {series.map((s) => {
+              const val = data[hoveredIndex]?.[s.key];
+              const isUnavailable = val === null || val === undefined;
+              return (
+                <div key={s.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: s.color, display: 'inline-block', flexShrink: 0 }} />
+                    <span style={{ color: isUnavailable ? '#94a3b8' : '#e2e8f0' }}>{s.name || s.key}:</span>
+                  </div>
+                  {isUnavailable ? (
+                    <span style={{ color: '#64748b', fontStyle: 'italic', fontSize: '10.5px' }}>
+                      Unavailable
+                    </span>
+                  ) : (
+                    <strong style={{ color: '#ffffff', fontWeight: 700 }}>
+                      {val}
+                      {s.unit || ''}
+                    </strong>
+                  )}
                 </div>
-                <strong style={{ color: '#ffffff', fontWeight: 700 }}>
-                  {data[hoveredIndex][s.key] !== undefined && data[hoveredIndex][s.key] !== null ? data[hoveredIndex][s.key] : '—'}
-                  {s.unit || ''}
-                </strong>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

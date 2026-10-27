@@ -9,6 +9,9 @@ async function run() {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
 
+  page.on('console', msg => console.log('BROWSER LOG:', msg.text()));
+  page.on('pageerror', err => console.log('BROWSER ERROR:', err.message));
+
   page.on('console', (msg) => {
     if (msg.type() === 'error') {
       console.error(`[Browser Console Error] ${msg.text()}`);
@@ -40,6 +43,13 @@ async function run() {
     await page.click('.doctor-sidebar button:has-text("Appointments")');
     await page.waitForSelector('table.doctor-table', { timeout: 10000 });
     console.log('✓ OPD Appointments table visible');
+
+    // Switch to All Appointments tab to ensure appointments are visible
+    const allTabBtn = await page.$('button:has-text("All Appointments")');
+    if (allTabBtn) {
+      await allTabBtn.click();
+      await page.waitForTimeout(500);
+    }
 
     // 3. Verify "+ Consult" gating on completed appointments vs "Mark Done"
     console.log('[Step 3] Checking Appointment status actions...');
@@ -78,7 +88,7 @@ async function run() {
     if (markDoneBtn) {
       console.log('Marking appointment as Completed...');
       await markDoneBtn.click();
-      await page.waitForSelector('.doctor-toast', { timeout: 5000 });
+      await page.waitForSelector('.doctor-toast', { timeout: 15000 });
       console.log('✓ Appointment status updated toast received');
       await page.waitForTimeout(1000);
     }

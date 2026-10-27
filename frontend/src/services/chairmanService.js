@@ -986,6 +986,14 @@ export const chairmanService = {
       return fallbackColors[index % fallbackColors.length];
     };
 
+    const getOnboardingMonth = (hName) => {
+      const lower = (hName || '').toLowerCase();
+      if (lower.includes('harborview')) return '2026-03';
+      if (lower.includes('aarogyam')) return '2026-05';
+      if (lower.includes('nexora')) return '2026-07';
+      return null;
+    };
+
     const trendSeries = activeHosps.map((h, i) => {
       const hid = (h._id || h.id || '').toString();
       return {
@@ -994,6 +1002,7 @@ export const chairmanService = {
         name: h.name,
         shortName: h.name.replace('Hospital', '').replace('MediMind', '').trim(),
         color: getHospitalColor(h.name, i),
+        onboardingMonth: getOnboardingMonth(h.name),
       };
     });
 
@@ -1023,8 +1032,13 @@ export const chairmanService = {
         const label = `${parts[2]} ${monthNames[mIdx] || parts[1]}`;
         const row = { bucket: dayStr, label };
         trendSeries.forEach(s => {
-          const match = dailyIntake.find(d => d.bucket === dayStr && d.hospitalId === s.hospitalId);
-          row[s.key] = match ? match.count : 0;
+          const dayMonth = dayStr.slice(0, 7);
+          if (s.onboardingMonth && dayMonth < s.onboardingMonth) {
+            row[s.key] = null;
+          } else {
+            const match = dailyIntake.find(d => d.bucket === dayStr && d.hospitalId === s.hospitalId);
+            row[s.key] = match ? match.count : 0;
+          }
         });
         return row;
       });
@@ -1035,8 +1049,13 @@ export const chairmanService = {
         const label = `${parts[2]} ${monthNames[mIdx] || parts[1]}`;
         const row = { bucket: dayStr, label };
         trendSeries.forEach(s => {
-          const match = dailyCompleted.find(d => d.bucket === dayStr && d.hospitalId === s.hospitalId);
-          row[s.key] = match ? match.count : 0;
+          const dayMonth = dayStr.slice(0, 7);
+          if (s.onboardingMonth && dayMonth < s.onboardingMonth) {
+            row[s.key] = null;
+          } else {
+            const match = dailyCompleted.find(d => d.bucket === dayStr && d.hospitalId === s.hospitalId);
+            row[s.key] = match ? match.count : 0;
+          }
         });
         return row;
       });
@@ -1047,8 +1066,13 @@ export const chairmanService = {
         const label = `${parts[2]} ${monthNames[mIdx] || parts[1]}`;
         const row = { bucket: dayStr, label };
         trendSeries.forEach(s => {
-          const match = dailyPreds.find(d => d.bucket === dayStr && d.hospitalId === s.hospitalId);
-          row[s.key] = match ? match.count : 0;
+          const dayMonth = dayStr.slice(0, 7);
+          if (s.onboardingMonth && dayMonth < s.onboardingMonth) {
+            row[s.key] = null;
+          } else {
+            const match = dailyPreds.find(d => d.bucket === dayStr && d.hospitalId === s.hospitalId);
+            row[s.key] = match ? match.count : 0;
+          }
         });
         return row;
       });
@@ -1084,6 +1108,20 @@ export const chairmanService = {
           ...monthlyCompleted.map(m => m.bucket),
           ...monthlyPreds.map(m => m.bucket)
         ])].filter(Boolean).sort();
+
+        // Ensure full continuous monthly reporting history from March 2026 to current month for All Time / This Year
+        if (dateRange === 'All Time' || dateRange === 'This Year') {
+          const earliest = '2026-03';
+          let cur = earliest;
+          while (cur <= currentMonthKey) {
+            if (!distinctMonths.includes(cur)) distinctMonths.push(cur);
+            const [cy, cm] = cur.split('-').map(Number);
+            const nextM = cm === 12 ? 1 : cm + 1;
+            const nextY = cm === 12 ? cy + 1 : cy;
+            cur = `${nextY}-${String(nextM).padStart(2, '0')}`;
+          }
+          distinctMonths.sort();
+        }
       }
 
       intakeTrends = distinctMonths.map(mStr => {
@@ -1096,6 +1134,8 @@ export const chairmanService = {
         trendSeries.forEach(s => {
           if (isFuture) {
             row[s.key] = 0;
+          } else if (s.onboardingMonth && mStr < s.onboardingMonth) {
+            row[s.key] = null;
           } else {
             const match = (stats?.byHospitalMonthlyIntake || []).find(m => m.bucket === mStr && m.hospitalId === s.hospitalId);
             row[s.key] = match ? match.count : 0;
@@ -1114,10 +1154,12 @@ export const chairmanService = {
         trendSeries.forEach(s => {
           if (isFuture) {
             row[s.key] = 0;
+          } else if (s.onboardingMonth && mStr < s.onboardingMonth) {
+            row[s.key] = null;
           } else {
             const match = (stats?.byHospitalMonthlyCompleted || []).find(m => m.bucket === mStr && m.hospitalId === s.hospitalId);
             row[s.key] = match ? match.count : 0;
-          } 
+          }
         });
         return row;
       });
@@ -1132,6 +1174,8 @@ export const chairmanService = {
         trendSeries.forEach(s => {
           if (isFuture) {
             row[s.key] = 0;
+          } else if (s.onboardingMonth && mStr < s.onboardingMonth) {
+            row[s.key] = null;
           } else {
             const match = (stats?.byHospitalMonthlyPreds || []).find(m => m.bucket === mStr && m.hospitalId === s.hospitalId);
             row[s.key] = match ? match.count : 0;

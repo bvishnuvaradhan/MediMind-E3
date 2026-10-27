@@ -102,6 +102,15 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
     };
   });
 
+  const hospName = hospital?.name || '';
+  const defaultStartMonth = hospName.includes('Nexora')
+    ? 'July 2026'
+    : hospName.includes('Aarogyam')
+    ? 'May 2026'
+    : 'March 2026';
+  const trendStartMonth = monthlyTrends[0]?.month || defaultStartMonth;
+  const trendEndMonth = monthlyTrends[monthlyTrends.length - 1]?.month || 'Present';
+
   const periodOptions = HOSPITAL_ADMIN_PERIOD_OPTIONS || STANDARDIZED_ANALYTICS_PERIODS;
 
   return (
@@ -192,7 +201,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
         <div className="ha-card-panel" style={{ margin: 0 }}>
           <div className="ha-card-panel-header">
             <div>
-              <h3>Historical Monthly Operational Volume Trends ({monthlyTrends[0]?.month || 'March 2026'} – {monthlyTrends[monthlyTrends.length - 1]?.month || 'Present'})</h3>
+              <h3>Historical Monthly Operational Volume Trends ({trendStartMonth} – {trendEndMonth})</h3>
               <p>Monthly booking intake, completed consultations, and clinical AI activity across the available reporting history</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--ha-text-muted)' }}>

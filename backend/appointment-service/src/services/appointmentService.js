@@ -2613,11 +2613,6 @@ export const appointmentService = {
         ed.setUTCHours(23, 59, 59, 999);
         dateFilter.$lte = ed;
       }
-      // Dual timestamp matching: capture both encounter service events (appointment_date) and booking intake events (created_at)
-      match.$or = [
-        { appointment_date: dateFilter },
-        { created_at: dateFilter }
-      ];
     }
 
     // Operational integrity: Platform-wide stats must only aggregate active approved hospitals
@@ -2778,7 +2773,7 @@ export const appointmentService = {
             {
               $match: {
                 status: 'COMPLETED',
-                ...(dateFilter ? { appointment_date: dateFilter } : {})
+                appointment_date: { $lte: new Date() }
               }
             },
             {
@@ -2797,7 +2792,7 @@ export const appointmentService = {
             {
               $match: {
                 ai_prediction_id: { $type: 'string', $ne: '' },
-                ...(dateFilter ? { appointment_date: dateFilter } : {})
+                appointment_date: { $lte: new Date() }
               }
             },
             {
@@ -2814,12 +2809,12 @@ export const appointmentService = {
 
           byHospitalMonthlyIntake: [
             {
-              $match: dateFilter ? {
+              $match: {
                 $or: [
-                  { created_at: dateFilter },
-                  { created_at: { $exists: false }, appointment_date: dateFilter }
+                  { created_at: { $lte: new Date() } },
+                  { created_at: { $exists: false }, appointment_date: { $lte: new Date() } }
                 ]
-              } : {}
+              }
             },
             {
               $group: {
@@ -3001,41 +2996,7 @@ export const appointmentService = {
 
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    const monthlyTrends = (stats?.byMonth || []).map(m => {
 
-      const parts = (m._id || '').split('-');
-
-      const year = parts[0];
-
-      const monthNum = parts[1];
-
-      const mIdx = parseInt(monthNum, 10) - 1;
-
-      const monthLabel = mIdx >= 0 && mIdx < 12 ? `${monthNames[mIdx]} ${year}` : m._id;
-
-      return {
-
-        month: monthLabel,
-
-        monthKey: m._id,
-
-        appointments: m.total,
-
-        volume: m.total,
-
-        total: m.total,
-
-        completed: m.completed,
-
-        scheduled: m.scheduled,
-
-        cancelled: m.cancelled,
-
-        aiUsage: m.aiUsage || 0,
-
-      };
-
-    });
 
     const dayNames = ['', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const byDayOfWeek = (stats?.byDayOfWeek || []).map(d => ({
@@ -3097,6 +3058,51 @@ export const appointmentService = {
       bucket: m._id?.bucket,
       count: m.count || 0,
     }));
+
+    const currentMonthKey = new Date().toISOString().slice(0, 7);
+    const targetHospId = match.hospital_id ? match.hospital_id.toString() : null;
+
+    const intakeItems = byHospitalMonthlyIntake.filter(m => !targetHospId || m.hospitalId === targetHospId);
+    const completedItems = byHospitalMonthlyCompleted.filter(m => !targetHospId || m.hospitalId === targetHospId);
+    const predItems = byHospitalMonthlyPreds.filter(m => !targetHospId || m.hospitalId === targetHospId);
+
+    const distinctTrendMonths = [...new Set([
+      ...intakeItems.map(m => m.bucket),
+      ...completedItems.map(m => m.bucket),
+      ...predItems.map(m => m.bucket)
+    ])].filter(b => b && b <= currentMonthKey).sort();
+
+    const monthlyTrends = distinctTrendMonths.map(mKey => {
+      const parts = mKey.split('-');
+      const year = parts[0];
+      const monthNum = parts[1];
+      const mIdx = parseInt(monthNum, 10) - 1;
+      const monthLabel = mIdx >= 0 && mIdx < 12 ? `${monthNames[mIdx]} ${year}` : mKey;
+
+      const intakeCount = intakeItems
+        .filter(m => m.bucket === mKey)
+        .reduce((sum, item) => sum + (item.count || 0), 0);
+
+      const completedCount = completedItems
+        .filter(m => m.bucket === mKey)
+        .reduce((sum, item) => sum + (item.count || 0), 0);
+
+      const aiCount = predItems
+        .filter(m => m.bucket === mKey)
+        .reduce((sum, item) => sum + (item.count || 0), 0);
+
+      return {
+        month: monthLabel,
+        monthKey: mKey,
+        appointments: intakeCount,
+        volume: intakeCount,
+        total: intakeCount,
+        completed: completedCount,
+        scheduled: Math.max(0, intakeCount - completedCount),
+        cancelled: 0,
+        aiUsage: aiCount,
+      };
+    });
 
     return {
       total,
