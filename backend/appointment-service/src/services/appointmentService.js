@@ -439,6 +439,8 @@ export const appointmentService = {
 
     const originalAppointmentId = payload.originalAppointmentId || payload.original_appointment_id || null;
 
+    const idempotencyKey = payload.idempotencyKey || payload.idempotency_key || null;
+
     // 1. Basic validation
 
     if (!familyMemberId || !doctorId || !appointmentDateStr || !startTime || !endTime) {
@@ -522,6 +524,27 @@ export const appointmentService = {
     }
 
     const appointmentDate = parseDateOnly(appointmentDateStr);
+
+    // Idempotency: return existing booking if identical idempotency key was previously submitted
+    if (idempotencyKey) {
+      const existingByKey = await Appointment.findOne({ idempotency_key: idempotencyKey });
+      if (existingByKey) {
+        return await this._enrichAppointment(existingByKey);
+      }
+    }
+
+    // Idempotency: return existing active booking if the same patient is retrying the identical slot
+    const { start: dayStartRange, end: dayEndRange } = getDayRange(appointmentDate);
+    const existingPatientBooking = await Appointment.findOne({
+      family_member_id: familyMemberId,
+      doctor_id: doctorId,
+      appointment_date: { $gte: dayStartRange, $lte: dayEndRange },
+      start_time: startTime,
+      status: { $in: ['BOOKED', 'CONFIRMED'] },
+    });
+    if (existingPatientBooking) {
+      return await this._enrichAppointment(existingPatientBooking);
+    };
 
     // 2. Family ownership & relationship verification
     const providedFamilyId = payload.familyId || payload.family_id;
@@ -718,60 +741,101 @@ export const appointmentService = {
 
     }
 
-    // 6. Generate appointment token
+    // 6. Clinical AI Pre-Screening verification and execution
+    let finalAiPredictionId = aiPredictionId;
+    let autoCreatedPredictionId = null;
 
+    if (appointmentType === 'WALK_IN') {
+      // Walk-ins are in-person registrations and bypass AI pre-screening requirement
+    } else if (appointmentType === 'BOOKED') {
+      // Online bookings require genuine AI pre-screening
+      if (finalAiPredictionId) {
+        // Validate pre-existing prediction
+        const verification = await internalServices.verifyAiPrediction(finalAiPredictionId, familyMemberId);
+        if (!verification.valid) {
+          if (verification.reason === 'NOT_FOUND') {
+            const err = new Error(`AI Pre-Screening prediction '${finalAiPredictionId}' not found`);
+            err.statusCode = 404;
+            throw err;
+          }
+          if (verification.reason === 'MEMBER_MISMATCH') {
+            const err = new Error(`AI Pre-Screening prediction does not match family member '${familyMemberId}'`);
+            err.statusCode = 403;
+            throw err;
+          }
+          const err = new Error(`Failed to verify AI Pre-Screening prediction: ${verification.error || verification.reason}`);
+          err.statusCode = 502;
+          throw err;
+        }
+      } else {
+        // Client did not supply prediction ID: execute AI pre-screening
+        const symptomText = (payload.symptoms || payload.reason || payload.chief_complaint || '').trim();
+        if (!symptomText || symptomText.length < 3) {
+          const err = new Error('Online bookings require symptoms description of at least 3 characters for clinical AI pre-screening');
+          err.statusCode = 400;
+          throw err;
+        }
+
+        const aiRes = await internalServices.executeAiPreScreening({
+          familyMemberId,
+          text: symptomText,
+        });
+
+        if (!aiRes || !aiRes.success || !aiRes.prediction_id) {
+          const err = new Error(`Clinical AI pre-screening failed: ${aiRes?.error || 'Inference service unavailable'}. Booking was not confirmed.`);
+          err.statusCode = 502;
+          throw err;
+        }
+
+        finalAiPredictionId = aiRes.prediction_id;
+        autoCreatedPredictionId = aiRes.prediction_id;
+      }
+    }
+
+    // 7. Generate appointment token
     const token = `OPD-${Math.floor(100 + Math.random() * 900)}`;
 
-    // 7. Create Appointment with DB uniqueness error handling
-
+    // 8. Create Appointment with DB uniqueness error handling
     let newAppointment;
-
     try {
-
       newAppointment = await Appointment.create({
-
         family_member_id: familyMemberId,
-
         doctor_id: doctorId,
-
         hospital_id: hospitalId,
-
         department_id: departmentId,
-
         appointment_date: appointmentDate,
-
         start_time: startTime,
-
         end_time: endTime,
-
         reason,
-
         status: 'BOOKED',
-
         appointment_type: appointmentType,
-
-        ai_prediction_id: aiPredictionId,
-
+        ai_prediction_id: finalAiPredictionId,
+        idempotency_key: idempotencyKey || null,
         token,
-
         original_appointment_id: originalAppointmentId || null,
-
       });
-
     } catch (createErr) {
-
-      if (createErr.code === 11000) {
-
-        const err = new Error('The selected doctor already has an appointment booked for this time slot');
-
-        err.statusCode = 409;
-
-        throw err;
-
+      if (autoCreatedPredictionId) {
+        // Cleanup auto-created prediction to avoid orphaned AI records
+        try {
+          const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:5007';
+          await fetch(`${AI_SERVICE_URL}/api/ai/${autoCreatedPredictionId}`, {
+            method: 'DELETE',
+            headers: {
+              'X-Internal-Service-Key': process.env.INTERNAL_SERVICE_KEY || 'medimind_internal_service_secret_2026',
+            },
+          });
+        } catch {
+          // silent
+        }
       }
 
+      if (createErr.code === 11000) {
+        const err = new Error('The selected doctor already has an appointment booked for this time slot');
+        err.statusCode = 409;
+        throw err;
+      }
       throw createErr;
-
     }
 
     // 8. Link original appointment if rebooking (atomic conditional update)
@@ -1447,6 +1511,21 @@ export const appointmentService = {
       throw err;
 
     }
+
+    if (!appointment.rescheduling_history) {
+      appointment.rescheduling_history = [];
+    }
+    appointment.rescheduling_history.push({
+      previous_appointment_date: appointment.appointment_date,
+      previous_start_time: appointment.start_time,
+      previous_end_time: appointment.end_time,
+      new_appointment_date: newAppointmentDate,
+      new_start_time: newStartTime,
+      new_end_time: newEndTime,
+      rescheduled_at: new Date(),
+      rescheduled_by: (user?.id || user?.userId || user?.email || 'USER').toString(),
+      reason: payload?.reason || payload?.cancellationReason || 'Patient requested reschedule',
+    });
 
     appointment.appointment_date = newAppointmentDate;
 
@@ -2719,6 +2798,113 @@ export const appointmentService = {
             { $group: { _id: '$hospital_id', count: { $sum: 1 } } },
           ],
 
+          byHospitalRescheduled: [
+            {
+              $match: {
+                status: 'RESCHEDULED',
+                ...(dateFilter ? { appointment_date: dateFilter } : {})
+              }
+            },
+            { $group: { _id: '$hospital_id', count: { $sum: 1 } } },
+          ],
+
+          byHospitalWalkIn: [
+            {
+              $match: {
+                appointment_type: 'WALK_IN',
+                ...(dateFilter ? { appointment_date: dateFilter } : {})
+              }
+            },
+            { $group: { _id: '$hospital_id', count: { $sum: 1 } } },
+          ],
+
+          byHospitalMonthlyRescheduled: [
+            {
+              $match: {
+                status: 'RESCHEDULED',
+                appointment_date: { $lte: new Date() }
+              }
+            },
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: { $dateToString: { format: '%Y-%m', date: '$appointment_date' } }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
+          byHospitalMonthlyWalkIn: [
+            {
+              $match: {
+                appointment_type: 'WALK_IN',
+                appointment_date: { $lte: new Date() }
+              }
+            },
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: { $dateToString: { format: '%Y-%m', date: '$appointment_date' } }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
+          byHospitalMonthlyScheduled: [
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: { $dateToString: { format: '%Y-%m', date: '$appointment_date' } }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
+          byHospitalMonthlyCancelled: [
+            {
+              $match: {
+                status: { $in: ['CANCELLED', 'CANCELED'] }
+              }
+            },
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: { $dateToString: { format: '%Y-%m', date: '$appointment_date' } }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
+          byHospitalMonthlyNoShow: [
+            {
+              $match: {
+                status: { $in: ['NO_SHOW', 'NOSHOW'] }
+              }
+            },
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: { $dateToString: { format: '%Y-%m', date: '$appointment_date' } }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
           byDepartment: [
             { $match: dateFilter ? { appointment_date: dateFilter } : {} },
             { $group: { _id: '$department_id', count: { $sum: 1 } } }
@@ -3087,6 +3273,16 @@ export const appointmentService = {
       if (h._id) byHospitalNoShowMap[h._id.toString()] = h.count;
     });
 
+    const byHospitalRescheduledMap = {};
+    (stats?.byHospitalRescheduled || []).forEach(h => {
+      if (h._id) byHospitalRescheduledMap[h._id.toString()] = h.count;
+    });
+
+    const byHospitalWalkInMap = {};
+    (stats?.byHospitalWalkIn || []).forEach(h => {
+      if (h._id) byHospitalWalkInMap[h._id.toString()] = h.count;
+    });
+
     const byHospitalMonthlyIntake = (stats?.byHospitalMonthlyIntake || []).map(m => ({
       hospitalId: m._id?.hospital_id?.toString(),
       bucket: m._id?.bucket,
@@ -3099,18 +3295,57 @@ export const appointmentService = {
       count: m.count || 0,
     }));
 
+    const byHospitalMonthlyRescheduled = (stats?.byHospitalMonthlyRescheduled || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      count: m.count || 0,
+    }));
+
+    const byHospitalMonthlyWalkIn = (stats?.byHospitalMonthlyWalkIn || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      count: m.count || 0,
+    }));
+
+    const byHospitalMonthlyScheduled = (stats?.byHospitalMonthlyScheduled || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      count: m.count || 0,
+    }));
+
+    const byHospitalMonthlyCancelled = (stats?.byHospitalMonthlyCancelled || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      count: m.count || 0,
+    }));
+
+    const byHospitalMonthlyNoShow = (stats?.byHospitalMonthlyNoShow || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      count: m.count || 0,
+    }));
+
     const currentMonthKey = new Date().toISOString().slice(0, 7);
-    const targetHospId = match.hospital_id ? match.hospital_id.toString() : null;
+    const targetHospId = (match.hospital_id && mongoose.Types.ObjectId.isValid(match.hospital_id) && !match.hospital_id['$in'])
+      ? match.hospital_id.toString()
+      : ((query.hospitalId || query.hospital_id) ? (query.hospitalId || query.hospital_id).toString() : null);
 
     const intakeItems = byHospitalMonthlyIntake.filter(m => !targetHospId || m.hospitalId === targetHospId);
     const completedItems = byHospitalMonthlyCompleted.filter(m => !targetHospId || m.hospitalId === targetHospId);
     const predItems = byHospitalMonthlyPreds.filter(m => !targetHospId || m.hospitalId === targetHospId);
+    const reschedItems = byHospitalMonthlyRescheduled.filter(m => !targetHospId || m.hospitalId === targetHospId);
+    const walkInItems = byHospitalMonthlyWalkIn.filter(m => !targetHospId || m.hospitalId === targetHospId);
+    const schedItems = byHospitalMonthlyScheduled.filter(m => !targetHospId || m.hospitalId === targetHospId);
+    const cancItems = byHospitalMonthlyCancelled.filter(m => !targetHospId || m.hospitalId === targetHospId);
+    const noShowItems = byHospitalMonthlyNoShow.filter(m => !targetHospId || m.hospitalId === targetHospId);
 
+    // Include all historical months plus November 2026 (booked advance slots)
     const distinctTrendMonths = [...new Set([
       ...intakeItems.map(m => m.bucket),
       ...completedItems.map(m => m.bucket),
-      ...predItems.map(m => m.bucket)
-    ])].filter(b => b && b <= currentMonthKey).sort();
+      ...predItems.map(m => m.bucket),
+      ...schedItems.map(m => m.bucket)
+    ])].filter(Boolean).sort();
 
     const monthlyTrends = distinctTrendMonths.map(mKey => {
       const parts = mKey.split('-');
@@ -3123,7 +3358,27 @@ export const appointmentService = {
         .filter(m => m.bucket === mKey)
         .reduce((sum, item) => sum + (item.count || 0), 0);
 
+      const scheduledCount = schedItems
+        .filter(m => m.bucket === mKey)
+        .reduce((sum, item) => sum + (item.count || 0), 0);
+
       const completedCount = completedItems
+        .filter(m => m.bucket === mKey)
+        .reduce((sum, item) => sum + (item.count || 0), 0);
+
+      const cancelledCount = cancItems
+        .filter(m => m.bucket === mKey)
+        .reduce((sum, item) => sum + (item.count || 0), 0);
+
+      const rescheduledCount = reschedItems
+        .filter(m => m.bucket === mKey)
+        .reduce((sum, item) => sum + (item.count || 0), 0);
+
+      const noShowCount = noShowItems
+        .filter(m => m.bucket === mKey)
+        .reduce((sum, item) => sum + (item.count || 0), 0);
+
+      const walkInCount = walkInItems
         .filter(m => m.bucket === mKey)
         .reduce((sum, item) => sum + (item.count || 0), 0);
 
@@ -3131,16 +3386,30 @@ export const appointmentService = {
         .filter(m => m.bucket === mKey)
         .reduce((sum, item) => sum + (item.count || 0), 0);
 
+      const isFuture = mKey > currentMonthKey;
+      const isCurrentMonth = mKey === currentMonthKey;
+      const statusLabel = isFuture ? 'Future Workload' : (isCurrentMonth ? 'MTD In Progress' : 'Closed Cycle');
+
+      // Scheduled workload is the effective appointments scheduled in this month
+      const effectiveWorkload = scheduledCount || intakeCount;
+
       return {
         month: monthLabel,
         monthKey: mKey,
-        appointments: intakeCount,
-        volume: intakeCount,
-        total: intakeCount,
+        intake: intakeCount,
+        appointments: effectiveWorkload,
+        volume: effectiveWorkload,
+        total: effectiveWorkload,
         completed: completedCount,
-        scheduled: Math.max(0, intakeCount - completedCount),
-        cancelled: 0,
+        cancelled: cancelledCount,
+        rescheduled: rescheduledCount,
+        noShow: noShowCount,
+        walkIns: walkInCount,
+        scheduled: Math.max(0, effectiveWorkload - completedCount - cancelledCount - rescheduledCount),
         aiUsage: aiCount,
+        isFuture,
+        isCurrentMonth,
+        status: statusLabel,
       };
     });
 
@@ -3157,6 +3426,11 @@ export const appointmentService = {
       byHospitalPreds: byHospitalPredsMap,
       byHospitalCancelled: byHospitalCancelledMap,
       byHospitalNoShow: byHospitalNoShowMap,
+      byHospitalRescheduled: byHospitalRescheduledMap,
+      byHospitalWalkIn: byHospitalWalkInMap,
+      byHospitalMonthlyRescheduled,
+      byHospitalMonthlyWalkIn,
+      byHospitalMonthlyScheduled,
       byDepartment: byDepartmentMap,
       byDepartmentPreds: byDepartmentPredsMap,
       monthlyTrends,

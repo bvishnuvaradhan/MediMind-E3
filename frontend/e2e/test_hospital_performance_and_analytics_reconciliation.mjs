@@ -148,12 +148,14 @@ async function run() {
       'Completed Consultations',
       'Completion Rate',
       'Cancelled Bookings',
+      'Rescheduled Bookings',
       'No-Show Rate',
-      'AI Triage Runs',
+      'Walk-ins',
+      'AI Triaged Scans',
     ];
 
-    if (table2Headers.length !== 7) {
-      throw new Error(`Expected exactly 7 headers in Table 2, found ${table2Headers.length}: ${JSON.stringify(table2Headers)}`);
+    if (table2Headers.length !== 9) {
+      throw new Error(`Expected exactly 9 headers in Table 2, found ${table2Headers.length}: ${JSON.stringify(table2Headers)}`);
     }
 
     for (let i = 0; i < expectedTable2Headers.length; i++) {
@@ -161,13 +163,14 @@ async function run() {
         throw new Error(`Table 2 Header mismatch at column ${i + 1}: expected "${expectedTable2Headers[i]}", got "${table2Headers[i]}"`);
       }
     }
-    console.log('✓ PASS: Table 2 (Hospital Operational Comparison) contains exactly 7 columns in strict required order.');
+    console.log('✓ PASS: Table 2 (Hospital Operational Comparison) contains exactly 9 columns in strict required order.');
 
-    // Step 6: Verify Three Dedicated Separate Line Charts
-    console.log('[Step 6] Verifying Three Dedicated Monthly Line Charts...');
+    // Step 6: Verify Four Dedicated Separate Line Charts
+    console.log('[Step 6] Verifying Four Dedicated Monthly Line Charts...');
     const graph1Title = await page.isVisible('h3:has-text("Intake Bookings by Hospital")');
     const graph2Title = await page.isVisible('h3:has-text("Appointments Served by Hospital")');
     const graph3Title = await page.isVisible('h3:has-text("Clinical AI Runs by Hospital")');
+    const graph4Title = await page.isVisible('h3:has-text("Rescheduled Bookings by Hospital")');
 
     if (!graph1Title) {
       throw new Error('Graph 1: "Intake Bookings by Hospital" is missing!');
@@ -178,7 +181,10 @@ async function run() {
     if (!graph3Title) {
       throw new Error('Graph 3: "Clinical AI Runs by Hospital" is missing!');
     }
-    console.log('✓ PASS: All 3 dedicated graph titles rendered (Intake Bookings, Appointments Served, Clinical AI Runs).');
+    if (!graph4Title) {
+      throw new Error('Graph 4: "Rescheduled Bookings by Hospital" is missing!');
+    }
+    console.log('✓ PASS: All 4 dedicated graph titles rendered (Intake Bookings, Appointments Served, Clinical AI Runs, Rescheduled Bookings).');
 
     // Verify SVG elements and legends
     const svgLineCount = await page.$$eval('.table-card svg path', (paths) => paths.length);

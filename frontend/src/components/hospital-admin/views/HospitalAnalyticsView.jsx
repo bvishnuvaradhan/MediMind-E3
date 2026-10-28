@@ -89,18 +89,40 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
     const appointments = Number(m.appointments ?? m.volume ?? m.total ?? 0);
     const completed = Number(m.completed ?? 0);
     const cancelled = Number(m.cancelled ?? 0);
+    const rescheduled = Number(m.rescheduled ?? 0);
+    const noShow = Number(m.noShow ?? 0);
+    const walkIns = Number(m.walkIns ?? 0);
     const scheduled = Number(m.scheduled ?? 0);
     const aiUsage = Number(m.aiUsage ?? 0);
+    const isFuture = Boolean(m.isFuture);
+    const isCurrentMonth = Boolean(m.isCurrentMonth);
+    const status = m.status || (isFuture ? 'Future Workload' : isCurrentMonth ? 'MTD In Progress' : 'Closed Cycle');
     return {
       ...m,
       month: m.month || 'Unknown',
       appointments,
       completed,
       cancelled,
+      rescheduled,
+      noShow,
+      walkIns,
       scheduled,
       aiUsage,
+      isFuture,
+      isCurrentMonth,
+      status,
     };
   });
+
+  const totalTableBookings = monthlyTrends.reduce((sum, m) => sum + m.appointments, 0);
+  const totalTableCompleted = monthlyTrends.reduce((sum, m) => sum + m.completed, 0);
+  const totalTableCancelled = monthlyTrends.reduce((sum, m) => sum + m.cancelled, 0);
+  const totalTableRescheduled = monthlyTrends.reduce((sum, m) => sum + m.rescheduled, 0);
+  const totalTableNoShow = monthlyTrends.reduce((sum, m) => sum + m.noShow, 0);
+  const totalTableWalkIns = monthlyTrends.reduce((sum, m) => sum + m.walkIns, 0);
+  const totalTableAiScans = monthlyTrends.reduce((sum, m) => sum + m.aiUsage, 0);
+  const tableCompletionRate = totalTableBookings > 0 ? ((totalTableCompleted / totalTableBookings) * 100).toFixed(1) + '%' : '0.0%';
+  const tableNoShowRate = totalTableBookings > 0 ? ((totalTableNoShow / totalTableBookings) * 100).toFixed(1) + '%' : '0.0%';
 
   const hospName = hospital?.name || '';
   const defaultStartMonth = hospName.includes('Nexora')
@@ -307,7 +329,9 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
                 <th>Completed Consultations</th>
                 <th>Completion Rate</th>
                 <th>Cancelled Bookings</th>
+                <th>Rescheduled Bookings</th>
                 <th>No-Show Rate</th>
+                <th>Walk-ins</th>
                 <th>AI Triaged Scans</th>
                 <th>Status</th>
               </tr>
@@ -317,8 +341,24 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
                 const appts = item.appointments;
                 const completed = item.completed;
                 const cancelled = item.cancelled;
-                const rate = appts > 0 ? `${Math.round((completed / appts) * 100)}%` : (completed === 0 ? '0%' : 'N/A');
-                const cRate = appts > 0 ? `${((cancelled / appts) * 100).toFixed(1)}%` : (cancelled === 0 ? '0.0%' : 'N/A');
+                const rescheduled = item.rescheduled;
+                const walkIns = item.walkIns;
+                const rate = item.isFuture
+                  ? 'N/A'
+                  : appts > 0
+                  ? `${((completed / appts) * 100).toFixed(1)}%`
+                  : (completed === 0 ? '0.0%' : 'N/A');
+                const noShowRate = item.isFuture
+                  ? 'N/A'
+                  : appts > 0
+                  ? `${((item.noShow / appts) * 100).toFixed(1)}%`
+                  : '0.0%';
+
+                const badgeClass = item.isFuture
+                  ? 'ha-badge warning'
+                  : item.isCurrentMonth
+                  ? 'ha-badge info'
+                  : 'ha-badge success';
 
                 return (
                   <tr key={item.month}>
@@ -329,27 +369,75 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
                       <strong style={{ fontSize: '13px' }}>{appts}</strong>
                     </td>
                     <td>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ha-teal)' }}>{completed}</span>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: item.isFuture ? 'var(--ha-text-muted)' : 'var(--ha-teal)' }}>
+                        {item.isFuture ? '-' : completed}
+                      </span>
                     </td>
                     <td>
-                      <span className="ha-badge success">{rate}</span>
+                      <span className={item.isFuture ? 'ha-badge' : 'ha-badge success'}>{rate}</span>
                     </td>
                     <td>
                       <span style={{ fontSize: '12px', color: 'var(--ha-text-secondary)' }}>{cancelled}</span>
                     </td>
                     <td>
-                      <span style={{ fontSize: '12px', color: 'var(--ha-warning)' }}>{cRate}</span>
+                      <span style={{ fontSize: '12px', color: 'var(--ha-primary)' }}>{rescheduled}</span>
                     </td>
                     <td>
-                      <span style={{ fontSize: '12px', color: 'var(--ha-primary)' }}>{item.aiUsage} Scans</span>
+                      <span style={{ fontSize: '12px', color: item.isFuture ? 'var(--ha-text-muted)' : 'var(--ha-warning)' }}>
+                        {noShowRate}
+                      </span>
                     </td>
                     <td>
-                      <span className="ha-badge info" style={{ fontSize: '10px' }}>Closed Cycle</span>
+                      <span style={{ fontSize: '12px', fontWeight: 600 }}>{walkIns}</span>
+                    </td>
+                    <td>
+                      <span style={{ fontSize: '12px', color: 'var(--ha-primary)' }}>
+                        {item.isFuture ? '-' : `${item.aiUsage} Scans`}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={badgeClass} style={{ fontSize: '10px' }}>{item.status}</span>
                     </td>
                   </tr>
                 );
               })}
             </tbody>
+            {monthlyTrends.length > 0 && (
+              <tfoot>
+                <tr style={{ fontWeight: 'bold', backgroundColor: 'var(--ha-table-header-bg, rgba(248, 250, 252, 0.9))', borderTop: '2px solid var(--ha-border)' }}>
+                  <td>
+                    <strong>TOTAL</strong>
+                  </td>
+                  <td>
+                    <strong style={{ fontSize: '13px' }}>{totalTableBookings}</strong>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ha-teal)' }}>{totalTableCompleted}</span>
+                  </td>
+                  <td>
+                    <span className="ha-badge success">{tableCompletionRate}</span>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '12px' }}>{totalTableCancelled}</span>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '12px', color: 'var(--ha-primary)' }}>{totalTableRescheduled}</span>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '12px', color: 'var(--ha-warning)' }}>{tableNoShowRate}</span>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '12px', fontWeight: 700 }}>{totalTableWalkIns}</span>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '12px', color: 'var(--ha-primary)', fontWeight: 700 }}>{totalTableAiScans} Scans</span>
+                  </td>
+                  <td>
+                    <span className="ha-badge info" style={{ fontSize: '10px' }}>Facility Total</span>
+                  </td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
       </div>

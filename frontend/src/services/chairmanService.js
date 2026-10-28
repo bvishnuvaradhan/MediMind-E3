@@ -934,6 +934,8 @@ export const chairmanService = {
       // Authoritative Cancellations and No-Shows
       const cancelledCount = (stats?.byHospitalCancelled && stats.byHospitalCancelled[hid]) || 0;
       const noShowCount = (stats?.byHospitalNoShow && stats.byHospitalNoShow[hid]) || 0;
+      const reschedCount = (stats?.byHospitalRescheduled && stats.byHospitalRescheduled[hid]) || 0;
+      const walkInCount = (stats?.byHospitalWalkIn && stats.byHospitalWalkIn[hid]) || 0;
 
       // Derived Operational Ratios (formatted to 1 decimal place, safe denominator handling)
       const completionRate = intakeCount > 0
@@ -971,12 +973,15 @@ export const chairmanService = {
         bedCapacity: bedCap,
         patientSatisfaction,
         status: netStatus,
-        // Hospital Operational Comparison Metrics (7 Columns Table)
+        // Hospital Operational Comparison Metrics (9 Columns Table with Rescheduled & Walk-ins)
         totalBookings: intakeCount,
         completedConsultations: servedCount,
         completionRate,
         cancelledBookings: cancelledCount,
+        rescheduledBookings: reschedCount,
         noShowRate,
+        noShowCount,
+        walkIns: walkInCount,
         aiTriageRuns: aiRunsCount,
       };
     });
@@ -1018,6 +1023,7 @@ export const chairmanService = {
     let intakeTrends = [];
     let servedTrends = [];
     let aiRunsTrends = [];
+    let rescheduledTrends = [];
 
     if (isSingleMonth) {
       // Daily line chart granularity
@@ -1080,6 +1086,22 @@ export const chairmanService = {
         });
         return row;
       });
+
+      rescheduledTrends = distinctDays.map(dayStr => {
+        const parts = dayStr.split('-');
+        const mIdx = parseInt(parts[1], 10) - 1;
+        const label = `${parts[2]} ${monthNames[mIdx] || parts[1]}`;
+        const row = { bucket: dayStr, label };
+        trendSeries.forEach(s => {
+          const dayMonth = dayStr.slice(0, 7);
+          if (s.onboardingMonth && dayMonth < s.onboardingMonth) {
+            row[s.key] = null;
+          } else {
+            row[s.key] = 0;
+          }
+        });
+        return row;
+      });
     } else {
       let distinctMonths = [];
 
@@ -1125,6 +1147,19 @@ export const chairmanService = {
             cur = `${nextY}-${String(nextM).padStart(2, '0')}`;
           }
           distinctMonths.sort();
+        } else if (dateParams.startDate && dateParams.endDate) {
+          const startMonth = dateParams.startDate.slice(0, 7);
+          const endMonth = dateParams.endDate.slice(0, 7);
+          let cur = startMonth;
+          while (cur <= endMonth && cur <= currentMonthKey) {
+            if (!distinctMonths.includes(cur)) distinctMonths.push(cur);
+            const [cy, cm] = cur.split('-').map(Number);
+            const nextM = cm === 12 ? 1 : cm + 1;
+            const nextY = cm === 12 ? cy + 1 : cy;
+            cur = `${nextY}-${String(nextM).padStart(2, '0')}`;
+          }
+          distinctMonths = distinctMonths.filter(m => m >= startMonth && m <= endMonth);
+          distinctMonths.sort();
         }
       }
 
@@ -1167,7 +1202,7 @@ export const chairmanService = {
         const row = { bucket: mStr, label, isFuture, isCurrentMonth };
         trendSeries.forEach(s => {
           if (isFuture) {
-            row[s.key] = 0;
+            row[s.key] = null;
           } else if (s.onboardingMonth && mStr < s.onboardingMonth) {
             row[s.key] = null;
           } else {
@@ -1192,11 +1227,36 @@ export const chairmanService = {
         const row = { bucket: mStr, label, isFuture, isCurrentMonth };
         trendSeries.forEach(s => {
           if (isFuture) {
-            row[s.key] = 0;
+            row[s.key] = null;
           } else if (s.onboardingMonth && mStr < s.onboardingMonth) {
             row[s.key] = null;
           } else {
             const match = (stats?.byHospitalMonthlyPreds || []).find(m => m.bucket === mStr && m.hospitalId === s.hospitalId);
+            row[s.key] = match ? match.count : 0;
+          }
+        });
+        return row;
+      });
+
+      rescheduledTrends = distinctMonths.map(mStr => {
+        const [yStr, mNum] = mStr.split('-');
+        const mIdx = parseInt(mNum, 10) - 1;
+        const isFuture = mStr > currentMonthKey;
+        const isCurrentMonth = mStr === currentMonthKey;
+        const monthName = monthNames[mIdx] || mNum;
+        const label = isFuture
+          ? `${monthName} ${yStr} (Planned)`
+          : isCurrentMonth
+          ? `${monthName} ${yStr} (MTD)`
+          : `${monthName} ${yStr}`;
+        const row = { bucket: mStr, label, isFuture, isCurrentMonth };
+        trendSeries.forEach(s => {
+          if (isFuture) {
+            row[s.key] = null;
+          } else if (s.onboardingMonth && mStr < s.onboardingMonth) {
+            row[s.key] = null;
+          } else {
+            const match = (stats?.byHospitalMonthlyRescheduled || []).find(m => m.bucket === mStr && m.hospitalId === s.hospitalId);
             row[s.key] = match ? match.count : 0;
           }
         });
@@ -1210,6 +1270,7 @@ export const chairmanService = {
     result.intakeTrends = intakeTrends;
     result.servedTrends = servedTrends;
     result.aiRunsTrends = aiRunsTrends;
+    result.rescheduledTrends = rescheduledTrends;
     result.granularity = isSingleMonth ? 'daily' : 'monthly';
     return result;
   },

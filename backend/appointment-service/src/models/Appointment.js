@@ -108,12 +108,32 @@ const appointmentSchema = new mongoose.Schema(
       index: true,
     },
 
+    idempotency_key: {
+      type: String,
+      default: null,
+      index: true,
+    },
+
     replacement_appointment_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Appointment',
       default: null,
       index: true,
     },
+
+    rescheduling_history: [
+      {
+        previous_appointment_date: { type: Date },
+        previous_start_time: { type: String, trim: true },
+        previous_end_time: { type: String, trim: true },
+        new_appointment_date: { type: Date },
+        new_start_time: { type: String, trim: true },
+        new_end_time: { type: String, trim: true },
+        rescheduled_at: { type: Date, default: Date.now },
+        rescheduled_by: { type: String, default: null },
+        reason: { type: String, default: null, trim: true },
+      },
+    ],
   },
   {
     timestamps: {
@@ -183,6 +203,10 @@ appointmentSchema.methods.toPublicJSON = function () {
     original_appointment_id: this.original_appointment_id,
     replacementAppointmentId: this.replacement_appointment_id,
     replacement_appointment_id: this.replacement_appointment_id,
+    idempotencyKey: this.idempotency_key,
+    idempotency_key: this.idempotency_key,
+    reschedulingHistory: this.rescheduling_history || [],
+    rescheduling_history: this.rescheduling_history || [],
     createdAt: this.created_at,
     updatedAt: this.updated_at,
   };

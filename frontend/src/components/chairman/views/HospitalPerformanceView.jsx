@@ -44,10 +44,17 @@ export function HospitalPerformanceView() {
   const totalBookings = performance.reduce((sum, h) => sum + (Number(h.totalBookings) || 0), 0);
   const totalServed = performance.reduce((sum, h) => sum + (Number(h.appointmentsServed) || 0), 0);
   const totalAiRuns = performance.reduce((sum, h) => sum + (Number(h.clinicalAiRuns) || 0), 0);
+  const totalCancelled = performance.reduce((sum, h) => sum + (Number(h.cancelledBookings) || 0), 0);
+  const totalRescheduled = performance.reduce((sum, h) => sum + (Number(h.rescheduledBookings) || 0), 0);
+  const totalWalkIns = performance.reduce((sum, h) => sum + (Number(h.walkIns) || 0), 0);
+  const totalNoShowCount = performance.reduce((sum, h) => sum + (Number(h.noShowCount) || 0), 0);
+  const totalCompletionRate = totalBookings > 0 ? ((totalServed / totalBookings) * 100).toFixed(1) + '%' : '0.0%';
+  const totalNoShowRate = totalBookings > 0 ? ((totalNoShowCount / totalBookings) * 100).toFixed(1) + '%' : '0.0%';
 
   const intakeTrends = performance.intakeTrends || [];
   const servedTrends = performance.servedTrends || [];
   const aiRunsTrends = performance.aiRunsTrends || [];
+  const rescheduledTrends = performance.rescheduledTrends || [];
   const trendSeries = performance.trendSeries || [];
   const granularity = performance.granularity || 'monthly';
 
@@ -173,14 +180,14 @@ export function HospitalPerformanceView() {
         </div>
       </div>
 
-      {/* Table 2: Hospital Operational Comparison Table (Distinct Section, Exactly 7 Columns) */}
+      {/* Table 2: Hospital Operational Comparison Table (Distinct Section, Exactly 9 Columns + TOTAL Row) */}
       <div className="table-card" style={{ marginBottom: '24px' }}>
         <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--chair-border)' }}>
           <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>
             Hospital Operational Comparison
           </h3>
           <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
-            Booking intake, completed clinical encounters, and AI triage activity by hospital ({dateRange})
+            Booking intake, completed clinical encounters, rescheduling volume, and walk-ins by hospital ({dateRange})
           </p>
         </div>
         <div className="table-responsive">
@@ -192,20 +199,22 @@ export function HospitalPerformanceView() {
                 <th>Completed Consultations</th>
                 <th>Completion Rate</th>
                 <th>Cancelled Bookings</th>
+                <th>Rescheduled Bookings</th>
                 <th>No-Show Rate</th>
-                <th>AI Triage Runs</th>
+                <th>Walk-ins</th>
+                <th>AI Triaged Scans</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center', padding: '32px', color: 'var(--chair-muted)' }}>
+                  <td colSpan="9" style={{ textAlign: 'center', padding: '32px', color: 'var(--chair-muted)' }}>
                     Loading operational comparisons...
                   </td>
                 </tr>
               ) : performance.length === 0 ? (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center', padding: '32px', color: 'var(--chair-muted)' }}>
+                  <td colSpan="9" style={{ textAlign: 'center', padding: '32px', color: 'var(--chair-muted)' }}>
                     No operational data available for selected period.
                   </td>
                 </tr>
@@ -232,19 +241,68 @@ export function HospitalPerformanceView() {
                       <span style={{ fontSize: '11px', color: 'var(--chair-muted)', marginLeft: '4px' }}>Cancelled</span>
                     </td>
                     <td>
+                      <span>{item.rescheduledBookings}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--chair-muted)', marginLeft: '4px' }}>Rescheduled</span>
+                    </td>
+                    <td>
                       <span style={{ color: item.noShowRate !== '0.0%' && item.noShowRate !== '0%' ? 'var(--chair-text)' : 'var(--chair-muted)' }}>
                         {item.noShowRate}
                       </span>
                     </td>
                     <td>
+                      <strong>{item.walkIns}</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--chair-muted)', marginLeft: '4px' }}>Walk-ins</span>
+                    </td>
+                    <td>
                       <span className="badge" style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', fontWeight: '600' }}>
-                        {item.aiTriageRuns} Runs
+                        {item.aiTriageRuns} Scans
                       </span>
                     </td>
                   </tr>
                 ))
               )}
             </tbody>
+            {performance.length > 0 && !loading && (
+              <tfoot>
+                <tr style={{ fontWeight: '700', backgroundColor: 'var(--chair-subtle, rgba(248, 250, 252, 0.8))', borderTop: '2px solid var(--chair-border)' }}>
+                  <td>
+                    <strong>TOTAL</strong>
+                    <div style={{ fontSize: '11px', color: 'var(--chair-muted)' }}>3 Active Facilities</div>
+                  </td>
+                  <td>
+                    <strong>{totalBookings}</strong>
+                    <span style={{ fontSize: '11px', color: 'var(--chair-muted)', marginLeft: '4px' }}>Bookings</span>
+                  </td>
+                  <td>
+                    <strong style={{ color: 'var(--chair-sapphire)' }}>{totalServed}</strong>
+                    <span style={{ fontSize: '11px', color: 'var(--chair-muted)', marginLeft: '4px' }}>Encounters</span>
+                  </td>
+                  <td>
+                    <span className="badge badge-active">{totalCompletionRate}</span>
+                  </td>
+                  <td>
+                    <span>{totalCancelled}</span>
+                    <span style={{ fontSize: '11px', color: 'var(--chair-muted)', marginLeft: '4px' }}>Cancelled</span>
+                  </td>
+                  <td>
+                    <span>{totalRescheduled}</span>
+                    <span style={{ fontSize: '11px', color: 'var(--chair-muted)', marginLeft: '4px' }}>Rescheduled</span>
+                  </td>
+                  <td>
+                    <span>{totalNoShowRate}</span>
+                  </td>
+                  <td>
+                    <strong>{totalWalkIns}</strong>
+                    <span style={{ fontSize: '11px', color: 'var(--chair-muted)', marginLeft: '4px' }}>Walk-ins</span>
+                  </td>
+                  <td>
+                    <span className="badge" style={{ backgroundColor: 'rgba(37, 99, 235, 0.15)', color: '#2563eb', fontWeight: '700' }}>
+                      {totalAiRuns} Scans
+                    </span>
+                  </td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
       </div>
@@ -342,6 +400,28 @@ export function HospitalPerformanceView() {
             xKey="label"
             height={220}
             yAxisLabel="AI Inferences"
+            showGrid={true}
+            showLegend={true}
+          />
+        </div>
+
+        {/* Graph 4: Rescheduled Bookings by Hospital (Monthly/Daily Line Chart) */}
+        <div className="table-card" style={{ padding: '24px' }}>
+          <div style={{ marginBottom: '16px' }}>
+            <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontFamily: 'Plus Jakarta Sans' }}>
+              Rescheduled Bookings by Hospital
+            </h3>
+            <p style={{ margin: 0, fontSize: '12px', color: 'var(--chair-muted)' }}>
+              Monthly rescheduled booking volume by operational appointment month across verified network facilities
+            </p>
+          </div>
+
+          <LineChart
+            data={rescheduledTrends}
+            series={trendSeries}
+            xKey="label"
+            height={220}
+            yAxisLabel="Rescheduled"
             showGrid={true}
             showLegend={true}
           />
