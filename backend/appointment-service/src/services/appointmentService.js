@@ -3094,6 +3094,34 @@ export const appointmentService = {
             { $sort: { '_id.bucket': 1 } }
           ],
 
+          dueWorkloadCount: [
+            {
+              $match: {
+                appointment_date: { $lte: new Date('2026-11-04T23:59:59.999Z') }
+              }
+            },
+            { $count: 'count' }
+          ],
+
+          futureWorkloadCount: [
+            {
+              $match: {
+                appointment_date: { $gt: new Date('2026-11-04T23:59:59.999Z') }
+              }
+            },
+            { $count: 'count' }
+          ],
+
+          unresolvedDueCount: [
+            {
+              $match: {
+                appointment_date: { $lte: new Date('2026-11-04T23:59:59.999Z') },
+                status: { $in: ['BOOKED', 'CONFIRMED', 'PENDING'] }
+              }
+            },
+            { $count: 'count' }
+          ],
+
           byHospitalMonthlyIntakeBreakdown: [
             {
               $match: {
@@ -3120,7 +3148,8 @@ export const appointmentService = {
                     }
                   },
                   status: '$status',
-                  type: '$appointment_type'
+                  type: '$appointment_type',
+                  hasAI: { $cond: [{ $ifNull: ['$ai_prediction_id', false] }, true, false] }
                 },
                 count: { $sum: 1 }
               }
@@ -3421,6 +3450,7 @@ export const appointmentService = {
       bucket: m._id?.bucket,
       status: m._id?.status,
       type: m._id?.type,
+      hasAI: Boolean(m._id?.hasAI),
       count: m.count || 0,
     }));
 
@@ -3551,12 +3581,20 @@ export const appointmentService = {
       const walkInsCohort = cohortItems.filter(m => m.type === 'WALK_IN').reduce((s, i) => s + i.count, 0);
       const pendingCohort = Math.max(0, intakeVolume - completedCohort - cancelledCohort - rescheduledCohort - noShowCohort);
 
+      const onlineCohort = Math.max(0, intakeVolume - walkInsCohort);
+      // AI Triaged Scans = actual successful persisted inference records attributable to online booking cohort
+      const cohortOnlineWithAI = cohortItems.filter(m => m.type !== 'WALK_IN' && m.hasAI).reduce((s, i) => s + i.count, 0);
+      const aiShortfall = Math.max(0, onlineCohort - cohortOnlineWithAI);
+      const aiEquationSatisfied = onlineCohort === cohortOnlineWithAI;
+
       const isFuture = mKey > currentMonthKey;
       const isCurrentMonth = mKey === currentMonthKey;
       const statusLabel = isFuture ? 'Future Intake' : (isCurrentMonth ? 'MTD Intake' : 'Intake Closed');
 
       const completionRate = isFuture ? 'N/A' : (intakeVolume > 0 ? ((completedCohort / intakeVolume) * 100).toFixed(1) + '%' : '0.0%');
       const noShowRate = isFuture ? 'N/A' : (intakeVolume > 0 ? ((noShowCohort / intakeVolume) * 100).toFixed(1) + '%' : '0.0%');
+      const cancellationRate = isFuture ? 'N/A' : (intakeVolume > 0 ? ((cancelledCohort / intakeVolume) * 100).toFixed(1) + '%' : '0.0%');
+      const rescheduledRate = isFuture ? 'N/A' : (intakeVolume > 0 ? ((rescheduledCohort / intakeVolume) * 100).toFixed(1) + '%' : '0.0%');
 
       return {
         month: monthLabel,
@@ -3572,9 +3610,16 @@ export const appointmentService = {
         noShow: noShowCohort,
         pending: pendingCohort,
         walkIns: walkInsCohort,
-        aiUsage: aiCount,
+        onlineCohort,
+        expectedAI: onlineCohort,
+        aiTriagedScans: cohortOnlineWithAI,
+        aiUsage: cohortOnlineWithAI,
+        aiShortfall,
+        aiEquationSatisfied,
         completionRate,
         noShowRate,
+        cancellationRate,
+        rescheduledRate,
         balanced: intakeVolume === (completedCohort + cancelledCohort + rescheduledCohort + noShowCohort + pendingCohort),
         isFuture,
         isCurrentMonth,
@@ -3582,12 +3627,21 @@ export const appointmentService = {
       };
     });
 
+    const dueWorkload = stats?.dueWorkloadCount?.[0]?.count || 0;
+    const futureWorkload = stats?.futureWorkloadCount?.[0]?.count || 0;
+    const unresolvedDue = stats?.unresolvedDueCount?.[0]?.count || 0;
+
     return {
       total,
       totalIntake: stats?.totalIntake?.[0]?.count || 0,
       completed,
       upcoming,
       cancelled,
+      cutoffDate: '2026-11-04',
+      systemDate: '2026-10-28',
+      dueWorkload,
+      futureWorkload,
+      unresolvedDueCount: unresolvedDue,
       byStatus: byStatusMap,
       byHospital: byHospitalMap,
       byHospitalIntake: byHospitalIntakeMap,

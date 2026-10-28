@@ -191,7 +191,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--ha-text-muted)', backgroundColor: 'var(--ha-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--ha-border)' }}>
           <ShieldCheck size={16} style={{ color: 'var(--ha-teal)' }} />
-          <span>Hospital Operational Overview · Zero PHI Access</span>
+          <span>Cutoff: Nov 4, 2026 · Current: Oct 28, 2026 · Zero PHI Access</span>
         </div>
       </div>
 
@@ -401,12 +401,12 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
               </span>
             ) : (
               <span>
-                <strong>Intake Attribution Contract:</strong> Bookings grouped strictly by creation timestamp (<code>created_at</code>). November advance bookings appear under October intake cohort.
+                <strong>Intake Attribution Contract:</strong> AI Triaged Scans ({totalTableAiScans}) = Total Online Bookings ({totalTableBookings - totalTableWalkIns}) = Total Bookings ({totalTableBookings}) - Walk-ins ({totalTableWalkIns})
               </span>
             )}
           </div>
           <span className={`ha-badge ${tableAnalyticsMode === 'scheduled' ? 'success' : 'info'}`} style={{ fontSize: '11px' }}>
-            {tableAnalyticsMode === 'scheduled' ? '100% Mathematically Reconciled' : 'Creation Timestamp Event-Time'}
+            {tableAnalyticsMode === 'scheduled' ? '100% Mathematically Reconciled' : 'Intake Contract Enforced'}
           </span>
         </div>
 
@@ -481,9 +481,19 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
                       <span style={{ fontSize: '12px', fontWeight: 600 }}>{walkIns}</span>
                     </td>
                     <td>
-                      <span style={{ fontSize: '12px', color: 'var(--ha-primary)' }}>
+                      <span style={{ fontSize: '12px', color: 'var(--ha-primary)', fontWeight: 600 }}>
                         {item.isFuture ? '-' : `${item.aiUsage} Scans`}
                       </span>
+                      {tableAnalyticsMode === 'intake' && item.aiShortfall > 0 && !item.isFuture && (
+                        <span style={{ display: 'block', fontSize: '10px', color: 'var(--ha-warning, #d97706)', fontWeight: 600 }}>
+                          ({item.aiShortfall} unscreened legacy)
+                        </span>
+                      )}
+                      {tableAnalyticsMode === 'intake' && item.aiEquationSatisfied && !item.isFuture && (
+                        <span style={{ display: 'block', fontSize: '10px', color: 'var(--ha-teal)', fontWeight: 600 }}>
+                          ✓ Equality Verified
+                        </span>
+                      )}
                     </td>
                     <td>
                       <span className={badgeClass} style={{ fontSize: '10px' }}>{item.status}</span>

@@ -1274,6 +1274,11 @@ export const chairmanService = {
     result.monthlyTrends = stats?.monthlyTrends || [];
     result.monthlyScheduledTrends = stats?.monthlyScheduledTrends || stats?.monthlyTrends || [];
     result.monthlyIntakeTrends = stats?.monthlyIntakeTrends || [];
+    result.cutoffDate = stats?.cutoffDate || '2026-11-04';
+    result.systemDate = stats?.systemDate || '2026-10-28';
+    result.dueWorkload = stats?.dueWorkload;
+    result.futureWorkload = stats?.futureWorkload;
+    result.unresolvedDueCount = stats?.unresolvedDueCount;
     result.granularity = isSingleMonth ? 'daily' : 'monthly';
     return result;
   },

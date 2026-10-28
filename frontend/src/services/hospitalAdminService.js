@@ -805,6 +805,11 @@ export const hospitalAdminService = {
           monthlyTrends: stats.monthlyTrends || [],
           monthlyScheduledTrends: stats.monthlyScheduledTrends || stats.monthlyTrends || [],
           monthlyIntakeTrends: stats.monthlyIntakeTrends || [],
+          cutoffDate: stats.cutoffDate || '2026-11-04',
+          systemDate: stats.systemDate || '2026-10-28',
+          dueWorkload: stats.dueWorkload,
+          futureWorkload: stats.futureWorkload,
+          unresolvedDueCount: stats.unresolvedDueCount,
         };
 
         adminCache[cacheKey] = resultAnalytics;

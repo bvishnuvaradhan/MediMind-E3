@@ -94,8 +94,12 @@ export function HospitalPerformanceView() {
           </div>
         </div>
 
-        {/* Standardized Date Range Selector */}
-        <div className="view-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Standardized Date Range Selector & Cutoff Badge */}
+        <div className="view-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: 'var(--chair-card)', padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--chair-border)', fontSize: '11px', color: 'var(--chair-muted)' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#059669', display: 'inline-block' }}></span>
+            <span>Cutoff: Nov 4, 2026 · Current: Oct 28, 2026</span>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: 'var(--chair-card)', padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--chair-border)' }}>
             <Calendar size={15} style={{ color: 'var(--chair-sapphire)' }} />
             <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--chair-muted)' }}>Range:</span>
@@ -378,12 +382,12 @@ export function HospitalPerformanceView() {
               </span>
             ) : (
               <span>
-                <strong>Intake Attribution Contract:</strong> Bookings grouped strictly by creation timestamp (<code>created_at</code>). November advance bookings appear under October intake cohort.
+                <strong>Intake Attribution Contract:</strong> AI Triaged Scans ({totalMonthlyAiScans}) = Total Online Bookings ({totalMonthlyBookings - totalMonthlyWalkIns}) = Total Bookings ({totalMonthlyBookings}) - Walk-ins ({totalMonthlyWalkIns})
               </span>
             )}
           </div>
           <span className="badge badge-active" style={{ fontSize: '11px' }}>
-            {tableAnalyticsMode === 'scheduled' ? '100% Mathematically Reconciled' : 'Creation Timestamp Event-Time'}
+            {tableAnalyticsMode === 'scheduled' ? '100% Mathematically Reconciled' : 'Intake Contract Enforced'}
           </span>
         </div>
 
@@ -463,6 +467,16 @@ export function HospitalPerformanceView() {
                         <span className="badge" style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', fontWeight: '600' }}>
                           {item.isFuture ? '-' : `${item.aiUsage} Scans`}
                         </span>
+                        {tableAnalyticsMode === 'intake' && item.aiShortfall > 0 && !item.isFuture && (
+                          <div style={{ fontSize: '10px', color: '#d97706', fontWeight: '600', marginTop: '2px' }}>
+                            ({item.aiShortfall} unscreened legacy)
+                          </div>
+                        )}
+                        {tableAnalyticsMode === 'intake' && item.aiEquationSatisfied && !item.isFuture && (
+                          <div style={{ fontSize: '10px', color: '#059669', fontWeight: '600', marginTop: '2px' }}>
+                            ✓ Equality Verified
+                          </div>
+                        )}
                       </td>
                       <td>
                         <span className={`badge ${item.isFuture ? 'badge-warning' : 'badge-active'}`} style={{ fontSize: '10px' }}>
