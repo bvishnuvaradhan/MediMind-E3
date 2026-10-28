@@ -2887,6 +2887,51 @@ export const appointmentService = {
             { $sort: { '_id.bucket': 1 } }
           ],
 
+          byHospitalMonthlyCancellationEvents: [
+            {
+              $match: {
+                status: { $in: ['CANCELLED', 'CANCELED'] },
+                cancelled_at: { $ne: null }
+              }
+            },
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: { $dateToString: { format: '%Y-%m', date: '$cancelled_at' } }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
+          byHospitalMonthlyReschedulingEvents: [
+            {
+              $match: {
+                $or: [
+                  { status: 'RESCHEDULED' },
+                  { 'rescheduling_history.0': { $exists: true } }
+                ]
+              }
+            },
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: {
+                    $dateToString: {
+                      format: '%Y-%m',
+                      date: { $ifNull: ['$rescheduled_at', { $ifNull: ['$updated_at', '$appointment_date'] }] }
+                    }
+                  }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
           byHospitalMonthlyNoShow: [
             {
               $match: {
@@ -3042,6 +3087,40 @@ export const appointmentService = {
                       }
                     }
                   }
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.bucket': 1 } }
+          ],
+
+          byHospitalMonthlyIntakeBreakdown: [
+            {
+              $match: {
+                $or: [
+                  { created_at: { $lte: new Date() } },
+                  { created_at: { $exists: false }, appointment_date: { $lte: new Date() } }
+                ]
+              }
+            },
+            {
+              $group: {
+                _id: {
+                  hospital_id: '$hospital_id',
+                  bucket: {
+                    $dateToString: {
+                      format: '%Y-%m',
+                      date: {
+                        $cond: [
+                          { $eq: [{ $type: '$created_at' }, 'date'] },
+                          '$created_at',
+                          { $ifNull: [{ $dateFromString: { dateString: '$created_at', onError: null } }, '$appointment_date'] }
+                        ]
+                      }
+                    }
+                  },
+                  status: '$status',
+                  type: '$appointment_type'
                 },
                 count: { $sum: 1 }
               }
@@ -3325,6 +3404,26 @@ export const appointmentService = {
       count: m.count || 0,
     }));
 
+    const byHospitalMonthlyCancellationEvents = (stats?.byHospitalMonthlyCancellationEvents || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      count: m.count || 0,
+    }));
+
+    const byHospitalMonthlyReschedulingEvents = (stats?.byHospitalMonthlyReschedulingEvents || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      count: m.count || 0,
+    }));
+
+    const byHospitalMonthlyIntakeBreakdown = (stats?.byHospitalMonthlyIntakeBreakdown || []).map(m => ({
+      hospitalId: m._id?.hospital_id?.toString(),
+      bucket: m._id?.bucket,
+      status: m._id?.status,
+      type: m._id?.type,
+      count: m.count || 0,
+    }));
+
     const currentMonthKey = new Date().toISOString().slice(0, 7);
     const targetHospId = (match.hospital_id && mongoose.Types.ObjectId.isValid(match.hospital_id) && !match.hospital_id['$in'])
       ? match.hospital_id.toString()
@@ -3393,20 +3492,90 @@ export const appointmentService = {
       // Scheduled workload is the effective appointments scheduled in this month
       const effectiveWorkload = scheduledCount || intakeCount;
 
+      const pendingCount = Math.max(0, effectiveWorkload - completedCount - cancelledCount - rescheduledCount - noShowCount);
+
+      const completionRate = isFuture ? 'N/A' : (effectiveWorkload > 0 ? ((completedCount / effectiveWorkload) * 100).toFixed(1) + '%' : '0.0%');
+      const noShowRate = isFuture ? 'N/A' : (effectiveWorkload > 0 ? ((noShowCount / effectiveWorkload) * 100).toFixed(1) + '%' : '0.0%');
+      const cancellationRate = isFuture ? 'N/A' : (effectiveWorkload > 0 ? ((cancelledCount / effectiveWorkload) * 100).toFixed(1) + '%' : '0.0%');
+
       return {
         month: monthLabel,
         monthKey: mKey,
         intake: intakeCount,
+        intakeVolume: intakeCount,
         appointments: effectiveWorkload,
+        scheduledWorkload: effectiveWorkload,
         volume: effectiveWorkload,
         total: effectiveWorkload,
         completed: completedCount,
         cancelled: cancelledCount,
         rescheduled: rescheduledCount,
         noShow: noShowCount,
+        pending: pendingCount,
         walkIns: walkInCount,
-        scheduled: Math.max(0, effectiveWorkload - completedCount - cancelledCount - rescheduledCount),
+        scheduled: pendingCount,
         aiUsage: aiCount,
+        completionRate,
+        noShowRate,
+        cancellationRate,
+        balanced: effectiveWorkload === (completedCount + cancelledCount + rescheduledCount + noShowCount + pendingCount),
+        isFuture,
+        isCurrentMonth,
+        status: statusLabel,
+      };
+    });
+
+    const distinctIntakeMonths = [...new Set(intakeItems.map(m => m.bucket))].filter(Boolean).sort();
+    const monthlyIntakeTrends = distinctIntakeMonths.map(mKey => {
+      const parts = mKey.split('-');
+      const year = parts[0];
+      const monthNum = parts[1];
+      const mIdx = parseInt(monthNum, 10) - 1;
+      const monthLabel = mIdx >= 0 && mIdx < 12 ? `${monthNames[mIdx]} ${year}` : mKey;
+
+      const intakeVolume = intakeItems
+        .filter(m => m.bucket === mKey)
+        .reduce((sum, item) => sum + (item.count || 0), 0);
+
+      const aiCount = predItems
+        .filter(m => m.bucket === mKey)
+        .reduce((sum, item) => sum + (item.count || 0), 0);
+
+      const cohortItems = byHospitalMonthlyIntakeBreakdown
+        .filter(m => (!targetHospId || m.hospitalId === targetHospId) && m.bucket === mKey);
+
+      const completedCohort = cohortItems.filter(m => m.status === 'COMPLETED').reduce((s, i) => s + i.count, 0);
+      const cancelledCohort = cohortItems.filter(m => m.status === 'CANCELLED' || m.status === 'CANCELED').reduce((s, i) => s + i.count, 0);
+      const rescheduledCohort = cohortItems.filter(m => m.status === 'RESCHEDULED').reduce((s, i) => s + i.count, 0);
+      const noShowCohort = cohortItems.filter(m => m.status === 'NO_SHOW').reduce((s, i) => s + i.count, 0);
+      const walkInsCohort = cohortItems.filter(m => m.type === 'WALK_IN').reduce((s, i) => s + i.count, 0);
+      const pendingCohort = Math.max(0, intakeVolume - completedCohort - cancelledCohort - rescheduledCohort - noShowCohort);
+
+      const isFuture = mKey > currentMonthKey;
+      const isCurrentMonth = mKey === currentMonthKey;
+      const statusLabel = isFuture ? 'Future Intake' : (isCurrentMonth ? 'MTD Intake' : 'Intake Closed');
+
+      const completionRate = isFuture ? 'N/A' : (intakeVolume > 0 ? ((completedCohort / intakeVolume) * 100).toFixed(1) + '%' : '0.0%');
+      const noShowRate = isFuture ? 'N/A' : (intakeVolume > 0 ? ((noShowCohort / intakeVolume) * 100).toFixed(1) + '%' : '0.0%');
+
+      return {
+        month: monthLabel,
+        monthKey: mKey,
+        intakeVolume,
+        intake: intakeVolume,
+        appointments: intakeVolume,
+        total: intakeVolume,
+        volume: intakeVolume,
+        completed: completedCohort,
+        cancelled: cancelledCohort,
+        rescheduled: rescheduledCohort,
+        noShow: noShowCohort,
+        pending: pendingCohort,
+        walkIns: walkInsCohort,
+        aiUsage: aiCount,
+        completionRate,
+        noShowRate,
+        balanced: intakeVolume === (completedCohort + cancelledCohort + rescheduledCohort + noShowCohort + pendingCohort),
         isFuture,
         isCurrentMonth,
         status: statusLabel,
@@ -3431,9 +3600,13 @@ export const appointmentService = {
       byHospitalMonthlyRescheduled,
       byHospitalMonthlyWalkIn,
       byHospitalMonthlyScheduled,
+      byHospitalMonthlyCancellationEvents,
+      byHospitalMonthlyReschedulingEvents,
       byDepartment: byDepartmentMap,
       byDepartmentPreds: byDepartmentPredsMap,
       monthlyTrends,
+      monthlyScheduledTrends: monthlyTrends,
+      monthlyIntakeTrends,
       byHospitalMonthlyCompleted,
       byHospitalMonthlyPreds,
       byHospitalMonthlyIntake,

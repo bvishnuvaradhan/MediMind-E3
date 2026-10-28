@@ -38,8 +38,7 @@ async function run() {
     }
   }
 
-  await page.waitForSelector('table.ha-table', { timeout: 15000 });
-  await page.waitForTimeout(2000);
+  await page.waitForSelector('table.ha-table tbody tr', { timeout: 15000 });
 
   // 3. Inspect Table: Monthly Operational Performance Summary Table
   console.log('[Step 3] Inspecting Monthly Operational Performance Summary Table...');

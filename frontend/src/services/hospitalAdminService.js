@@ -803,6 +803,8 @@ export const hospitalAdminService = {
           byDepartmentPreds: stats.byDepartmentPreds || {},
           monthlyDepartmentTraffic: deptTraffic.length > 0 ? deptTraffic : analyticsState.monthlyDepartmentTraffic,
           monthlyTrends: stats.monthlyTrends || [],
+          monthlyScheduledTrends: stats.monthlyScheduledTrends || stats.monthlyTrends || [],
+          monthlyIntakeTrends: stats.monthlyIntakeTrends || [],
         };
 
         adminCache[cacheKey] = resultAnalytics;

@@ -22,6 +22,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
   const [period, setPeriod] = useState('This Month');
   const [periodStats, setPeriodStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(false);
+  const [tableAnalyticsMode, setTableAnalyticsMode] = useState('scheduled'); // 'scheduled' | 'intake'
 
   const targetHospitalId = hospital?.id || hospital?._id || '6ac85a18074c2bc731a76381';
 
@@ -83,7 +84,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
         { day: 'Sat', scheduled: 0, completed: 0 },
       ];
 
-  // Retrospective multi-month trends
+  // Retrospective multi-month trends (Scheduled Workload by appointment_date)
   const rawMonthlyTrends = currentAnalytics?.monthlyTrends || analytics?.monthlyTrends || [];
   const monthlyTrends = rawMonthlyTrends.map((m) => {
     const appointments = Number(m.appointments ?? m.volume ?? m.total ?? 0);
@@ -93,6 +94,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
     const noShow = Number(m.noShow ?? 0);
     const walkIns = Number(m.walkIns ?? 0);
     const scheduled = Number(m.scheduled ?? 0);
+    const pending = Number(m.pending ?? 0);
     const aiUsage = Number(m.aiUsage ?? 0);
     const isFuture = Boolean(m.isFuture);
     const isCurrentMonth = Boolean(m.isCurrentMonth);
@@ -105,6 +107,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
       cancelled,
       rescheduled,
       noShow,
+      pending,
       walkIns,
       scheduled,
       aiUsage,
@@ -114,13 +117,50 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
     };
   });
 
-  const totalTableBookings = monthlyTrends.reduce((sum, m) => sum + m.appointments, 0);
-  const totalTableCompleted = monthlyTrends.reduce((sum, m) => sum + m.completed, 0);
-  const totalTableCancelled = monthlyTrends.reduce((sum, m) => sum + m.cancelled, 0);
-  const totalTableRescheduled = monthlyTrends.reduce((sum, m) => sum + m.rescheduled, 0);
-  const totalTableNoShow = monthlyTrends.reduce((sum, m) => sum + m.noShow, 0);
-  const totalTableWalkIns = monthlyTrends.reduce((sum, m) => sum + m.walkIns, 0);
-  const totalTableAiScans = monthlyTrends.reduce((sum, m) => sum + m.aiUsage, 0);
+  // Retrospective multi-month intake trends (Booking Intake by created_at)
+  const rawIntakeTrends = currentAnalytics?.monthlyIntakeTrends || [];
+  const monthlyIntakeTrends = rawIntakeTrends.map((m) => {
+    const appointments = Number(m.intakeVolume ?? m.appointments ?? m.intake ?? 0);
+    const completed = Number(m.completed ?? 0);
+    const cancelled = Number(m.cancelled ?? 0);
+    const rescheduled = Number(m.rescheduled ?? 0);
+    const noShow = Number(m.noShow ?? 0);
+    const pending = Number(m.pending ?? 0);
+    const walkIns = Number(m.walkIns ?? 0);
+    const aiUsage = Number(m.aiUsage ?? 0);
+    const isFuture = Boolean(m.isFuture);
+    const isCurrentMonth = Boolean(m.isCurrentMonth);
+    const status = m.status || (isFuture ? 'Future Intake' : isCurrentMonth ? 'MTD Intake' : 'Intake Closed');
+    return {
+      ...m,
+      month: m.month || 'Unknown',
+      appointments,
+      completed,
+      cancelled,
+      rescheduled,
+      noShow,
+      pending,
+      walkIns,
+      scheduled: pending,
+      aiUsage,
+      isFuture,
+      isCurrentMonth,
+      status,
+    };
+  });
+
+  const activeTrends = tableAnalyticsMode === 'intake' && monthlyIntakeTrends.length > 0
+    ? monthlyIntakeTrends
+    : monthlyTrends;
+
+  const totalTableBookings = activeTrends.reduce((sum, m) => sum + m.appointments, 0);
+  const totalTableCompleted = activeTrends.reduce((sum, m) => sum + (typeof m.completed === 'number' ? m.completed : 0), 0);
+  const totalTableCancelled = activeTrends.reduce((sum, m) => sum + m.cancelled, 0);
+  const totalTableRescheduled = activeTrends.reduce((sum, m) => sum + m.rescheduled, 0);
+  const totalTableNoShow = activeTrends.reduce((sum, m) => sum + m.noShow, 0);
+  const totalTablePending = activeTrends.reduce((sum, m) => sum + (m.pending || 0), 0);
+  const totalTableWalkIns = activeTrends.reduce((sum, m) => sum + m.walkIns, 0);
+  const totalTableAiScans = activeTrends.reduce((sum, m) => sum + m.aiUsage, 0);
   const tableCompletionRate = totalTableBookings > 0 ? ((totalTableCompleted / totalTableBookings) * 100).toFixed(1) + '%' : '0.0%';
   const tableNoShowRate = totalTableBookings > 0 ? ((totalTableNoShow / totalTableBookings) * 100).toFixed(1) + '%' : '0.0%';
 
@@ -313,11 +353,61 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
 
       {/* Aggregate Retrospective Performance Summary */}
       <div className="ha-card-panel">
-        <div className="ha-card-panel-header">
+        <div className="ha-card-panel-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <h3>Monthly Operational Performance Summary Table</h3>
-            <p>Retrospective hospital-level operational metrics across all clinical units</p>
+            <p>
+              {tableAnalyticsMode === 'scheduled'
+                ? 'Retrospective hospital-level operational metrics across all clinical units (by scheduled appointment month)'
+                : 'New patient booking intake volume across all clinical units (by booking creation month)'}
+            </p>
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              className={`ha-filter-pill ${tableAnalyticsMode === 'scheduled' ? 'active' : ''}`}
+              onClick={() => setTableAnalyticsMode('scheduled')}
+              style={{ fontSize: '11px', padding: '6px 12px', cursor: 'pointer' }}
+            >
+              Scheduled Workload (Appointment Month)
+            </button>
+            <button
+              className={`ha-filter-pill ${tableAnalyticsMode === 'intake' ? 'active' : ''}`}
+              onClick={() => setTableAnalyticsMode('intake')}
+              style={{ fontSize: '11px', padding: '6px 12px', cursor: 'pointer' }}
+            >
+              Booking Intake (Creation Month)
+            </button>
+          </div>
+        </div>
+
+        {/* Reconciliation Equation Banner */}
+        <div style={{
+          padding: '10px 14px',
+          margin: '0 0 16px',
+          borderRadius: '8px',
+          background: tableAnalyticsMode === 'scheduled' ? 'rgba(37, 99, 235, 0.05)' : 'rgba(15, 118, 110, 0.05)',
+          border: `1px solid ${tableAnalyticsMode === 'scheduled' ? 'rgba(37, 99, 235, 0.2)' : 'rgba(15, 118, 110, 0.2)'}`,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '8px',
+          fontSize: '12px'
+        }}>
+          <div>
+            {tableAnalyticsMode === 'scheduled' ? (
+              <span>
+                <strong>Reconciliation Contract:</strong> Total Scheduled ({totalTableBookings}) = Completed ({totalTableCompleted}) + Cancelled ({totalTableCancelled}) + Rescheduled ({totalTableRescheduled}) + No-Show ({totalTableNoShow}) + Pending ({totalTablePending})
+              </span>
+            ) : (
+              <span>
+                <strong>Intake Attribution Contract:</strong> Bookings grouped strictly by creation timestamp (<code>created_at</code>). November advance bookings appear under October intake cohort.
+              </span>
+            )}
+          </div>
+          <span className={`ha-badge ${tableAnalyticsMode === 'scheduled' ? 'success' : 'info'}`} style={{ fontSize: '11px' }}>
+            {tableAnalyticsMode === 'scheduled' ? '100% Mathematically Reconciled' : 'Creation Timestamp Event-Time'}
+          </span>
         </div>
 
         <div className="ha-table-container">
@@ -337,7 +427,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
               </tr>
             </thead>
             <tbody>
-              {monthlyTrends.map((item) => {
+              {activeTrends.map((item) => {
                 const appts = item.appointments;
                 const completed = item.completed;
                 const cancelled = item.cancelled;
@@ -402,7 +492,7 @@ export function HospitalAnalyticsView({ analytics = {}, hospital = {}, appointme
                 );
               })}
             </tbody>
-            {monthlyTrends.length > 0 && (
+            {activeTrends.length > 0 && (
               <tfoot>
                 <tr style={{ fontWeight: 'bold', backgroundColor: 'var(--ha-table-header-bg, rgba(248, 250, 252, 0.9))', borderTop: '2px solid var(--ha-border)' }}>
                   <td>

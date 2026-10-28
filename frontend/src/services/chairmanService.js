@@ -1271,6 +1271,9 @@ export const chairmanService = {
     result.servedTrends = servedTrends;
     result.aiRunsTrends = aiRunsTrends;
     result.rescheduledTrends = rescheduledTrends;
+    result.monthlyTrends = stats?.monthlyTrends || [];
+    result.monthlyScheduledTrends = stats?.monthlyScheduledTrends || stats?.monthlyTrends || [];
+    result.monthlyIntakeTrends = stats?.monthlyIntakeTrends || [];
     result.granularity = isSingleMonth ? 'daily' : 'monthly';
     return result;
   },
