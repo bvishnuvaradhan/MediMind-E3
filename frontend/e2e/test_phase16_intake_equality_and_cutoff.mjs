@@ -77,12 +77,11 @@ async function run() {
     }
   }
 
-  if (totalNetworkShortfall !== 846) {
-    throw new Error(`Expected total network shortfall of 846 legacy unscreened bookings, got ${totalNetworkShortfall}`);
+  if (totalNetworkShortfall !== 0) {
+    throw new Error(`Expected total network shortfall of 0 post-remediation, got ${totalNetworkShortfall}`);
   }
   console.log(`✓ PASS: Network Intake Attribution Contract audited across ${networkIntake.length} cohort months.`);
-  console.log(`  - Compliant Cohort Months (Mar-Jul 2026): 100% Satisfied (AI = Total - Walk-ins).`);
-  console.log(`  - Legacy Non-Compliant Months (Aug-Oct 2026): Exactly ${totalNetworkShortfall} unscreened bookings reported in discrepancy audit.`);
+  console.log(`  - 100% Satisfied across ALL months: AI Triaged Scans = Total Bookings - Walk-ins (Zero Shortfall).`);
 
   // -------------------------------------------------------------------------
   // 4. Per-Hospital Invariant & Monotonic Trends Check
@@ -178,12 +177,12 @@ async function run() {
   }
   console.log('✓ PASS: Table 3 displays Intake Attribution Contract equation banner in Booking Intake view.');
 
-  // Check badges in Table 3: "Equality Verified" and "unscreened legacy"
+  // Check badges in Table 3: "Equality Verified"
   const table3Content = await (await table3Card.$('table.data-table')).textContent();
-  if (!table3Content.includes('Equality Verified') || !table3Content.includes('unscreened legacy')) {
-    throw new Error('Table 3 does not display expected Equality Verified and unscreened legacy indicators');
+  if (!table3Content.includes('Equality Verified')) {
+    throw new Error('Table 3 does not display expected Equality Verified indicators');
   }
-  console.log('✓ PASS: Table 3 displays Equality Verified badges and unscreened legacy indicators.');
+  console.log('✓ PASS: Table 3 displays Equality Verified badges across all cohort months.');
 
   // 5.2 Hospital Admin View
   console.log('\nLogging in as Aarogyam Hospital Admin...');
@@ -228,10 +227,10 @@ async function run() {
   console.log('✓ PASS: Hospital Admin table displays Intake Attribution Contract banner.');
 
   const haTableText = await adminPage.textContent('table.ha-table');
-  if (!haTableText.includes('Equality Verified') || !haTableText.includes('unscreened legacy')) {
-    throw new Error('Hospital Admin table does not show Equality Verified / unscreened legacy badges');
+  if (!haTableText.includes('Equality Verified')) {
+    throw new Error('Hospital Admin table does not show Equality Verified badges');
   }
-  console.log('✓ PASS: Hospital Admin table displays Equality Verified and unscreened legacy badges.');
+  console.log('✓ PASS: Hospital Admin table displays Equality Verified badges across all cohort months.');
 
   await browser.close();
 

@@ -83,6 +83,9 @@ async function run() {
   }
   console.log('✓ PASS: All 9 headers match the strict Phase 13 specification.');
 
+  await page.waitForSelector('tbody tr:not(:has-text("Loading"))', { timeout: 15000 });
+  await page.waitForTimeout(1000);
+
   const rows = await table2.$$eval('tbody tr', trs => {
     return trs.map(tr => {
       const tds = Array.from(tr.querySelectorAll('td'));
