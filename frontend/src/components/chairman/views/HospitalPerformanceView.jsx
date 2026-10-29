@@ -561,7 +561,7 @@ export function HospitalPerformanceView() {
               border: '1px solid rgba(234, 179, 8, 0.3)'
             }}
           >
-            Reporting Cutoff: October 27, 2026 (Month-to-Date)
+            Reporting Cutoff: {performance.cutoffDate || 'November 4, 2026'} (Operational Boundary)
           </span>
         </div>
       </div>
