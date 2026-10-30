@@ -3,6 +3,7 @@ import app from './src/app.js';
 import { connectDB } from './src/config/db.js';
 import User from './src/models/User.js';
 import { seedCanonicalAuthUsers } from './src/utils/seedData.js';
+import { registerServiceWithEureka } from '../eurekaClient.js';
 
 const PORT = process.env.PORT || process.env.AUTH_SERVICE_PORT || 5001;
 
@@ -18,6 +19,7 @@ const startServer = async () => {
 
     const server = app.listen(PORT, () => {
       console.log(`[auth-service] Running on port ${PORT}`);
+      registerServiceWithEureka({ appName: 'AUTH-SERVICE', port: PORT });
     });
 
     const shutdown = async () => {

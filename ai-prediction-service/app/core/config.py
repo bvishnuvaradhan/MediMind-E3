@@ -1,7 +1,13 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load service-level .env first, then fallback to cwd .env
+_service_env = Path(__file__).resolve().parent.parent.parent / ".env"
+if _service_env.exists():
+    load_dotenv(dotenv_path=_service_env)
+else:
+    load_dotenv()
 
 class Settings:
     def __init__(self) -> None:

@@ -1,10 +1,12 @@
 import '../load-env.js';
 import app from './src/app.js';
+import { registerServiceWithEureka } from '../eurekaClient.js';
 
 const PORT = process.env.PORT || process.env.GATEWAY_PORT || 5000;
 
 const server = app.listen(PORT, () => {
   console.log(`[api-gateway] Running on port ${PORT}`);
+  registerServiceWithEureka({ appName: 'API-GATEWAY', port: PORT });
 });
 
 const shutdown = () => {

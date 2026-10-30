@@ -1,6 +1,7 @@
 import '../load-env.js';
 import app from './src/app.js';
 import { connectDB } from './src/config/db.js';
+import { registerServiceWithEureka } from '../eurekaClient.js';
 
 const PORT = process.env.PORT || process.env.APPOINTMENT_SERVICE_PORT || 5005;
 
@@ -11,6 +12,7 @@ const startServer = async () => {
 
     const server = app.listen(PORT, () => {
       console.log(`[appointment-service] Running on port ${PORT}`);
+      registerServiceWithEureka({ appName: 'APPOINTMENT-SERVICE', port: PORT });
     });
 
     const shutdown = async () => {

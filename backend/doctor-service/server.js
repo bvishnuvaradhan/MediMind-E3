@@ -2,6 +2,7 @@ import '../load-env.js';
 import app from './src/app.js';
 import { connectDB } from './src/config/db.js';
 import { seedCanonicalDoctors } from './src/utils/seedData.js';
+import { registerServiceWithEureka } from '../eurekaClient.js';
 
 const PORT = process.env.PORT || process.env.DOCTOR_SERVICE_PORT || 5004;
 
@@ -15,6 +16,7 @@ const startServer = async () => {
 
     const server = app.listen(PORT, () => {
       console.log(`[doctor-service] Running on port ${PORT}`);
+      registerServiceWithEureka({ appName: 'DOCTOR-SERVICE', port: PORT });
     });
 
     const shutdown = async () => {
