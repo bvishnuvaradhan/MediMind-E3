@@ -14,11 +14,12 @@ import {
   Layers,
   Building2,
   ArrowUpRight,
+  Sparkles,
 } from 'lucide-react';
 import { chairmanService } from '../../../services/chairmanService';
 import { LineChart, BarChart, DonutChart } from '../../common/charts';
 
-export function AppointmentsView() {
+export function AppointmentsView({ onNavigate }) {
   const [analytics, setAnalytics] = useState(null);
 
   useEffect(() => {
@@ -48,6 +49,19 @@ export function AppointmentsView() {
             <h1>Platform Appointments Overview</h1>
             <p>Aggregate platform-wide consultation volume, monthly growth trends, and hospital throughput across member hospitals.</p>
           </div>
+        </div>
+
+        <div className="view-actions">
+          {onNavigate && (
+            <button
+              className="primary-button"
+              style={{ background: '#6d28d9', borderColor: '#5b21b6', display: 'flex', alignItems: 'center', gap: '6px' }}
+              onClick={() => onNavigate('October 2026 Demonstration')}
+            >
+              <Sparkles size={15} />
+              <span>October 2026 Demonstration (1,128 Target)</span>
+            </button>
+          )}
         </div>
       </div>
 

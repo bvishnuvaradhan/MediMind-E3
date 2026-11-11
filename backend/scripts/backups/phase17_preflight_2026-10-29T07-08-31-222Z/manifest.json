@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-10-29T07-08-31-222Z",
+  "connectionHost": "ac-quljgj0-shard-00-01.plxllln.mongodb.net:27017, ac-quljgj0-shard-00-02.plxllln.mongodb.net:27017, ac-quljgj0-shard-00-00.plxllln.mongodb.net:27017",
+  "collections": {
+    "medimind_appointment.appointments": {
+      "sourceCount": 5010,
+      "backupCount": 5010,
+      "verified": true,
+      "fileSizeKB": 3485
+    },
+    "medimind_records.consultations": {
+      "sourceCount": 3939,
+      "backupCount": 3939,
+      "verified": true,
+      "fileSizeKB": 3738
+    },
+    "medimind_records.prescriptions": {
+      "sourceCount": 2873,
+      "backupCount": 2873,
+      "verified": true,
+      "fileSizeKB": 2658
+    },
+    "medimind_ai.predictions": {
+      "sourceCount": 4197,
+      "backupCount": 4197,
+      "verified": true,
+      "fileSizeKB": 4955
+    }
+  }
+}

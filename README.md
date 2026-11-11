@@ -69,7 +69,7 @@ MediMind integrates four validated clinical decision support modules with 3,719 
 
 - **Groq NLP Explanations (Optional):** Supports integration with Groq (`GROQ_API_KEY`, `GROQ_ENABLED=true`) for server-side generation of patient-friendly natural language explanations for primary model outputs. Ensures strict zero-dependency fallback to primary models if Groq is unavailable.
 
-For an extensive technical breakdown of model architectures and validation experiments, refer to [MediMind AI/ML Final Report](MediMind_AI_ML_Final_Report.md).
+For an extensive technical breakdown of model architectures and validation experiments, refer to [MediMind Master AI Model & Experiment Report](Documents/Master_Reports/MediMind_Master_AI_Model_and_Experiment_Report.md).
 
 ---
 
@@ -212,20 +212,20 @@ MediMind includes an automated Playwright acceptance suite validating full brows
 
 ---
 
-## Governance, Data Integrity & Master Remediation Audits
+## Master Documentation & Architecture Reports
 
-The root directory maintains comprehensive, evidence-based audit reports certifying data integrity, security hardening, and release readiness:
+Authoritative technical documentation and system governance are consolidated in Documents/Master_Reports/:
 
-1. [MediMind Master Remediation Report](MediMind_Master_Remediation_Report.md) — Overarching release gate certification across all 13 phases.
-2. [MediMind Account Lifecycle & Deactivation Audit](MediMind_Account_Lifecycle_and_Deactivation_Audit.md) — Directory vs. dashboard reconciliation and staging deactivation boundaries.
-3. [MediMind Hospital Eligibility & Throughput Audit](MediMind_Hospital_Eligibility_and_Throughput_Audit.md) — Zero pending throughput enforcement and Sunrise encounter resolution.
-4. [MediMind Appointment & Clinical Record Integrity](MediMind_Appointment_and_Clinical_Record_Integrity.md) — Past unattended closures, October booking creation volume, and zero orphaned records.
-5. [MediMind AI Prediction & Standalone Screening Audit](MediMind_AI_Prediction_and_Standalone_Screening_Audit.md) — Prediction timestamps, dynamic relative periods, and 76.9% screening conversion.
-6. [MediMind Performance & Cache Freshness Report](MediMind_Performance_and_Cache_Freshness_Report.md) — Sub-second Owner latency benchmarks and 15s/30s dual-tier cache validation.
-7. [MediMind E2E Role & Cross-Flow Test Report](MediMind_E2E_Role_and_Cross_Flow_Test_Report.md) — Cross-role workflows, access control denial (HTTP 403), and contract verification.
-8. [MediMind Security & Cryptographic Integrity Report](MediMind_Security_and_Data_Integrity_Report.md) — 100% 6/6 SHA-256 model checksum verification and secret scanning.
-9. [MediMind Repository Cleanup Report](MediMind_Repository_Cleanup_Report.md) — 5,950 file inventory, safe deletions, and hardened .gitignore rules.
-10. [MediMind Authentication & Full-Stack Recovery Audit](MediMind_Authentication_and_Full_Stack_Recovery_Audit.md) — Centralized apiClient, pre-flight JWT expiry check, 401 interception, and zero-mock live data reconciliation.
+1. [MediMind Master Project Overview](Documents/Master_Reports/MediMind_Master_Project_Overview.md) — Overarching ecosystem architecture, clinical role personas, and 12-week delivery milestones.
+2. [MediMind Master Architecture & Technical Systems](Documents/Master_Reports/MediMind_Master_Architecture_and_Technical_Documentation.md) — Microservices topology, Netflix Eureka discovery, Kafka streaming, and MongoDB partitioning.
+3. [MediMind Master AI Model & Experiment Report](Documents/Master_Reports/MediMind_Master_AI_Model_and_Experiment_Report.md) — Clinical AI models (Cardiology RF, Diabetes MLP, Fracture DualViewROIResNet18 Exp 8A, NLP Triage) and Experiments 1–8A.
+4. [MediMind Master Data Science & Dataset Governance](Documents/Master_Reports/MediMind_Master_Data_Science_and_Dataset_Report.md) — Ingestion provenance, cryptographic deduplication (-3,820 rows), train-only biological zero imputation, and patient-level radiograph partitioning.
+5. [MediMind Master Production Readiness & Data Integrity](Documents/Master_Reports/MediMind_Master_Production_Readiness_and_Integrity_Report.md) — Mock data elimination, appointment state machine, resolution of 414 unclosed records, and deployment gate certification.
+6. [MediMind Master Security, Authentication & Authorization](Documents/Master_Reports/MediMind_Master_Security_and_Authorization_Report.md) — JWT token lifecycle, bcrypt hashing, inter-service keys, MongoDB ObjectId family authorization, and RBAC matrix.
+7. [MediMind Master Clinical Workflow & E2E Validation](Documents/Master_Reports/MediMind_Master_Clinical_Workflow_and_Validation_Report.md) — Consultation lifecycle, prescription immutability, AI suggestion tracking, and automated Playwright/Pytest suites.
+8. [MediMind Master Performance, Latency & Hospital Analytics](Documents/Master_Reports/MediMind_Master_Performance_and_Analytics_Report.md) — Sub-150ms inference latency benchmarks, dynamic relative date filtering, staggered hospital onboarding, and caching.
+9. [MediMind Master Repository Governance & Development Standards](Documents/Master_Reports/MediMind_Master_Repository_and_Development_Report.md) — Repository rationalization, directory taxonomy, two-stage quarantine workflow, and asset protection.
+10. [MediMind Phase 2 Repository Rationalization Report](Documents/MediMind_Phase2_Repository_Rationalization_Report.md) — Complete repository audit, before/after inventory, and consolidation manifest.
 
 ---
 

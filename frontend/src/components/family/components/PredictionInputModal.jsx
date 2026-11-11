@@ -1,6 +1,42 @@
 import { useState } from 'react';
 import { X, Sparkles, Activity, HeartPulse, ShieldCheck, Upload, Paperclip, FileText, Image as ImageIcon } from 'lucide-react';
 import { evaluateGeneralHealth } from '../../../utils/generalHealthNlp';
+import { getStoredToken } from '../../../services/apiClient';
+
+/**
+ * Sanitized logging helper for AI microservice responses.
+ * Never logs JWT tokens, passwords, or protected health information (PHI).
+ */
+function logAiApiError(endpoint, response, errorBody, error) {
+  const status = response ? response.status : (error?.status || 0);
+  const statusText = response ? response.statusText : (error?.name || 'NetworkError');
+  let validationDetails = null;
+  let message = error?.message || statusText;
+
+  if (errorBody) {
+    if (typeof errorBody === 'object') {
+      validationDetails = errorBody.detail || errorBody.errors || errorBody.message || errorBody;
+      if (typeof errorBody.detail === 'string') {
+        message = errorBody.detail;
+      } else if (Array.isArray(errorBody.detail)) {
+        validationDetails = errorBody.detail.map((d) => ({ loc: d.loc, msg: d.msg, type: d.type }));
+        message = errorBody.detail.map((d) => `${(d.loc || []).join('.')}: ${d.msg}`).join(', ');
+      } else if (errorBody.message) {
+        message = errorBody.message;
+      }
+    } else {
+      message = String(errorBody);
+    }
+  }
+
+  console.error('[AI API Error]', {
+    endpoint,
+    status,
+    statusText,
+    validationDetails,
+    message,
+  });
+}
 
 export function PredictionInputModal({
   isOpen,
@@ -171,28 +207,41 @@ export function PredictionInputModal({
       documentUsed: attachedDoc,
     };
 
-    const token = (typeof localStorage !== 'undefined' && localStorage.getItem('medimind_jwt_token')) || currentMemberObj?.token || '';
+    const token = getStoredToken() || currentMemberObj?.token || '';
     const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+    const memberId = currentMemberObj?.id || 'MEM-FAM-001-01';
 
     if (modelType === 'fracture') {
       let isFracture = false;
       let modelProb = 0.042;
       const calibratedThreshold = 0.18;
+      const endpoint = '/api/ai/fracture';
 
       try {
-        const formData = new FormData();
-        formData.append('family_member_id', currentMemberObj?.id || 'mem_001_01');
+        let res;
         if (uploadedFile) {
+          const formData = new FormData();
+          formData.append('family_member_id', memberId);
           formData.append('file', uploadedFile);
-        } else if (selectedExistingRecordId) {
-          formData.append('record_id', selectedExistingRecordId);
-        }
 
-        const res = await fetch('/api/ai/fracture', {
-          method: 'POST',
-          headers: authHeaders,
-          body: formData,
-        });
+          res = await fetch(endpoint, {
+            method: 'POST',
+            headers: authHeaders,
+            body: formData,
+          });
+        } else {
+          res = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...authHeaders,
+            },
+            body: JSON.stringify({
+              family_member_id: memberId,
+              filename: uploadedFileName || selectedExistingRecordId || 'IMG0000019.jpg',
+            }),
+          });
+        }
 
         if (res.ok) {
           const data = await res.json();
@@ -205,33 +254,17 @@ export function PredictionInputModal({
             isFracture = data.result.possibleFracture ?? (modelProb >= calibratedThreshold);
           }
         } else {
-          // Fallback JSON payload
-          const jsonRes = await fetch('/api/ai/fracture', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...authHeaders },
-            body: JSON.stringify({
-              family_member_id: currentMemberObj?.id || 'mem_001_01',
-              filename: uploadedFileName || selectedExistingRecordId || 'radiograph.png',
-            }),
-          });
-          if (jsonRes.ok) {
-            const data = await jsonRes.json();
-            if (data && data.result) {
-              modelProb = typeof data.result.probability === 'number'
-                ? data.result.probability
-                : typeof data.result.confidence === 'number'
-                ? data.result.confidence
-                : (data.risk_score || 0.042);
-              isFracture = data.result.possibleFracture ?? (modelProb >= calibratedThreshold);
-            }
-          }
+          const errText = await res.text();
+          let parsedErr;
+          try { parsedErr = JSON.parse(errText); } catch { parsedErr = errText; }
+          logAiApiError(endpoint, res, parsedErr);
         }
       } catch (err) {
-        console.warn('[AI Fracture Inference Request]', err.message);
+        logAiApiError(endpoint, null, null, err);
       }
 
       console.info('[AI Fracture Inference]', {
-        fracture_image_received: true,
+        fracture_image_received: Boolean(uploadedFile || selectedExistingRecordId),
         image_name: uploadedFileName || selectedExistingRecordId || 'radiograph.png',
         model_probability: modelProb,
         threshold: calibratedThreshold,
@@ -287,19 +320,20 @@ export function PredictionInputModal({
       const hba1cVal = parseFloat(diabetesData.hba1c) || 5.7;
       const bmiVal = parseFloat(diabetesData.bmi) || 24;
       const bpVal = parseFloat(diabetesData.bpSystolic) || 120;
+      const endpoint = '/api/ai/diabetes';
 
       let apiProb = null;
       let apiCategory = null;
 
       try {
-        const res = await fetch('/api/ai/diabetes', {
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             ...authHeaders,
           },
           body: JSON.stringify({
-            family_member_id: currentMemberObj?.id || 'mem_001_01',
+            family_member_id: memberId,
             Pregnancies: currentMemberObj?.gender === 'Female' ? 2 : 0,
             Glucose: glucoseVal,
             BloodPressure: Math.round(bpVal * 0.65) || 80,
@@ -317,9 +351,14 @@ export function PredictionInputModal({
             apiProb = data.result.risk_probability ?? data.risk_score;
             apiCategory = data.result.risk_category ?? data.risk_level;
           }
+        } else {
+          const errText = await res.text();
+          let parsedErr;
+          try { parsedErr = JSON.parse(errText); } catch { parsedErr = errText; }
+          logAiApiError(endpoint, res, parsedErr);
         }
       } catch (err) {
-        console.warn('[AI Diabetes Inference Request]', err.message);
+        logAiApiError(endpoint, null, null, err);
       }
 
       const isHigh = (apiCategory === 'HIGH' && (glucoseVal >= 140 || hba1cVal >= 6.5 || bmiVal >= 30)) || (!apiCategory && (glucoseVal >= 140 || hba1cVal >= 6.5 || bmiVal >= 30));
@@ -354,19 +393,20 @@ export function PredictionInputModal({
       const cholVal = parseFloat(heartData.cholesterol) || 190;
       const bpVal = parseFloat(heartData.bpSystolic) || 125;
       const isSmoker = heartData.smoker === 'Yes';
+      const endpoint = '/api/ai/heart-disease';
 
       let apiProb = null;
       let apiCategory = null;
 
       try {
-        const res = await fetch('/api/ai/heart-disease', {
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             ...authHeaders,
           },
           body: JSON.stringify({
-            family_member_id: currentMemberObj?.id || 'mem_001_01',
+            family_member_id: memberId,
             AGE: parseFloat(currentMemberObj?.age) || 50,
             GENDER: currentMemberObj?.gender === 'Female' ? 2 : 1,
             HEIGHT: 165,
@@ -387,9 +427,14 @@ export function PredictionInputModal({
             apiProb = data.result.risk_probability ?? data.risk_score;
             apiCategory = data.result.risk_category ?? data.risk_level;
           }
+        } else {
+          const errText = await res.text();
+          let parsedErr;
+          try { parsedErr = JSON.parse(errText); } catch { parsedErr = errText; }
+          logAiApiError(endpoint, res, parsedErr);
         }
       } catch (err) {
-        console.warn('[AI Heart Inference Request]', err.message);
+        logAiApiError(endpoint, null, null, err);
       }
 
       const isHigh = (apiCategory === 'HIGH' && (cholVal >= 240 || bpVal >= 145 || (isSmoker && cholVal >= 210))) || (!apiCategory && (cholVal >= 240 || bpVal >= 145 || (isSmoker && cholVal >= 210)));
@@ -421,6 +466,7 @@ export function PredictionInputModal({
           : 'Cardiovascular parameters remain optimal. Continue current aerobic exercise and routine annual cardiovascular screening.',
       };
     } else {
+      const endpoint = '/api/ai/general-health';
       let nlpResult = evaluateGeneralHealth({
         symptoms: generalData.symptoms,
         lifestyle: generalData.lifestyle,
@@ -428,14 +474,14 @@ export function PredictionInputModal({
       });
 
       try {
-        const res = await fetch('/api/ai/general-health', {
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             ...authHeaders,
           },
           body: JSON.stringify({
-            family_member_id: currentMemberObj?.id || 'mem_001_01',
+            family_member_id: memberId,
             text: `${generalData.symptoms}. Lifestyle: ${generalData.lifestyle}. Family history: ${generalData.familyHistory}.`,
           }),
         });
@@ -447,9 +493,14 @@ export function PredictionInputModal({
               nlpResult.score = `${Math.round(data.risk_score * 100)}%`;
             }
           }
+        } else {
+          const errText = await res.text();
+          let parsedErr;
+          try { parsedErr = JSON.parse(errText); } catch { parsedErr = errText; }
+          logAiApiError(endpoint, res, parsedErr);
         }
       } catch (err) {
-        console.warn('[AI General Health Inference Request]', err.message);
+        logAiApiError(endpoint, null, null, err);
       }
 
       payload = {

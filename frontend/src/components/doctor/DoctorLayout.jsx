@@ -295,13 +295,13 @@ export function DoctorLayout({ dark, setDark }) {
 
   // Consultation handlers
   const handleOpenNewConsultation = (patient = null, initialCons = null) => {
-    setConsultationModalData(
-      initialCons
-        ? initialCons
-        : patient
-        ? { patientId: patient.id }
-        : null
-    );
+    let modalData = null;
+    if (initialCons) {
+      modalData = initialCons;
+    } else if (patient && (patient.appointmentId || patient.id)) {
+      modalData = patient.appointmentId ? patient : { patientId: patient.id };
+    }
+    setConsultationModalData(modalData);
     setIsConsultationModalOpen(true);
   };
 
@@ -903,6 +903,7 @@ export function DoctorLayout({ dark, setDark }) {
             <ConsultationsView
               consultations={consultations}
               patients={patients}
+              appointments={appointments}
               onOpenNewConsultation={handleOpenNewConsultation}
               onAmendConsultation={handleAmendConsultation}
             />

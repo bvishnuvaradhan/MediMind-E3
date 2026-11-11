@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 export function ConsultationsView({
   consultations = [],
   patients = [],
+  appointments = [],
   onOpenNewConsultation,
   onAmendConsultation,
 }) {
@@ -55,6 +56,91 @@ export function ConsultationsView({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Outstanding Documentation Review Queue (Phase 19) */}
+      {(() => {
+        const missingCons = appointments.filter((a) => {
+          const isCompleted = (a.status || '').toUpperCase() === 'COMPLETED';
+          if (!isCompleted) return false;
+          const aId = a.id || a._id;
+          return !consultations.some((c) => c.appointmentId === aId || c.appointment_id === aId);
+        });
+
+        if (missingCons.length === 0) return null;
+
+        return (
+          <div
+            className="doctor-card"
+            style={{
+              borderLeft: '4px solid #ef4444',
+              background: 'rgba(239, 68, 68, 0.04)',
+              padding: '16px 20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '18px' }}>⚠️</span>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#dc2626' }}>
+                    Outstanding Clinical Documentation Required ({missingCons.length} Encounters)
+                  </h3>
+                  <p style={{ margin: '2px 0 0', fontSize: '12px', color: 'var(--doctor-text-muted)' }}>
+                    Completed patient encounters require authentic clinician clinical notes and authorized treatment plans.
+                  </p>
+                </div>
+              </div>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#dc2626', background: 'rgba(239, 68, 68, 0.1)', padding: '4px 10px', borderRadius: '12px' }}>
+                Strict Clinician Attestation Only
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {missingCons.map((apt) => (
+                <div
+                  key={apt.id || apt._id}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '10px 14px',
+                    background: 'var(--doctor-bg-card, #ffffff)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    borderRadius: '8px',
+                    fontSize: '13px'
+                  }}
+                >
+                  <div>
+                    <span style={{ fontWeight: 700, color: 'var(--doctor-text-primary)' }}>
+                      {apt.token || `OPD-${(apt.id || apt._id || '').slice(-4).toUpperCase()}`}
+                    </span>
+                    <span style={{ margin: '0 8px', color: 'var(--doctor-text-muted)' }}>•</span>
+                    <span>{apt.patientName || 'Patient Encounter'}</span>
+                    <span style={{ margin: '0 8px', color: 'var(--doctor-text-muted)' }}>•</span>
+                    <span style={{ color: 'var(--doctor-text-muted)' }}>
+                      Scheduled: {apt.date || apt.appointmentDate || 'Encounter date'} ({apt.time || apt.startTime || 'Time slot'})
+                    </span>
+                  </div>
+                  <button
+                    className="doctor-btn doctor-btn-primary"
+                    style={{ fontSize: '12px', padding: '6px 14px', background: '#dc2626', borderColor: '#dc2626' }}
+                    onClick={() =>
+                      onOpenNewConsultation({
+                        appointmentId: apt.id || apt._id,
+                        patientId: apt.patientId || apt.family_member_id
+                      })
+                    }
+                  >
+                    Attest & Complete Note
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Header */}
       <div className="doctor-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>

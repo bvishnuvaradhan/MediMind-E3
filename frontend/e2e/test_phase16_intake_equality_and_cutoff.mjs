@@ -11,13 +11,21 @@ async function run() {
   // 1. Authenticate via API Gateway as Chairman
   // -------------------------------------------------------------------------
   console.log('[Step 1] Authenticating as Platform Owner (Chairman)...');
-  const chairPw = 'Chair#2026' + String.fromCharCode(36) + '01!Dev';
-  const loginRes = await fetch('http://localhost:5000/api/auth/login', {
+  const chairPw = 'Password123!';
+  let loginRes = await fetch('http://localhost:5000/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: 'chairman@medimind.org', password: chairPw })
   });
-  const loginData = await loginRes.json();
+  let loginData = await loginRes.json();
+  if (!loginData.success) {
+    loginRes = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'chairman@medimind.org', password: 'Password123!' })
+    });
+    loginData = await loginRes.json();
+  }
   const token = loginData.data?.token || loginData.token;
   if (!token) throw new Error('Chairman authentication failed: ' + JSON.stringify(loginData));
   console.log('✓ Chairman API authentication successful.');

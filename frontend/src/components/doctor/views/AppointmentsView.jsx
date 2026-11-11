@@ -56,6 +56,11 @@ export function AppointmentsView({
     let matchesTab = true;
     if (tabFilter === 'Today') matchesTab = apt.date?.includes('Today') && apt.status !== 'Cancelled';
     else if (tabFilter === 'Upcoming') matchesTab = (apt.status === 'Confirmed' || apt.status === 'Booked') && !apt.date?.includes('Today');
+    else if (tabFilter === 'Review Queue') {
+      const isPending = apt.status === 'Confirmed' || apt.status === 'Booked' || apt.status === 'In Progress';
+      const isPast = !apt.date?.includes('Today') && (apt.date?.includes('Yesterday') || !apt.date?.includes('2026-11') && !apt.date?.includes('Nov'));
+      matchesTab = isPending && isPast;
+    }
     else if (tabFilter === 'Completed') matchesTab = apt.status === 'Completed';
     else if (tabFilter === 'Cancelled') matchesTab = apt.status === 'Cancelled';
 
@@ -110,6 +115,26 @@ export function AppointmentsView({
             onClick={() => setTabFilter('Upcoming')}
           >
             Upcoming
+          </button>
+          <button
+            className={`doctor-tab-btn ${tabFilter === 'Review Queue' ? 'active' : ''}`}
+            onClick={() => setTabFilter('Review Queue')}
+            style={{ position: 'relative' }}
+          >
+            Review Queue
+            <span
+              style={{
+                marginLeft: '6px',
+                padding: '1px 6px',
+                borderRadius: '10px',
+                fontSize: '11px',
+                fontWeight: 700,
+                background: tabFilter === 'Review Queue' ? '#ffffff' : '#ef4444',
+                color: tabFilter === 'Review Queue' ? '#ef4444' : '#ffffff'
+              }}
+            >
+              Overdue
+            </span>
           </button>
           <button
             className={`doctor-tab-btn ${tabFilter === 'Completed' ? 'active' : ''}`}

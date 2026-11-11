@@ -23,6 +23,9 @@ router.get('/reports/export-excel', authenticate, requireRole('CHAIRMAN', 'HOSPI
 router.post('/', authenticate, appointmentController.bookAppointment);
 router.get('/', authenticate, appointmentController.getAppointments);
 router.get('/stats', authenticate, appointmentController.getStats);
+router.get('/october-demonstration', authenticate, appointmentController.getOctoberDemonstration);
+router.get('/review-queue', authenticate, appointmentController.getReviewQueue);
+router.post('/:appointmentId/review', authenticate, appointmentController.submitReviewDecision);
 router.get('/:appointmentId', authenticate, appointmentController.getAppointmentById);
 router.put('/:appointmentId/reschedule', authenticate, appointmentController.rescheduleAppointment);
 router.put('/:appointmentId/cancel', authenticate, appointmentController.cancelAppointment);

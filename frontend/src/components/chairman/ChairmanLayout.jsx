@@ -44,6 +44,7 @@ import { HospitalPerformanceView } from './views/HospitalPerformanceView';
 import { ReportsView } from './views/ReportsView';
 import { KnowledgeActivityView } from './views/KnowledgeActivityView';
 import { SettingsView } from './views/SettingsView';
+import { OctoberDemonstrationView } from './views/OctoberDemonstrationView';
 
 const pageToHash = {
   'Platform Dashboard': 'dashboard',
@@ -55,6 +56,7 @@ const pageToHash = {
   'Hospital Performance': 'hospital-performance',
   'Platform Appointments Overview': 'appointments',
   'Appointments': 'appointments',
+  'October 2026 Demonstration': 'october-demonstration',
   'Reports': 'reports',
   'AI Analytics': 'ai-analytics',
   'Knowledge Activity': 'knowledge-activity',
@@ -72,6 +74,7 @@ const hashToPage = {
   'hospital-performance': 'Hospital Performance',
   appointments: 'Platform Appointments Overview',
   'platform-appointments': 'Platform Appointments Overview',
+  'october-demonstration': 'October 2026 Demonstration',
   reports: 'Reports',
   'ai-analytics': 'AI Analytics',
   'knowledge-activity': 'Knowledge Activity',
@@ -160,6 +163,7 @@ export function ChairmanLayout({ dark, setDark }) {
       items: [
         { label: 'Hospital Performance', icon: Award },
         { label: 'Platform Appointments Overview', icon: CalendarDays },
+        { label: 'October 2026 Demonstration', icon: Sparkles },
         { label: 'Reports', icon: FileText },
         { label: 'AI Analytics', icon: Sparkles },
         { label: 'Knowledge Activity', icon: BookOpen },
@@ -392,7 +396,10 @@ export function ChairmanLayout({ dark, setDark }) {
           {currentPage === 'Family Accounts' && <FamilyAccountsView />}
           {currentPage === 'Hospital Performance' && <HospitalPerformanceView />}
           {(currentPage === 'Platform Appointments Overview' || currentPage === 'Appointments') && (
-            <AppointmentsView />
+            <AppointmentsView onNavigate={navigateTo} />
+          )}
+          {currentPage === 'October 2026 Demonstration' && (
+            <OctoberDemonstrationView onNavigate={navigateTo} />
           )}
           {currentPage === 'Reports' && <ReportsView announce={announce} />}
           {currentPage === 'AI Analytics' && <AiAnalyticsView />}

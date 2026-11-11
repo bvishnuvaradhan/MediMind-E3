@@ -134,6 +134,20 @@ const appointmentSchema = new mongoose.Schema(
         reason: { type: String, default: null, trim: true },
       },
     ],
+
+    clinical_review_history: [
+      {
+        decision: { type: String, trim: true },
+        reviewer_id: { type: String, default: null },
+        reviewer_role: { type: String, default: null },
+        reviewer_name: { type: String, default: null },
+        reason: { type: String, default: null, trim: true },
+        evidence_reference: { type: String, default: null, trim: true },
+        previous_status: { type: String, default: null },
+        new_status: { type: String, default: null },
+        reviewed_at: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: {
@@ -207,6 +221,8 @@ appointmentSchema.methods.toPublicJSON = function () {
     idempotency_key: this.idempotency_key,
     reschedulingHistory: this.rescheduling_history || [],
     rescheduling_history: this.rescheduling_history || [],
+    clinicalReviewHistory: this.clinical_review_history || [],
+    clinical_review_history: this.clinical_review_history || [],
     createdAt: this.created_at,
     updatedAt: this.updated_at,
   };

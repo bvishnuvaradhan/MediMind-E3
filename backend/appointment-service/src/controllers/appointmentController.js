@@ -184,4 +184,31 @@ export const appointmentController = {
       next(error);
     }
   },
+  async getReviewQueue(req, res, next) {
+    try {
+      const data = await appointmentService.getReviewQueue(req.user, req.query);
+      return successResponse(res, 200, 'Review queue retrieved successfully', data);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async submitReviewDecision(req, res, next) {
+    try {
+      const { appointmentId } = req.params;
+      const data = await appointmentService.submitReviewDecision(req.user, appointmentId, req.body);
+      return successResponse(res, 200, 'Review decision recorded successfully', data);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getOctoberDemonstration(req, res, next) {
+    try {
+      const data = await appointmentService.getOctoberDemonstration();
+      return successResponse(res, 200, 'October demonstration data retrieved successfully', data);
+    } catch (error) {
+      next(error);
+    }
+  },
 };
