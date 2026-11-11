@@ -4,7 +4,7 @@ import { verifyJwt } from '../middleware/authMiddleware.js';
 import { forwardRequest } from '../utils/proxy.js';
 
 const router = Router();
-const proxyRecord = forwardRequest(serviceUrls.record);
+const proxyRecord = forwardRequest(() => serviceUrls.record);
 
 // Public health route
 router.get('/health', proxyRecord);

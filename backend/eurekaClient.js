@@ -195,10 +195,23 @@ export class EurekaServiceRegistry {
   }
 }
 
+export function isEurekaEnabled() {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') {
+    return false;
+  }
+  if (process.env.EUREKA_ENABLED === 'false') {
+    return false;
+  }
+  return process.env.EUREKA_ENABLED === 'true' || Boolean(process.env.EUREKA_SERVER_URL);
+}
+
 /**
  * Helper to initialize Eureka registration with non-blocking resilience.
  */
 export function registerServiceWithEureka({ appName, port, host = '127.0.0.1', healthPath = '/health' }) {
+  if (!isEurekaEnabled()) {
+    return null;
+  }
   const client = new EurekaServiceRegistry({ appName, port, host, healthPath });
   client.start().catch((err) => {
     console.warn(`[EurekaClient:${appName}] Background registration error: ${err.message}`);

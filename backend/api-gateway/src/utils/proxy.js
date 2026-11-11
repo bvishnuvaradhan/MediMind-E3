@@ -1,6 +1,10 @@
-export const forwardRequest = (targetServiceUrl) => {
+import { getInternalServiceSecret, getInternalServiceKey } from '../config/runtimeConfig.js';
+
+export const forwardRequest = (targetServiceUrlOrFn) => {
   return async (req, res, next) => {
     try {
+      const targetServiceUrl =
+        typeof targetServiceUrlOrFn === 'function' ? targetServiceUrlOrFn() : targetServiceUrlOrFn;
       const url = `${targetServiceUrl}${req.originalUrl}`;
 
       const headers = { ...req.headers };
@@ -16,8 +20,8 @@ export const forwardRequest = (targetServiceUrl) => {
       }
 
       // Ensure internal secret is forwarded
-      const internalSecret = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
-      const internalKey = process.env.INTERNAL_SERVICE_KEY || internalSecret;
+      const internalSecret = getInternalServiceSecret();
+      const internalKey = getInternalServiceKey();
       headers['x-internal-service-secret'] = internalSecret;
       headers['X-Internal-Service-Key'] = internalKey;
 
@@ -77,7 +81,9 @@ export const forwardRequest = (targetServiceUrl) => {
       };
 
       if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-        if (req.headers['content-type']?.includes('application/json') && req.body && Object.keys(req.body).length > 0) {
+        if (Buffer.isBuffer(req.body)) {
+          options.body = req.body;
+        } else if (req.headers['content-type']?.includes('application/json') && req.body && Object.keys(req.body).length > 0) {
           options.body = JSON.stringify(req.body);
           headers['content-type'] = 'application/json';
         } else if (req.headers['content-type']?.includes('multipart/form-data')) {

@@ -13,34 +13,55 @@
 import { Kafka, Partitioners } from 'kafkajs';
 import crypto from 'crypto';
 
-const KAFKA_BROKERS = (process.env.KAFKA_BROKERS || 'localhost:9092').split(',');
 const CLIENT_ID = process.env.KAFKA_CLIENT_ID || 'medimind-backend';
+
+export function isKafkaEnabled() {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') {
+    return false;
+  }
+  if (process.env.KAFKA_ENABLED === 'false') {
+    return false;
+  }
+  return process.env.KAFKA_ENABLED === 'true' || Boolean(process.env.KAFKA_BROKERS);
+}
 
 class ResilientKafkaProducer {
   constructor() {
+    this.kafka = null;
+    this.producer = null;
+    this.isConnected = false;
+    this.isConnecting = false;
+    this.brokers = [];
+  }
+
+  _ensureClient() {
+    if (this.producer) return true;
+    const rawBrokers = process.env.KAFKA_BROKERS || 'localhost:9092';
+    this.brokers = rawBrokers.split(',').map((b) => b.trim()).filter(Boolean);
+    if (this.brokers.length === 0) return false;
     this.kafka = new Kafka({
       clientId: CLIENT_ID,
-      brokers: KAFKA_BROKERS,
+      brokers: this.brokers,
       retry: {
         initialRetryTime: 300,
         retries: 3,
       },
     });
-
     this.producer = this.kafka.producer({
       createPartitioner: Partitioners.DefaultPartitioner,
     });
-    this.isConnected = false;
-    this.isConnecting = false;
+    return true;
   }
 
   async connect() {
+    if (!isKafkaEnabled()) return;
     if (this.isConnected || this.isConnecting) return;
+    if (!this._ensureClient()) return;
     this.isConnecting = true;
     try {
       await this.producer.connect();
       this.isConnected = true;
-      console.log(`[KafkaProducer] Connected to Kafka cluster (${KAFKA_BROKERS.join(', ')})`);
+      console.log(`[KafkaProducer] Connected to Kafka cluster (${this.brokers.join(', ')})`);
     } catch (err) {
       this.isConnected = false;
       console.warn(`[KafkaProducer] Kafka connection not available (${err.message}). Messaging will retry asynchronously.`);
@@ -53,12 +74,15 @@ class ResilientKafkaProducer {
    * Safe, fire-and-forget message publishing. Never throws.
    */
   async publish(topic, event) {
+    if (!isKafkaEnabled()) {
+      return;
+    }
     try {
       if (!this.isConnected) {
         await this.connect();
       }
 
-      if (!this.isConnected) {
+      if (!this.isConnected || !this.producer) {
         // Still not connected, drop silently to preserve synchronous clinical workflow
         return;
       }

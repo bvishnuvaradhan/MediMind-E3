@@ -1,0 +1,24 @@
+# Exclude local env, caches, datasets, tests, and non-production training/experiment weights
+.env
+.env.*
+.git
+.gitignore
+.pytest_cache
+__pycache__
+*.pyc
+*.pyo
+test-dataset/
+tests/
+scripts/
+artifacts/experiments/
+artifacts/fracture_v2/
+artifacts/diabetes/logistic_regression.joblib
+artifacts/diabetes/mlp.joblib
+artifacts/diabetes/training_report.json
+artifacts/fracture/baseline_model.pt
+artifacts/fracture/mura_pretrained_backbone.pt
+artifacts/fracture/mura_pretrained_model.pt
+artifacts/fracture/training_report.json
+artifacts/heart_disease/training_report.json
+README.md
+requirements-dev.txt

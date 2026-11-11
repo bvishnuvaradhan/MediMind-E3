@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: medimind-ai-prediction-service
+    runtime: docker
+    rootDir: ai-prediction-service
+    dockerfilePath: ./Dockerfile
+    plan: standard
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: STRICT_REMOTE_DB
+        value: "true"
+      - key: DISABLE_EUREKA
+        value: "true"
+      - key: DB_NAME
+        value: medimind_ai
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: INTERNAL_SERVICE_KEY
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: GROQ_ENABLED
+        value: "false"
+      - key: GROQ_API_KEY
+        sync: false

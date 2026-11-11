@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Sparkles, Activity, HeartPulse, ShieldCheck, Upload, Paperclip, FileText, Image as ImageIcon } from 'lucide-react';
 import { evaluateGeneralHealth } from '../../../utils/generalHealthNlp';
 import { getStoredToken } from '../../../services/apiClient';
+import { buildAiUrl, buildApiUrl } from '../../../config/apiConfig';
 
 /**
  * Sanitized logging helper for AI microservice responses.
@@ -224,13 +225,13 @@ export function PredictionInputModal({
           formData.append('family_member_id', memberId);
           formData.append('file', uploadedFile);
 
-          res = await fetch(endpoint, {
+          res = await fetch(buildAiUrl(endpoint), {
             method: 'POST',
             headers: authHeaders,
             body: formData,
           });
         } else {
-          res = await fetch(endpoint, {
+          res = await fetch(buildAiUrl(endpoint), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -326,7 +327,7 @@ export function PredictionInputModal({
       let apiCategory = null;
 
       try {
-        const res = await fetch(endpoint, {
+        const res = await fetch(buildApiUrl(endpoint), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -399,7 +400,7 @@ export function PredictionInputModal({
       let apiCategory = null;
 
       try {
-        const res = await fetch(endpoint, {
+        const res = await fetch(buildApiUrl(endpoint), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -474,7 +475,7 @@ export function PredictionInputModal({
       });
 
       try {
-        const res = await fetch(endpoint, {
+        const res = await fetch(buildApiUrl(endpoint), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

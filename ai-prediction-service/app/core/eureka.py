@@ -14,6 +14,26 @@ logging.basicConfig(level=logging.INFO)
 EUREKA_SERVER_URL = os.getenv("EUREKA_SERVER_URL", "http://127.0.0.1:8761").rstrip("/")
 EUREKA_URL = f"{EUREKA_SERVER_URL}/eureka"
 
+
+def is_eureka_enabled() -> bool:
+    if os.getenv("PYTEST_CURRENT_TEST"):
+        return False
+    if os.getenv("DISABLE_EUREKA", "").strip().lower() in {"1", "true", "yes"}:
+        return False
+    if os.getenv("EUREKA_ENABLED", "").strip().lower() in {"0", "false", "no"}:
+        return False
+    env_mode = (
+        os.getenv("APP_ENV")
+        or os.getenv("ENVIRONMENT")
+        or os.getenv("NODE_ENV")
+        or "development"
+    ).strip().lower()
+    if env_mode == "production" or os.getenv("VERCEL"):
+        return os.getenv("EUREKA_ENABLED", "").strip().lower() in {"1", "true", "yes"}
+    return os.getenv("EUREKA_ENABLED", "").strip().lower() in {"1", "true", "yes"} or bool(
+        os.getenv("EUREKA_SERVER_URL")
+    )
+
 class EurekaClient:
     def __init__(self, app_name="AI-PREDICTION-SERVICE", port=5007, host="127.0.0.1"):
         self.app_name = app_name.upper()
@@ -72,6 +92,9 @@ class EurekaClient:
         }
 
     def start(self):
+        if not is_eureka_enabled():
+            logger.info("[EurekaClient:%s] Registration disabled for this runtime.", self.app_name)
+            return
         self._stop_event.clear()
         self._thread = threading.Thread(target=self._run_lifecycle, daemon=True)
         self._thread.start()

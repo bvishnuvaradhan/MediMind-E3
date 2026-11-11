@@ -8,7 +8,8 @@ import Appointment from '../models/Appointment.js';
 import Notification from '../models/Notification.js';
 
 import { internalServices } from '../utils/internalServices.js';
-import { kafkaProducer } from '../../../kafkaClient.js';
+import { kafkaProducer } from '../utils/kafkaProducer.js';
+import { getInternalServiceKey, resolveServiceUrl } from '../config/runtimeConfig.js';
 
 const parseDateOnly = (dateStr) => {
 
@@ -819,11 +820,13 @@ export const appointmentService = {
       if (autoCreatedPredictionId) {
         // Cleanup auto-created prediction to avoid orphaned AI records
         try {
-          const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:5007';
+          const AI_SERVICE_URL = resolveServiceUrl('AI_SERVICE_URL', 'ai', 5007, {
+            requiredInProd: Boolean(process.env.VERCEL),
+          });
           await fetch(`${AI_SERVICE_URL}/api/ai/${autoCreatedPredictionId}`, {
             method: 'DELETE',
             headers: {
-              'X-Internal-Service-Key': process.env.INTERNAL_SERVICE_KEY || 'medimind_internal_service_secret_2026',
+              'X-Internal-Service-Key': getInternalServiceKey(),
             },
           });
         } catch {

@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
+import { getJwtSecret } from '../config/runtimeConfig.js';
 
 export const generateToken = (payload, options = {}) => {
-  const secret = process.env.JWT_SECRET || 'medimind_jwt_secret_development_key_change_in_production';
+  const secret = getJwtSecret();
   const expiresIn = options.expiresIn || process.env.JWT_EXPIRES_IN || '24h';
 
   const cleanPayload = {
@@ -18,6 +19,6 @@ export const generateToken = (payload, options = {}) => {
 };
 
 export const verifyToken = (token) => {
-  const secret = process.env.JWT_SECRET || 'medimind_jwt_secret_development_key_change_in_production';
+  const secret = getJwtSecret();
   return jwt.verify(token, secret);
 };

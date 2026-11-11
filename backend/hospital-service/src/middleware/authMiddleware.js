@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
+import { getInternalServiceSecret, getJwtSecret } from '../config/runtimeConfig.js';
 
 export const authenticate = (req, res, next) => {
-  const internalSecret = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+  const internalSecret = getInternalServiceSecret();
   const providedInternalSecret = req.headers['x-internal-service-secret'];
 
   // 1. Trusted headers injected by API Gateway
@@ -33,7 +34,7 @@ export const authenticate = (req, res, next) => {
   }
 
   const token = authHeader.split(' ')[1];
-  const secret = process.env.JWT_SECRET || 'medimind_jwt_secret_development_key_change_in_production';
+  const secret = getJwtSecret();
 
   try {
     const decoded = jwt.verify(token, secret);
@@ -58,7 +59,7 @@ export const authenticate = (req, res, next) => {
 };
 
 export const optionalAuth = (req, res, next) => {
-  const internalSecret = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+  const internalSecret = getInternalServiceSecret();
   const providedInternalSecret = req.headers['x-internal-service-secret'];
 
   if (providedInternalSecret && providedInternalSecret === internalSecret) {
@@ -80,7 +81,7 @@ export const optionalAuth = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
-    const secret = process.env.JWT_SECRET || 'medimind_jwt_secret_development_key_change_in_production';
+    const secret = getJwtSecret();
     try {
       const decoded = jwt.verify(token, secret);
       req.user = {

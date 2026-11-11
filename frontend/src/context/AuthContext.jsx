@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { AuthContext } from './authContextCore';
+import { buildApiUrl } from '../config/apiConfig';
 import { chairmen, hospitalAdmins, departmentHeads, doctors, hospitals, families } from '../data/medimindData';
 import {
   TOKEN_STORAGE_KEY,
@@ -189,7 +190,7 @@ export function AuthProvider({ children }) {
 
     // Attempt real backend authentication first
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(buildApiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: cleanEmail, password: cleanPassword }),
@@ -218,7 +219,7 @@ export function AuthProvider({ children }) {
         return { success: false, error: errMessage };
       }
     } catch {
-      const errMessage = 'Authentication service is unreachable. Ensure backend microservices are running on port 5000.';
+      const errMessage = 'Authentication service is unreachable. Please verify the API backend is online and try again.';
       setError(errMessage);
       setLoading(false);
       return { success: false, error: errMessage };
@@ -244,7 +245,7 @@ export function AuthProvider({ children }) {
 
     // Family account creation
     try {
-      const res = await fetch('/api/families', {
+      const res = await fetch(buildApiUrl('/api/families'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -292,7 +293,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     setError(null);
     if (token) {
-      fetch('/api/auth/logout', {
+      fetch(buildApiUrl('/api/auth/logout'), {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       }).catch(() => {});

@@ -12,8 +12,8 @@ export function validateMongoConfig(uri, env = process.env) {
 
   const isLocalhost = uri.includes('localhost') || uri.includes('127.0.0.1');
   const isRemote = uri.includes('mongodb+srv://') || (uri.includes('mongodb://') && !isLocalhost && uri.includes('@'));
-  const strictRemote = env.STRICT_REMOTE_DB === 'true' || env.NODE_ENV === 'production';
-  const allowLocalFallback = env.ALLOW_LOCAL_FALLBACK !== 'false' && env.NODE_ENV !== 'production';
+  const strictRemote = env.STRICT_REMOTE_DB === 'true' || env.NODE_ENV === 'production' || Boolean(env.VERCEL);
+  const allowLocalFallback = env.ALLOW_LOCAL_FALLBACK !== 'false' && env.NODE_ENV !== 'production' && !env.VERCEL;
 
   if (strictRemote && isLocalhost) {
     throw new Error('Database configuration violation: Localhost MongoDB is strictly prohibited when remote database is required.');

@@ -1,19 +1,20 @@
-const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:5001';
-const HOSPITAL_SERVICE_URL = process.env.HOSPITAL_SERVICE_URL || 'http://localhost:5003';
-const INTERNAL_SECRET = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+import { getInternalServiceSecret, resolveServiceUrl } from '../config/runtimeConfig.js';
+
+const getAuthServiceUrl = () => resolveServiceUrl('AUTH_SERVICE_URL', 'auth', 5001);
+const getHospitalServiceUrl = () => resolveServiceUrl('HOSPITAL_SERVICE_URL', 'hospital', 5003);
 
 export const internalServices = {
   /**
    * Provision a User authentication record via Auth Service internal endpoint
    */
   async createAuthUser({ email, password, role = 'DOCTOR', accountType = 'DOCTOR_ACCOUNT', referenceId }) {
-    const url = `${AUTH_SERVICE_URL}/api/auth/internal/users`;
+    const url = `${getAuthServiceUrl()}/api/auth/internal/users`;
     try {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-internal-service-secret': INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
         },
         body: JSON.stringify({
           email,
@@ -48,13 +49,13 @@ export const internalServices = {
    */
   async resolveDepartmentHead({ userId, headId, referenceId }) {
     const queryParam = userId ? `userId=${userId}` : (headId ? `headId=${headId}` : `referenceId=${referenceId}`);
-    const url = `${HOSPITAL_SERVICE_URL}/api/department-heads?${queryParam}`;
+    const url = `${getHospitalServiceUrl()}/api/department-heads?${queryParam}`;
 
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'x-internal-service-secret': INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
           'x-user-id': 'internal_doctor_service',
           'x-user-role': 'CHAIRMAN',
         },
@@ -80,13 +81,13 @@ export const internalServices = {
    * Verify whether a department belongs to the specified hospital via Hospital Service
    */
   async verifyDepartmentInHospital({ departmentId, hospitalId }) {
-    const url = `${HOSPITAL_SERVICE_URL}/api/departments/${departmentId}`;
+    const url = `${getHospitalServiceUrl()}/api/departments/${departmentId}`;
 
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'x-internal-service-secret': INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
           'x-user-id': 'internal_doctor_service',
           'x-user-role': 'CHAIRMAN',
         },

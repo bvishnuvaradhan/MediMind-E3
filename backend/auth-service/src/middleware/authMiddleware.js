@@ -1,7 +1,8 @@
 import { verifyToken } from '../utils/jwt.js';
+import { getInternalServiceSecret } from '../config/runtimeConfig.js';
 
 export const authenticate = (req, res, next) => {
-  const internalSecret = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+  const internalSecret = getInternalServiceSecret();
   const providedInternalSecret = req.headers['x-internal-service-secret'];
 
   // 1. If routed via API Gateway with trusted identity headers
@@ -42,7 +43,7 @@ export const authenticate = (req, res, next) => {
 };
 
 export const optionalAuth = (req, res, next) => {
-  const internalSecret = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+  const internalSecret = getInternalServiceSecret();
   const providedInternalSecret = req.headers['x-internal-service-secret'];
 
   if (providedInternalSecret && providedInternalSecret === internalSecret) {

@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { getJwtSecret, getInternalServiceSecret } from '../config/runtimeConfig.js';
 
 export const verifyJwt = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -11,8 +12,8 @@ export const verifyJwt = (req, res, next) => {
   }
 
   const token = authHeader.split(' ')[1];
-  const secret = process.env.JWT_SECRET || 'medimind_jwt_secret_development_key_change_in_production';
-  const internalSecret = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+  const secret = getJwtSecret();
+  const internalSecret = getInternalServiceSecret();
 
   try {
     const decoded = jwt.verify(token, secret);
@@ -46,7 +47,7 @@ export const verifyJwt = (req, res, next) => {
       success: false,
       message: error.name === 'TokenExpiredError'
         ? 'Authentication token has expired. Please re-authenticate.'
-        : 'Invalid authentication token.',
+        : 'Invalid or expired authentication token.',
     });
   }
 };
@@ -58,8 +59,8 @@ export const optionalJwt = (req, res, next) => {
   }
 
   const token = authHeader.split(' ')[1];
-  const secret = process.env.JWT_SECRET || 'medimind_jwt_secret_development_key_change_in_production';
-  const internalSecret = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+  const secret = getJwtSecret();
+  const internalSecret = getInternalServiceSecret();
 
   try {
     const decoded = jwt.verify(token, secret);

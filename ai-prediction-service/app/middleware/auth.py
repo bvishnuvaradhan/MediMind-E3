@@ -24,8 +24,10 @@ def _get_auth_mongo_client() -> Optional[MongoClient]:
         try:
             _auth_mongo_client = MongoClient(
                 settings.MONGO_URI,
-                serverSelectionTimeoutMS=2000,
-                connectTimeoutMS=2000,
+                serverSelectionTimeoutMS=10000,
+                connectTimeoutMS=10000,
+                maxPoolSize=10,
+                minPoolSize=0,
             )
             # Lightweight ping
             _auth_mongo_client.admin.command("ping")

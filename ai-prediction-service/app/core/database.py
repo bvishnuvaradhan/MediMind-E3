@@ -1,9 +1,26 @@
 import logging
+from urllib.parse import urlparse
 from motor.motor_asyncio import AsyncIOMotorClient
 from typing import Dict, Any, List, Optional
 from app.core.config import settings
 
 logger = logging.getLogger("ai_service.db")
+
+
+def _mask_mongo_uri(uri: str) -> str:
+    if not uri:
+        return "<EMPTY>"
+    try:
+        is_srv = uri.startswith("mongodb+srv://")
+        normalized = uri.replace("mongodb+srv://", "http://", 1).replace("mongodb://", "http://", 1)
+        parsed = urlparse(normalized)
+        scheme = "mongodb+srv://" if is_srv else "mongodb://"
+        host = parsed.hostname or "<host>"
+        if parsed.port:
+            host = f"{host}:{parsed.port}"
+        return f"{scheme}***:***@{host}{parsed.path or ''}"
+    except Exception:
+        return "mongodb+srv://***@<remote-host>" if "mongodb+srv" in uri else "mongodb://***@<host>"
 
 # Required fields that every prediction record must contain before persisting
 _REQUIRED_FIELDS = {"prediction_id", "family_member_id", "risk_level", "prediction_type", "created_at"}
@@ -27,12 +44,16 @@ class Database:
     async def connect_db(cls) -> None:
         """
         Connect to MongoDB and create performance / uniqueness indexes.
-        Falls back to the in-memory store if MongoDB is unreachable.
+        In production / STRICT_REMOTE_DB mode, fails loudly instead of falling back
+        to transient in-memory storage.
         """
         try:
             cls.client = AsyncIOMotorClient(
                 settings.MONGO_URI,
-                serverSelectionTimeoutMS=2000
+                serverSelectionTimeoutMS=10000,
+                connectTimeoutMS=10000,
+                maxPoolSize=10,
+                minPoolSize=0,
             )
             # Verify server availability
             await cls.client.server_info()
@@ -41,12 +62,17 @@ class Database:
             # Ensure indexes exist — idempotent, safe to call every startup
             await cls.create_indexes()
         except Exception as e:
-            logger.warning(
-                f"MongoDB connection failed: {e}. "
-                "Falling back to in-memory store for development/testing."
-            )
             cls.client = None
             cls.db = None
+            masked_target = _mask_mongo_uri(settings.MONGO_URI)
+            if not settings.ALLOW_MEMORY_DB_FALLBACK:
+                logger.error("MongoDB connection failed (%s) at %s", type(e).__name__, masked_target)
+                raise RuntimeError(f"Database connection failed for {masked_target}") from e
+            logger.warning(
+                "MongoDB connection failed (%s) at %s. Falling back to in-memory store for non-production runtime.",
+                e,
+                masked_target,
+            )
 
     @classmethod
     async def close_db(cls) -> None:

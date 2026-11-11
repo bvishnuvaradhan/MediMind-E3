@@ -5,7 +5,7 @@ import { authRateLimiter } from '../middleware/securityMiddleware.js';
 import { forwardRequest } from '../utils/proxy.js';
 
 const router = Router();
-const proxyAuth = forwardRequest(serviceUrls.auth);
+const proxyAuth = forwardRequest(() => serviceUrls.auth);
 
 // Public route: Login (rate-limited)
 router.post('/login', authRateLimiter, proxyAuth);

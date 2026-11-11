@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { serviceUrls } from '../config/services.js';
+import { getInternalServiceSecret, getInternalServiceKey } from '../config/runtimeConfig.js';
 import { verifyJwt } from '../middleware/authMiddleware.js';
 import { requireRole } from '../middleware/roleMiddleware.js';
 import { forwardRequest } from '../utils/proxy.js';
-import { kafkaProducer } from '../../../kafkaClient.js';
+import { kafkaProducer } from '../utils/kafkaProducer.js';
 
 const router = Router();
-const proxyAi = forwardRequest(serviceUrls.ai);
+const proxyAi = forwardRequest(() => serviceUrls.ai);
 
 /**
  * Enhanced proxy middleware that emits Kafka events to 'medimind.predictions'
@@ -41,8 +42,8 @@ const proxyAiWithKafka = (req, res, next) => {
 // Public health check route
 router.get('/health', async (req, res, next) => {
   try {
-    const internalSecret = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
-    const internalKey = process.env.INTERNAL_SERVICE_KEY || internalSecret;
+    const internalSecret = getInternalServiceSecret();
+    const internalKey = getInternalServiceKey();
     const response = await fetch(`${serviceUrls.ai}/health`, {
       method: 'GET',
       headers: {

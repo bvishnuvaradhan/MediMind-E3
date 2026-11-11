@@ -1,5 +1,6 @@
 import { authService } from '../services/authService.js';
 import mongoose from 'mongoose';
+import { getInternalServiceSecret } from '../config/runtimeConfig.js';
 
 export const authController = {
   async login(req, res, next) {
@@ -74,7 +75,7 @@ export const authController = {
 
   async createInternalUser(req, res, next) {
     try {
-      const internalSecret = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+      const internalSecret = getInternalServiceSecret();
       const providedSecret = req.headers['x-internal-service-secret'];
       if (!providedSecret || providedSecret !== internalSecret) {
         return res.status(403).json({

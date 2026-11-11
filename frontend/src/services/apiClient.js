@@ -1,6 +1,8 @@
 // MediMind Platform - Centralized Authenticated API Client
 // Enforces valid JWT attachment, token expiration checks, and controlled redirect on 401 Unauthorized.
 
+import { buildApiUrl } from '../config/apiConfig.js';
+
 export const TOKEN_STORAGE_KEY = 'medimind_jwt_token';
 export const SESSION_STORAGE_KEY = 'medimind_auth_session';
 
@@ -117,7 +119,7 @@ export async function authFetch(url, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(url, {
+  const response = await fetch(buildApiUrl(url), {
     ...options,
     headers,
   });

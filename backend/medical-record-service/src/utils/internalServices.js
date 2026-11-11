@@ -1,19 +1,26 @@
-const FAMILY_SERVICE_URL = process.env.FAMILY_SERVICE_URL || 'http://localhost:5002';
-const DOCTOR_SERVICE_URL = process.env.DOCTOR_SERVICE_URL || 'http://localhost:5004';
-const APPOINTMENT_SERVICE_URL = process.env.APPOINTMENT_SERVICE_URL || 'http://localhost:5005';
-const INTERNAL_SECRET = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+import {
+  getInternalServiceKey,
+  getInternalServiceSecret,
+  resolveServiceUrl,
+} from '../config/runtimeConfig.js';
+
+const getFamilyServiceUrl = () => resolveServiceUrl('FAMILY_SERVICE_URL', 'family', 5002);
+const getDoctorServiceUrl = () => resolveServiceUrl('DOCTOR_SERVICE_URL', 'doctor', 5004);
+const getAppointmentServiceUrl = () => resolveServiceUrl('APPOINTMENT_SERVICE_URL', 'appointment', 5005);
+const getAiServiceUrl = () =>
+  resolveServiceUrl('AI_SERVICE_URL', 'ai', 5007, { requiredInProd: Boolean(process.env.VERCEL) });
 
 export const internalServices = {
   /**
    * Verify family member ownership via Family Service
    */
   async verifyFamilyMember({ user, memberId }) {
-    const url = `${FAMILY_SERVICE_URL}/api/families/members/${memberId}`;
+    const url = `${getFamilyServiceUrl()}/api/families/members/${memberId}`;
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'x-internal-service-secret': INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
           'x-user-id': user.userId,
           'x-user-role': 'FAMILY',
           'x-user-reference-id': user.referenceId || user.familyId || '',
@@ -47,12 +54,12 @@ export const internalServices = {
    * Fetch doctor details from Doctor Service
    */
   async getDoctor(doctorId) {
-    const url = `${DOCTOR_SERVICE_URL}/api/doctors/${doctorId}`;
+    const url = `${getDoctorServiceUrl()}/api/doctors/${doctorId}`;
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'x-internal-service-secret': INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
           'x-user-id': 'internal_medical_record_service',
           'x-user-role': 'CHAIRMAN',
         },
@@ -73,12 +80,12 @@ export const internalServices = {
    * Fetch appointment details from Appointment Service
    */
   async getAppointment(appointmentId) {
-    const url = `${APPOINTMENT_SERVICE_URL}/api/appointments/${appointmentId}`;
+    const url = `${getAppointmentServiceUrl()}/api/appointments/${appointmentId}`;
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'x-internal-service-secret': INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
           'x-user-id': 'internal_medical_record_service',
           'x-user-role': 'CHAIRMAN',
         },
@@ -99,14 +106,14 @@ export const internalServices = {
    * Fetch AI prediction details from AI Prediction Service
    */
   async getAiPrediction(predictionId) {
-    const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:5007';
+    const AI_SERVICE_URL = getAiServiceUrl();
     const url = `${AI_SERVICE_URL}/api/ai/${predictionId}`;
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'x-internal-service-secret': INTERNAL_SECRET,
-          'X-Internal-Service-Key': process.env.INTERNAL_SERVICE_KEY || INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
+          'X-Internal-Service-Key': getInternalServiceKey(),
           'x-user-id': 'internal_medical_record_service',
           'x-user-role': 'CHAIRMAN',
         },

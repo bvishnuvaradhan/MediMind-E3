@@ -32,6 +32,7 @@ import { AlternativeBookingModal } from './components/AlternativeBookingModal';
 import { UploadRecordModal } from './components/UploadRecordModal';
 import { appointmentService } from '../../services/appointmentService';
 import { familyService } from '../../services/familyService';
+import { buildApiUrl } from '../../config/apiConfig';
 import { DashboardView } from './views/DashboardView';
 import { MemberProfileView } from './views/MemberProfileView';
 import { FamilyMembersView } from './views/FamilyMembersView';
@@ -202,7 +203,7 @@ export function FamilyLayout({ dark, setDark }) {
 
   useEffect(() => {
     let isMounted = true;
-    fetch('/api/doctors')
+    fetch(buildApiUrl('/api/doctors'))
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (isMounted && data && Array.isArray(data.data)) {
@@ -219,7 +220,7 @@ export function FamilyLayout({ dark, setDark }) {
     let isMounted = true;
     const token = user?.token || localStorage.getItem('medimind_jwt_token');
     if (token) {
-      fetch('/api/families/members', {
+      fetch(buildApiUrl('/api/families/members'), {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => (res.ok ? res.json() : null))

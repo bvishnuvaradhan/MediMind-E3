@@ -36,10 +36,17 @@ Thumbs.db
 # Office Documents
 *.docx
 *.pdf
+!frontend/public/records/sample.pdf
 ~$*
 *.xlsx
 *credentials*.csv
 *Credentials*.csv
+
+# Vercel / Local Python Virtual Envs / Build Cache
+.vercel
+**/.vercel
+.venv/
+*.tsbuildinfo
 
 # Temporary, Backup & Editor files
 *.bak

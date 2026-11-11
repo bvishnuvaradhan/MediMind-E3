@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { getRecommendedSpecialists } from '../../../utils/specialistRanking';
 import { RadialGauge, BulletChart } from '../../common/charts';
+import { buildApiUrl } from '../../../config/apiConfig';
 
 export function PersonalPredictionDetailView({
   prediction,
@@ -37,7 +38,7 @@ export function PersonalPredictionDetailView({
   useEffect(() => {
     if (mongoDoctors && mongoDoctors.length > 0) return;
     let isMounted = true;
-    fetch('/api/doctors')
+    fetch(buildApiUrl('/api/doctors'))
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (isMounted && data && Array.isArray(data.data)) {

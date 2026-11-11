@@ -4,7 +4,7 @@ import { verifyJwt } from '../middleware/authMiddleware.js';
 import { forwardRequest } from '../utils/proxy.js';
 
 const router = Router();
-const proxyAppointment = forwardRequest(serviceUrls.appointment);
+const proxyAppointment = forwardRequest(() => serviceUrls.appointment);
 
 // Public health route
 router.get('/health', proxyAppointment);

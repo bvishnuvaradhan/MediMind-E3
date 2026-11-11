@@ -1,0 +1,46 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/_internal/auth/:path*",
+      "destination": "/api/auth"
+    },
+    {
+      "source": "/_internal/family/:path*",
+      "destination": "/api/family"
+    },
+    {
+      "source": "/_internal/hospital/:path*",
+      "destination": "/api/hospital"
+    },
+    {
+      "source": "/_internal/doctor/:path*",
+      "destination": "/api/doctor"
+    },
+    {
+      "source": "/_internal/appointment/:path*",
+      "destination": "/api/appointment"
+    },
+    {
+      "source": "/_internal/records/:path*",
+      "destination": "/api/records"
+    },
+    {
+      "source": "/_internal/knowledge/:path*",
+      "destination": "/api/knowledge"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "/api/gateway"
+    },
+    {
+      "source": "/health",
+      "destination": "/api/gateway"
+    },
+    {
+      "source": "/",
+      "destination": "/api/gateway"
+    }
+  ]
+}

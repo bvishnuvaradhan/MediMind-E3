@@ -4,7 +4,7 @@ import { optionalJwt } from '../middleware/authMiddleware.js';
 import { forwardRequest } from '../utils/proxy.js';
 
 const router = Router();
-const proxyHospital = forwardRequest(serviceUrls.hospital);
+const proxyHospital = forwardRequest(() => serviceUrls.hospital);
 
 // Hospital Service routes forward with optional JWT identity injection
 // Downstream hospital-service enforces role and hospital scoping as appropriate

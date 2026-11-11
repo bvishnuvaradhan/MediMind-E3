@@ -4,235 +4,110 @@ Intelligent clinical decision support and multi-hospital healthcare platform uni
 
 ---
 
-## Overview
+## Architecture Overview
 
-MediMind is a comprehensive, production-grade digital health ecosystem that bridges everyday clinical care with machine learning diagnostics. It provides:
-- **Family Health Management:** Household-scoped records, dependent tracking, diagnostic screening, and appointments.
-- **Clinical Physician Workspace:** Patient queue triage, clinical consultations, e-prescriptions, and AI-assisted radiological/risk decision support.
-- **Departmental Governance:** Clinical department coordination, OPD shift scheduling, and practitioner performance oversight.
-- **Hospital Administration:** Facility capacity, department provisioning, accreditation, and operational throughput monitoring.
-- **Executive Network Governance:** Cross-hospital onboarding, multi-facility metrics, and platform-wide diagnostic utilization.
+MediMind preserves a modular microservice architecture backed by MongoDB Atlas and a dedicated Python FastAPI ML inference service:
 
----
-
-## Architecture
-
-MediMind uses an asynchronous microservice architecture mediated by a unified API Gateway and a dedicated high-performance Python FastAPI AI inference service.
-
-```
-                               ┌─────────────────────────────────┐
-                               │   MediMind Frontend (React 19)  │
-                               │   Vite / Pure-SVG Charts (5173) │
-                               └────────────────┬────────────────┘
-                                                │ REST / JSON
-                                                ▼
-                               ┌─────────────────────────────────┐
-                               │     API Gateway (Express)       │
-                               │     Port: 5000                  │
-                               │  Anti-Spoofing & Header Scoping │
-                               └────────────────┬────────────────┘
-                                                │
-         ┌──────────────┬──────────────┬────────┼───────┬──────────────┬──────────────┐
-         ▼              ▼              ▼        ▼       ▼              ▼              ▼
-   ┌───────────┐  ┌───────────┐  ┌───────────┐ ... ┌───────────┐  ┌───────────┐  ┌──────────────────┐
-   │   Auth    │  │  Family   │  │ Hospital  │     │  Record   │  │ Knowledge │  │   AI Prediction  │
-   │  Service  │  │  Service  │  │  Service  │     │  Service  │  │  Service  │  │      Service     │
-   │ Port 5001 │  │ Port 5002 │  │ Port 5003 │     │ Port 5006 │  │ Port 5008 │  │ Port 5007 (FastAPI)│
-   └───────────┘  └───────────┘  └───────────┘     └───────────┘  └───────────┘  └──────────────────┘
+```text
+React + Vite Frontend (frontend/)  ──Vercel Project 1──┐
+                                                       ▼
+API Gateway + 8 Express Services (backend/)  ──Vercel Project 2 (vercel.json + api/*.js)──┐
+  ├── Gateway        (/api/*, /health)                                                    │
+  ├── Auth           (/_internal/auth/*         -> medimind_auth)                         │
+  ├── Family         (/_internal/family/*       -> medimind_family)                       │
+  ├── Hospital       (/_internal/hospital/*     -> medimind_hospital)                     │
+  ├── Doctor         (/_internal/doctor/*       -> medimind_doctor)                       │
+  ├── Appointment    (/_internal/appointment/*  -> medimind_appointment)                  ├──▶ MongoDB Atlas
+  ├── Medical Record (/_internal/records/*      -> medimind_records)                      │
+  └── Knowledge      (/_internal/knowledge/*    -> medimind_knowledge)                    │
+                                                                                          │
+AI Prediction Service (ai-prediction-service/)  ──Docker (Render/Railway/Cloud Run)───────┘
+  └── FastAPI (Port 5007 -> medimind_ai): Fracture CNN, Diabetes MLP, Heart Disease RF, General Health NLP
 ```
 
 ---
 
-## User Roles & Operational Workforce
+## User Roles & RBAC
 
-The platform enforces strict Role-Based Access Control (RBAC) across five canonical personas, managing 96 active operational accounts and 2 deactivated accounts:
+The platform enforces role-based access control and gateway header anti-spoofing across five roles:
 
-1. **`FAMILY`**: 10 Household Accounts (representing 44 registered family members) managing dependent records, booking consultations, accessing medical records, and executing standalone AI symptom/risk screenings.
-2. **`DOCTOR`**: 68 Credentialed Doctor Profiles (66 Active, 2 Deactivated) triaging patient appointment queues, conducting clinical consultations, prescribing medications, and inspecting model explainability (e.g., Grad-CAM heatmaps).
-3. **`DEPARTMENT_HEAD`**: 14 Department Leadership Accounts overseeing clinical departments across the 3 active network hospitals, OPD shifts, and clinical guideline publication.
-4. **`HOSPITAL_ADMIN`**: 4 Hospital Operational Administrators administering facility capacities, clinical departments, department heads, and hospital throughput.
-5. **`CHAIRMAN`**: 2 Platform Owners governing multi-hospital network accreditation, onboarding applications, hospital eligibility boundaries, and system-wide clinical analytics.
-
----
-
-## AI Decision Support & Diagnostic Screenings
-
-MediMind integrates four validated clinical decision support modules with 3,719 persisted predictions (3,693 appointment-linked, 26 standalone screenings with a 76.9% 30-day booking conversion rate):
-
-- **Fracture Detection (`ai_fracture`):** Deep convolutional neural network (ResNet-18 initialized on Stanford MURA v1.1 and calibrated on FracAtlas) detecting bone fractures in musculoskeletal radiographs.
-  - *Production Operating Threshold:* `0.1800`
-- **Diabetes Risk Assessment (`ai_diabetes`):** Multi-Layer Perceptron (MLP) trained on validated metabolic indicators (PIMA cohort) predicting type-2 diabetes onset.
-  - *Production Operating Threshold:* `0.2500`
-- **Heart Disease Risk Assessment (`ai_cardio`):** Calibrated Random Forest ensemble predicting 10-year cardiovascular disease risk from patient clinical profiles.
-  - *Production Operating Threshold:* `0.4000`
-- **General Health Assessment (`ai_general`):** Deterministic clinical Natural Language Processing (NLP) triage engine featuring negation detection, third-person attribution filtering, and emergency tri-pillar rules.
-
-- **Groq NLP Explanations (Optional):** Supports integration with Groq (`GROQ_API_KEY`, `GROQ_ENABLED=true`) for server-side generation of patient-friendly natural language explanations for primary model outputs. Ensures strict zero-dependency fallback to primary models if Groq is unavailable.
-
-For an extensive technical breakdown of model architectures and validation experiments, refer to [MediMind Master AI Model & Experiment Report](Documents/Master_Reports/MediMind_Master_AI_Model_and_Experiment_Report.md).
+1. **`FAMILY`**: Household profiles, dependent records, standalone AI screenings, appointment booking, and access consent controls.
+2. **`DOCTOR`**: Appointment triage queues, clinical consultations, e-prescriptions, and AI diagnostic decision support.
+3. **`DEPARTMENT_HEAD`**: Clinical department oversight, OPD shifts, clinical guideline publishing, and practitioner management.
+4. **`HOSPITAL_ADMIN`**: Facility capacity, department provisioning, and hospital throughput analytics.
+5. **`CHAIRMAN`**: Multi-hospital network governance, onboarding approvals, eligibility controls, and executive analytics.
 
 ---
 
-## Backend Services
+## AI Decision Support Modules
 
-| Service | Purpose | Port | Database |
-| :--- | :--- | :--- | :--- |
-| **API Gateway** | Entry point, routing, anti-spoofing, rate limiting, and request correlation | `5000` | Stateless (Reverse Proxy) |
-| **Auth Service** | User authentication, password hashing, and JWT token issuance | `5001` | MongoDB (`medimind_auth`) |
-| **Family Service** | Household accounts, member profiles, and dependent records | `5002` | MongoDB (`medimind_family`) |
-| **Hospital Service** | Facilities, clinical departments, and onboarding workflows | `5003` | MongoDB (`medimind_hospital`) |
-| **Doctor Service** | Doctor rosters, clinical specializations, and OPD availability | `5004` | MongoDB (`medimind_doctor`) |
-| **Appointment Service**| Patient appointment scheduling and lifecycle management | `5005` | MongoDB (`medimind_appointment`) |
-| **Medical Record Service** | Consultations, electronic prescriptions, and access consent | `5006` | MongoDB (`medimind_record`) |
-| **AI Prediction Service** | Clinical AI model inference, thresholding, and validation persistence | `5007` | MongoDB (`medimind_ai`) |
-| **Knowledge Service** | Clinical articles, guidelines, and patient health education | `5008` | MongoDB (`medimind_knowledge`) |
+The Python FastAPI service (`ai-prediction-service/`) provides four production diagnostic models:
+
+- **Fracture Detection (`ai_fracture`)**: ResNet-18 CNN (`artifacts/fracture/best_model.pt`, threshold `0.1800`) for musculoskeletal radiographs.
+- **Diabetes Risk Assessment (`ai_diabetes`)**: MLP classifier (`artifacts/diabetes/best_model.joblib`, threshold `0.2500`).
+- **Heart Disease Risk Assessment (`ai_cardio`)**: Calibrated Random Forest classifier (`artifacts/heart_disease/random_forest.joblib`, threshold `0.4000`).
+- **General Health Triage (`ai_general`)**: Deterministic clinical NLP engine with negation handling, attribution filtering, and emergency rules.
+- **Groq NLP Explanations (Optional)**: Controlled by `GROQ_ENABLED` / `GROQ_API_KEY` with non-blocking fallback to primary model output.
+
+Detailed model documentation lives in [`docs/ai-model-cards/`](docs/ai-model-cards/) and [`Documents/AI/AI_ML_Model_Specification.txt`](Documents/AI/AI_ML_Model_Specification.txt).
 
 ---
 
-## Authentication & Security
+## Deployment Documentation
 
-- **JWT Authentication:** Cryptographically signed tokens encoding verified identity claims (`userId`, `role`, `referenceId`, `accountType`, `hospitalId`, `departmentId`).
-- **Multi-Account Identity Isolation:** 26 canonical platform accounts across all five roles operate with strict session and data boundary isolation.
-- **Gateway Anti-Spoofing:** The API Gateway strips all client-supplied identity headers (`x-user-id`, `x-user-role`, `x-hospital-id`, `x-department-id`, `x-family-id`) and replaces them with verified JWT claims.
-- **Internal Service Authentication:** Downstream inter-service calls require mutual authentication using a private internal microservice secret.
-- **Data Scoping:** Queries and mutations are dynamically constrained:
-  - Doctors access only patients with active consent or appointment bookings.
-  - Department Heads access only doctors and resources within their hospital and department.
-  - Hospital Admins access only facilities and personnel belonging to their assigned hospital.
-  - Families access only members and records belonging to their authenticated family ID.
+- **Step-by-step Production Guide (Vercel + Docker + Atlas):** [`docs/DEPLOYMENT_GUIDE.md`](docs/DEPLOYMENT_GUIDE.md)
+- **Environment Variable Matrix:** [`docs/ENVIRONMENT_VARIABLES.md`](docs/ENVIRONMENT_VARIABLES.md)
+- **Verification & Test Results:** [`docs/DEPLOYMENT_VERIFICATION.md`](docs/DEPLOYMENT_VERIFICATION.md)
 
 ---
 
-## Testing & Validation
-
-MediMind maintains exhaustive automated test suites across every tier of the application:
-
-- **Multi-Account Identity Audit:** 523 / 523 checks passed (100% verification across all 26 accounts, cross-role switching, and data boundary isolation).
-- **Backend Service Test Suites:** 264 / 264 unit and integration tests passed across 20 test suites (Auth, Gateway, Family, Hospital, Doctor, Appointment, Medical Records, Knowledge).
-- **AI Prediction Service Tests:** 253 / 253 tests passed (Diabetes, Heart Disease, General Health NLP, Fracture Inference, Auth & Persistence).
-- **Frontend Quality Gates:** Production Vite build passes cleanly with 0 errors; Oxlint passes on 302 files with 0 errors.
-
----
-
-## AI / Research Status
-
-- **Production Models:**
-  - Fracture Detection: ResNet-18 (MURA $\to$ FracAtlas), operating threshold `0.1800`.
-  - Heart Disease: Calibrated Random Forest, operating threshold `0.4000`.
-  - Diabetes: MLP Classifier, operating threshold `0.2500`.
-  - General Health: Deterministic clinical NLP triage engine with negation and attribution handling.
-- **Research Experiments (Exp 1 – 8A):**
-  - Experiments 1 through 8A systematically explored pediatric musculoskeletal radiograph analysis and dual-view fusion.
-  - **Experiment 8A (`DualViewROIResNet18`):** Formally frozen research best achieving 95.18% sensitivity on GRAZ held-out test data and 94.59% on external PediURF cohort while maintaining 87.25% specificity on normal controls.
-- **Frozen Artifacts:**
-  - The academic *MediMind Data Science Case Study*, historical datasets, and research checkpoints remain frozen and protected.
-
----
-
-## Development
+## Local Development
 
 ### Prerequisites
-- Node.js $\ge$ 18
-- Python $\ge$ 3.11 with PyTorch, Torchvision, Scikit-Learn, and FastAPI
-- MongoDB instance running on `localhost:27017`
+- Node.js `>= 18`
+- Python `>= 3.11` (`scikit-learn==1.7.0` recommended to match saved `.joblib` artifacts; PEP 508 environment markers handle Python `< 3.14` vs `>= 3.14`)
+- Local MongoDB (`127.0.0.1:27017`) or MongoDB Atlas connection string
 
-### Setup & Local Execution
+### Quick Start
 
 1. **Install Dependencies:**
    ```bash
-   # Backend dependencies
    npm --prefix backend install
-
-   # Frontend dependencies
    npm --prefix frontend install
-
-   # AI Service dependencies
    pip install -r ai-prediction-service/requirements.txt
    ```
 
-2. **Run All Backend Microservices:**
+2. **Configure Local `.env` Files:**
+   Use [`backend/.env.example`](backend/.env.example), [`frontend/.env.example`](frontend/.env.example), and [`ai-prediction-service/.env.example`](ai-prediction-service/.env.example) as templates (never commit real `.env` files).
+
+3. **Run All Services:**
    ```bash
+   # Backend Gateway + 8 Express Microservices
    npm --prefix backend run dev
-   ```
 
-3. **Run AI Prediction Service:**
-   ```bash
-   python -m uvicorn app.main:app --host 0.0.0.0 --port 5007
-   ```
+   # Python AI Prediction Service (port 5007)
+   cd ai-prediction-service && python -m uvicorn app.main:app --host 0.0.0.0 --port 5007
 
-4. **Run Frontend Application:**
-   ```bash
+   # Frontend Vite Dev Server (port 5173)
    npm --prefix frontend run dev
    ```
 
-5. **Run Full Live Demonstration Launcher:**
+4. **Run Validation Checks:**
    ```bash
-   node backend/scripts/start-live-demo.mjs
-   ```
-
-6. **Execute Automated Validation:**
-   ```bash
-   # Backend test suite
-   npm --prefix backend test
-
-   # Multi-account identity audit
-   node backend/scripts/audit-all-role-accounts.mjs
-
-   # Frontend production build & lint
+   # Frontend lint & production build
    npm --prefix frontend run lint
    npm --prefix frontend run build
 
-   # End-to-End Browser Acceptance Suite (Playwright)
-   # Requires running stack (ports 5000-5008, 5173)
-   npm --prefix frontend run test:e2e
+   # AI service tests
+   cd ai-prediction-service && python -m pytest tests -v
+
+   # Backend gateway & service Jest tests (run per service with test scripts)
+   npm --prefix backend/api-gateway test
    ```
 
 ---
 
-## End-to-End (E2E) Browser Testing
+## Repository Security
 
-MediMind includes an automated Playwright acceptance suite validating full browser-to-backend-to-AI workflows:
-- **Test Framework:** Playwright with headless Chromium
-- **Execution Command:** `npm --prefix frontend run test:e2e`
-- **Scope Covered:**
-  - `01-chairman.spec.js`: Executive network governance, hospital list, platform analytics, and settings.
-  - `02-hospital-admin.spec.js`: Hospital admin oversight, multi-hospital analytics (H1, H2, H3), and department rosters.
-  - `03-department-head.spec.js`: Department-specific dashboards, clinical guidelines, and cross-department isolation.
-  - `04-doctor.spec.js`: Doctor workspaces (Orthopedics, Diabetology), consultations, e-prescriptions, and practitioner identity isolation.
-  - `05-family.spec.js`: Family portals, household member switching, and cross-family boundary privacy.
-  - `06-ai-predictions.spec.js`: Live clinical inference pipelines: X-ray radiograph fracture upload, metabolic risk scoring, symptom NLP triage, and Groq supporting explanations.
-
----
-
-## Repository Safety
-
-- **Excluded Sensitive Assets:** All credentials, private keys, `.env` files, and session tokens are strictly ignored by version control.
-- **Local Secret Storage:** `credentials.txt` serves strictly as an offline reference for local testing and demonstration rehearsal and is never committed.
-- **Protected Checkpoints:** Large experiment binary weights (`.pt`) and local run result logs are kept locally and excluded from git tracking.
-
----
-
-## Master Documentation & Architecture Reports
-
-Authoritative technical documentation and system governance are consolidated in Documents/Master_Reports/:
-
-1. [MediMind Master Project Overview](Documents/Master_Reports/MediMind_Master_Project_Overview.md) — Overarching ecosystem architecture, clinical role personas, and 12-week delivery milestones.
-2. [MediMind Master Architecture & Technical Systems](Documents/Master_Reports/MediMind_Master_Architecture_and_Technical_Documentation.md) — Microservices topology, Netflix Eureka discovery, Kafka streaming, and MongoDB partitioning.
-3. [MediMind Master AI Model & Experiment Report](Documents/Master_Reports/MediMind_Master_AI_Model_and_Experiment_Report.md) — Clinical AI models (Cardiology RF, Diabetes MLP, Fracture DualViewROIResNet18 Exp 8A, NLP Triage) and Experiments 1–8A.
-4. [MediMind Master Data Science & Dataset Governance](Documents/Master_Reports/MediMind_Master_Data_Science_and_Dataset_Report.md) — Ingestion provenance, cryptographic deduplication (-3,820 rows), train-only biological zero imputation, and patient-level radiograph partitioning.
-5. [MediMind Master Production Readiness & Data Integrity](Documents/Master_Reports/MediMind_Master_Production_Readiness_and_Integrity_Report.md) — Mock data elimination, appointment state machine, resolution of 414 unclosed records, and deployment gate certification.
-6. [MediMind Master Security, Authentication & Authorization](Documents/Master_Reports/MediMind_Master_Security_and_Authorization_Report.md) — JWT token lifecycle, bcrypt hashing, inter-service keys, MongoDB ObjectId family authorization, and RBAC matrix.
-7. [MediMind Master Clinical Workflow & E2E Validation](Documents/Master_Reports/MediMind_Master_Clinical_Workflow_and_Validation_Report.md) — Consultation lifecycle, prescription immutability, AI suggestion tracking, and automated Playwright/Pytest suites.
-8. [MediMind Master Performance, Latency & Hospital Analytics](Documents/Master_Reports/MediMind_Master_Performance_and_Analytics_Report.md) — Sub-150ms inference latency benchmarks, dynamic relative date filtering, staggered hospital onboarding, and caching.
-9. [MediMind Master Repository Governance & Development Standards](Documents/Master_Reports/MediMind_Master_Repository_and_Development_Report.md) — Repository rationalization, directory taxonomy, two-stage quarantine workflow, and asset protection.
-10. [MediMind Phase 2 Repository Rationalization Report](Documents/MediMind_Phase2_Repository_Rationalization_Report.md) — Complete repository audit, before/after inventory, and consolidation manifest.
-
----
-
-## Current Status & Release Certification
-
-- **Target Branch:** `experiment8-multiview-localized-fusion` (Never pushed to `main`).
-- **Cryptographic Integrity:** 6/6 Model weights matched bit-for-bit (0% drift).
-- **Test Discovery:** Pytest 283/283 passed; Jest 74/74 passed; Vite production build bundled cleanly in 1.30s.
-- **Reporting Engine:** 5 multi-sheet OpenXML compliant Excel workbooks verified (< 5s export, zero timeouts).
-- **Release Readiness:** Certified Production-Ready for final deployment.
+- `.env` files, credentials workbooks, private keys, datasets, and `node_modules` are excluded via [`.gitignore`](.gitignore).
+- Eureka (`eureka-server/`) and Kafka (`kafka-dashboard/`) remain available for optional local development and are disabled automatically in production/Vercel runtimes.

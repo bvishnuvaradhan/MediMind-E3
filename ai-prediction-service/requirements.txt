@@ -1,18 +1,20 @@
-fastapi>=0.100.0
-uvicorn[standard]>=0.22.0
-pydantic>=2.0.0
-motor>=3.0.0
-pymongo>=4.0.0
-python-dotenv>=1.0.0
-pytest>=7.0.0
-httpx>=0.24.0
-openpyxl>=3.1.0
-pandas>=2.0.0
-scikit-learn>=1.4.0
-joblib>=1.3.0
-PyJWT>=2.8.0
-cryptography>=41.0.0
-torch>=2.0.0
-torchvision>=0.15.0
+# Production runtime dependencies for MediMind AI Prediction Service
+fastapi>=0.115.0,<1.0.0
+uvicorn[standard]>=0.30.0,<1.0.0
+pydantic>=2.0.0,<3.0.0
+python-multipart>=0.0.9
+motor>=3.6.0,<4.0.0
+pymongo>=4.8.0,<5.0.0
+python-dotenv>=1.0.0,<2.0.0
+httpx>=0.27.0,<1.0.0
+PyJWT>=2.8.0,<3.0.0
+cryptography>=42.0.0
+numpy>=1.26.0
+pandas>=2.2.0
+joblib>=1.4.0
+# Active sklearn artifacts (diabetes/best_model.joblib & heart_disease/random_forest.joblib) were serialized with 1.7.0
+scikit-learn==1.7.0; python_version < "3.14"
+scikit-learn>=1.8.0; python_version >= "3.14"
 pillow>=10.0.0
-numpy>=1.24.0
+torch>=2.2.0
+torchvision>=0.17.0

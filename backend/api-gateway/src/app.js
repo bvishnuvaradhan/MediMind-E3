@@ -1,6 +1,7 @@
-import '../../load-env.js';
+import './config/runtimeConfig.js';
 import express from 'express';
 import cors from 'cors';
+import { getCorsOptions } from './config/runtimeConfig.js';
 import { correlationIdMiddleware, sanitizeIdentityHeaders } from './middleware/securityMiddleware.js';
 import { errorHandler, notFoundHandler } from './middleware/errorMiddleware.js';
 
@@ -16,27 +17,7 @@ import knowledgeRoutes from './routes/knowledgeRoutes.js';
 const app = express();
 
 // 1. CORS Configuration
-const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:3000')
-  .split(',')
-  .map((o) => o.trim())
-  .filter(Boolean);
-
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, curl, server-to-server)
-    if (!origin) {
-      return callback(null, true);
-    }
-    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
-      return callback(null, true);
-    }
-    return callback(new Error(`CORS policy rejection: origin ${origin} is not allowed`));
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-request-id', 'x-correlation-id'],
-  exposedHeaders: ['x-request-id'],
-}));
+app.use(cors(getCorsOptions()));
 
 // 2. Request parsing
 app.use(express.json());

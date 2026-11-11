@@ -4,7 +4,7 @@ import { verifyJwt } from '../middleware/authMiddleware.js';
 import { forwardRequest } from '../utils/proxy.js';
 
 const router = Router();
-const proxyFamily = forwardRequest(serviceUrls.family);
+const proxyFamily = forwardRequest(() => serviceUrls.family);
 
 // Public routes
 router.post('/', proxyFamily);

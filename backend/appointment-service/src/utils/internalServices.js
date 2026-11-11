@@ -1,19 +1,20 @@
-const FAMILY_SERVICE_URL = process.env.FAMILY_SERVICE_URL || 'http://localhost:5002';
-const HOSPITAL_SERVICE_URL = process.env.HOSPITAL_SERVICE_URL || 'http://localhost:5003';
-const DOCTOR_SERVICE_URL = process.env.DOCTOR_SERVICE_URL || 'http://localhost:5004';
-const INTERNAL_SECRET = process.env.INTERNAL_SERVICE_SECRET || 'medimind_internal_service_secret_2026';
+import { getInternalServiceKey, getInternalServiceSecret, resolveServiceUrl } from '../config/runtimeConfig.js';
+const getFamilyServiceUrl = () => resolveServiceUrl('FAMILY_SERVICE_URL', 'family', 5002);
+const getHospitalServiceUrl = () => resolveServiceUrl('HOSPITAL_SERVICE_URL', 'hospital', 5003);
+const getDoctorServiceUrl = () => resolveServiceUrl('DOCTOR_SERVICE_URL', 'doctor', 5004);
+const getAiServiceUrl = () => resolveServiceUrl('AI_SERVICE_URL', 'ai', 5007, { requiredInProd: Boolean(process.env.VERCEL) });
 
 export const internalServices = {
   /**
    * Retrieve doctor details from Doctor Service
    */
   async getDoctor(doctorId) {
-    const url = `${DOCTOR_SERVICE_URL}/api/doctors/${doctorId}`;
+    const url = `${getDoctorServiceUrl()}/api/doctors/${doctorId}`;
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'x-internal-service-secret': INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
           'x-user-id': 'internal_appointment_service',
           'x-user-role': 'CHAIRMAN',
         },
@@ -34,12 +35,12 @@ export const internalServices = {
    * Verify family member ownership via Family Service
    */
   async verifyFamilyMember({ user, memberId }) {
-    const url = `${FAMILY_SERVICE_URL}/api/families/members/${memberId}`;
+    const url = `${getFamilyServiceUrl()}/api/families/members/${memberId}`;
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'x-internal-service-secret': INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
           'x-user-id': user.userId,
           'x-user-role': 'FAMILY',
           'x-user-reference-id': user.referenceId || user.familyId || '',
@@ -73,12 +74,12 @@ export const internalServices = {
    * Fetch all member IDs belonging to a family for query scoping
    */
   async getFamilyMemberIds(user) {
-    const url = `${FAMILY_SERVICE_URL}/api/families/members`;
+    const url = `${getFamilyServiceUrl()}/api/families/members`;
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'x-internal-service-secret': INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
           'x-user-id': user.userId,
           'x-user-role': 'FAMILY',
           'x-user-reference-id': user.referenceId || user.familyId || '',
@@ -100,12 +101,12 @@ export const internalServices = {
    * Resolve department head assignment via Hospital Service
    */
   async resolveDepartmentHead(userId) {
-    const url = `${HOSPITAL_SERVICE_URL}/api/department-heads?userId=${userId}`;
+    const url = `${getHospitalServiceUrl()}/api/department-heads?userId=${userId}`;
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'x-internal-service-secret': INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
           'x-user-id': 'internal_appointment_service',
           'x-user-role': 'CHAIRMAN',
         },
@@ -127,14 +128,14 @@ export const internalServices = {
    * Fetch AI prediction details from AI Prediction Service
    */
   async getAiPrediction(predictionId) {
-    const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:5007';
+    const AI_SERVICE_URL = getAiServiceUrl();
     const url = `${AI_SERVICE_URL}/api/ai/${predictionId}`;
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'x-internal-service-secret': INTERNAL_SECRET,
-          'X-Internal-Service-Key': process.env.INTERNAL_SERVICE_KEY || INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
+          'X-Internal-Service-Key': getInternalServiceKey(),
           'x-user-id': 'internal_appointment_service',
           'x-user-role': 'CHAIRMAN',
         },
@@ -151,15 +152,15 @@ export const internalServices = {
    * Execute real clinical AI pre-screening via AI Prediction Service (Port 5007)
    */
   async executeAiPreScreening({ familyMemberId, text, appointmentId }) {
-    const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:5007';
+    const AI_SERVICE_URL = getAiServiceUrl();
     const url = `${AI_SERVICE_URL}/api/ai/general-health`;
     try {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-internal-service-secret': INTERNAL_SECRET,
-          'X-Internal-Service-Key': process.env.INTERNAL_SERVICE_KEY || INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
+          'X-Internal-Service-Key': getInternalServiceKey(),
           'x-user-id': 'internal_appointment_service',
           'x-user-role': 'CHAIRMAN',
         },
@@ -187,14 +188,14 @@ export const internalServices = {
    * Verify an existing AI prediction record against a patient familyMemberId
    */
   async verifyAiPrediction(predictionId, familyMemberId) {
-    const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:5007';
+    const AI_SERVICE_URL = getAiServiceUrl();
     const url = `${AI_SERVICE_URL}/api/ai/${predictionId}`;
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'x-internal-service-secret': INTERNAL_SECRET,
-          'X-Internal-Service-Key': process.env.INTERNAL_SERVICE_KEY || INTERNAL_SECRET,
+          'x-internal-service-secret': getInternalServiceSecret(),
+          'X-Internal-Service-Key': getInternalServiceKey(),
           'x-user-id': 'internal_appointment_service',
           'x-user-role': 'CHAIRMAN',
         },

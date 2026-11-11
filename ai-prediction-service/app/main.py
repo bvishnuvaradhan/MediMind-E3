@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.core.database import Database
-from app.core.eureka import EurekaClient
+from app.core.eureka import EurekaClient, is_eureka_enabled
 from app.api.v1.general_health import router as general_health_router
 from app.api.v1.heart_disease import router as heart_disease_router
 from app.api.v1.diabetes import router as diabetes_router
@@ -14,12 +14,14 @@ eureka_client = EurekaClient(app_name="AI-PREDICTION-SERVICE", port=settings.POR
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Connect to Database and register with Eureka
+    # Startup: Connect to Database and register with Eureka when enabled
     await Database.connect_db()
-    eureka_client.start()
+    if is_eureka_enabled():
+        eureka_client.start()
     yield
     # Shutdown: Close Eureka registration and Database connection
-    eureka_client.stop()
+    if is_eureka_enabled():
+        eureka_client.stop()
     await Database.close_db()
 
 app = FastAPI(
@@ -32,10 +34,10 @@ app = FastAPI(
 # Enable CORS for API Gateway & Frontend communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Internal-Service-Key", "x-request-id", "x-correlation-id"],
 )
 
 # Include API v1 Routers (specific static routes before parameterized routes)
@@ -52,6 +54,7 @@ async def health_check():
         "service": settings.PROJECT_NAME,
         "version": settings.VERSION,
         "database_connected": Database.db is not None,
+        "eureka_enabled": is_eureka_enabled(),
         "eureka_registered": eureka_client.registered
     }
 
