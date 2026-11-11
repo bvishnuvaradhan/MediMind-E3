@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from urllib.parse import urlparse
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -34,11 +35,37 @@ class Database:
 
     client: Optional[AsyncIOMotorClient] = None
     db = None
+    _loop_id: Optional[int] = None
     _memory_store: List[Dict[str, Any]] = []   # Used when MongoDB is unavailable
 
     # ─────────────────────────────────────────────────────────────────────────
     # LIFECYCLE
     # ─────────────────────────────────────────────────────────────────────────
+
+    @classmethod
+    async def ensure_connected(cls) -> None:
+        """
+        Ensure a live Motor client bound to the active asyncio event loop.
+        Reuses warm connections on the same loop and reconnects cleanly if a
+        serverless runtime invokes handlers on a new loop or skips ASGI lifespan.
+        """
+        try:
+            running_loop_id = id(asyncio.get_running_loop())
+        except RuntimeError:
+            running_loop_id = None
+
+        if cls.db is not None and cls.client is not None and cls._loop_id == running_loop_id:
+            return
+
+        if cls.client is not None and cls._loop_id != running_loop_id:
+            try:
+                cls.client.close()
+            except Exception:
+                pass
+            cls.client = None
+            cls.db = None
+
+        await cls.connect_db()
 
     @classmethod
     async def connect_db(cls) -> None:
@@ -48,6 +75,13 @@ class Database:
         to transient in-memory storage.
         """
         try:
+            running_loop_id = id(asyncio.get_running_loop())
+        except RuntimeError:
+            running_loop_id = None
+
+        try:
+            if cls.db is not None and cls.client is not None and cls._loop_id == running_loop_id:
+                return
             cls.client = AsyncIOMotorClient(
                 settings.MONGO_URI,
                 serverSelectionTimeoutMS=10000,
@@ -58,12 +92,14 @@ class Database:
             # Verify server availability
             await cls.client.server_info()
             cls.db = cls.client[settings.DB_NAME]
+            cls._loop_id = running_loop_id
             logger.info("Connected to MongoDB database '%s'", settings.DB_NAME)
             # Ensure indexes exist — idempotent, safe to call every startup
             await cls.create_indexes()
         except Exception as e:
             cls.client = None
             cls.db = None
+            cls._loop_id = None
             masked_target = _mask_mongo_uri(settings.MONGO_URI)
             if not settings.ALLOW_MEMORY_DB_FALLBACK:
                 logger.error("MongoDB connection failed (%s) at %s", type(e).__name__, masked_target)
@@ -79,6 +115,9 @@ class Database:
         """Gracefully close the MongoDB connection."""
         if cls.client:
             cls.client.close()
+            cls.client = None
+            cls.db = None
+            cls._loop_id = None
             logger.info("MongoDB connection closed.")
 
     # ─────────────────────────────────────────────────────────────────────────
@@ -128,6 +167,10 @@ class Database:
                 f"Prediction record is missing required fields: {missing}"
             )
 
+        # ── Serverless / Strict DB Lazy Connect Guard ────────────────────────
+        if cls.db is None and (not settings.ALLOW_MEMORY_DB_FALLBACK or settings.IS_VERCEL):
+            await cls.ensure_connected()
+
         # ── MongoDB path ─────────────────────────────────────────────────────
         if cls.db is not None:
             try:
@@ -162,6 +205,8 @@ class Database:
         Results are sorted by created_at descending (most recent first)
         and support pagination via skip / limit.
         """
+        if cls.db is None and (not settings.ALLOW_MEMORY_DB_FALLBACK or settings.IS_VERCEL):
+            await cls.ensure_connected()
         if cls.db is not None:
             try:
                 cursor = (
@@ -193,6 +238,8 @@ class Database:
         Retrieve a single prediction record by its prediction_id string
         or MongoDB ObjectId.
         """
+        if cls.db is None and (not settings.ALLOW_MEMORY_DB_FALLBACK or settings.IS_VERCEL):
+            await cls.ensure_connected()
         if cls.db is not None:
             try:
                 from bson import ObjectId

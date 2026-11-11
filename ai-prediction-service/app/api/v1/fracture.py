@@ -1,10 +1,14 @@
 import logging
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
+from urllib.parse import urlparse
 
+import httpx
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
 
+from app.core.config import settings
 from app.middleware.auth import authorize_family_member_access, get_current_user_or_service
+from app.models.fracture.fracture_preprocessing import MAX_FILE_SIZE_BYTES
 from app.schemas.prediction_schemas import CommonPredictionResponse
 from app.services.fracture_service import FractureInferenceService
 
@@ -32,6 +36,76 @@ def _resolve_sample_image(filename: Optional[str]) -> Optional[Tuple[bytes, str,
             return c.read_bytes(), c.name, "image/jpeg"
 
     return None
+
+
+def _validate_blob_url(blob_url: str) -> str:
+    """Validate that a supplied blob_url points strictly to an allowed HTTPS Vercel Blob host."""
+    raw = (blob_url or "").strip()
+    parsed = urlparse(raw)
+    if parsed.scheme.lower() != "https" or not parsed.hostname or parsed.username or parsed.password:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Invalid blob_url: must be a clean HTTPS URL.",
+        )
+    hostname = parsed.hostname.lower()
+    allowed = settings.ALLOWED_BLOB_HOSTS
+    if not any(
+        (hostname.endswith(entry) if entry.startswith(".") else hostname == entry)
+        for entry in allowed
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Unsupported blob_url storage host.",
+        )
+    return raw
+
+
+async def _fetch_blob_image(blob_url: str) -> Tuple[bytes, Optional[str]]:
+    """Download radiograph bytes from a validated Vercel Blob URL enforcing size caps."""
+    safe_url = _validate_blob_url(blob_url)
+    headers: Dict[str, str] = {}
+    if settings.BLOB_READ_WRITE_TOKEN:
+        headers["Authorization"] = f"Bearer {settings.BLOB_READ_WRITE_TOKEN}"
+
+    try:
+        async with httpx.AsyncClient(timeout=20.0, follow_redirects=False) as client:
+            async with client.stream("GET", safe_url, headers=headers) as resp:
+                # Public stores may reject unknown Authorization or accept it; retry once cleanly without header if 401/403
+                if resp.status_code in (401, 403) and "Authorization" in headers:
+                    async with client.stream("GET", safe_url) as public_resp:
+                        return await _read_bounded_stream(public_resp)
+                return await _read_bounded_stream(resp)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.warning("Failed downloading radiograph blob: %s", type(exc).__name__)
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Unable to fetch uploaded radiograph from Vercel Blob storage.",
+        )
+
+
+async def _read_bounded_stream(resp: httpx.Response) -> Tuple[bytes, Optional[str]]:
+    if resp.status_code != 200:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Blob storage returned HTTP {resp.status_code} when retrieving radiograph.",
+        )
+    content_length = resp.headers.get("content-length")
+    if content_length and content_length.isdigit() and int(content_length) > MAX_FILE_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Radiograph exceeds maximum permitted size ({MAX_FILE_SIZE_BYTES} bytes).",
+        )
+    chunks = bytearray()
+    async for chunk in resp.aiter_bytes(chunk_size=65536):
+        chunks.extend(chunk)
+        if len(chunks) > MAX_FILE_SIZE_BYTES:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Radiograph exceeds maximum permitted size ({MAX_FILE_SIZE_BYTES} bytes).",
+            )
+    return bytes(chunks), resp.headers.get("content-type")
 
 
 @router.post(
@@ -69,6 +143,7 @@ async def detect_fracture(
     image_bytes = None
     filename = None
     content_type = None
+    blob_url = None
 
     # Handle JSON request bodies
     content_type_header = request.headers.get("content-type", "")
@@ -83,7 +158,11 @@ async def detect_fracture(
         family_member_id = body.get("family_member_id")
         appointment_id = body.get("appointment_id")
         ref_filename = body.get("filename")
-        if ref_filename:
+        raw_blob_url = body.get("blob_url")
+        if raw_blob_url:
+            blob_url = _validate_blob_url(str(raw_blob_url))
+            filename = ref_filename or Path(urlparse(blob_url).path).name or "radiograph.png"
+        elif ref_filename:
             resolved = _resolve_sample_image(ref_filename)
             if resolved:
                 image_bytes, filename, content_type = resolved
@@ -111,6 +190,11 @@ async def detect_fracture(
 
     clean_family_member_id = str(family_member_id).strip()
     authorize_family_member_access(current_user, clean_family_member_id)
+
+    if blob_url and not image_bytes:
+        image_bytes, blob_content_type = await _fetch_blob_image(blob_url)
+        if blob_content_type and not content_type:
+            content_type = blob_content_type
 
     if not image_bytes or len(image_bytes) == 0:
         raise HTTPException(

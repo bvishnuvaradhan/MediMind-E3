@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { upload as uploadToVercelBlob } from '@vercel/blob/client';
 import { X, Sparkles, Activity, HeartPulse, ShieldCheck, Upload, Paperclip, FileText, Image as ImageIcon } from 'lucide-react';
 import { evaluateGeneralHealth } from '../../../utils/generalHealthNlp';
 import { getStoredToken } from '../../../services/apiClient';
@@ -221,15 +222,54 @@ export function PredictionInputModal({
       try {
         let res;
         if (uploadedFile) {
-          const formData = new FormData();
-          formData.append('family_member_id', memberId);
-          formData.append('file', uploadedFile);
+          const VERCEL_SAFE_MULTIPART_BYTES = 4 * 1024 * 1024;
+          let uploadedViaBlob = false;
 
-          res = await fetch(buildAiUrl(endpoint), {
-            method: 'POST',
-            headers: authHeaders,
-            body: formData,
-          });
+          if (uploadedFile.size > VERCEL_SAFE_MULTIPART_BYTES) {
+            try {
+              const blob = await uploadToVercelBlob(uploadedFile.name, uploadedFile, {
+                access: import.meta.env.VITE_BLOB_ACCESS === 'private' ? 'private' : 'public',
+                handleUploadUrl: buildApiUrl('/api/ai/fracture/blob-upload'),
+                headers: authHeaders,
+                multipart: uploadedFile.size > 5 * 1024 * 1024,
+                clientPayload: JSON.stringify({
+                  family_member_id: memberId,
+                  filename: uploadedFile.name,
+                }),
+              });
+
+              res = await fetch(buildAiUrl(endpoint), {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  ...authHeaders,
+                },
+                body: JSON.stringify({
+                  family_member_id: memberId,
+                  blob_url: blob.url,
+                  filename: uploadedFile.name,
+                }),
+              });
+              uploadedViaBlob = true;
+            } catch (blobErr) {
+              // In local dev without BLOB_READ_WRITE_TOKEN, fall back to direct multipart upload
+              if (import.meta.env.PROD && import.meta.env.VITE_API_BASE_URL) {
+                throw blobErr;
+              }
+            }
+          }
+
+          if (!uploadedViaBlob) {
+            const formData = new FormData();
+            formData.append('family_member_id', memberId);
+            formData.append('file', uploadedFile);
+
+            res = await fetch(buildAiUrl(endpoint), {
+              method: 'POST',
+              headers: authHeaders,
+              body: formData,
+            });
+          }
         } else {
           res = await fetch(buildAiUrl(endpoint), {
             method: 'POST',
@@ -327,7 +367,7 @@ export function PredictionInputModal({
       let apiCategory = null;
 
       try {
-        const res = await fetch(buildApiUrl(endpoint), {
+        const res = await fetch(buildAiUrl(endpoint), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -400,7 +440,7 @@ export function PredictionInputModal({
       let apiCategory = null;
 
       try {
-        const res = await fetch(buildApiUrl(endpoint), {
+        const res = await fetch(buildAiUrl(endpoint), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -475,7 +515,7 @@ export function PredictionInputModal({
       });
 
       try {
-        const res = await fetch(buildApiUrl(endpoint), {
+        const res = await fetch(buildAiUrl(endpoint), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

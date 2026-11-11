@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { handleUpload } from '@vercel/blob/client';
 import { serviceUrls } from '../config/services.js';
 import { getInternalServiceSecret, getInternalServiceKey } from '../config/runtimeConfig.js';
 import { verifyJwt } from '../middleware/authMiddleware.js';
@@ -82,6 +83,59 @@ router.get('/health', async (req, res, next) => {
 
 // Platform-wide aggregate AI analytics (CHAIRMAN, HOSPITAL_ADMIN, DEPARTMENT_HEAD, DOCTOR)
 router.get('/analytics', verifyJwt, requireRole('CHAIRMAN', 'HOSPITAL_ADMIN', 'DEPARTMENT_HEAD', 'DOCTOR'), proxyAi);
+
+// Direct Vercel Blob client-upload token exchange for radiographs > 4.5 MB
+const conditionalBlobAuth = (req, res, next) => {
+  if (req.body?.type === 'blob.upload-completed') {
+    return next();
+  }
+  return verifyJwt(req, res, (err) => {
+    if (err) return next(err);
+    return requireRole('FAMILY', 'DOCTOR')(req, res, next);
+  });
+};
+
+router.post('/fracture/blob-upload', conditionalBlobAuth, async (req, res) => {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return res.status(503).json({
+      success: false,
+      message: 'Vercel Blob storage is not configured (BLOB_READ_WRITE_TOKEN missing).',
+    });
+  }
+
+  try {
+    const jsonResponse = await handleUpload({
+      body: req.body,
+      request: req,
+      onBeforeGenerateToken: async () => ({
+        allowedContentTypes: [
+          'image/jpeg',
+          'image/png',
+          'image/webp',
+          'image/tiff',
+          'image/bmp',
+          'application/dicom',
+          'application/octet-stream',
+        ],
+        maximumSizeInBytes: 25 * 1024 * 1024,
+        addRandomSuffix: true,
+        tokenPayload: JSON.stringify({
+          userId: req.user?.userId || null,
+          role: req.user?.role || null,
+          referenceId: req.user?.referenceId || null,
+        }),
+      }),
+      onUploadCompleted: async () => {},
+    });
+
+    return res.status(200).json(jsonResponse);
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error?.message || 'Unable to handle Vercel Blob upload request.',
+    });
+  }
+});
 
 // Protected inference and prediction history routes (clinical access for FAMILY and DOCTOR)
 router.use(verifyJwt, requireRole('FAMILY', 'DOCTOR'), proxyAiWithKafka);

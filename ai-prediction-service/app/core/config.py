@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import List
 from dotenv import load_dotenv
 
-# Load service-level .env first, then fallback to cwd .env (skip during pytest unless explicitly loaded)
-if not os.getenv("PYTEST_CURRENT_TEST"):
+# Load service-level .env first, then fallback to cwd .env (skip during pytest or Vercel runtime)
+if not os.getenv("PYTEST_CURRENT_TEST") and not os.getenv("VERCEL"):
     _service_env = Path(__file__).resolve().parent.parent.parent / ".env"
     if _service_env.exists():
         load_dotenv(dotenv_path=_service_env)
@@ -36,8 +36,13 @@ class Settings:
             or os.getenv("NODE_ENV")
             or "development"
         ).strip().lower()
-        self.IS_PRODUCTION = env_mode == "production"
-        self.STRICT_REMOTE_DB = self.IS_PRODUCTION or _env_flag("STRICT_REMOTE_DB", False)
+        self.IS_VERCEL = bool(os.getenv("VERCEL"))
+        self.IS_PRODUCTION = env_mode == "production" or os.getenv("VERCEL_ENV") == "production"
+        self.STRICT_REMOTE_DB = (
+            self.IS_PRODUCTION
+            or (self.IS_VERCEL and env_mode != "test")
+            or _env_flag("STRICT_REMOTE_DB", False)
+        )
         self.ALLOW_MEMORY_DB_FALLBACK = (
             not self.STRICT_REMOTE_DB and _env_flag("ALLOW_MEMORY_DB_FALLBACK", True)
         )
@@ -58,6 +63,12 @@ class Settings:
         self.JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
         self.INTERNAL_SERVICE_KEY = self._required_secret("INTERNAL_SERVICE_KEY")
         self.CORS_ORIGINS = self._parse_cors_origins()
+        self.BLOB_READ_WRITE_TOKEN = os.getenv("BLOB_READ_WRITE_TOKEN", "").strip()
+        self.ALLOWED_BLOB_HOSTS = [
+            h.strip().lower()
+            for h in os.getenv("ALLOWED_BLOB_HOSTS", ".blob.vercel-storage.com").split(",")
+            if h.strip()
+        ]
 
     def _parse_cors_origins(self) -> List[str]:
         raw = os.getenv("CORS_ORIGIN", "").strip()

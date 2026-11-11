@@ -21,8 +21,8 @@ API Gateway + 8 Express Services (backend/)  ──Vercel Project 2 (vercel.json
   ├── Medical Record (/_internal/records/*      -> medimind_records)                      │
   └── Knowledge      (/_internal/knowledge/*    -> medimind_knowledge)                    │
                                                                                           │
-AI Prediction Service (ai-prediction-service/)  ──Docker (Render/Railway/Cloud Run)───────┘
-  └── FastAPI (Port 5007 -> medimind_ai): Fracture CNN, Diabetes MLP, Heart Disease RF, General Health NLP
+AI Prediction Service (ai-prediction-service/)  ──Vercel Project 3 (Large Functions + Vercel Blob)───┘
+  └── FastAPI (api/index.py -> medimind_ai): Fracture CNN, Diabetes MLP, Heart Disease RF, General Health NLP
 ```
 
 ---
@@ -55,7 +55,7 @@ Detailed model documentation lives in [`docs/ai-model-cards/`](docs/ai-model-car
 
 ## Deployment Documentation
 
-- **Step-by-step Production Guide (Vercel + Docker + Atlas):** [`docs/DEPLOYMENT_GUIDE.md`](docs/DEPLOYMENT_GUIDE.md)
+- **Step-by-step Production Guide (All-Vercel + Atlas + Blob):** [`docs/DEPLOYMENT_GUIDE.md`](docs/DEPLOYMENT_GUIDE.md)
 - **Environment Variable Matrix:** [`docs/ENVIRONMENT_VARIABLES.md`](docs/ENVIRONMENT_VARIABLES.md)
 - **Verification & Test Results:** [`docs/DEPLOYMENT_VERIFICATION.md`](docs/DEPLOYMENT_VERIFICATION.md)
 

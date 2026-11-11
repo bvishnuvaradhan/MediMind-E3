@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 300,
+      "excludeFiles": "{test-dataset/**,tests/**,scripts/**,artifacts/experiments/**,artifacts/fracture_v2/**,artifacts/fracture/baseline_model.pt,artifacts/fracture/mura_pretrained_backbone.pt,artifacts/fracture/mura_pretrained_model.pt,artifacts/fracture/training_report.json,artifacts/diabetes/logistic_regression.joblib,artifacts/diabetes/mlp.joblib,artifacts/diabetes/random_forest.joblib,artifacts/diabetes/training_report.json,artifacts/heart_disease/best_model.joblib,artifacts/heart_disease/logistic_regression.joblib,artifacts/heart_disease/mlp.joblib,artifacts/heart_disease/training_report.json}"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ]
+}
