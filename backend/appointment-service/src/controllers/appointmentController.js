@@ -202,13 +202,4 @@ export const appointmentController = {
       next(error);
     }
   },
-
-  async getOctoberDemonstration(req, res, next) {
-    try {
-      const data = await appointmentService.getOctoberDemonstration();
-      return successResponse(res, 200, 'October demonstration data retrieved successfully', data);
-    } catch (error) {
-      next(error);
-    }
-  },
 };

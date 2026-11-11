@@ -78,14 +78,6 @@ export function PlatformDashboard({ onNavigate }) {
               <span>{requests.length} Pending Hospital Requests</span>
             </button>
           )}
-          <button
-            className="primary-button"
-            style={{ background: '#6d28d9', borderColor: '#5b21b6', display: 'flex', alignItems: 'center', gap: '6px' }}
-            onClick={() => onNavigate('October 2026 Demonstration')}
-          >
-            <Sparkles size={15} />
-            <span>October 2026 Demonstration</span>
-          </button>
           <button className="primary-button" onClick={() => onNavigate('Hospital Admins', { action: 'create' })}>
             <UserPlus size={15} />
             <span>Create Admin</span>
