@@ -228,7 +228,7 @@ export function PredictionInputModal({
           if (uploadedFile.size > VERCEL_SAFE_MULTIPART_BYTES) {
             try {
               const blob = await uploadToVercelBlob(uploadedFile.name, uploadedFile, {
-                access: import.meta.env.VITE_BLOB_ACCESS === 'private' ? 'private' : 'public',
+                access: import.meta.env.VITE_BLOB_ACCESS === 'public' ? 'public' : 'private',
                 handleUploadUrl: buildApiUrl('/api/ai/fracture/blob-upload'),
                 headers: authHeaders,
                 multipart: uploadedFile.size > 5 * 1024 * 1024,
@@ -253,7 +253,7 @@ export function PredictionInputModal({
               uploadedViaBlob = true;
             } catch (blobErr) {
               // In local dev without BLOB_READ_WRITE_TOKEN, fall back to direct multipart upload
-              if (import.meta.env.PROD && import.meta.env.VITE_API_BASE_URL) {
+              if (import.meta.env.PROD) {
                 throw blobErr;
               }
             }

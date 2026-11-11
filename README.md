@@ -6,23 +6,22 @@ Intelligent clinical decision support and multi-hospital healthcare platform uni
 
 ## Architecture Overview
 
-MediMind preserves a modular microservice architecture backed by MongoDB Atlas and a dedicated Python FastAPI ML inference service:
+MediMind runs inside **one Vercel project (`medimind`)** powered by Vercel Services ([`vercel.json`](vercel.json)) and backed by MongoDB Atlas:
 
 ```text
-React + Vite Frontend (frontend/)  ──Vercel Project 1──┐
-                                                       ▼
-API Gateway + 8 Express Services (backend/)  ──Vercel Project 2 (vercel.json + api/*.js)──┐
-  ├── Gateway        (/api/*, /health)                                                    │
-  ├── Auth           (/_internal/auth/*         -> medimind_auth)                         │
-  ├── Family         (/_internal/family/*       -> medimind_family)                       │
-  ├── Hospital       (/_internal/hospital/*     -> medimind_hospital)                     │
-  ├── Doctor         (/_internal/doctor/*       -> medimind_doctor)                       │
-  ├── Appointment    (/_internal/appointment/*  -> medimind_appointment)                  ├──▶ MongoDB Atlas
-  ├── Medical Record (/_internal/records/*      -> medimind_records)                      │
-  └── Knowledge      (/_internal/knowledge/*    -> medimind_knowledge)                    │
-                                                                                          │
-AI Prediction Service (ai-prediction-service/)  ──Vercel Project 3 (Large Functions + Vercel Blob)───┘
-  └── FastAPI (api/index.py -> medimind_ai): Fracture CNN, Diabetes MLP, Heart Disease RF, General Health NLP
+                       medimind.vercel.app (Single Vercel Project)
+                       ┌──────────────────────────────────────────┐
+  /          ─────────▶│ frontend (frontend/) — Vite React 19 SPA │
+  /api/*     ─────────▶│ backend (backend/api-gateway/) — Express │
+  /ai/*      ─────────▶│ ai (ai-prediction-service/) — FastAPI ML │
+                       └──────────────┬───────────────┬───────────┘
+                                      │ Service       │
+                                      │ Bindings      ▼
+                       Private Internal Node.js Microservices (backend/):
+                         auth · family · hospital · doctor · appointment · records · knowledge
+                                      │
+                                      ▼
+                                MongoDB Atlas + Private Vercel Blob
 ```
 
 ---

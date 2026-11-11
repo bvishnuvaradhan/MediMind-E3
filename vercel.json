@@ -1,0 +1,271 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "frontend": {
+      "root": "frontend/",
+      "framework": "vite",
+      "buildCommand": "npm run build",
+      "outputDirectory": "dist",
+      "rewrites": [
+        {
+          "source": "/(.*)",
+          "destination": "/index.html"
+        }
+      ],
+      "headers": [
+        {
+          "source": "/assets/(.*)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=31536000, immutable"
+            }
+          ]
+        }
+      ]
+    },
+    "backend": {
+      "root": "backend/api-gateway/",
+      "framework": "express",
+      "entrypoint": "src/app.js",
+      "functions": {
+        "src/app.js": {
+          "maxDuration": 60
+        }
+      },
+      "bindings": [
+        {
+          "type": "service",
+          "service": "auth",
+          "format": "url",
+          "env": "AUTH_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "family",
+          "format": "url",
+          "env": "FAMILY_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "hospital",
+          "format": "url",
+          "env": "HOSPITAL_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "doctor",
+          "format": "url",
+          "env": "DOCTOR_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "appointment",
+          "format": "url",
+          "env": "APPOINTMENT_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "records",
+          "format": "url",
+          "env": "RECORD_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "knowledge",
+          "format": "url",
+          "env": "KNOWLEDGE_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "ai",
+          "format": "url",
+          "env": "AI_SERVICE_URL"
+        }
+      ]
+    },
+    "auth": {
+      "root": "backend/auth-service/",
+      "framework": "express",
+      "entrypoint": "src/app.js",
+      "functions": {
+        "src/app.js": {
+          "maxDuration": 60
+        }
+      }
+    },
+    "family": {
+      "root": "backend/family-service/",
+      "framework": "express",
+      "entrypoint": "src/app.js",
+      "functions": {
+        "src/app.js": {
+          "maxDuration": 60
+        }
+      }
+    },
+    "hospital": {
+      "root": "backend/hospital-service/",
+      "framework": "express",
+      "entrypoint": "src/app.js",
+      "functions": {
+        "src/app.js": {
+          "maxDuration": 60
+        }
+      }
+    },
+    "doctor": {
+      "root": "backend/doctor-service/",
+      "framework": "express",
+      "entrypoint": "src/app.js",
+      "functions": {
+        "src/app.js": {
+          "maxDuration": 60
+        }
+      },
+      "bindings": [
+        {
+          "type": "service",
+          "service": "auth",
+          "format": "url",
+          "env": "AUTH_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "hospital",
+          "format": "url",
+          "env": "HOSPITAL_SERVICE_URL"
+        }
+      ]
+    },
+    "appointment": {
+      "root": "backend/appointment-service/",
+      "framework": "express",
+      "entrypoint": "src/app.js",
+      "functions": {
+        "src/app.js": {
+          "maxDuration": 60
+        }
+      },
+      "bindings": [
+        {
+          "type": "service",
+          "service": "family",
+          "format": "url",
+          "env": "FAMILY_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "hospital",
+          "format": "url",
+          "env": "HOSPITAL_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "doctor",
+          "format": "url",
+          "env": "DOCTOR_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "ai",
+          "format": "url",
+          "env": "AI_SERVICE_URL"
+        }
+      ]
+    },
+    "records": {
+      "root": "backend/medical-record-service/",
+      "framework": "express",
+      "entrypoint": "src/app.js",
+      "functions": {
+        "src/app.js": {
+          "maxDuration": 60
+        }
+      },
+      "bindings": [
+        {
+          "type": "service",
+          "service": "family",
+          "format": "url",
+          "env": "FAMILY_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "doctor",
+          "format": "url",
+          "env": "DOCTOR_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "appointment",
+          "format": "url",
+          "env": "APPOINTMENT_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "ai",
+          "format": "url",
+          "env": "AI_SERVICE_URL"
+        }
+      ]
+    },
+    "knowledge": {
+      "root": "backend/knowledge-service/",
+      "framework": "express",
+      "entrypoint": "src/app.js",
+      "functions": {
+        "src/app.js": {
+          "maxDuration": 60
+        }
+      },
+      "bindings": [
+        {
+          "type": "service",
+          "service": "doctor",
+          "format": "url",
+          "env": "DOCTOR_SERVICE_URL"
+        },
+        {
+          "type": "service",
+          "service": "hospital",
+          "format": "url",
+          "env": "HOSPITAL_SERVICE_URL"
+        }
+      ]
+    },
+    "ai": {
+      "root": "ai-prediction-service/",
+      "framework": "fastapi",
+      "entrypoint": "app.main:app",
+      "functions": {
+        "app/main.py": {
+          "maxDuration": 300,
+          "excludeFiles": "{test-dataset/**,tests/**,scripts/**,artifacts/experiments/**,artifacts/fracture_v2/**,artifacts/fracture/baseline_model.pt,artifacts/fracture/mura_pretrained_backbone.pt,artifacts/fracture/mura_pretrained_model.pt,artifacts/fracture/training_report.json,artifacts/diabetes/logistic_regression.joblib,artifacts/diabetes/mlp.joblib,artifacts/diabetes/random_forest.joblib,artifacts/diabetes/training_report.json,artifacts/heart_disease/best_model.joblib,artifacts/heart_disease/logistic_regression.joblib,artifacts/heart_disease/mlp.joblib,artifacts/heart_disease/training_report.json}"
+        }
+      }
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api",
+      "destination": { "service": "backend" }
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": { "service": "backend" }
+    },
+    {
+      "source": "/ai",
+      "destination": { "service": "ai" }
+    },
+    {
+      "source": "/ai/(.*)",
+      "destination": { "service": "ai" }
+    },
+    {
+      "source": "/(.*)",
+      "destination": { "service": "frontend" }
+    }
+  ]
+}

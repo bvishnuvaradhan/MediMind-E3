@@ -107,24 +107,42 @@ router.post('/fracture/blob-upload', conditionalBlobAuth, async (req, res) => {
     const jsonResponse = await handleUpload({
       body: req.body,
       request: req,
-      onBeforeGenerateToken: async () => ({
-        allowedContentTypes: [
-          'image/jpeg',
-          'image/png',
-          'image/webp',
-          'image/tiff',
-          'image/bmp',
-          'application/dicom',
-          'application/octet-stream',
-        ],
-        maximumSizeInBytes: 25 * 1024 * 1024,
-        addRandomSuffix: true,
-        tokenPayload: JSON.stringify({
-          userId: req.user?.userId || null,
-          role: req.user?.role || null,
-          referenceId: req.user?.referenceId || null,
-        }),
-      }),
+      onBeforeGenerateToken: async (pathname, clientPayload) => {
+        if (!pathname || typeof pathname !== 'string' || pathname.includes('..') || pathname.includes('\\') || pathname.startsWith('/')) {
+          throw new Error('Invalid radiograph upload pathname.');
+        }
+
+        if (clientPayload) {
+          let parsedPayload;
+          try {
+            parsedPayload = JSON.parse(clientPayload);
+          } catch {
+            throw new Error('Invalid clientPayload JSON.');
+          }
+          if (!parsedPayload || typeof parsedPayload !== 'object' || !parsedPayload.family_member_id) {
+            throw new Error('clientPayload must include family_member_id.');
+          }
+        }
+
+        return {
+          allowedContentTypes: [
+            'image/jpeg',
+            'image/png',
+            'image/webp',
+            'image/tiff',
+            'image/bmp',
+            'application/dicom',
+            'application/octet-stream',
+          ],
+          maximumSizeInBytes: 25 * 1024 * 1024,
+          addRandomSuffix: true,
+          tokenPayload: JSON.stringify({
+            userId: req.user?.userId || null,
+            role: req.user?.role || null,
+            referenceId: req.user?.referenceId || null,
+          }),
+        };
+      },
       onUploadCompleted: async () => {},
     });
 

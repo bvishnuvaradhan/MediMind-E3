@@ -24,5 +24,15 @@ export function buildAiUrl(path) {
   if (!path || typeof path !== 'string') return path;
   if (/^https?:\/\//i.test(path)) return path;
   const normalized = path.startsWith('/') ? path : `/${path}`;
-  return AI_SERVICE_URL ? `${AI_SERVICE_URL}${normalized}` : buildApiUrl(normalized);
+  if (!AI_SERVICE_URL) {
+    return buildApiUrl(normalized);
+  }
+  // When VITE_AI_SERVICE_URL=/ai in the unified Vercel deployment, avoid duplicating /api/ai
+  if (
+    (AI_SERVICE_URL === '/ai' || AI_SERVICE_URL.endsWith('/ai')) &&
+    (normalized === '/api/ai' || normalized.startsWith('/api/ai/'))
+  ) {
+    return `${AI_SERVICE_URL}${normalized.slice('/api/ai'.length)}`;
+  }
+  return `${AI_SERVICE_URL}${normalized}`;
 }

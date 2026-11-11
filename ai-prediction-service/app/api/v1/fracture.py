@@ -63,6 +63,14 @@ def _validate_blob_url(blob_url: str) -> str:
 async def _fetch_blob_image(blob_url: str) -> Tuple[bytes, Optional[str]]:
     """Download radiograph bytes from a validated Vercel Blob URL enforcing size caps."""
     safe_url = _validate_blob_url(blob_url)
+    hostname = (urlparse(safe_url).hostname or "").lower()
+    is_private_blob = ".private.blob.vercel-storage.com" in hostname
+    if is_private_blob and not settings.BLOB_READ_WRITE_TOKEN:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Private Vercel Blob storage requires BLOB_READ_WRITE_TOKEN in AI service.",
+        )
+
     headers: Dict[str, str] = {}
     if settings.BLOB_READ_WRITE_TOKEN:
         headers["Authorization"] = f"Bearer {settings.BLOB_READ_WRITE_TOKEN}"
@@ -70,8 +78,8 @@ async def _fetch_blob_image(blob_url: str) -> Tuple[bytes, Optional[str]]:
     try:
         async with httpx.AsyncClient(timeout=20.0, follow_redirects=False) as client:
             async with client.stream("GET", safe_url, headers=headers) as resp:
-                # Public stores may reject unknown Authorization or accept it; retry once cleanly without header if 401/403
-                if resp.status_code in (401, 403) and "Authorization" in headers:
+                # Public stores may reject unknown Authorization headers; never downgrade private stores to unauthenticated requests
+                if resp.status_code in (401, 403) and "Authorization" in headers and not is_private_blob:
                     async with client.stream("GET", safe_url) as public_resp:
                         return await _read_bounded_stream(public_resp)
                 return await _read_bounded_stream(resp)
