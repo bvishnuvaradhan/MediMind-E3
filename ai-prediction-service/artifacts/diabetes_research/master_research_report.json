@@ -1,0 +1,1909 @@
+{
+  "experiment_1_baseline_reproduction": {
+    "description": "Pima-only Baseline MLP (32, 16) across 5 independent seeds",
+    "seed_runs": [
+      {
+        "seed": 42,
+        "validation": {
+          "threshold": 0.23,
+          "roc_auc": 0.7711,
+          "pr_auc": 0.6109,
+          "sensitivity": 0.8293,
+          "recall": 0.8293,
+          "specificity": 0.6133,
+          "precision": 0.5397,
+          "f1": 0.6538,
+          "balanced_accuracy": 0.7213,
+          "brier_score": 0.2237,
+          "expected_calibration_error": 0.1946,
+          "maximum_calibration_error": 0.4184,
+          "calibration_slope": 0.2367,
+          "calibration_intercept": -0.3102,
+          "confusion_matrix": [
+            [
+              46,
+              29
+            ],
+            [
+              7,
+              34
+            ]
+          ]
+        },
+        "test": {
+          "threshold": 0.23,
+          "roc_auc": 0.8128,
+          "pr_auc": 0.6531,
+          "sensitivity": 0.75,
+          "recall": 0.75,
+          "specificity": 0.75,
+          "precision": 0.6122,
+          "f1": 0.6742,
+          "balanced_accuracy": 0.75,
+          "brier_score": 0.1956,
+          "expected_calibration_error": 0.1653,
+          "maximum_calibration_error": 0.486,
+          "calibration_slope": 0.3157,
+          "calibration_intercept": 0.026,
+          "confusion_matrix": [
+            [
+              57,
+              19
+            ],
+            [
+              10,
+              30
+            ]
+          ]
+        }
+      },
+      {
+        "seed": 123,
+        "validation": {
+          "threshold": 0.07,
+          "roc_auc": 0.7688,
+          "pr_auc": 0.6245,
+          "sensitivity": 0.7805,
+          "recall": 0.7805,
+          "specificity": 0.6,
+          "precision": 0.5161,
+          "f1": 0.6214,
+          "balanced_accuracy": 0.6902,
+          "brier_score": 0.2116,
+          "expected_calibration_error": 0.178,
+          "maximum_calibration_error": 0.3526,
+          "calibration_slope": 0.2738,
+          "calibration_intercept": -0.103,
+          "confusion_matrix": [
+            [
+              45,
+              30
+            ],
+            [
+              9,
+              32
+            ]
+          ]
+        },
+        "test": {
+          "threshold": 0.07,
+          "roc_auc": 0.8655,
+          "pr_auc": 0.7851,
+          "sensitivity": 0.925,
+          "recall": 0.925,
+          "specificity": 0.5789,
+          "precision": 0.5362,
+          "f1": 0.6789,
+          "balanced_accuracy": 0.752,
+          "brier_score": 0.15,
+          "expected_calibration_error": 0.0973,
+          "maximum_calibration_error": 0.2853,
+          "calibration_slope": 0.5826,
+          "calibration_intercept": -0.026,
+          "confusion_matrix": [
+            [
+              44,
+              32
+            ],
+            [
+              3,
+              37
+            ]
+          ]
+        }
+      },
+      {
+        "seed": 456,
+        "validation": {
+          "threshold": 0.11,
+          "roc_auc": 0.8442,
+          "pr_auc": 0.6909,
+          "sensitivity": 0.878,
+          "recall": 0.878,
+          "specificity": 0.6267,
+          "precision": 0.5625,
+          "f1": 0.6857,
+          "balanced_accuracy": 0.7524,
+          "brier_score": 0.1639,
+          "expected_calibration_error": 0.0998,
+          "maximum_calibration_error": 0.2298,
+          "calibration_slope": 0.4686,
+          "calibration_intercept": -0.1308,
+          "confusion_matrix": [
+            [
+              47,
+              28
+            ],
+            [
+              5,
+              36
+            ]
+          ]
+        },
+        "test": {
+          "threshold": 0.11,
+          "roc_auc": 0.8095,
+          "pr_auc": 0.6324,
+          "sensitivity": 0.875,
+          "recall": 0.875,
+          "specificity": 0.5658,
+          "precision": 0.5147,
+          "f1": 0.6481,
+          "balanced_accuracy": 0.7204,
+          "brier_score": 0.1725,
+          "expected_calibration_error": 0.1425,
+          "maximum_calibration_error": 0.3503,
+          "calibration_slope": 0.374,
+          "calibration_intercept": -0.2764,
+          "confusion_matrix": [
+            [
+              43,
+              33
+            ],
+            [
+              5,
+              35
+            ]
+          ]
+        }
+      },
+      {
+        "seed": 789,
+        "validation": {
+          "threshold": 0.09,
+          "roc_auc": 0.8228,
+          "pr_auc": 0.733,
+          "sensitivity": 0.8537,
+          "recall": 0.8537,
+          "specificity": 0.6267,
+          "precision": 0.5556,
+          "f1": 0.6731,
+          "balanced_accuracy": 0.7402,
+          "brier_score": 0.1893,
+          "expected_calibration_error": 0.1623,
+          "maximum_calibration_error": 0.4362,
+          "calibration_slope": 0.3567,
+          "calibration_intercept": -0.3286,
+          "confusion_matrix": [
+            [
+              47,
+              28
+            ],
+            [
+              6,
+              35
+            ]
+          ]
+        },
+        "test": {
+          "threshold": 0.09,
+          "roc_auc": 0.7345,
+          "pr_auc": 0.5611,
+          "sensitivity": 0.8,
+          "recall": 0.8,
+          "specificity": 0.6053,
+          "precision": 0.5161,
+          "f1": 0.6275,
+          "balanced_accuracy": 0.7026,
+          "brier_score": 0.2326,
+          "expected_calibration_error": 0.1854,
+          "maximum_calibration_error": 0.4625,
+          "calibration_slope": 0.2319,
+          "calibration_intercept": -0.2385,
+          "confusion_matrix": [
+            [
+              46,
+              30
+            ],
+            [
+              8,
+              32
+            ]
+          ]
+        }
+      },
+      {
+        "seed": 2026,
+        "validation": {
+          "threshold": 0.13,
+          "roc_auc": 0.7662,
+          "pr_auc": 0.6301,
+          "sensitivity": 0.8293,
+          "recall": 0.8293,
+          "specificity": 0.6133,
+          "precision": 0.5397,
+          "f1": 0.6538,
+          "balanced_accuracy": 0.7213,
+          "brier_score": 0.2087,
+          "expected_calibration_error": 0.19,
+          "maximum_calibration_error": 0.4555,
+          "calibration_slope": 0.3169,
+          "calibration_intercept": -0.1442,
+          "confusion_matrix": [
+            [
+              46,
+              29
+            ],
+            [
+              7,
+              34
+            ]
+          ]
+        },
+        "test": {
+          "threshold": 0.13,
+          "roc_auc": 0.7793,
+          "pr_auc": 0.5997,
+          "sensitivity": 0.8,
+          "recall": 0.8,
+          "specificity": 0.7105,
+          "precision": 0.5926,
+          "f1": 0.6809,
+          "balanced_accuracy": 0.7553,
+          "brier_score": 0.2024,
+          "expected_calibration_error": 0.1651,
+          "maximum_calibration_error": 0.8831,
+          "calibration_slope": 0.281,
+          "calibration_intercept": -0.0416,
+          "confusion_matrix": [
+            [
+              54,
+              22
+            ],
+            [
+              8,
+              32
+            ]
+          ]
+        }
+      }
+    ],
+    "summary": {
+      "roc_auc_mean": 0.8003199999999999,
+      "roc_auc_std": 0.04304083642309941,
+      "sensitivity_mean": 0.8299999999999998,
+      "sensitivity_std": 0.062048368229954284,
+      "specificity_mean": 0.6421,
+      "specificity_std": 0.07415003708697658,
+      "brier_score_mean": 0.19062,
+      "brier_score_std": 0.027943543082436777,
+      "ece_mean": 0.15112,
+      "ece_std": 0.030141426641750062
+    }
+  },
+  "experiment_2_architectural_benchmark": {
+    "logistic_regression": {
+      "validation": {
+        "threshold": 0.23,
+        "roc_auc": 0.8367,
+        "pr_auc": 0.6948,
+        "sensitivity": 0.878,
+        "recall": 0.878,
+        "specificity": 0.6533,
+        "precision": 0.5806,
+        "f1": 0.699,
+        "balanced_accuracy": 0.7657,
+        "brier_score": 0.1571,
+        "expected_calibration_error": 0.1046,
+        "maximum_calibration_error": 0.4156,
+        "calibration_slope": 0.8083,
+        "calibration_intercept": -0.2196,
+        "confusion_matrix": [
+          [
+            49,
+            26
+          ],
+          [
+            5,
+            36
+          ]
+        ]
+      },
+      "test": {
+        "threshold": 0.23,
+        "roc_auc": 0.8345,
+        "pr_auc": 0.7084,
+        "sensitivity": 0.925,
+        "recall": 0.925,
+        "specificity": 0.6579,
+        "precision": 0.5873,
+        "f1": 0.7184,
+        "balanced_accuracy": 0.7914,
+        "brier_score": 0.16,
+        "expected_calibration_error": 0.1247,
+        "maximum_calibration_error": 0.5454,
+        "calibration_slope": 0.8452,
+        "calibration_intercept": -0.1796,
+        "confusion_matrix": [
+          [
+            50,
+            26
+          ],
+          [
+            3,
+            37
+          ]
+        ]
+      }
+    },
+    "random_forest": {
+      "validation": {
+        "threshold": 0.27,
+        "roc_auc": 0.827,
+        "pr_auc": 0.7036,
+        "sensitivity": 0.878,
+        "recall": 0.878,
+        "specificity": 0.6133,
+        "precision": 0.5538,
+        "f1": 0.6792,
+        "balanced_accuracy": 0.7457,
+        "brier_score": 0.1575,
+        "expected_calibration_error": 0.1077,
+        "maximum_calibration_error": 0.3313,
+        "calibration_slope": 0.9372,
+        "calibration_intercept": -0.1628,
+        "confusion_matrix": [
+          [
+            46,
+            29
+          ],
+          [
+            5,
+            36
+          ]
+        ]
+      },
+      "test": {
+        "threshold": 0.27,
+        "roc_auc": 0.8283,
+        "pr_auc": 0.6791,
+        "sensitivity": 0.925,
+        "recall": 0.925,
+        "specificity": 0.6579,
+        "precision": 0.5873,
+        "f1": 0.7184,
+        "balanced_accuracy": 0.7914,
+        "brier_score": 0.1564,
+        "expected_calibration_error": 0.0996,
+        "maximum_calibration_error": 0.2791,
+        "calibration_slope": 0.9735,
+        "calibration_intercept": -0.0389,
+        "confusion_matrix": [
+          [
+            50,
+            26
+          ],
+          [
+            3,
+            37
+          ]
+        ]
+      }
+    },
+    "mlp_baseline": {
+      "validation": {
+        "threshold": 0.17,
+        "roc_auc": 0.7977,
+        "pr_auc": 0.6366,
+        "sensitivity": 0.878,
+        "recall": 0.878,
+        "specificity": 0.6,
+        "precision": 0.5455,
+        "f1": 0.6729,
+        "balanced_accuracy": 0.739,
+        "brier_score": 0.1898,
+        "expected_calibration_error": 0.1437,
+        "maximum_calibration_error": 0.3565,
+        "calibration_slope": 0.3909,
+        "calibration_intercept": -0.2824,
+        "confusion_matrix": [
+          [
+            45,
+            30
+          ],
+          [
+            5,
+            36
+          ]
+        ]
+      },
+      "test": {
+        "threshold": 0.17,
+        "roc_auc": 0.8299,
+        "pr_auc": 0.6763,
+        "sensitivity": 0.9,
+        "recall": 0.9,
+        "specificity": 0.6447,
+        "precision": 0.5714,
+        "f1": 0.699,
+        "balanced_accuracy": 0.7724,
+        "brier_score": 0.1683,
+        "expected_calibration_error": 0.1145,
+        "maximum_calibration_error": 0.2846,
+        "calibration_slope": 0.4906,
+        "calibration_intercept": 0.0288,
+        "confusion_matrix": [
+          [
+            49,
+            27
+          ],
+          [
+            4,
+            36
+          ]
+        ]
+      }
+    },
+    "hist_gradient_boosting": {
+      "validation": {
+        "threshold": 0.09,
+        "roc_auc": 0.8192,
+        "pr_auc": 0.6793,
+        "sensitivity": 0.878,
+        "recall": 0.878,
+        "specificity": 0.6133,
+        "precision": 0.5538,
+        "f1": 0.6792,
+        "balanced_accuracy": 0.7457,
+        "brier_score": 0.1751,
+        "expected_calibration_error": 0.1436,
+        "maximum_calibration_error": 0.4622,
+        "calibration_slope": 0.3756,
+        "calibration_intercept": -0.3252,
+        "confusion_matrix": [
+          [
+            46,
+            29
+          ],
+          [
+            5,
+            36
+          ]
+        ]
+      },
+      "test": {
+        "threshold": 0.09,
+        "roc_auc": 0.8342,
+        "pr_auc": 0.627,
+        "sensitivity": 0.85,
+        "recall": 0.85,
+        "specificity": 0.6711,
+        "precision": 0.5763,
+        "f1": 0.6869,
+        "balanced_accuracy": 0.7605,
+        "brier_score": 0.1632,
+        "expected_calibration_error": 0.1422,
+        "maximum_calibration_error": 0.4569,
+        "calibration_slope": 0.3906,
+        "calibration_intercept": -0.2379,
+        "confusion_matrix": [
+          [
+            51,
+            25
+          ],
+          [
+            6,
+            34
+          ]
+        ]
+      }
+    },
+    "deep_regularized_mlp": {
+      "validation": {
+        "threshold": 0.33,
+        "roc_auc": 0.8215,
+        "pr_auc": 0.7063,
+        "sensitivity": 0.8293,
+        "recall": 0.8293,
+        "specificity": 0.6,
+        "precision": 0.5312,
+        "f1": 0.6476,
+        "balanced_accuracy": 0.7146,
+        "brier_score": 0.1707,
+        "expected_calibration_error": 0.0995,
+        "maximum_calibration_error": 0.3288,
+        "calibration_slope": 1.7042,
+        "calibration_intercept": -0.0221,
+        "confusion_matrix": [
+          [
+            45,
+            30
+          ],
+          [
+            7,
+            34
+          ]
+        ]
+      },
+      "test": {
+        "threshold": 0.33,
+        "roc_auc": 0.8155,
+        "pr_auc": 0.6474,
+        "sensitivity": 0.925,
+        "recall": 0.925,
+        "specificity": 0.6184,
+        "precision": 0.5606,
+        "f1": 0.6981,
+        "balanced_accuracy": 0.7717,
+        "brier_score": 0.1751,
+        "expected_calibration_error": 0.1131,
+        "maximum_calibration_error": 0.3556,
+        "calibration_slope": 1.5227,
+        "calibration_intercept": -0.0891,
+        "confusion_matrix": [
+          [
+            47,
+            29
+          ],
+          [
+            3,
+            37
+          ]
+        ]
+      }
+    },
+    "multi_model_ensemble": {
+      "validation": {
+        "threshold": 0.25,
+        "roc_auc": 0.838,
+        "pr_auc": 0.7234,
+        "sensitivity": 0.8537,
+        "recall": 0.8537,
+        "specificity": 0.64,
+        "precision": 0.5645,
+        "f1": 0.6796,
+        "balanced_accuracy": 0.7468,
+        "brier_score": 0.1526,
+        "expected_calibration_error": 0.0376,
+        "maximum_calibration_error": 0.2097,
+        "calibration_slope": 1.0367,
+        "calibration_intercept": -0.2028,
+        "confusion_matrix": [
+          [
+            48,
+            27
+          ],
+          [
+            6,
+            35
+          ]
+        ]
+      },
+      "test": {
+        "threshold": 0.25,
+        "roc_auc": 0.8424,
+        "pr_auc": 0.6821,
+        "sensitivity": 0.925,
+        "recall": 0.925,
+        "specificity": 0.6579,
+        "precision": 0.5873,
+        "f1": 0.7184,
+        "balanced_accuracy": 0.7914,
+        "brier_score": 0.149,
+        "expected_calibration_error": 0.0939,
+        "maximum_calibration_error": 0.3105,
+        "calibration_slope": 1.0875,
+        "calibration_intercept": -0.1248,
+        "confusion_matrix": [
+          [
+            50,
+            26
+          ],
+          [
+            3,
+            37
+          ]
+        ]
+      }
+    }
+  },
+  "experiment_3_imputation_ablation": {
+    "median_indicators_False": {
+      "threshold": 0.11,
+      "roc_auc": 0.8293,
+      "pr_auc": 0.6521,
+      "sensitivity": 0.85,
+      "recall": 0.85,
+      "specificity": 0.6579,
+      "precision": 0.5667,
+      "f1": 0.68,
+      "balanced_accuracy": 0.7539,
+      "brier_score": 0.1659,
+      "expected_calibration_error": 0.1728,
+      "maximum_calibration_error": 0.6842,
+      "calibration_slope": 0.3839,
+      "calibration_intercept": -0.1982,
+      "confusion_matrix": [
+        [
+          50,
+          26
+        ],
+        [
+          6,
+          34
+        ]
+      ]
+    },
+    "median_indicators_True": {
+      "threshold": 0.11,
+      "roc_auc": 0.8372,
+      "pr_auc": 0.6787,
+      "sensitivity": 0.875,
+      "recall": 0.875,
+      "specificity": 0.6579,
+      "precision": 0.5738,
+      "f1": 0.6931,
+      "balanced_accuracy": 0.7664,
+      "brier_score": 0.1608,
+      "expected_calibration_error": 0.1307,
+      "maximum_calibration_error": 0.3066,
+      "calibration_slope": 0.4053,
+      "calibration_intercept": -0.2076,
+      "confusion_matrix": [
+        [
+          50,
+          26
+        ],
+        [
+          5,
+          35
+        ]
+      ]
+    },
+    "knn_indicators_False": {
+      "threshold": 0.31,
+      "roc_auc": 0.8332,
+      "pr_auc": 0.626,
+      "sensitivity": 0.775,
+      "recall": 0.775,
+      "specificity": 0.7368,
+      "precision": 0.6078,
+      "f1": 0.6813,
+      "balanced_accuracy": 0.7559,
+      "brier_score": 0.1758,
+      "expected_calibration_error": 0.1309,
+      "maximum_calibration_error": 0.6106,
+      "calibration_slope": 0.3861,
+      "calibration_intercept": -0.1421,
+      "confusion_matrix": [
+        [
+          56,
+          20
+        ],
+        [
+          9,
+          31
+        ]
+      ]
+    },
+    "knn_indicators_True": {
+      "threshold": 0.11,
+      "roc_auc": 0.8326,
+      "pr_auc": 0.6434,
+      "sensitivity": 0.925,
+      "recall": 0.925,
+      "specificity": 0.6711,
+      "precision": 0.5968,
+      "f1": 0.7255,
+      "balanced_accuracy": 0.798,
+      "brier_score": 0.172,
+      "expected_calibration_error": 0.1403,
+      "maximum_calibration_error": 0.5355,
+      "calibration_slope": 0.3972,
+      "calibration_intercept": -0.1714,
+      "confusion_matrix": [
+        [
+          51,
+          25
+        ],
+        [
+          3,
+          37
+        ]
+      ]
+    }
+  },
+  "experiment_4_calibration_comparison": {
+    "uncalibrated_hgb": {
+      "threshold": 0.5,
+      "roc_auc": 0.8293,
+      "pr_auc": 0.6521,
+      "sensitivity": 0.75,
+      "recall": 0.75,
+      "specificity": 0.8289,
+      "precision": 0.6977,
+      "f1": 0.7229,
+      "balanced_accuracy": 0.7895,
+      "brier_score": 0.1659,
+      "expected_calibration_error": 0.1728,
+      "maximum_calibration_error": 0.6842,
+      "calibration_slope": 0.3839,
+      "calibration_intercept": -0.1982,
+      "confusion_matrix": [
+        [
+          63,
+          13
+        ],
+        [
+          10,
+          30
+        ]
+      ]
+    },
+    "platt_calibrated_hgb": {
+      "threshold": 0.5,
+      "roc_auc": 0.7954,
+      "pr_auc": 0.641,
+      "sensitivity": 0.5,
+      "recall": 0.5,
+      "specificity": 0.8553,
+      "precision": 0.6452,
+      "f1": 0.5634,
+      "balanced_accuracy": 0.6776,
+      "brier_score": 0.1764,
+      "expected_calibration_error": 0.0463,
+      "maximum_calibration_error": 0.1076,
+      "calibration_slope": 1.3406,
+      "calibration_intercept": 0.1665,
+      "confusion_matrix": [
+        [
+          65,
+          11
+        ],
+        [
+          20,
+          20
+        ]
+      ]
+    },
+    "isotonic_calibrated_hgb": {
+      "threshold": 0.5,
+      "roc_auc": 0.7873,
+      "pr_auc": 0.6268,
+      "sensitivity": 0.55,
+      "recall": 0.55,
+      "specificity": 0.8289,
+      "precision": 0.6286,
+      "f1": 0.5867,
+      "balanced_accuracy": 0.6895,
+      "brier_score": 0.1818,
+      "expected_calibration_error": 0.1055,
+      "maximum_calibration_error": 0.3197,
+      "calibration_slope": 0.7275,
+      "calibration_intercept": -0.1537,
+      "confusion_matrix": [
+        [
+          63,
+          13
+        ],
+        [
+          18,
+          22
+        ]
+      ]
+    },
+    "calibrated_ensemble": {
+      "threshold": 0.5,
+      "roc_auc": 0.797,
+      "pr_auc": 0.6174,
+      "sensitivity": 0.525,
+      "recall": 0.525,
+      "specificity": 0.8553,
+      "precision": 0.6562,
+      "f1": 0.5833,
+      "balanced_accuracy": 0.6901,
+      "brier_score": 0.1782,
+      "expected_calibration_error": 0.1102,
+      "maximum_calibration_error": 0.2324,
+      "calibration_slope": 1.2247,
+      "calibration_intercept": 0.0741,
+      "confusion_matrix": [
+        [
+          65,
+          11
+        ],
+        [
+          19,
+          21
+        ]
+      ]
+    }
+  },
+  "experiment_5_cross_cohort_transfer": {
+    "pima_trained_evaluated_on_healthcare100k": {
+      "threshold": 0.35,
+      "roc_auc": 0.7085,
+      "pr_auc": 0.1585,
+      "sensitivity": 0.6848,
+      "recall": 0.6848,
+      "specificity": 0.6192,
+      "precision": 0.1432,
+      "f1": 0.2368,
+      "balanced_accuracy": 0.652,
+      "brier_score": 0.2394,
+      "expected_calibration_error": 0.2686,
+      "maximum_calibration_error": 0.7869,
+      "calibration_slope": 0.2803,
+      "calibration_intercept": -2.2134,
+      "confusion_matrix": [
+        [
+          56658,
+          34842
+        ],
+        [
+          2679,
+          5821
+        ]
+      ]
+    },
+    "healthcare100k_trained_evaluated_on_pima": {
+      "threshold": 0.35,
+      "roc_auc": 0.7172,
+      "pr_auc": 0.5658,
+      "sensitivity": 0.0448,
+      "recall": 0.0448,
+      "specificity": 0.996,
+      "precision": 0.8571,
+      "f1": 0.0851,
+      "balanced_accuracy": 0.5204,
+      "brier_score": 0.3014,
+      "expected_calibration_error": 0.3008,
+      "maximum_calibration_error": 0.4745,
+      "calibration_slope": 0.2408,
+      "calibration_intercept": 0.7915,
+      "confusion_matrix": [
+        [
+          498,
+          2
+        ],
+        [
+          256,
+          12
+        ]
+      ]
+    }
+  },
+  "experiment_6_harmonized_joint_learning": {
+    "joint_heldout_evaluation": {
+      "threshold": 0.3,
+      "roc_auc": 0.9061,
+      "pr_auc": 0.6748,
+      "sensitivity": 0.6,
+      "recall": 0.6,
+      "specificity": 0.9385,
+      "precision": 0.5532,
+      "f1": 0.5756,
+      "balanced_accuracy": 0.7692,
+      "brier_score": 0.0612,
+      "expected_calibration_error": 0.0303,
+      "maximum_calibration_error": 0.2116,
+      "calibration_slope": 0.6627,
+      "calibration_intercept": -0.4316,
+      "confusion_matrix": [
+        [
+          961,
+          63
+        ],
+        [
+          52,
+          78
+        ]
+      ]
+    },
+    "joint_model_on_pure_pima": {
+      "threshold": 0.3,
+      "roc_auc": 0.9662,
+      "pr_auc": 0.935,
+      "sensitivity": 0.9366,
+      "recall": 0.9366,
+      "specificity": 0.874,
+      "precision": 0.7994,
+      "f1": 0.8625,
+      "balanced_accuracy": 0.9053,
+      "brier_score": 0.0724,
+      "expected_calibration_error": 0.0753,
+      "maximum_calibration_error": 0.2338,
+      "calibration_slope": 1.6831,
+      "calibration_intercept": 0.442,
+      "confusion_matrix": [
+        [
+          437,
+          63
+        ],
+        [
+          17,
+          251
+        ]
+      ]
+    }
+  },
+  "experiment_7_nhanes_transfer": {
+    "threshold": 0.25,
+    "roc_auc": 0.8476,
+    "pr_auc": 0.5363,
+    "sensitivity": 0.6037,
+    "recall": 0.6037,
+    "specificity": 0.8299,
+    "precision": 0.4836,
+    "f1": 0.537,
+    "balanced_accuracy": 0.7168,
+    "brier_score": 0.131,
+    "expected_calibration_error": 0.0674,
+    "maximum_calibration_error": 0.2022,
+    "calibration_slope": 0.5579,
+    "calibration_intercept": 0.1125,
+    "confusion_matrix": [
+      [
+        6443,
+        1321
+      ],
+      [
+        812,
+        1237
+      ]
+    ]
+  },
+  "experiment_8_decision_curve_analysis": {
+    "pima_calibrated_ensemble_dca": {
+      "prevalence": 0.3448275862068966,
+      "sample_size": 116,
+      "decision_curves": [
+        {
+          "threshold": 0.05,
+          "weight": 0.0526,
+          "tp": 40,
+          "fp": 76,
+          "fn": 0,
+          "tn": 0,
+          "net_benefit_model": 0.3103,
+          "net_benefit_treat_all": 0.3103,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 0.0
+        },
+        {
+          "threshold": 0.075,
+          "weight": 0.0811,
+          "tp": 40,
+          "fp": 76,
+          "fn": 0,
+          "tn": 0,
+          "net_benefit_model": 0.2917,
+          "net_benefit_treat_all": 0.2917,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 0.0
+        },
+        {
+          "threshold": 0.1,
+          "weight": 0.1111,
+          "tp": 40,
+          "fp": 76,
+          "fn": 0,
+          "tn": 0,
+          "net_benefit_model": 0.272,
+          "net_benefit_treat_all": 0.272,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 0.0
+        },
+        {
+          "threshold": 0.125,
+          "weight": 0.1429,
+          "tp": 40,
+          "fp": 76,
+          "fn": 0,
+          "tn": 0,
+          "net_benefit_model": 0.2512,
+          "net_benefit_treat_all": 0.2512,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 0.0
+        },
+        {
+          "threshold": 0.15,
+          "weight": 0.1765,
+          "tp": 40,
+          "fp": 73,
+          "fn": 0,
+          "tn": 3,
+          "net_benefit_model": 0.2338,
+          "net_benefit_treat_all": 0.2292,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 2.59
+        },
+        {
+          "threshold": 0.175,
+          "weight": 0.2121,
+          "tp": 40,
+          "fp": 54,
+          "fn": 0,
+          "tn": 22,
+          "net_benefit_model": 0.2461,
+          "net_benefit_treat_all": 0.2059,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 18.97
+        },
+        {
+          "threshold": 0.2,
+          "weight": 0.25,
+          "tp": 37,
+          "fp": 42,
+          "fn": 3,
+          "tn": 34,
+          "net_benefit_model": 0.2284,
+          "net_benefit_treat_all": 0.181,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 18.97
+        },
+        {
+          "threshold": 0.225,
+          "weight": 0.2903,
+          "tp": 35,
+          "fp": 32,
+          "fn": 5,
+          "tn": 44,
+          "net_benefit_model": 0.2216,
+          "net_benefit_treat_all": 0.1546,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 23.08
+        },
+        {
+          "threshold": 0.25,
+          "weight": 0.3333,
+          "tp": 34,
+          "fp": 29,
+          "fn": 6,
+          "tn": 47,
+          "net_benefit_model": 0.2098,
+          "net_benefit_treat_all": 0.1264,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 25.0
+        },
+        {
+          "threshold": 0.275,
+          "weight": 0.3793,
+          "tp": 30,
+          "fp": 28,
+          "fn": 10,
+          "tn": 48,
+          "net_benefit_model": 0.1671,
+          "net_benefit_treat_all": 0.0963,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 18.65
+        },
+        {
+          "threshold": 0.3,
+          "weight": 0.4286,
+          "tp": 29,
+          "fp": 25,
+          "fn": 11,
+          "tn": 51,
+          "net_benefit_model": 0.1576,
+          "net_benefit_treat_all": 0.064,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 21.84
+        },
+        {
+          "threshold": 0.325,
+          "weight": 0.4815,
+          "tp": 29,
+          "fp": 22,
+          "fn": 11,
+          "tn": 54,
+          "net_benefit_model": 0.1587,
+          "net_benefit_treat_all": 0.0294,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 26.86
+        },
+        {
+          "threshold": 0.35,
+          "weight": 0.5385,
+          "tp": 29,
+          "fp": 20,
+          "fn": 11,
+          "tn": 56,
+          "net_benefit_model": 0.1572,
+          "net_benefit_treat_all": -0.008,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 30.67
+        },
+        {
+          "threshold": 0.375,
+          "weight": 0.6,
+          "tp": 27,
+          "fp": 19,
+          "fn": 13,
+          "tn": 57,
+          "net_benefit_model": 0.1345,
+          "net_benefit_treat_all": -0.0483,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 30.46
+        },
+        {
+          "threshold": 0.4,
+          "weight": 0.6667,
+          "tp": 27,
+          "fp": 15,
+          "fn": 13,
+          "tn": 61,
+          "net_benefit_model": 0.1466,
+          "net_benefit_treat_all": -0.092,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 35.78
+        },
+        {
+          "threshold": 0.425,
+          "weight": 0.7391,
+          "tp": 24,
+          "fp": 15,
+          "fn": 16,
+          "tn": 61,
+          "net_benefit_model": 0.1113,
+          "net_benefit_treat_all": -0.1394,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 33.92
+        },
+        {
+          "threshold": 0.45,
+          "weight": 0.8182,
+          "tp": 22,
+          "fp": 13,
+          "fn": 18,
+          "tn": 63,
+          "net_benefit_model": 0.098,
+          "net_benefit_treat_all": -0.1912,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 35.34
+        },
+        {
+          "threshold": 0.475,
+          "weight": 0.9048,
+          "tp": 22,
+          "fp": 12,
+          "fn": 18,
+          "tn": 64,
+          "net_benefit_model": 0.0961,
+          "net_benefit_treat_all": -0.2479,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 38.02
+        },
+        {
+          "threshold": 0.5,
+          "weight": 1.0,
+          "tp": 21,
+          "fp": 11,
+          "fn": 19,
+          "tn": 65,
+          "net_benefit_model": 0.0862,
+          "net_benefit_treat_all": -0.3103,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 39.66
+        },
+        {
+          "threshold": 0.525,
+          "weight": 1.1053,
+          "tp": 18,
+          "fp": 9,
+          "fn": 22,
+          "tn": 67,
+          "net_benefit_model": 0.0694,
+          "net_benefit_treat_all": -0.3793,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 40.6
+        },
+        {
+          "threshold": 0.55,
+          "weight": 1.2222,
+          "tp": 17,
+          "fp": 8,
+          "fn": 23,
+          "tn": 68,
+          "net_benefit_model": 0.0623,
+          "net_benefit_treat_all": -0.4559,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 42.4
+        },
+        {
+          "threshold": 0.575,
+          "weight": 1.3529,
+          "tp": 16,
+          "fp": 7,
+          "fn": 24,
+          "tn": 69,
+          "net_benefit_model": 0.0563,
+          "net_benefit_treat_all": -0.5416,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 44.19
+        },
+        {
+          "threshold": 0.6,
+          "weight": 1.5,
+          "tp": 13,
+          "fp": 7,
+          "fn": 27,
+          "tn": 69,
+          "net_benefit_model": 0.0216,
+          "net_benefit_treat_all": -0.6379,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 43.97
+        },
+        {
+          "threshold": 0.625,
+          "weight": 1.6667,
+          "tp": 9,
+          "fp": 6,
+          "fn": 31,
+          "tn": 70,
+          "net_benefit_model": -0.0086,
+          "net_benefit_treat_all": -0.7471,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 44.31
+        },
+        {
+          "threshold": 0.65,
+          "weight": 1.8571,
+          "tp": 7,
+          "fp": 6,
+          "fn": 33,
+          "tn": 70,
+          "net_benefit_model": -0.0357,
+          "net_benefit_treat_all": -0.8719,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 45.03
+        },
+        {
+          "threshold": 0.675,
+          "weight": 2.0769,
+          "tp": 6,
+          "fp": 4,
+          "fn": 34,
+          "tn": 72,
+          "net_benefit_model": -0.0199,
+          "net_benefit_treat_all": -1.0159,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 47.96
+        },
+        {
+          "threshold": 0.7,
+          "weight": 2.3333,
+          "tp": 3,
+          "fp": 3,
+          "fn": 37,
+          "tn": 73,
+          "net_benefit_model": -0.0345,
+          "net_benefit_treat_all": -1.1839,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 49.26
+        }
+      ]
+    },
+    "joint_model_dca": {
+      "prevalence": 0.11265164644714037,
+      "sample_size": 1154,
+      "decision_curves": [
+        {
+          "threshold": 0.05,
+          "weight": 0.0526,
+          "tp": 115,
+          "fp": 260,
+          "fn": 15,
+          "tn": 764,
+          "net_benefit_model": 0.0878,
+          "net_benefit_treat_all": 0.0659,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 41.51
+        },
+        {
+          "threshold": 0.075,
+          "weight": 0.0811,
+          "tp": 108,
+          "fp": 209,
+          "fn": 22,
+          "tn": 815,
+          "net_benefit_model": 0.0789,
+          "net_benefit_treat_all": 0.0407,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 47.11
+        },
+        {
+          "threshold": 0.1,
+          "weight": 0.1111,
+          "tp": 99,
+          "fp": 185,
+          "fn": 31,
+          "tn": 839,
+          "net_benefit_model": 0.068,
+          "net_benefit_treat_all": 0.0141,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 48.53
+        },
+        {
+          "threshold": 0.125,
+          "weight": 0.1429,
+          "tp": 98,
+          "fp": 159,
+          "fn": 32,
+          "tn": 865,
+          "net_benefit_model": 0.0652,
+          "net_benefit_treat_all": -0.0141,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 55.55
+        },
+        {
+          "threshold": 0.15,
+          "weight": 0.1765,
+          "tp": 93,
+          "fp": 131,
+          "fn": 37,
+          "tn": 893,
+          "net_benefit_model": 0.0606,
+          "net_benefit_treat_all": -0.0439,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 59.21
+        },
+        {
+          "threshold": 0.175,
+          "weight": 0.2121,
+          "tp": 90,
+          "fp": 110,
+          "fn": 40,
+          "tn": 914,
+          "net_benefit_model": 0.0578,
+          "net_benefit_treat_all": -0.0756,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 62.86
+        },
+        {
+          "threshold": 0.2,
+          "weight": 0.25,
+          "tp": 88,
+          "fp": 99,
+          "fn": 42,
+          "tn": 925,
+          "net_benefit_model": 0.0548,
+          "net_benefit_treat_all": -0.1092,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 65.6
+        },
+        {
+          "threshold": 0.225,
+          "weight": 0.2903,
+          "tp": 86,
+          "fp": 91,
+          "fn": 44,
+          "tn": 933,
+          "net_benefit_model": 0.0516,
+          "net_benefit_treat_all": -0.145,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 67.72
+        },
+        {
+          "threshold": 0.25,
+          "weight": 0.3333,
+          "tp": 82,
+          "fp": 83,
+          "fn": 48,
+          "tn": 941,
+          "net_benefit_model": 0.0471,
+          "net_benefit_treat_all": -0.1831,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 69.06
+        },
+        {
+          "threshold": 0.275,
+          "weight": 0.3793,
+          "tp": 80,
+          "fp": 72,
+          "fn": 50,
+          "tn": 952,
+          "net_benefit_model": 0.0457,
+          "net_benefit_treat_all": -0.2239,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 71.07
+        },
+        {
+          "threshold": 0.3,
+          "weight": 0.4286,
+          "tp": 78,
+          "fp": 63,
+          "fn": 52,
+          "tn": 961,
+          "net_benefit_model": 0.0442,
+          "net_benefit_treat_all": -0.2676,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 72.76
+        },
+        {
+          "threshold": 0.325,
+          "weight": 0.4815,
+          "tp": 75,
+          "fp": 53,
+          "fn": 55,
+          "tn": 971,
+          "net_benefit_model": 0.0429,
+          "net_benefit_treat_all": -0.3146,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 74.24
+        },
+        {
+          "threshold": 0.35,
+          "weight": 0.5385,
+          "tp": 72,
+          "fp": 44,
+          "fn": 58,
+          "tn": 980,
+          "net_benefit_model": 0.0419,
+          "net_benefit_treat_all": -0.3652,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 75.59
+        },
+        {
+          "threshold": 0.375,
+          "weight": 0.6,
+          "tp": 71,
+          "fp": 36,
+          "fn": 59,
+          "tn": 988,
+          "net_benefit_model": 0.0428,
+          "net_benefit_treat_all": -0.4198,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 77.09
+        },
+        {
+          "threshold": 0.4,
+          "weight": 0.6667,
+          "tp": 68,
+          "fp": 33,
+          "fn": 62,
+          "tn": 991,
+          "net_benefit_model": 0.0399,
+          "net_benefit_treat_all": -0.4789,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 77.82
+        },
+        {
+          "threshold": 0.425,
+          "weight": 0.7391,
+          "tp": 65,
+          "fp": 30,
+          "fn": 65,
+          "tn": 994,
+          "net_benefit_model": 0.0371,
+          "net_benefit_treat_all": -0.5432,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 78.51
+        },
+        {
+          "threshold": 0.45,
+          "weight": 0.8182,
+          "tp": 64,
+          "fp": 28,
+          "fn": 66,
+          "tn": 996,
+          "net_benefit_model": 0.0356,
+          "net_benefit_treat_all": -0.6134,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 79.32
+        },
+        {
+          "threshold": 0.475,
+          "weight": 0.9048,
+          "tp": 64,
+          "fp": 27,
+          "fn": 66,
+          "tn": 997,
+          "net_benefit_model": 0.0343,
+          "net_benefit_treat_all": -0.6902,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 80.07
+        },
+        {
+          "threshold": 0.5,
+          "weight": 1.0,
+          "tp": 61,
+          "fp": 23,
+          "fn": 69,
+          "tn": 1001,
+          "net_benefit_model": 0.0329,
+          "net_benefit_treat_all": -0.7747,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 80.76
+        },
+        {
+          "threshold": 0.525,
+          "weight": 1.1053,
+          "tp": 61,
+          "fp": 21,
+          "fn": 69,
+          "tn": 1003,
+          "net_benefit_model": 0.0327,
+          "net_benefit_treat_all": -0.8681,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 81.51
+        },
+        {
+          "threshold": 0.55,
+          "weight": 1.2222,
+          "tp": 58,
+          "fp": 18,
+          "fn": 72,
+          "tn": 1006,
+          "net_benefit_model": 0.0312,
+          "net_benefit_treat_all": -0.9719,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 82.07
+        },
+        {
+          "threshold": 0.575,
+          "weight": 1.3529,
+          "tp": 58,
+          "fp": 16,
+          "fn": 72,
+          "tn": 1008,
+          "net_benefit_model": 0.0315,
+          "net_benefit_treat_all": -1.0879,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 82.74
+        },
+        {
+          "threshold": 0.6,
+          "weight": 1.5,
+          "tp": 57,
+          "fp": 15,
+          "fn": 73,
+          "tn": 1009,
+          "net_benefit_model": 0.0299,
+          "net_benefit_treat_all": -1.2184,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 83.22
+        },
+        {
+          "threshold": 0.625,
+          "weight": 1.6667,
+          "tp": 54,
+          "fp": 12,
+          "fn": 76,
+          "tn": 1012,
+          "net_benefit_model": 0.0295,
+          "net_benefit_treat_all": -1.3663,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 83.74
+        },
+        {
+          "threshold": 0.65,
+          "weight": 1.8571,
+          "tp": 51,
+          "fp": 10,
+          "fn": 79,
+          "tn": 1014,
+          "net_benefit_model": 0.0281,
+          "net_benefit_treat_all": -1.5353,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 84.18
+        },
+        {
+          "threshold": 0.675,
+          "weight": 2.0769,
+          "tp": 49,
+          "fp": 8,
+          "fn": 81,
+          "tn": 1016,
+          "net_benefit_model": 0.0281,
+          "net_benefit_treat_all": -1.7303,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 84.66
+        },
+        {
+          "threshold": 0.7,
+          "weight": 2.3333,
+          "tp": 48,
+          "fp": 5,
+          "fn": 82,
+          "tn": 1019,
+          "net_benefit_model": 0.0315,
+          "net_benefit_treat_all": -1.9578,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 85.26
+        }
+      ]
+    }
+  },
+  "experiment_9_subgroup_fairness": {
+    "age_cohort": {
+      "young_adult (21-34)": {
+        "sample_size": 76,
+        "prevalence": 0.2237,
+        "selection_rate": 0.3947,
+        "sensitivity": {
+          "estimate": 0.6471,
+          "ci_lower": 0.413,
+          "ci_upper": 0.8269
+        },
+        "specificity": {
+          "estimate": 0.678,
+          "ci_lower": 0.5511,
+          "ci_upper": 0.7831
+        },
+        "roc_auc": 0.7517,
+        "tp": 11,
+        "fp": 19,
+        "fn": 6,
+        "tn": 40
+      },
+      "middle_age (35-49)": {
+        "sample_size": 27,
+        "prevalence": 0.6667,
+        "selection_rate": 0.6667,
+        "sensitivity": {
+          "estimate": 0.8333,
+          "ci_lower": 0.6078,
+          "ci_upper": 0.9416
+        },
+        "specificity": {
+          "estimate": 0.6667,
+          "ci_lower": 0.3542,
+          "ci_upper": 0.8794
+        },
+        "roc_auc": 0.8889,
+        "tp": 15,
+        "fp": 3,
+        "fn": 3,
+        "tn": 6
+      },
+      "older_adult (50+)": {
+        "sample_size": 13,
+        "prevalence": 0.3846,
+        "selection_rate": 0.4615,
+        "sensitivity": {
+          "estimate": 0.6,
+          "ci_lower": 0.2307,
+          "ci_upper": 0.8824
+        },
+        "specificity": {
+          "estimate": 0.625,
+          "ci_lower": 0.3057,
+          "ci_upper": 0.8632
+        },
+        "roc_auc": 0.775,
+        "tp": 3,
+        "fp": 3,
+        "fn": 2,
+        "tn": 5
+      },
+      "disparity_summary": {
+        "max_tpr_gap (Equal Opportunity)": 0.2333,
+        "max_fpr_gap (Predictive Equality)": 0.053,
+        "demographic_parity_gap": 0.2719
+      }
+    },
+    "bmi_tier": {
+      "normal_overweight (<30)": {
+        "sample_size": 46,
+        "prevalence": 0.1304,
+        "selection_rate": 0.0435,
+        "sensitivity": {
+          "estimate": 0.0,
+          "ci_lower": 0.0,
+          "ci_upper": 0.3903
+        },
+        "specificity": {
+          "estimate": 0.95,
+          "ci_lower": 0.835,
+          "ci_upper": 0.9862
+        },
+        "roc_auc": 0.7917,
+        "tp": 0,
+        "fp": 2,
+        "fn": 6,
+        "tn": 38
+      },
+      "obese_class_1_2 (30-40)": {
+        "sample_size": 49,
+        "prevalence": 0.4694,
+        "selection_rate": 0.6531,
+        "sensitivity": {
+          "estimate": 0.7826,
+          "ci_lower": 0.581,
+          "ci_upper": 0.9034
+        },
+        "specificity": {
+          "estimate": 0.4615,
+          "ci_lower": 0.2876,
+          "ci_upper": 0.6454
+        },
+        "roc_auc": 0.7742,
+        "tp": 18,
+        "fp": 14,
+        "fn": 5,
+        "tn": 12
+      },
+      "severe_obese (40+)": {
+        "sample_size": 21,
+        "prevalence": 0.5238,
+        "selection_rate": 0.9524,
+        "sensitivity": {
+          "estimate": 1.0,
+          "ci_lower": 0.7412,
+          "ci_upper": 1.0
+        },
+        "specificity": {
+          "estimate": 0.1,
+          "ci_lower": 0.0179,
+          "ci_upper": 0.4041
+        },
+        "roc_auc": 0.5636,
+        "tp": 11,
+        "fp": 9,
+        "fn": 0,
+        "tn": 1
+      },
+      "disparity_summary": {
+        "max_tpr_gap (Equal Opportunity)": 1.0,
+        "max_fpr_gap (Predictive Equality)": 0.85,
+        "demographic_parity_gap": 0.9089
+      }
+    }
+  },
+  "experiment_10_adversarial_frankfurt_audit": {
+    "metrics_on_frankfurt": {
+      "threshold": 0.3,
+      "roc_auc": 0.9482,
+      "pr_auc": 0.8699,
+      "sensitivity": 0.9401,
+      "recall": 0.9401,
+      "specificity": 0.9179,
+      "precision": 0.8562,
+      "f1": 0.8962,
+      "balanced_accuracy": 0.929,
+      "brier_score": 0.0616,
+      "expected_calibration_error": 0.0464,
+      "maximum_calibration_error": 0.276,
+      "calibration_slope": 0.8563,
+      "calibration_intercept": -0.1347,
+      "confusion_matrix": [
+        [
+          1208,
+          108
+        ],
+        [
+          41,
+          643
+        ]
+      ]
+    },
+    "duplicate_rows_count": 1981,
+    "total_rows_frankfurt": 2000,
+    "duplication_rate_pct": 99.05,
+    "scientific_conclusion": "Evaluating on Frankfurt Hospital produces artificially inflated generalization metrics (ROC-AUC=0.9482) because 1981 of 2000 rows (99.05%) are duplicates of Pima Indians dataset. This confirms that 'Frankfurt Hospital' is a contaminated re-sampling artifact rather than an independent European clinical cohort."
+  },
+  "global_permutation_importance": {
+    "scoring": "roc_auc",
+    "n_repeats": 15,
+    "ranked_features": [
+      {
+        "feature": "Glucose",
+        "mean_importance": 0.13234,
+        "std_importance": 0.02586,
+        "ci_lower": 0.11925,
+        "ci_upper": 0.14542
+      },
+      {
+        "feature": "BMI",
+        "mean_importance": 0.0428,
+        "std_importance": 0.01824,
+        "ci_lower": 0.03356,
+        "ci_upper": 0.05203
+      },
+      {
+        "feature": "Insulin",
+        "mean_importance": 0.01372,
+        "std_importance": 0.01276,
+        "ci_lower": 0.00727,
+        "ci_upper": 0.02018
+      },
+      {
+        "feature": "Age",
+        "mean_importance": 0.0132,
+        "std_importance": 0.0136,
+        "ci_lower": 0.00632,
+        "ci_upper": 0.02008
+      },
+      {
+        "feature": "DiabetesPedigreeFunction",
+        "mean_importance": 0.00963,
+        "std_importance": 0.0092,
+        "ci_lower": 0.00497,
+        "ci_upper": 0.01428
+      },
+      {
+        "feature": "Pregnancies",
+        "mean_importance": 0.00859,
+        "std_importance": 0.0101,
+        "ci_lower": 0.00347,
+        "ci_upper": 0.0137
+      },
+      {
+        "feature": "BloodPressure",
+        "mean_importance": 0.00013,
+        "std_importance": 0.00475,
+        "ci_lower": -0.00227,
+        "ci_upper": 0.00253
+      },
+      {
+        "feature": "SkinThickness",
+        "mean_importance": -0.00098,
+        "std_importance": 0.00669,
+        "ci_lower": -0.00436,
+        "ci_upper": 0.00241
+      }
+    ]
+  },
+  "sample_local_explanation": {
+    "primary_risk_drivers": [
+      {
+        "feature": "Pregnancies",
+        "value": 6.0,
+        "clinical_normal_range": "0 - 3",
+        "cohort_median": 3,
+        "impact": "elevated_risk",
+        "relative_elevation_pct": 100.0
+      },
+      {
+        "feature": "DiabetesPedigreeFunction",
+        "value": 0.627,
+        "clinical_normal_range": "0.0 - 0.4",
+        "cohort_median": 0.4,
+        "impact": "elevated_risk",
+        "relative_elevation_pct": 56.7
+      },
+      {
+        "feature": "Glucose",
+        "value": 148.0,
+        "clinical_normal_range": "70.0 - 100.0",
+        "cohort_median": 118.0,
+        "impact": "elevated_risk",
+        "relative_elevation_pct": 48.0
+      },
+      {
+        "feature": "SkinThickness",
+        "value": 35.0,
+        "clinical_normal_range": "10.0 - 25.0",
+        "cohort_median": 28.0,
+        "impact": "elevated_risk",
+        "relative_elevation_pct": 40.0
+      }
+    ],
+    "protective_factors": [
+      {
+        "feature": "BloodPressure",
+        "value": 72.0,
+        "clinical_normal_range": "60.0 - 80.0",
+        "impact": "within_normal_limits"
+      },
+      {
+        "feature": "Insulin",
+        "value": 126.0,
+        "clinical_normal_range": "16.0 - 166.0",
+        "impact": "within_normal_limits"
+      }
+    ],
+    "explanation_summary": "Prediction is primarily driven by elevated Pregnancies, DiabetesPedigreeFunction."
+  }
+}
