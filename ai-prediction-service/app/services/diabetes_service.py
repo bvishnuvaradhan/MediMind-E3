@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 
 from app.models.diabetes.diabetes_preprocessing import DIABETES_FEATURES
+from app.models.diabetes.explainability import generate_local_explanation
 from app.core.database import Database
 from app.services.groq_service import GroqService
 from app.schemas.prediction_schemas import (
@@ -20,9 +21,14 @@ from app.schemas.prediction_schemas import (
 
 
 MODEL_VERSION = "0.1.0"
-THRESHOLD = 0.25  # Tuned on validation set (max recall under specificity floor 0.60)
+RESEARCH_MODEL_VERSION = "0.2.0-calibrated-ensemble"
+THRESHOLD = 0.25  # Baseline tuned threshold
+RESEARCH_THRESHOLD = 0.30  # Calibrated ensemble cost-sensitive threshold
 MODEL_PATH = (
     Path(__file__).parents[2] / "artifacts" / "diabetes" / "best_model.joblib"
+)
+RESEARCH_MODEL_PATH = (
+    Path(__file__).parents[2] / "artifacts" / "diabetes_research" / "best_calibrated_model.joblib"
 )
 DISCLAIMER = (
     "This is an AI-assisted diabetes risk estimate, not a medical diagnosis. "
@@ -33,20 +39,16 @@ DISCLAIMER = (
 class DiabetesInferenceService:
     """Lazy-loading diabetes risk inference service.
 
-    The Random Forest (or best selected) model is loaded once on first use
-    and cached for the lifetime of the process. Supports stub injection for
-    testing via reset_model().
+    The model is loaded once on first use and cached for the lifetime of the process.
+    Supports stub injection for testing via reset_model().
     """
 
     _model: Optional[Any] = None
+    _research_model: Optional[Any] = None
 
     @classmethod
     def load_model(cls, model_path: str | Path = MODEL_PATH) -> Any:
-        """Load the diabetes model artifact lazily.
-
-        Raises:
-            FileNotFoundError: If the model artifact does not exist at model_path.
-        """
+        """Load the diabetes model artifact lazily."""
         if cls._model is None:
             path = Path(model_path)
             if not path.exists():
@@ -57,37 +59,58 @@ class DiabetesInferenceService:
         return cls._model
 
     @classmethod
+    def load_research_model(cls, model_path: str | Path = RESEARCH_MODEL_PATH) -> Any:
+        """Load the calibrated multi-cohort ensemble research model."""
+        if cls._research_model is None:
+            path = Path(model_path)
+            if not path.exists():
+                # Fallback to base model if research artifact is absent
+                return cls.load_model()
+            cls._research_model = joblib.load(path)
+        return cls._research_model
+
+    @classmethod
     def reset_model(cls) -> None:
-        """Clear the cached model — used in tests to isolate inference state."""
+        """Clear the cached models — used in tests to isolate inference state."""
         cls._model = None
+        cls._research_model = None
 
     @classmethod
     def predict(
         cls,
         request: DiabetesRequest,
         model_path: str | Path = MODEL_PATH,
+        use_research: bool = False,
     ) -> Dict[str, Any]:
-        """Run inference for a single patient record.
-
-        Args:
-            request:    Validated DiabetesRequest with all 8 feature fields.
-            model_path: Override for testing against a non-default artifact path.
-
-        Returns:
-            Dictionary containing risk_probability, risk_category, threshold,
-            model metadata, feature_order, and disclaimer.
-
-        Raises:
-            FileNotFoundError: Model artifact is missing.
-            ValueError:        Non-finite feature values detected.
-        """
+        """Run inference for a single patient record."""
         values = [getattr(request, feature) for feature in DIABETES_FEATURES]
         numeric_values = np.asarray(values, dtype=float)
         if not np.isfinite(numeric_values).all():
             raise ValueError("All Diabetes features must be finite numbers.")
 
-        model = cls.load_model(model_path)
         feature_frame = pd.DataFrame([numeric_values], columns=DIABETES_FEATURES)
+
+        if use_research:
+            model = cls.load_research_model()
+            prob = float(model.predict_proba(feature_frame)[0, 1])
+            thresh = RESEARCH_THRESHOLD
+            v_name = RESEARCH_MODEL_VERSION
+            patient_dict = {f: getattr(request, f) for f in DIABETES_FEATURES}
+            medians = {"Glucose": 117.0, "BMI": 32.4, "BloodPressure": 72.0, "Age": 29.0}
+            local_expl = generate_local_explanation(model, patient_dict, DIABETES_FEATURES, medians)
+            return {
+                "risk_probability": prob,
+                "risk_category": "HIGH" if prob >= thresh else "LOW",
+                "threshold": thresh,
+                "model_name": "diabetes_risk_calibrated_ensemble",
+                "model_version": v_name,
+                "feature_order": DIABETES_FEATURES,
+                "primary_risk_drivers": local_expl["primary_risk_drivers"],
+                "explanation_summary": local_expl["explanation_summary"],
+                "disclaimer": DISCLAIMER,
+            }
+
+        model = cls.load_model(model_path)
         probability = float(model.predict_proba(feature_frame)[0, 1])
 
         return {
