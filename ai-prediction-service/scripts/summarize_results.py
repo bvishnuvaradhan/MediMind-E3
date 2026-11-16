@@ -1,6 +1,8 @@
 import json
+from pathlib import Path
 
-with open('artifacts/diabetes_research/master_research_report.json') as f:
+report_path = Path(__file__).resolve().parents[1] / "artifacts" / "diabetes_research" / "master_research_report.json"
+with open(report_path) as f:
     r = json.load(f)
 
 print("=== EXP 1: Baseline Seed Summary ===")
@@ -26,7 +28,10 @@ for name, t in r['experiment_5_cross_cohort_transfer'].items():
 
 print("\n=== EXP 6: Harmonized Joint Learning ===")
 for name, t in r['experiment_6_harmonized_joint_learning'].items():
-    print(f"  {name:30s} | ROC: {t['roc_auc']:.4f} | Sens: {t['sensitivity']:.4f} | Spec: {t['specificity']:.4f}")
+    if isinstance(t, dict) and 'roc_auc' in t:
+        print(f"  {name:30s} | ROC: {t['roc_auc']:.4f} | Sens: {t['sensitivity']:.4f} | Spec: {t['specificity']:.4f}")
+    elif isinstance(t, str):
+        print(f"  {name:30s} | {t}")
 
 print("\n=== EXP 7: NHANES Transfer ===")
 t7 = r['experiment_7_nhanes_transfer']

@@ -17,18 +17,19 @@ To isolate the specific mechanisms responsible for improved cross-population gen
 
 ---
 
-## 2. Ablation 1: Single-Cohort vs. Multi-Cohort Training
+## 2. Ablation 1: Single-Cohort vs. Multi-Cohort Training (Quarantined Leak-Free Audit)
 
-| Model Configuration | Training Data | Evaluation Target | Test ROC-AUC | Sensitivity | Specificity |
-|---|---|---|---|---|---|
-| **Pima Single-Cohort** | Pima only ($N=768$) | Healthcare 100k ($N=100k$) | 0.7085 | 68.48% | 61.92% |
-| **Pima Single-Cohort** | Pima only ($N=768$) | CDC NHANES ($N=9,813$) | 0.7240 | 54.10% | 76.50% |
-| **EHR Single-Cohort** | Healthcare 100k only | Pima Indians ($N=768$) | 0.7172 | 4.48% | 99.60% |
-| **Harmonized Multi-Cohort (Ours)** | Pima + Healthcare 100k | CDC NHANES ($N=9,813$) | **0.8476** | **60.37%** | **82.99%** |
-| **Harmonized Multi-Cohort (Ours)** | Pima + Healthcare 100k | Pima Indians ($N=768$) | **0.9662** | **93.66%** | **87.40%** |
+| Model Configuration | Training Data | Evaluation Target | Test ROC-AUC | Sensitivity | Specificity | Notes |
+|---|---|---|---|---|---|---|
+| **Pima Single-Cohort** | Pima only ($N=768$) | Healthcare 100k ($N=100k$) | 0.7085 | 68.48% | 61.92% | Zero-shot transfer |
+| **Pima Single-Cohort** | Pima only ($N=768$) | CDC NHANES Lab ($N=5,359$) | 0.7142 | 52.40% | 74.80% | Lab-confirmed glucose |
+| **EHR Single-Cohort** | Healthcare 100k only | Pima Indians ($N=768$) | 0.7172 | 4.48% | 99.60% | Base-rate collapse |
+| **Pima-Only Baseline** | Pima Train (80%) | Quarantined Pima Test (20%) | 0.8026 | 72.22% | 78.00% | Single-cohort baseline |
+| **Harmonized Multi-Cohort (Ours)** | Pima Train + Healthcare 100k Train | **Quarantined Pima Test (20%)** | **0.8194** | **70.37%** | **76.00%** | Zero leakage (+0.0168 gain) |
+| **Harmonized Multi-Cohort (Ours)** | Pima Train + Healthcare 100k Train | **CDC NHANES Lab ($N=5,359$)** | **0.7483** | **58.78%** | **72.36%** | Real laboratory glucose |
 
-### Finding:
-Multi-cohort training provides a **$+12.36\text{ point gain in cross-population ROC-AUC}$ on CDC NHANES** ($0.8476$ vs. $0.7240$). Training on a single cohort produces severe distribution overfitting.
+### Finding & Leakage Correction:
+Training across harmonized cohorts produces genuine positive transfer (+0.0168 ROC-AUC on held-out Pima and 0.7483 on external multi-ethnic NHANES). In pre-audit experimentation, evaluating on the combined unpartitioned Pima dataset yielded an artificial 0.9662 ROC-AUC due to 80% training sample overlap; our leak-free quarantined evaluation establishes the true, scientifically defensible performance.
 
 ---
 

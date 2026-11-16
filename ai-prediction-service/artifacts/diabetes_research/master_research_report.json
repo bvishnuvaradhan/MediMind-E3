@@ -886,80 +886,107 @@
   "experiment_6_harmonized_joint_learning": {
     "joint_heldout_evaluation": {
       "threshold": 0.3,
-      "roc_auc": 0.9061,
-      "pr_auc": 0.6748,
-      "sensitivity": 0.6,
-      "recall": 0.6,
-      "specificity": 0.9385,
-      "precision": 0.5532,
-      "f1": 0.5756,
-      "balanced_accuracy": 0.7692,
-      "brier_score": 0.0612,
-      "expected_calibration_error": 0.0303,
-      "maximum_calibration_error": 0.2116,
-      "calibration_slope": 0.6627,
-      "calibration_intercept": -0.4316,
+      "roc_auc": 0.92,
+      "pr_auc": 0.6935,
+      "sensitivity": 0.6077,
+      "recall": 0.6077,
+      "specificity": 0.9492,
+      "precision": 0.6031,
+      "f1": 0.6054,
+      "balanced_accuracy": 0.7785,
+      "brier_score": 0.0586,
+      "expected_calibration_error": 0.025,
+      "maximum_calibration_error": 0.1642,
+      "calibration_slope": 0.7333,
+      "calibration_intercept": -0.2899,
       "confusion_matrix": [
         [
-          961,
-          63
+          972,
+          52
         ],
         [
-          52,
-          78
+          51,
+          79
         ]
       ]
     },
     "joint_model_on_pure_pima": {
       "threshold": 0.3,
-      "roc_auc": 0.9662,
-      "pr_auc": 0.935,
-      "sensitivity": 0.9366,
-      "recall": 0.9366,
-      "specificity": 0.874,
-      "precision": 0.7994,
-      "f1": 0.8625,
-      "balanced_accuracy": 0.9053,
-      "brier_score": 0.0724,
-      "expected_calibration_error": 0.0753,
-      "maximum_calibration_error": 0.2338,
-      "calibration_slope": 1.6831,
-      "calibration_intercept": 0.442,
+      "roc_auc": 0.8194,
+      "pr_auc": 0.6623,
+      "sensitivity": 0.7037,
+      "recall": 0.7037,
+      "specificity": 0.76,
+      "precision": 0.6129,
+      "f1": 0.6552,
+      "balanced_accuracy": 0.7319,
+      "brier_score": 0.1791,
+      "expected_calibration_error": 0.1207,
+      "maximum_calibration_error": 0.3542,
+      "calibration_slope": 0.5158,
+      "calibration_intercept": 0.0924,
       "confusion_matrix": [
         [
-          437,
-          63
+          76,
+          24
         ],
         [
-          17,
-          251
+          16,
+          38
         ]
       ]
-    }
+    },
+    "pima_only_baseline_on_pure_pima": {
+      "threshold": 0.3,
+      "roc_auc": 0.8026,
+      "pr_auc": 0.6247,
+      "sensitivity": 0.7222,
+      "recall": 0.7222,
+      "specificity": 0.78,
+      "precision": 0.6393,
+      "f1": 0.6783,
+      "balanced_accuracy": 0.7511,
+      "brier_score": 0.1888,
+      "expected_calibration_error": 0.158,
+      "maximum_calibration_error": 0.6446,
+      "calibration_slope": 0.394,
+      "calibration_intercept": -0.0893,
+      "confusion_matrix": [
+        [
+          78,
+          22
+        ],
+        [
+          15,
+          39
+        ]
+      ]
+    },
+    "audit_note": "Evaluated strictly on independent held-out partitions with zero sample leakage."
   },
   "experiment_7_nhanes_transfer": {
     "threshold": 0.25,
-    "roc_auc": 0.8476,
-    "pr_auc": 0.5363,
-    "sensitivity": 0.6037,
-    "recall": 0.6037,
-    "specificity": 0.8299,
-    "precision": 0.4836,
-    "f1": 0.537,
-    "balanced_accuracy": 0.7168,
-    "brier_score": 0.131,
-    "expected_calibration_error": 0.0674,
-    "maximum_calibration_error": 0.2022,
-    "calibration_slope": 0.5579,
-    "calibration_intercept": 0.1125,
+    "roc_auc": 0.7483,
+    "pr_auc": 0.632,
+    "sensitivity": 0.5878,
+    "recall": 0.5878,
+    "specificity": 0.7236,
+    "precision": 0.6103,
+    "f1": 0.5988,
+    "balanced_accuracy": 0.6557,
+    "brier_score": 0.2511,
+    "expected_calibration_error": 0.1925,
+    "maximum_calibration_error": 0.3628,
+    "calibration_slope": 0.3708,
+    "calibration_intercept": 0.4781,
     "confusion_matrix": [
       [
-        6443,
-        1321
+        2233,
+        853
       ],
       [
-        812,
-        1237
+        937,
+        1336
       ]
     ]
   },
@@ -1301,326 +1328,326 @@
         {
           "threshold": 0.05,
           "weight": 0.0526,
-          "tp": 115,
-          "fp": 260,
-          "fn": 15,
-          "tn": 764,
-          "net_benefit_model": 0.0878,
+          "tp": 118,
+          "fp": 250,
+          "fn": 12,
+          "tn": 774,
+          "net_benefit_model": 0.0909,
           "net_benefit_treat_all": 0.0659,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 41.51
+          "interventions_avoided_per_100": 47.31
         },
         {
           "threshold": 0.075,
           "weight": 0.0811,
-          "tp": 108,
-          "fp": 209,
-          "fn": 22,
-          "tn": 815,
-          "net_benefit_model": 0.0789,
+          "tp": 115,
+          "fp": 206,
+          "fn": 15,
+          "tn": 818,
+          "net_benefit_model": 0.0852,
           "net_benefit_treat_all": 0.0407,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 47.11
+          "interventions_avoided_per_100": 54.85
         },
         {
           "threshold": 0.1,
           "weight": 0.1111,
-          "tp": 99,
-          "fp": 185,
-          "fn": 31,
-          "tn": 839,
-          "net_benefit_model": 0.068,
+          "tp": 106,
+          "fp": 177,
+          "fn": 24,
+          "tn": 847,
+          "net_benefit_model": 0.0748,
           "net_benefit_treat_all": 0.0141,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 48.53
+          "interventions_avoided_per_100": 54.68
         },
         {
           "threshold": 0.125,
           "weight": 0.1429,
-          "tp": 98,
-          "fp": 159,
-          "fn": 32,
-          "tn": 865,
-          "net_benefit_model": 0.0652,
+          "tp": 101,
+          "fp": 153,
+          "fn": 29,
+          "tn": 871,
+          "net_benefit_model": 0.0686,
           "net_benefit_treat_all": -0.0141,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 55.55
+          "interventions_avoided_per_100": 57.89
         },
         {
           "threshold": 0.15,
           "weight": 0.1765,
-          "tp": 93,
-          "fp": 131,
-          "fn": 37,
-          "tn": 893,
-          "net_benefit_model": 0.0606,
+          "tp": 94,
+          "fp": 126,
+          "fn": 36,
+          "tn": 898,
+          "net_benefit_model": 0.0622,
           "net_benefit_treat_all": -0.0439,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 59.21
+          "interventions_avoided_per_100": 60.14
         },
         {
           "threshold": 0.175,
           "weight": 0.2121,
           "tp": 90,
-          "fp": 110,
+          "fp": 107,
           "fn": 40,
-          "tn": 914,
-          "net_benefit_model": 0.0578,
+          "tn": 917,
+          "net_benefit_model": 0.0583,
           "net_benefit_treat_all": -0.0756,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 62.86
+          "interventions_avoided_per_100": 63.12
         },
         {
           "threshold": 0.2,
           "weight": 0.25,
           "tp": 88,
-          "fp": 99,
+          "fp": 95,
           "fn": 42,
-          "tn": 925,
-          "net_benefit_model": 0.0548,
+          "tn": 929,
+          "net_benefit_model": 0.0557,
           "net_benefit_treat_all": -0.1092,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 65.6
+          "interventions_avoided_per_100": 65.94
         },
         {
           "threshold": 0.225,
           "weight": 0.2903,
-          "tp": 86,
-          "fp": 91,
-          "fn": 44,
-          "tn": 933,
-          "net_benefit_model": 0.0516,
+          "tp": 85,
+          "fp": 83,
+          "fn": 45,
+          "tn": 941,
+          "net_benefit_model": 0.0528,
           "net_benefit_treat_all": -0.145,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 67.72
+          "interventions_avoided_per_100": 68.11
         },
         {
           "threshold": 0.25,
           "weight": 0.3333,
           "tp": 82,
-          "fp": 83,
+          "fp": 74,
           "fn": 48,
-          "tn": 941,
-          "net_benefit_model": 0.0471,
+          "tn": 950,
+          "net_benefit_model": 0.0497,
           "net_benefit_treat_all": -0.1831,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 69.06
+          "interventions_avoided_per_100": 69.84
         },
         {
           "threshold": 0.275,
           "weight": 0.3793,
           "tp": 80,
-          "fp": 72,
+          "fp": 59,
           "fn": 50,
-          "tn": 952,
-          "net_benefit_model": 0.0457,
+          "tn": 965,
+          "net_benefit_model": 0.0499,
           "net_benefit_treat_all": -0.2239,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 71.07
+          "interventions_avoided_per_100": 72.2
         },
         {
           "threshold": 0.3,
           "weight": 0.4286,
-          "tp": 78,
-          "fp": 63,
-          "fn": 52,
-          "tn": 961,
-          "net_benefit_model": 0.0442,
+          "tp": 79,
+          "fp": 52,
+          "fn": 51,
+          "tn": 972,
+          "net_benefit_model": 0.0491,
           "net_benefit_treat_all": -0.2676,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 72.76
+          "interventions_avoided_per_100": 73.92
         },
         {
           "threshold": 0.325,
           "weight": 0.4815,
-          "tp": 75,
-          "fp": 53,
-          "fn": 55,
-          "tn": 971,
-          "net_benefit_model": 0.0429,
+          "tp": 76,
+          "fp": 46,
+          "fn": 54,
+          "tn": 978,
+          "net_benefit_model": 0.0467,
           "net_benefit_treat_all": -0.3146,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 74.24
+          "interventions_avoided_per_100": 75.03
         },
         {
           "threshold": 0.35,
           "weight": 0.5385,
-          "tp": 72,
-          "fp": 44,
-          "fn": 58,
-          "tn": 980,
-          "net_benefit_model": 0.0419,
+          "tp": 74,
+          "fp": 38,
+          "fn": 56,
+          "tn": 986,
+          "net_benefit_model": 0.0464,
           "net_benefit_treat_all": -0.3652,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 75.59
+          "interventions_avoided_per_100": 76.43
         },
         {
           "threshold": 0.375,
           "weight": 0.6,
           "tp": 71,
-          "fp": 36,
+          "fp": 28,
           "fn": 59,
-          "tn": 988,
-          "net_benefit_model": 0.0428,
+          "tn": 996,
+          "net_benefit_model": 0.047,
           "net_benefit_treat_all": -0.4198,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 77.09
+          "interventions_avoided_per_100": 77.79
         },
         {
           "threshold": 0.4,
           "weight": 0.6667,
           "tp": 68,
-          "fp": 33,
+          "fp": 25,
           "fn": 62,
-          "tn": 991,
-          "net_benefit_model": 0.0399,
+          "tn": 999,
+          "net_benefit_model": 0.0445,
           "net_benefit_treat_all": -0.4789,
-          "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 77.82
-        },
-        {
-          "threshold": 0.425,
-          "weight": 0.7391,
-          "tp": 65,
-          "fp": 30,
-          "fn": 65,
-          "tn": 994,
-          "net_benefit_model": 0.0371,
-          "net_benefit_treat_all": -0.5432,
           "net_benefit_treat_none": 0.0,
           "interventions_avoided_per_100": 78.51
         },
         {
+          "threshold": 0.425,
+          "weight": 0.7391,
+          "tp": 67,
+          "fp": 23,
+          "fn": 63,
+          "tn": 1001,
+          "net_benefit_model": 0.0433,
+          "net_benefit_treat_all": -0.5432,
+          "net_benefit_treat_none": 0.0,
+          "interventions_avoided_per_100": 79.36
+        },
+        {
           "threshold": 0.45,
           "weight": 0.8182,
-          "tp": 64,
-          "fp": 28,
-          "fn": 66,
-          "tn": 996,
-          "net_benefit_model": 0.0356,
+          "tp": 67,
+          "fp": 20,
+          "fn": 63,
+          "tn": 1004,
+          "net_benefit_model": 0.0439,
           "net_benefit_treat_all": -0.6134,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 79.32
+          "interventions_avoided_per_100": 80.33
         },
         {
           "threshold": 0.475,
           "weight": 0.9048,
-          "tp": 64,
-          "fp": 27,
-          "fn": 66,
-          "tn": 997,
-          "net_benefit_model": 0.0343,
+          "tp": 66,
+          "fp": 20,
+          "fn": 64,
+          "tn": 1004,
+          "net_benefit_model": 0.0415,
           "net_benefit_treat_all": -0.6902,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 80.07
+          "interventions_avoided_per_100": 80.87
         },
         {
           "threshold": 0.5,
           "weight": 1.0,
-          "tp": 61,
-          "fp": 23,
-          "fn": 69,
-          "tn": 1001,
-          "net_benefit_model": 0.0329,
+          "tp": 63,
+          "fp": 17,
+          "fn": 67,
+          "tn": 1007,
+          "net_benefit_model": 0.0399,
           "net_benefit_treat_all": -0.7747,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 80.76
+          "interventions_avoided_per_100": 81.46
         },
         {
           "threshold": 0.525,
           "weight": 1.1053,
-          "tp": 61,
-          "fp": 21,
-          "fn": 69,
-          "tn": 1003,
-          "net_benefit_model": 0.0327,
+          "tp": 59,
+          "fp": 17,
+          "fn": 71,
+          "tn": 1007,
+          "net_benefit_model": 0.0348,
           "net_benefit_treat_all": -0.8681,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 81.51
+          "interventions_avoided_per_100": 81.7
         },
         {
           "threshold": 0.55,
           "weight": 1.2222,
           "tp": 58,
-          "fp": 18,
+          "fp": 17,
           "fn": 72,
-          "tn": 1006,
-          "net_benefit_model": 0.0312,
+          "tn": 1007,
+          "net_benefit_model": 0.0323,
           "net_benefit_treat_all": -0.9719,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 82.07
+          "interventions_avoided_per_100": 82.16
         },
         {
           "threshold": 0.575,
           "weight": 1.3529,
-          "tp": 58,
-          "fp": 16,
-          "fn": 72,
-          "tn": 1008,
-          "net_benefit_model": 0.0315,
+          "tp": 57,
+          "fp": 14,
+          "fn": 73,
+          "tn": 1010,
+          "net_benefit_model": 0.033,
           "net_benefit_treat_all": -1.0879,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 82.74
+          "interventions_avoided_per_100": 82.85
         },
         {
           "threshold": 0.6,
           "weight": 1.5,
           "tp": 57,
-          "fp": 15,
+          "fp": 14,
           "fn": 73,
-          "tn": 1009,
-          "net_benefit_model": 0.0299,
+          "tn": 1010,
+          "net_benefit_model": 0.0312,
           "net_benefit_treat_all": -1.2184,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 83.22
+          "interventions_avoided_per_100": 83.3
         },
         {
           "threshold": 0.625,
           "weight": 1.6667,
-          "tp": 54,
-          "fp": 12,
-          "fn": 76,
-          "tn": 1012,
-          "net_benefit_model": 0.0295,
+          "tp": 56,
+          "fp": 10,
+          "fn": 74,
+          "tn": 1014,
+          "net_benefit_model": 0.0341,
           "net_benefit_treat_all": -1.3663,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 83.74
+          "interventions_avoided_per_100": 84.02
         },
         {
           "threshold": 0.65,
           "weight": 1.8571,
-          "tp": 51,
-          "fp": 10,
-          "fn": 79,
-          "tn": 1014,
-          "net_benefit_model": 0.0281,
+          "tp": 53,
+          "fp": 8,
+          "fn": 77,
+          "tn": 1016,
+          "net_benefit_model": 0.0331,
           "net_benefit_treat_all": -1.5353,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 84.18
+          "interventions_avoided_per_100": 84.45
         },
         {
           "threshold": 0.675,
           "weight": 2.0769,
-          "tp": 49,
+          "tp": 52,
           "fp": 8,
-          "fn": 81,
+          "fn": 78,
           "tn": 1016,
-          "net_benefit_model": 0.0281,
+          "net_benefit_model": 0.0307,
           "net_benefit_treat_all": -1.7303,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 84.66
+          "interventions_avoided_per_100": 84.79
         },
         {
           "threshold": 0.7,
           "weight": 2.3333,
-          "tp": 48,
-          "fp": 5,
-          "fn": 82,
-          "tn": 1019,
-          "net_benefit_model": 0.0315,
+          "tp": 50,
+          "fp": 8,
+          "fn": 80,
+          "tn": 1016,
+          "net_benefit_model": 0.0272,
           "net_benefit_treat_all": -1.9578,
           "net_benefit_treat_none": 0.0,
-          "interventions_avoided_per_100": 85.26
+          "interventions_avoided_per_100": 85.07
         }
       ]
     }

@@ -56,6 +56,14 @@ DATASET_SOURCES = {
         "license": "CDC Public Domain (Data Access & Use Agreement)",
         "type": "epidemiological_physical_exam",
     },
+    "nhanes_lab": {
+        "local_path": DATA_DIR / "nhanes_lab_med.csv",
+        "download_url": "https://raw.githubusercontent.com/ChintanaL/Diabetes-Prediction-using-NHANES-dataset/master/lab_med_new.csv",
+        "description": "CDC NHANES Laboratory Measurement Cohort (Fasting Plasma Glucose & HbA1c)",
+        "institution": "National Center for Health Statistics (NCHS), CDC, USA",
+        "license": "CDC Public Domain (Data Access & Use Agreement)",
+        "type": "epidemiological_laboratory",
+    },
     "healthcare_100k": {
         "local_path": DATA_DIR / "healthcare_100k_diabetes.csv",
         "download_url": "https://raw.githubusercontent.com/NANITH777/Diabetes-Prediction-ID3_Alg-ML-Models/main/diabetes_prediction_dataset.csv",

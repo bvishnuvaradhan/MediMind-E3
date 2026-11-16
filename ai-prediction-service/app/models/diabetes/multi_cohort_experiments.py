@@ -302,37 +302,61 @@ def run_experiment_suite() -> Dict[str, Any]:
     }
 
     # ─────────────────────────────────────────────────────────────────────────
-    # EXP 6: HARMONIZED MULTI-COHORT LEARNING (JOINT TRAINING)
+    # EXP 6: HARMONIZED MULTI-COHORT LEARNING (JOINT TRAINING - STRICTLY QUARANTINED)
     # ─────────────────────────────────────────────────────────────────────────
-    logger.info("Executing Exp 6: Harmonized Multi-Cohort Joint Learning...")
-    # Combine balanced sample of Healthcare 100k with Pima to prevent volume drowning
+    logger.info("Executing Exp 6: Harmonized Multi-Cohort Joint Learning (Leak-Free)...")
+    # Independent strictly quarantined partitioning to eliminate train/test leakage
+    p_tr_idx, p_te_idx = train_test_split(pima_df.index, test_size=0.20, stratify=pima_y, random_state=42)
     h_sample = health100k_core.sample(n=5000, random_state=42)
     h_sample_y = health_y[h_sample.index]
+    h_tr_idx, h_te_idx = train_test_split(h_sample.index, test_size=0.20, stratify=h_sample_y, random_state=42)
 
-    combined_x = pd.concat([pima_core, h_sample], axis=0).reset_index(drop=True)
-    combined_y = np.concatenate([pima_y, h_sample_y])
+    c_xtr = pd.concat([pima_core.loc[p_tr_idx], health100k_core.loc[h_tr_idx]], axis=0).reset_index(drop=True)
+    c_ytr = np.concatenate([pima_y[p_tr_idx], health_y[h_tr_idx]])
 
-    c_xtr, c_xte, c_ytr, c_yte = train_test_split(combined_x, combined_y, test_size=0.20, stratify=combined_y, random_state=42)
+    c_xte = pd.concat([pima_core.loc[p_te_idx], health100k_core.loc[h_te_idx]], axis=0).reset_index(drop=True)
+    c_yte = np.concatenate([pima_y[p_te_idx], health_y[h_te_idx]])
+
     clf_joint = HistGradientBoostingClassifier(random_state=42).fit(c_xtr, c_ytr)
     joint_te_probs = clf_joint.predict_proba(c_xte)[:, 1]
-    joint_pima_probs = clf_joint.predict_proba(pima_core)[:, 1]
+    # Pure held-out Pima evaluation (strictly quarantined, 0 sample overlap)
+    joint_pima_te_probs = clf_joint.predict_proba(pima_core.loc[p_te_idx])[:, 1]
+
+    # Baseline Pima-only model on the exact same held-out split for scientific comparison
+    clf_pima_base = HistGradientBoostingClassifier(random_state=42).fit(pima_core.loc[p_tr_idx], pima_y[p_tr_idx])
+    pima_base_te_probs = clf_pima_base.predict_proba(pima_core.loc[p_te_idx])[:, 1]
 
     master_results["experiment_6_harmonized_joint_learning"] = {
         "joint_heldout_evaluation": compute_comprehensive_metrics(c_yte, joint_te_probs, threshold=0.30),
-        "joint_model_on_pure_pima": compute_comprehensive_metrics(pima_y, joint_pima_probs, threshold=0.30),
+        "joint_model_on_pure_pima": compute_comprehensive_metrics(pima_y[p_te_idx], joint_pima_te_probs, threshold=0.30),
+        "pima_only_baseline_on_pure_pima": compute_comprehensive_metrics(pima_y[p_te_idx], pima_base_te_probs, threshold=0.30),
+        "audit_note": "Evaluated strictly on independent held-out partitions with zero sample leakage.",
     }
 
     # ─────────────────────────────────────────────────────────────────────────
-    # EXP 7: EPIDEMIOLOGICAL TRANSFER & VALIDATION ON CDC NHANES
+    # EXP 7: EPIDEMIOLOGICAL TRANSFER & VALIDATION ON CDC NHANES (REAL LAB DATA)
     # ─────────────────────────────────────────────────────────────────────────
-    logger.info("Executing Exp 7: Epidemiological Transfer on CDC NHANES...")
-    nhanes_core = harmonize_nhanes_to_core(nhanes_df)
-    nhanes_y = nhanes_df["is_diabetic"].to_numpy()
+    logger.info("Executing Exp 7: Epidemiological Transfer on CDC NHANES (Laboratory-Enriched)...")
+    nhanes_lab_file = DATA_DIR / "nhanes_lab_med.csv"
+    if nhanes_lab_file.exists():
+        lab_df = pd.read_csv(nhanes_lab_file)
+        nhanes_merged = pd.merge(
+            nhanes_df,
+            lab_df[["SEQN", "LBXGLT", "LBXGH", "LBXIN"]],
+            on="SEQN",
+            how="inner",
+        )
+        logger.info("Merged NHANES examination with laboratory cohort: %d records with true lab glucose", len(nhanes_merged))
+    else:
+        nhanes_merged = nhanes_df
 
-    # Impute missing glucose and any missing examination features in NHANES
-    nhanes_core["Glucose"] = nhanes_core["Glucose"].fillna(float(pima_core["Glucose"].median()))
+    nhanes_core = harmonize_nhanes_to_core(nhanes_merged)
+    nhanes_y = nhanes_merged["is_diabetic"].to_numpy()
+
+    # Fill any residual missing examination features with median
     for c in nhanes_core.columns:
-        nhanes_core[c] = nhanes_core[c].fillna(float(nhanes_core[c].median()))
+        if nhanes_core[c].isna().any():
+            nhanes_core[c] = nhanes_core[c].fillna(float(nhanes_core[c].median()))
 
     # Evaluate Model trained on Harmonized Multi-Cohort on NHANES
     nhanes_probs = clf_joint.predict_proba(nhanes_core)[:, 1]

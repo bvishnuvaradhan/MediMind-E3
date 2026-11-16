@@ -155,14 +155,35 @@ def harmonize_healthcare100k_to_core(df: pd.DataFrame) -> pd.DataFrame:
 def harmonize_nhanes_to_core(df: pd.DataFrame) -> pd.DataFrame:
     """Map CDC NHANES Examination dataset to Harmonized Core Clinical representation."""
     core = pd.DataFrame(index=df.index)
-    core["Age"] = df["AgeYears"].astype(float)
+    core["Age"] = df["AgeYears"].astype(float) if "AgeYears" in df.columns else df["Age"].astype(float)
     core["BMI"] = df["BMI"].fillna(df["BMI"].median()).astype(float)
     # NHANES examination has BP.Dystolic and BP.Systolic
-    bp = df["BP.Dystolic"].replace(0, np.nan).fillna(df["BP.Dystolic"].median()).astype(float)
-    core["BloodPressure"] = bp
-    core["Hypertension"] = ((bp >= 80.0) | (df["BP.Systolic"] >= 130.0)).astype(float)
-    # NHANES examination does not have fasting glucose on all subjects in this sheet; proxy from age/BMI/BP or default
-    core["Glucose"] = np.nan  # will be imputed
-    # Gender: 1=Male, 2=Female
-    core["IsFemale"] = (df["Gender"] == 2).astype(float)
+    if "BP.Dystolic" in df.columns:
+        bp = df["BP.Dystolic"].replace(0, np.nan).fillna(df["BP.Dystolic"].median()).astype(float)
+        core["BloodPressure"] = bp
+        sys_bp = df["BP.Systolic"].replace(0, np.nan).fillna(120.0).astype(float) if "BP.Systolic" in df.columns else 120.0
+        core["Hypertension"] = ((bp >= 80.0) | (sys_bp >= 130.0)).astype(float)
+    else:
+        core["BloodPressure"] = 72.0
+        core["Hypertension"] = 0.0
+
+    # Glucose: use laboratory LBXGLT (oral glucose tolerance / fasting plasma glucose) if present
+    if "LBXGLT" in df.columns:
+        core["Glucose"] = df["LBXGLT"].astype(float)
+    elif "Glucose" in df.columns:
+        core["Glucose"] = df["Glucose"].astype(float)
+    else:
+        core["Glucose"] = np.nan
+
+    # Gender handling: string ('Female'/'Male') or NHANES numerical code (1=Male, 2=Female)
+    if "Gender" in df.columns:
+        if df["Gender"].dtype == object or df["Gender"].astype(str).str.isalpha().any():
+            core["IsFemale"] = (df["Gender"].astype(str).str.lower() == "female").astype(float)
+        else:
+            core["IsFemale"] = (df["Gender"].astype(float) == 2.0).astype(float)
+    elif "gender" in df.columns:
+        core["IsFemale"] = (df["gender"].astype(str).str.lower() == "female").astype(float)
+    else:
+        core["IsFemale"] = 0.5
+
     return core[HARMONIZED_CORE_FEATURES]

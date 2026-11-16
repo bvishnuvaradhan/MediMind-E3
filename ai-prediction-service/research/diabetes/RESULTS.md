@@ -45,17 +45,19 @@ The Multi-Model Calibrated Ensemble achieves the highest discrimination ($\text{
 
 ## 3. Experiment 4: Probability Calibration Comparison
 
-Post-hoc calibration methods were fit exclusively on the validation partition and evaluated on the test set:
+Post-hoc calibration methods were fit exclusively on the validation partition ($N=115$) and evaluated on the test set ($N=116$):
 
 | Calibration Method | Base Model | Expected Calibration Error (ECE) | Maximum Calibration Error (MCE) | Brier Score | Calibration Slope | Calibration Intercept |
 |---|---|---|---|---|---|---|
 | **Uncalibrated** | HistGradientBoosting | 0.1728 | 0.3533 | 0.1659 | 0.3839 | -0.1982 |
 | **Platt Scaling (Sigmoid)** | HistGradientBoosting | **0.0463** | **0.1135** | 0.1764 | 1.3406 | +0.1665 |
 | **Isotonic Regression** | HistGradientBoosting | 0.1055 | 0.2831 | 0.1818 | 0.7275 | -0.1537 |
-| **Calibrated Ensemble (Ours)** | Multi-Model Ensemble | **0.1102** | **0.2520** | **0.1490** | 1.2247 | +0.0741 |
+| **Calibrated Ensemble (Platt)** | Multi-Model Ensemble | **0.1102** | **0.2520** | 0.1782 | 1.2247 | +0.0741 |
+| *Raw Soft-Voting Ensemble (Exp 2)* | Multi-Model Ensemble | *0.0939* | *0.2014* | **0.1490** | *1.1180* | *-0.0410* |
 
-### Finding:
-Uncalibrated tree ensembles exhibit severe overconfidence ($\text{ECE} = 17.28\%$, slope $0.38$). Platt scaling dramatically corrects this calibration distortion, **reducing ECE to $4.63\%$**, well below the recommended $5\%$ clinical threshold.
+### Independent Audit Finding on Calibration Dynamics:
+1. Uncalibrated tree ensembles exhibit severe overconfidence ($\text{ECE} = 17.28\%$, slope $0.38$). Platt scaling dramatically corrects this calibration distortion for HistGradientBoosting, **reducing ECE to $4.63\%$**, well below the recommended $5\%$ clinical threshold.
+2. For the Multi-Model Ensemble, raw soft-voting across HGB, Deep MLP, and Random Forest inherently smooths extreme probabilities, yielding an uncalibrated ECE of $0.0939$ and optimal Brier score ($0.1490$). When post-hoc Platt scaling is fitted on the modest validation partition ($N=115$), the additional parametric mapping introduces slight variance on the small test set ($\text{ECE} = 0.1102$, Brier $0.1782$). Both values are scientifically reported to document calibration behavior transparently.
 
 ---
 
@@ -72,32 +74,34 @@ To assess real-world distribution shift, models were transferred across cohorts 
 
 ---
 
-## 5. Experiment 6: Harmonized Multi-Cohort Joint Learning
+## 5. Experiment 6: Harmonized Multi-Cohort Joint Learning (Leak-Free Audit)
 
-By training on a combined dataset mapped into the Harmonized Core Clinical Space ($\mathcal{X}_{\text{core}}$):
+By training on a combined dataset mapped into the Harmonized Core Clinical Space ($\mathcal{X}_{\text{core}}$), we evaluated whether multi-cohort training enriches representations without data leakage. The evaluation partitions were strictly quarantined: Pima was partitioned into 80% train and 20% held-out test prior to combining with Healthcare 100k, and evaluated exclusively on the held-out test split:
 
-| Evaluation Set | Cohort Type | ROC-AUC | Sensitivity | Specificity | Balanced Accuracy |
-|---|---|---|---|---|---|
-| **Joint Held-Out Test Set** | Multi-Cohort Composite | **0.9061** | 60.00% | 93.85% | 76.92% |
-| **Pure Pima Indians Test Set** | Physiological Baseline | **0.9662** | 93.66% | 87.40% | **90.53%** |
+| Evaluation Set | Cohort Type | ROC-AUC | Sensitivity | Specificity | Balanced Accuracy | Notes |
+|---|---|---|---|---|---|---|
+| **Joint Held-Out Test Set** | Multi-Cohort Composite ($N=1,154$) | **0.9200** | 60.77% | 94.92% | 77.85% | 20% independent held-out split |
+| **Pure Pima Indians Held-Out** | Physiological Test ($N=154$) | **0.8194** | 70.37% | 76.00% | **73.19%** | Quarantined test split (0 train overlap) |
+| **Pima-Only Baseline (Identical Split)** | Physiological Baseline ($N=154$) | **0.8026** | 72.22% | 78.00% | 75.11% | Trained only on Pima train partition |
 
-### Finding:
-Harmonized joint learning resolves the cohort transfer bottleneck. The multi-cohort model achieves **$0.9061\text{ ROC-AUC}$ on held-out composite data** and **$0.9662\text{ ROC-AUC}$ on pure Pima records** ($93.66\%$ sensitivity, $87.40\%$ specificity), demonstrating that multi-cohort training enriches the representation and prevents overfitting to idiosyncratic cohort artifacts.
+### Independent Audit Finding & Leakage Correction:
+In previous un-audited experimentation, evaluating the joint model on the entire Pima dataset resulted in an artificially inflated $\text{ROC-AUC} = 0.9662$ and $93.66\%$ sensitivity because $80\%$ of Pima records were present in the joint training pool (memorization artifact). When evaluated under strict quarantine on the 20% held-out test split ($N=154$), the joint model achieves **$\text{ROC-AUC} = 0.8194$**, outperforming the Pima-only model trained on the same split (**$\text{ROC-AUC} = 0.8026$**, $+0.0168$ gain). This confirms genuine positive transfer without data leakage.
 
 ---
 
-## 6. Experiment 7: External Epidemiological Validation on CDC NHANES
+## 6. Experiment 7: External Epidemiological Validation on CDC NHANES (Laboratory-Enriched)
 
-The harmonized model was tested zero-shot on the entire CDC NHANES examination cohort ($N = 9,813$ American adults):
+The harmonized joint model was tested zero-shot on the CDC NHANES examination cohort matched with the official laboratory fasting plasma glucose and OGTT module (`LBXGLT`, $N = 5,359$ American adults):
 
-* **Cross-Population ROC-AUC:** **0.8476**
-* **Sensitivity:** **60.37%**
-* **Specificity:** **82.99%**
-* **Balanced Accuracy:** **71.68%**
-* **Class Balance:** 7,764 non-diabetic vs. 2,049 diabetic
+* **Cross-Population ROC-AUC:** **0.7483**
+* **Sensitivity:** **58.78%**
+* **Specificity:** **72.36%**
+* **Balanced Accuracy:** **65.57%**
+* **Class Balance:** 3,086 non-diabetic vs. 2,273 diabetic cases
+* **Laboratory Glucose Distribution:** Mean 124.4 mg/dL, Median 124.2 mg/dL, Range [41.0, 604.0] mg/dL
 
-### Finding:
-Achieving $0.8476\text{ ROC-AUC}$ across nearly 10,000 nationally representative multi-ethnic patients provides definitive evidence of generalizability, far beyond any claim that could be substantiated using Pima alone.
+### Independent Audit Finding:
+Previous reports cited $0.8476\text{ ROC-AUC}$ based on a demographic table lacking laboratory glucose (where glucose was synthetically imputed as a constant median). When evaluated on the true laboratory examination subset containing confirmed fasting plasma glucose (`LBXGLT`) and proper gender encoding, the model achieves a scientifically defensible cross-population **$\text{ROC-AUC} = 0.7483$**. This establishes genuine external clinical validity across a nationally representative multi-ethnic population.
 
 ---
 

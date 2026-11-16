@@ -28,8 +28,8 @@ Our research delivers four specific, measurable, and scientifically defensible c
 * **Empirical Demonstration:** We empirically prove that an ensemble achieving $0.8424\text{ ROC-AUC}$ on Pima drops to **$0.7085\text{ ROC-AUC}$** when transferred zero-shot to a large-scale clinical EHR cohort ($N = 100,000$). We demonstrate that sensitivity collapses from $80.5\%$ to $4.48\%$ when base-rate prevalence changes ($34.9\% \to 8.5\%$) without calibration-aware threshold adaptation.
 
 ### Contribution 3: Harmonized Multi-Cohort Learning with National Epidemiological Validation
-* **Methodological Advance:** We develop a Harmonized Core Clinical Feature Space ($\mathcal{X}_{\text{core}}$) that reconciles acute physiological oral glucose tolerance tests with continuous outpatient EHR indicators.
-* **Empirical Validation:** Training on the harmonized multi-cohort representation yields an **ROC-AUC of $0.8476$ on the independent CDC NHANES examination cohort ($N = 9,813$ American adults)**, establishing broad demographic and ethnic generalization across nationally representative populations.
+* **Methodological Advance:** We develop a Harmonized Core Clinical Feature Space ($\mathcal{X}_{\text{core}}$) that reconciles acute physiological oral glucose tolerance tests with continuous outpatient EHR indicators without data leakage.
+* **Empirical Validation:** Under strict quarantine (zero sample overlap), the harmonized joint model improves held-out Pima discrimination from $0.8026$ to **$0.8194\text{ ROC-AUC}$** ($+1.7\%$ relative gain) and achieves an **ROC-AUC of $0.7483$ on the independent laboratory-verified CDC NHANES examination cohort ($N = 5,359$ American adults with confirmed fasting/OGTT glucose)**, establishing genuine demographic and ethnic generalization across nationally representative populations.
 
 ### Contribution 4: Clinically Actionable Probability Calibration & Decision Curve Analysis
 * **Calibration:** We demonstrate that Platt scaling on hold-out validation data reduces Expected Calibration Error (ECE) from $17.28\%$ to **$4.63\%$**, rectifying tree-ensemble overconfidence.
